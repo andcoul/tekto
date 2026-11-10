@@ -43,6 +43,13 @@ class PlanDao extends DatabaseAccessor<AppDatabase> with _$PlanDaoMixin {
   Future<void> upsertPlanExercises(List<PlanExercisesCompanion> rows) =>
       batch((b) => b.insertAllOnConflictUpdate(planExercises, rows));
 
+  /// Mirrors the server's week boundary / adaptation state (adapt-plan, FR-026).
+  Future<void> updateWeekState(String planId, {required int currentWeek, required int lastAdaptedWeek}) =>
+      (update(plans)..where((p) => p.id.equals(planId))).write(PlansCompanion(
+        currentWeek: Value(currentWeek),
+        lastAdaptedWeek: Value(lastAdaptedWeek),
+      ));
+
   Future<void> archivePlan(String planId) => (update(plans)
         ..where((p) => p.id.equals(planId)))
       .write(PlansCompanion(status: const Value('archived')));

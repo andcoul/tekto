@@ -35,7 +35,7 @@ class _CoachScreenState extends ConsumerState<CoachScreen> {
   @override
   Widget build(BuildContext context) {
     final coachState = ref.watch(coachControllerProvider);
-    final entitlement = ref.watch(entitlementProvider).valueOrNull;
+    final entitlement = ref.watch(entitlementProvider).value;
     final isPro = entitlement?.isPro ?? false;
 
     return DraggableScrollableSheet(

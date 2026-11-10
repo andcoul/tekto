@@ -9,7 +9,7 @@ const _tokenKey = 'supabase_access_token';
 
 /// Provides the current auth state as a stream.
 @riverpod
-Stream<User?> authState(AuthStateRef ref) {
+Stream<User?> authState(Ref ref) {
   return Supabase.instance.client.auth.onAuthStateChange.map((e) => e.session?.user);
 }
 
@@ -58,7 +58,7 @@ class AuthService {
 }
 
 @riverpod
-AuthService authService(AuthServiceRef ref) {
+AuthService authService(Ref ref) {
   final client = Supabase.instance.client;
   const storage = FlutterSecureStorage(
     aOptions: AndroidOptions(encryptedSharedPreferences: true),

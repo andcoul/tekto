@@ -1,112 +1,141 @@
-import { getDb } from './db.ts';
-import type { Session, PlanExercise } from './types.ts';
+// Plan rule-checker (T015) — one validator for AI and template plans (FR-002a, Constitution III/IV).
+// Pure: takes the exercise library as input so it can be unit-tested without a database.
+import { isAllowed } from './exercise-substitution.ts';
+import {
+  type DraftPlan,
+  estimateSessionMinutes,
+  type Library,
+  type LibraryExercise,
+  libraryFrom,
+  type PlanProfile,
+  type PlanSource,
+  type ValidationError,
+  type ValidationResult,
+} from './plan-draft.ts';
+import type { TrainingLevel } from './types.ts';
 
-export interface ValidationResult {
-  valid: boolean;
-  errors: string[];
-}
+export type { ValidationError, ValidationResult };
 
-export interface PlanPayload {
-  sessions: Session[];
-  plan_exercises: PlanExercise[];
-  user_days_per_week: number;
-  user_session_length_min: number;
-}
-
-const MAX_VOLUME_PER_MUSCLE_SETS = 25; // weekly sets per muscle group
-const MIN_REST_DAYS_PER_WEEK = 1;
+/** Weekly working sets per primary muscle (contracts/ai-services.md §1 rule 2). */
+export const VOLUME_BOUNDS: Record<TrainingLevel, { min: number; max: number }> = {
+  beginner: { min: 10, max: 14 },
+  intermediate: { min: 14, max: 18 },
+  advanced: { min: 16, max: 22 },
+};
 
 /**
- * Rule-checker for AI-generated plans (Principle IV: Video Gate; Principle III: AI safety).
- *
- * Validates:
- * 1. Every exercise_slug has a non-null video_front_url (Video Gate).
- * 2. Weekly volume per muscle group ≤ MAX_VOLUME_PER_MUSCLE_SETS sets.
- * 3. At least MIN_REST_DAYS_PER_WEEK rest day(s) present in each week.
- * 4. Session count matches user's days_per_week.
- * 5. Each session's estimated duration ≤ user's session_length_min + 10 min buffer.
+ * Muscles whose minimum is enforced. Smaller muscles only have a maximum, because a sound plan
+ * often trains them indirectly. Minimums apply only at 3+ days per week.
  */
-export async function validatePlan(payload: PlanPayload): Promise<ValidationResult> {
-  const errors: string[] = [];
-  const db = getDb();
+export const MAJOR_MUSCLES = new Set(['chest', 'lats', 'quadriceps', 'hamstrings', 'glutes', 'shoulders']);
 
-  // 1. Video Gate — fetch all exercises referenced in the plan
-  const slugs = [...new Set(payload.plan_exercises.map((pe) => pe.exercise_slug))];
-  const { data: exercises, error: dbError } = await db
-    .from('exercises')
-    .select('slug, video_front_url')
-    .in('slug', slugs);
+export const DURATION_BUFFER_MIN = 10;
 
-  if (dbError) {
-    return { valid: false, errors: [`DB error fetching exercises: ${dbError.message}`] };
+export function validatePlan(
+  plan: DraftPlan,
+  profile: PlanProfile,
+  library: Library,
+  source: PlanSource,
+): ValidationResult {
+  const errors: ValidationError[] = [];
+
+  if (plan.weeks_total < 4 || plan.weeks_total > 12) {
+    errors.push({ code: 'WEEKS', message: `weeks_total ${plan.weeks_total} is outside 4–12.` });
   }
 
-  const exerciseMap = new Map((exercises ?? []).map((e) => [e.slug, e]));
-
-  for (const slug of slugs) {
-    const ex = exerciseMap.get(slug);
-    if (!ex) {
-      errors.push(`PLAN_VALIDATION: exercise '${slug}' not found in library.`);
-    } else if (!ex.video_front_url) {
-      errors.push(`VIDEO_GATE: exercise '${slug}' has no video_front_url.`);
-    }
-  }
-
-  // 2. Volume per muscle group (approximate — 1 set per set_log entry)
-  //    Group plan_exercises by week → muscle → count sets
-  const weekSessions = groupBy(payload.sessions, (s) => s.week_number);
-  for (const [week, sessions] of Object.entries(weekSessions)) {
-    const muscleSetCount: Record<string, number> = {};
-    for (const session of sessions) {
-      const exercises = payload.plan_exercises.filter((pe) =>
-        pe.session_id === session.id,
-      );
-      for (const pe of exercises) {
-        const ex = exerciseMap.get(pe.exercise_slug);
-        if (!ex) continue;
-        // Use DB-fetched exercise info for muscle groups
-        // (not available here without a fuller fetch — flag if unreachable)
+  // Per-exercise rules: library membership, Video Gate, equipment, limitations.
+  const reported = new Set<string>();
+  for (const session of plan.sessions) {
+    for (const pe of session.exercises) {
+      if (reported.has(pe.exercise_slug)) continue;
+      reported.add(pe.exercise_slug);
+      const ex = library.get(pe.exercise_slug);
+      if (!ex) {
+        errors.push({ code: 'UNKNOWN_EXERCISE', exercise_slug: pe.exercise_slug, message: `'${pe.exercise_slug}' is not in the library.` });
+      } else if (!ex.video_front_url) {
+        errors.push({ code: 'VIDEO_GATE', exercise_slug: ex.slug, message: `'${ex.slug}' has no video_front_url.` });
+      } else if (!isAllowed({ ...ex, contraindications: [] }, profile)) {
+        errors.push({ code: 'EQUIPMENT', exercise_slug: ex.slug, message: `'${ex.slug}' needs equipment the user does not have.` });
+      } else if (!isAllowed(ex, profile)) {
+        errors.push({ code: 'CONTRAINDICATED', exercise_slug: ex.slug, message: `'${ex.slug}' is contraindicated by the user's limitations.` });
       }
     }
   }
 
-  // 3. Rest days — ensure sessions don't fill every day of the week
-  const daysPerWeek = payload.user_days_per_week;
-  const sessionsPerWeek = payload.sessions.filter((s) => s.week_number === 1).length;
-  if (sessionsPerWeek > 7 - MIN_REST_DAYS_PER_WEEK) {
-    errors.push(
-      `REST_DAYS: Week 1 has ${sessionsPerWeek} sessions, leaving fewer than ${MIN_REST_DAYS_PER_WEEK} rest day(s).`,
-    );
+  // Rest days: no two consecutive days in a week that train the same primary muscle.
+  for (const [week, sessions] of byWeek(plan)) {
+    const sorted = [...sessions].sort((a, b) => a.day_of_week - b.day_of_week);
+    for (let i = 1; i < sorted.length; i++) {
+      const prev = sorted[i - 1];
+      const cur = sorted[i];
+      if (cur.day_of_week - prev.day_of_week !== 1) continue;
+      const shared = [...musclesOf(prev.exercises, library)].filter((m) => musclesOf(cur.exercises, library).has(m));
+      if (shared.length > 0) {
+        errors.push({
+          code: 'REST_DAYS',
+          message: `Week ${week}: days ${prev.day_of_week} and ${cur.day_of_week} both train ${shared.join(', ')}.`,
+        });
+      }
+    }
   }
 
-  // 4. Session count matches user preference
-  if (sessionsPerWeek !== daysPerWeek) {
-    errors.push(
-      `SESSION_COUNT: Expected ${daysPerWeek} sessions/week, got ${sessionsPerWeek}.`,
-    );
+  // Duration feasibility.
+  const limit = profile.session_length_min + DURATION_BUFFER_MIN;
+  for (const session of plan.sessions) {
+    const minutes = estimateSessionMinutes(session.exercises);
+    if (minutes > limit) {
+      errors.push({
+        code: 'DURATION',
+        message: `Week ${session.week_number} '${session.name_en}' is ~${minutes} min; limit is ${limit} min.`,
+      });
+    }
   }
 
-  // 5. Duration feasibility (rough estimate: 3 min per set including rest)
-  for (const session of payload.sessions.filter((s) => s.week_number === 1)) {
-    const exercises = payload.plan_exercises.filter((pe) => pe.session_id === session.id);
-    const totalSets = exercises.reduce((sum, pe) => sum + pe.sets, 0);
-    const estimatedMin = totalSets * 3;
-    if (estimatedMin > payload.user_session_length_min + 10) {
-      errors.push(
-        `DURATION: Session '${session.name_en}' estimated ${estimatedMin} min, ` +
-          `exceeds user limit ${payload.user_session_length_min} + 10 min buffer.`,
-      );
+  // Volume per muscle — AI plans only (templates are pre-validated content).
+  if (source === 'ai') {
+    const bounds = VOLUME_BOUNDS[profile.level];
+    for (const [week, sessions] of byWeek(plan)) {
+      const sets = new Map<string, number>();
+      for (const s of sessions) {
+        for (const pe of s.exercises) {
+          for (const m of library.get(pe.exercise_slug)?.muscle_primary ?? []) {
+            sets.set(m, (sets.get(m) ?? 0) + pe.sets);
+          }
+        }
+      }
+      for (const [muscle, count] of sets) {
+        if (count > bounds.max) {
+          errors.push({ code: 'VOLUME', message: `Week ${week}: ${muscle} has ${count} sets; maximum is ${bounds.max}.` });
+        } else if (count < bounds.min && MAJOR_MUSCLES.has(muscle) && profile.days_per_week >= 3) {
+          errors.push({ code: 'VOLUME', message: `Week ${week}: ${muscle} has ${count} sets; minimum is ${bounds.min}.` });
+        }
+      }
     }
   }
 
   return { valid: errors.length === 0, errors };
 }
 
-function groupBy<T>(arr: T[], key: (item: T) => string | number): Record<string, T[]> {
-  return arr.reduce((acc, item) => {
-    const k = String(key(item));
-    if (!acc[k]) acc[k] = [];
-    acc[k].push(item);
-    return acc;
-  }, {} as Record<string, T[]>);
+function byWeek(plan: DraftPlan): Map<number, DraftPlan['sessions']> {
+  const weeks = new Map<number, DraftPlan['sessions']>();
+  for (const s of plan.sessions) {
+    weeks.set(s.week_number, [...(weeks.get(s.week_number) ?? []), s]);
+  }
+  return weeks;
+}
+
+function musclesOf(exercises: DraftPlan['sessions'][number]['exercises'], library: Library): Set<string> {
+  return new Set(exercises.flatMap((pe) => library.get(pe.exercise_slug)?.muscle_primary ?? []));
+}
+
+/** Loads the library rows the plan logic needs (service-role client). */
+export async function loadLibrary(
+  // deno-lint-ignore no-explicit-any -- supabase-js client type differs between esm.sh builds
+  db: any,
+): Promise<Library> {
+  const { data, error } = await db
+    .from('exercises')
+    .select('slug, equipment, muscle_primary, video_front_url, contraindications');
+  if (error) throw new Error(`Failed to load exercise library: ${error.message}`);
+  return libraryFrom((data ?? []) as LibraryExercise[]);
 }

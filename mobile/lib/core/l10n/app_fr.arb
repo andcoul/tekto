@@ -1,6 +1,5 @@
 {
   "@@locale": "fr",
-
   "appName": "Tekto",
   "continueButton": "Continuer",
   "skipButton": "Passer",
@@ -9,23 +8,19 @@
   "confirmButton": "Confirmer",
   "retryButton": "Réessayer",
   "loadingLabel": "Chargement…",
-
   "errorGeneric": "Une erreur est survenue. Veuillez réessayer.",
   "errorNoConnection": "Pas de connexion Internet. Mode hors ligne activé.",
   "errorTimeout": "Cela prend plus de temps que prévu. Vérifiez votre connexion.",
   "errorAiUnavailable": "L'IA est temporairement indisponible. Réessayez dans un instant.",
   "errorPlanValidationFailed": "Nous avons eu du mal à créer votre programme. Nouvelle tentative en cours…",
-
   "healthDisclaimerTitle": "Avant de commencer",
   "healthDisclaimerBody": "Tekto fournit des programmes d'entraînement générés par IA à des fins éducatives uniquement. Consultez toujours un professionnel de santé qualifié avant de commencer tout programme d'exercice, surtout si vous avez une condition préexistante, une blessure ou un problème de santé. Arrêtez l'exercice et consultez un médecin si vous ressentez de la douleur, des vertiges ou des symptômes inhabituels.",
   "healthDisclaimerAcknowledge": "Je comprends — c'est parti",
-
   "onboardingGoalTitle": "Quel est votre objectif principal ?",
   "goalMuscle": "Prendre du muscle",
   "goalStrength": "Devenir plus fort",
   "goalFatLoss": "Perdre du gras",
   "goalGeneralFitness": "Forme générale",
-
   "onboardingLevelTitle": "Quelle est votre expérience ?",
   "levelBeginner": "Débutant",
   "levelBeginnerSub": "Moins d'1 an d'entraînement régulier",
@@ -33,40 +28,31 @@
   "levelIntermediateSub": "1 à 3 ans d'entraînement régulier",
   "levelAdvanced": "Avancé",
   "levelAdvancedSub": "3+ ans, à l'aise avec les exercices composés",
-
   "onboardingDaysTitle": "Combien de jours par semaine pouvez-vous vous entraîner ?",
   "onboardingDaysLabel": "{days} jours/semaine",
-
   "onboardingSessionLengthTitle": "Quelle est la durée de chaque séance ?",
   "onboardingSessionLengthLabel": "{minutes} minutes",
-
   "onboardingEquipmentTitle": "Quel équipement avez-vous ?",
   "equipmentBarbell": "Barre",
   "equipmentDumbbell": "Haltères",
   "equipmentCable": "Machine à câbles",
   "equipmentBodyweight": "Poids de corps uniquement",
   "equipmentBands": "Élastiques de résistance",
-
   "onboardingLimitationsTitle": "Des limitations à signaler ?",
   "onboardingLimitationsHint": "ex. douleur lombaire, genoux fragiles… (optionnel)",
-
   "generatingPlanTitle": "Construction de votre programme…",
   "generatingPlanSubtitle": "Analyse de votre profil et sélection des meilleurs exercices.",
-
   "trialOfferTitle": "Commencez votre essai gratuit",
   "trialOfferSubtitle": "Coaching IA illimité, analyse de forme et programmes adaptatifs.",
   "trialOfferCta": "Démarrer l'essai de 7 jours",
   "trialOfferSkip": "Non merci — commencer gratuitement",
   "trialOfferCancelAnytime": "Annulez à tout moment. Aucun prélèvement avant la fin de l'essai.",
-
   "homeTitle": "Aujourd'hui",
   "homeRestDay": "Jour de repos",
   "homeRestDaySubtitle": "La récupération fait partie du programme. À demain.",
   "homeStartWorkout": "Démarrer la séance",
-
   "planTitle": "Mon programme",
   "planWeekOf": "Semaine {week} sur {total}",
-
   "workoutTitle": "Séance",
   "workoutSetOf": "Série {current} sur {total}",
   "workoutDone": "Fait",
@@ -78,7 +64,6 @@
   "workoutSummaryTitle": "Séance terminée",
   "workoutTotalVolume": "Volume total",
   "workoutKgMoved": "{kg} kg soulevés",
-
   "libraryTitle": "Bibliothèque d'exercices",
   "librarySearchHint": "Rechercher des exercices…",
   "libraryFilterMuscle": "Muscle",
@@ -86,7 +71,6 @@
   "libraryDownloadForOffline": "Télécharger pour hors ligne",
   "libraryDownloadProgress": "Téléchargement {progress}%…",
   "libraryOfflineProRequired": "La vidéo hors ligne nécessite Tekto Pro",
-
   "coachTitle": "Coach",
   "coachInputHint": "Posez une question à votre coach…",
   "coachUnavailableOffline": "Votre coach est indisponible hors ligne. Connectez-vous à Internet pour discuter.",
@@ -96,7 +80,6 @@
   "coachPlanChangePending": "Je vous suggère cette modification de votre programme :",
   "coachApplyChange": "Appliquer le changement",
   "coachDeclineChange": "Non merci",
-
   "formCheckTitle": "Analyse de forme",
   "formCheckPlacementTitle": "Positionnez votre téléphone",
   "formCheckPlacementInstructions": "Posez votre téléphone au sol à environ 2 m de vous, face à vous. Assurez-vous que tout votre corps est visible.",
@@ -105,12 +88,10 @@
   "formCheckReps": "{reps} rép.",
   "formCheckScoreLabel": "Score de forme",
   "formCheckTopTipLabel": "Conseil principal",
-
   "progressTitle": "Progression",
   "progressTabHistory": "Historique",
   "progressTabRecords": "Records",
   "progressTabVolume": "Volume",
-
   "settingsTitle": "Paramètres",
   "settingsPreferences": "Préférences",
   "settingsLanguage": "Langue",
@@ -125,7 +106,6 @@
   "settingsDeleteAccount": "Supprimer le compte",
   "settingsDeleteAccountConfirm": "Toutes vos données seront définitivement supprimées. Cette action est irréversible. Êtes-vous sûr ?",
   "settingsDeleteAccountConfirmSecond": "Supprimer définitivement mon compte",
-
   "paywallTitle": "Débloquer Tekto Pro",
   "paywallMonthly": "12,99 $ / mois",
   "paywallAnnual": "79,99 $ / an",
@@ -134,7 +114,6 @@
   "paywallRestore": "Restaurer les achats",
   "paywallCancelAnytime": "Annulez à tout moment",
   "paywallNotNow": "Pas maintenant",
-
   "subscriptionSettingsTitle": "Abonnement",
   "subscriptionProBadge": "Pro",
   "subscriptionFreeBadge": "Gratuit",
@@ -142,14 +121,23 @@
   "subscriptionRenews": "Renouvellement le {date}",
   "subscriptionManage": "Gérer l'abonnement",
   "subscriptionRestorePurchases": "Restaurer les achats",
-
   "adaptationSummaryTitle": "Votre programme a été mis à jour",
   "adaptationSummarySubtitle": "Voici ce qui a changé pour la semaine prochaine et pourquoi.",
   "adaptationGotIt": "Compris",
-
   "proGateCoachLimit": "Vous avez atteint la limite de coaching gratuit.",
   "proGateFormCheck": "L'analyse de forme est une fonctionnalité Pro.",
   "proGateOfflineVideo": "Téléchargez des vidéos pour une lecture hors ligne avec Pro.",
   "proGateAdaptivePlan": "Les programmes adaptatifs hebdomadaires nécessitent Pro.",
-  "proGateUnlimitedCoach": "Obtenez un coaching illimité avec Pro."
+  "proGateUnlimitedCoach": "Obtenez un coaching illimité avec Pro.",
+  "consentTitle": "Vos données de santé",
+  "consentBody": "Tekto utilise les informations d'entraînement que vous saisissez (objectifs, limitations, séances, résultats d'analyse de forme) pour créer et adapter votre programme. Ce sont des données de santé. Elles sont chiffrées sur votre téléphone et sur nos serveurs, les images de la caméra ne quittent jamais votre appareil, et vous pouvez tout exporter ou supprimer à tout moment dans les Réglages.",
+  "consentAgree": "J'accepte",
+  "onboardingLanguageTitle": "Choisissez votre langue",
+  "planFallbackNotice": "Nous vous avons préparé un programme de départ. Vous pourrez le régénérer plus tard dans les Réglages.",
+  "freePlanDaysCapped": "Votre programme gratuit comprend 4 séances par semaine. Tekto Pro crée des programmes de 5 jours ou plus.",
+  "coachUnavailable": "Le coach est momentanément indisponible. Votre programme fonctionne toujours — réessayez dans un instant.",
+  "proUnavailableInRegion": "Tekto Pro n'est pas encore disponible dans votre région.",
+  "adaptationSessionsCompleted": "{completed} séances sur {scheduled} effectuées",
+  "adaptationWhyLabel": "Pourquoi",
+  "formCheckFreeTryUsed": "Vous avez utilisé votre analyse de forme gratuite pour cet exercice."
 }

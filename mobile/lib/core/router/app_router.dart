@@ -14,6 +14,7 @@ import '../../features/onboarding/ui/health_disclaimer_screen.dart';
 import '../../features/onboarding/ui/onboarding_quiz_screen.dart';
 import '../../features/onboarding/ui/plan_generation_screen.dart';
 import '../../features/onboarding/ui/trial_offer_screen.dart';
+import '../../features/plan/domain/adaptation_provider.dart';
 import '../../features/plan/ui/adaptation_summary_screen.dart';
 import '../../features/plan/ui/exercise_swap_sheet.dart';
 import '../../features/plan/ui/plan_overview_screen.dart';
@@ -24,18 +25,19 @@ import '../../features/subscription/ui/subscription_settings_screen.dart';
 import '../../features/workout/ui/home_screen.dart';
 import '../../features/workout/ui/live_workout_screen.dart';
 import '../../features/workout/ui/workout_summary_screen.dart';
+import '../../shared/services/form_check/form_score_calculator.dart';
 
 part 'app_router.g.dart';
 
 @riverpod
-GoRouter appRouter(AppRouterRef ref) {
+GoRouter appRouter(Ref ref) {
   final authState = ref.watch(authStateProvider);
 
   return GoRouter(
     initialLocation: '/home',
     debugLogDiagnostics: false,
     redirect: (context, state) {
-      final isAuthenticated = authState.valueOrNull != null;
+      final isAuthenticated = authState.value != null;
       final isAuthRoute = state.matchedLocation.startsWith('/auth') ||
           state.matchedLocation.startsWith('/onboarding');
 
@@ -131,7 +133,11 @@ GoRouter appRouter(AppRouterRef ref) {
             path: 'summary',
             builder: (context, state) {
               final slug = state.pathParameters['exerciseSlug']!;
-              return FormSummaryScreen(exerciseSlug: slug);
+              // The form-check screen pushes the computed summary as `extra`.
+              return FormSummaryScreen(
+                exerciseSlug: slug,
+                summary: state.extra! as FormSetSummary,
+              );
             },
           ),
         ],
@@ -159,15 +165,16 @@ GoRouter appRouter(AppRouterRef ref) {
       GoRoute(
         path: '/paywall',
         builder: (context, state) {
-          final feature = state.uri.queryParameters['feature'] ?? 'pro';
-          return PaywallScreen(featureKey: feature);
+          // Feature-specific copy is chosen by the caller via ProGateWidget (T055/T056).
+          return const PaywallScreen();
         },
       ),
 
       // ── Plan adaptation ─────────────────────────────────────────────────
       GoRoute(
         path: '/plan/adaptation',
-        builder: (context, state) => const AdaptationSummaryScreen(),
+        builder: (context, state) =>
+            AdaptationSummaryScreen(summary: state.extra! as AdaptationSummary),
       ),
     ],
     errorBuilder: (context, state) => Scaffold(

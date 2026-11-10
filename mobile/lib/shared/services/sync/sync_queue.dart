@@ -3,13 +3,13 @@ import 'dart:convert';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:drift/drift.dart';
-import 'package:uuid/uuid.dart';
 
 import '../api/supabase_client.dart';
 import '../local_db/database.dart';
 
-const _uuid = Uuid();
 const _maxRetries = 3;
+const _pending = 'pending';
+const _failed = 'failed';
 
 /// Offline-first write queue (Principle I: every live-workout write goes through here).
 ///
@@ -36,25 +36,27 @@ class SyncQueue {
 
   /// Enqueue a write operation. Returns immediately — does NOT wait for network.
   Future<void> enqueue({
-    required String operation, // 'INSERT' | 'UPDATE' | 'DELETE'
+    required String operation, // 'insert' | 'update' | 'delete' (case-insensitive)
     required String tableName,
     required Map<String, dynamic> payload,
   }) async {
     await db.into(db.syncQueueTable).insert(
           SyncQueueTableCompanion.insert(
-            id: _uuid.v4(),
-            operation: operation,
+            operation: operation.toLowerCase(),
             tableName_: tableName,
             payload: jsonEncode(payload),
           ),
         );
   }
 
-  /// Process all pending queue entries in FIFO order.
+  /// Process all pending queue entries in insertion order.
   /// Called automatically on reconnect and manually after app foreground.
+  /// A row that fails [_maxRetries] times is marked `failed` for manual review and
+  /// never blocks the rows after it.
   Future<void> flush() async {
     final pending = await (db.select(db.syncQueueTable)
-          ..orderBy([(q) => OrderingTerm.asc(q.createdAt)]))
+          ..where((q) => q.status.equals(_pending))
+          ..orderBy([(q) => OrderingTerm.asc(q.id)]))
         .get();
 
     for (final entry in pending) {
@@ -64,21 +66,13 @@ class SyncQueue {
               ..where((q) => q.id.equals(entry.id)))
             .go();
       } on Exception {
-        final newRetryCount = entry.retryCount + 1;
-        if (newRetryCount >= _maxRetries) {
-          // Mark for manual review by flagging with high retry count
-          await (db.update(db.syncQueueTable)
-                ..where((q) => q.id.equals(entry.id)))
-              .write(SyncQueueTableCompanion(
-                retryCount: Value(newRetryCount),
-              ));
-        } else {
-          await (db.update(db.syncQueueTable)
-                ..where((q) => q.id.equals(entry.id)))
-              .write(SyncQueueTableCompanion(
-                retryCount: Value(newRetryCount),
-              ));
-        }
+        final retries = entry.retryCount + 1;
+        await (db.update(db.syncQueueTable)
+              ..where((q) => q.id.equals(entry.id)))
+            .write(SyncQueueTableCompanion(
+              retryCount: Value(retries),
+              status: Value(retries >= _maxRetries ? _failed : _pending),
+            ));
       }
     }
   }
@@ -88,21 +82,22 @@ class SyncQueue {
     final path = '/rest/v1/${entry.tableName_}';
 
     switch (entry.operation) {
-      case 'INSERT':
+      case 'insert':
         await dio.post(path, data: payload);
-      case 'UPDATE':
+      case 'update':
         final id = payload['id'] as String?;
         if (id == null) return;
         await dio.patch('$path?id=eq.$id', data: payload);
-      case 'DELETE':
+      case 'delete':
         final id = payload['id'] as String?;
         if (id == null) return;
         await dio.delete('$path?id=eq.$id');
     }
   }
 
-  Future<int> pendingCount() =>
-      db.syncQueueTable.count().getSingle();
+  Future<int> pendingCount() => db.syncQueueTable
+      .count(where: (q) => q.status.equals(_pending))
+      .getSingle();
 
   void dispose() {
     _connectivitySub?.cancel();

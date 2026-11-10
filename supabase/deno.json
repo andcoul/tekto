@@ -1,0 +1,6 @@
+{
+  "tasks": {
+    "test": "deno test --allow-env --allow-read functions",
+    "eval:guardrails": "deno run --allow-net --allow-env --allow-read --allow-write evals/coach-guardrails/run.ts"
+  }
+}

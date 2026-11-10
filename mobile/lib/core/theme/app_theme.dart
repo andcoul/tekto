@@ -58,7 +58,7 @@ abstract final class AppTheme {
       onError: AppColors.onDark,
     ),
     scaffoldBackgroundColor: AppColors.charcoalBase,
-    cardTheme: CardTheme(
+    cardTheme: CardThemeData(
       elevation: AppSizes.cardElevation,
       color: AppColors.charcoalSurface,
       shape: RoundedRectangleBorder(
@@ -124,7 +124,7 @@ abstract final class AppTheme {
       onError: AppColors.onDark,
     ),
     scaffoldBackgroundColor: AppColors.lightBackground,
-    cardTheme: CardTheme(
+    cardTheme: CardThemeData(
       elevation: AppSizes.cardElevation,
       color: AppColors.lightSurface,
       shape: RoundedRectangleBorder(

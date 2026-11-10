@@ -4,7 +4,7 @@ part 'subscription_model.freezed.dart';
 part 'subscription_model.g.dart';
 
 @freezed
-class SubscriptionModel with _$SubscriptionModel {
+abstract class SubscriptionModel with _$SubscriptionModel {
   const factory SubscriptionModel({
     required String id,
     required String userId,
@@ -33,7 +33,7 @@ class SubscriptionModel with _$SubscriptionModel {
 }
 
 @freezed
-class FormCheckSessionModel with _$FormCheckSessionModel {
+abstract class FormCheckSessionModel with _$FormCheckSessionModel {
   const factory FormCheckSessionModel({
     required String id,
     required String userId,
@@ -42,8 +42,12 @@ class FormCheckSessionModel with _$FormCheckSessionModel {
     required int repCount,
     int? formScore,
     required List<String> cuesShown,
+    /// 1-based reps with at least one cue (FR-024).
+    @Default([]) List<int> flaggedReps,
     String? topTipEn,
     String? topTipFr,
+    /// Free tier: one try per lift (FR-029).
+    @Default(false) bool wasFreeTry,
     required bool userShared, // always false unless user explicitly shares
     required DateTime createdAt,
   }) = _FormCheckSessionModel;

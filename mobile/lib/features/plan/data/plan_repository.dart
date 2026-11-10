@@ -52,7 +52,10 @@ class PlanRepository {
       status: Value(row['status'] as String? ?? 'active'),
       weeksTotal: row['weeks_total'] as int,
       currentWeek: Value(row['current_week'] as int? ?? 1),
-      generatedBy: Value(row['generated_by'] as String? ?? 'ai'),
+      startDate: Value(DateTime.tryParse(row['start_date'] as String? ?? '')),
+      lastAdaptedWeek: Value(row['last_adapted_week'] as int? ?? 0),
+      source: Value(row['source'] as String? ?? 'ai'),
+      templateSlug: Value(row['template_slug'] as String?),
     ));
   }
 
@@ -63,7 +66,10 @@ class PlanRepository {
         status: p.status,
         weeksTotal: p.weeksTotal,
         currentWeek: p.currentWeek,
-        generatedBy: p.generatedBy,
+        startDate: p.startDate ?? p.createdAt,
+        lastAdaptedWeek: p.lastAdaptedWeek,
+        source: p.source,
+        templateSlug: p.templateSlug,
         rationaleEn: p.rationaleEn,
         rationaleFr: p.rationaleFr,
         createdAt: p.createdAt,

@@ -13,14 +13,14 @@ part 'providers.g.dart';
 // ── Supabase ──────────────────────────────────────────────────────────────
 
 @riverpod
-SupabaseClient supabaseClient(SupabaseClientRef ref) {
+SupabaseClient supabaseClient(Ref ref) {
   return Supabase.instance.client;
 }
 
 // ── Secure storage ────────────────────────────────────────────────────────
 
 @riverpod
-FlutterSecureStorage secureStorage(SecureStorageRef ref) {
+FlutterSecureStorage secureStorage(Ref ref) {
   return const FlutterSecureStorage(
     aOptions: AndroidOptions(encryptedSharedPreferences: true),
   );
@@ -29,7 +29,7 @@ FlutterSecureStorage secureStorage(SecureStorageRef ref) {
 // ── API client (Dio) ──────────────────────────────────────────────────────
 
 @riverpod
-TektoDioClient dioClient(DioClientRef ref) {
+TektoDioClient dioClient(Ref ref) {
   final storage = ref.watch(secureStorageProvider);
   return TektoDioClient(storage);
 }
@@ -37,7 +37,7 @@ TektoDioClient dioClient(DioClientRef ref) {
 // ── Local database (Drift) ────────────────────────────────────────────────
 
 @Riverpod(keepAlive: true)
-AppDatabase appDatabase(AppDatabaseRef ref) {
+AppDatabase appDatabase(Ref ref) {
   final db = AppDatabase();
   ref.onDispose(db.close);
   return db;
@@ -46,7 +46,7 @@ AppDatabase appDatabase(AppDatabaseRef ref) {
 // ── Offline sync queue ────────────────────────────────────────────────────
 
 @Riverpod(keepAlive: true)
-SyncQueue syncQueue(SyncQueueRef ref) {
+SyncQueue syncQueue(Ref ref) {
   final db = ref.watch(appDatabaseProvider);
   final dio = ref.watch(dioClientProvider);
   return SyncQueue(db: db, dio: dio);
@@ -55,6 +55,6 @@ SyncQueue syncQueue(SyncQueueRef ref) {
 // ── RevenueCat ────────────────────────────────────────────────────────────
 
 @Riverpod(keepAlive: true)
-RevenueCatService revenueCatService(RevenueCatServiceRef ref) {
+RevenueCatService revenueCatService(Ref ref) {
   return RevenueCatService();
 }

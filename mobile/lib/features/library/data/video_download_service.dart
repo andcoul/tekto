@@ -4,13 +4,11 @@ import 'dart:io';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:uuid/uuid.dart';
 
 import '../../../shared/services/api/supabase_client.dart';
 import '../../../shared/services/local_db/database.dart';
 import '../../../shared/services/local_db/daos/exercise_dao.dart';
 
-const _uuid = Uuid();
 
 class VideoDownloadService {
   VideoDownloadService({
@@ -66,13 +64,11 @@ class VideoDownloadService {
         );
 
         // Record in Drift DB
+        // Device-only record (data-model entity 14). Captions are added by T028.
         await _db.into(_db.exerciseVideoDownloads).insertOnConflictUpdate(
               ExerciseVideoDownloadsCompanion.insert(
-                id: _uuid.v4(),
-                userId: _userId,
                 exerciseSlug: slug,
-                planId: planId,
-                localPath: Value(localPath),
+                localPath: localPath,
               ),
             );
 
@@ -95,12 +91,9 @@ class VideoDownloadService {
   }
 
   /// Returns the local file path for a downloaded video, or null if not downloaded.
-  Future<String?> getLocalPath(String exerciseSlug, String planId) async {
+  Future<String?> getLocalPath(String exerciseSlug) async {
     final row = await (_db.select(_db.exerciseVideoDownloads)
-          ..where((d) =>
-              d.exerciseSlug.equals(exerciseSlug) &
-              d.planId.equals(planId) &
-              d.userId.equals(_userId)))
+          ..where((d) => d.exerciseSlug.equals(exerciseSlug)))
         .getSingleOrNull();
     return row?.localPath;
   }

@@ -17,16 +17,13 @@ class SubscriptionDao extends DatabaseAccessor<AppDatabase> with _$SubscriptionD
   Future<void> upsert(SubscriptionsCompanion sub) =>
       into(subscriptions).insertOnConflictUpdate(sub);
 
-  /// True if the user has an active Pro subscription (not expired, not cancelled past period).
-  bool isPro(Subscription? sub) {
+  /// data-model rule: `tier == 'pro' AND (current_period_ends_at > now() OR
+  /// (is_trial AND trial_ends_at > now()))`.
+  bool isPro(Subscription? sub, {DateTime? now}) {
     if (sub == null || sub.tier != 'pro') return false;
-    final now = DateTime.now();
-    if (sub.isTrial && sub.trialEndsAt != null) {
-      return sub.trialEndsAt!.isAfter(now);
-    }
-    if (sub.currentPeriodEndsAt != null) {
-      return sub.currentPeriodEndsAt!.isAfter(now);
-    }
-    return false;
+    final at = now ?? DateTime.now();
+    final periodActive = sub.currentPeriodEndsAt?.isAfter(at) ?? false;
+    final trialActive = sub.isTrial && (sub.trialEndsAt?.isAfter(at) ?? false);
+    return periodActive || trialActive;
   }
 }
