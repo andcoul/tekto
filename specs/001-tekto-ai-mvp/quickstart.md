@@ -284,7 +284,7 @@ flutter run -d iPhone-15-Pro
 **Expected outcomes**:
 - Download progress shown per exercise.
 - In airplane mode: video plays immediately from local storage (no spinner, no error), with captions available in EN and FR.
-- `exercise_video_downloads` rows exist in Supabase for all downloaded exercises.
+- The device's local `exercise_video_downloads` table has a row for every downloaded exercise (inspect with the Drift DevTools extension); nothing is written to Supabase.
 - A free user in airplane mode sees: "Offline video requires Tekto Pro" placeholder, and the workout continues (see Scenario 2).
 
 ---

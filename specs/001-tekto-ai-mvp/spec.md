@@ -212,7 +212,7 @@ A free user encounters a Pro feature, sees a contextual paywall that communicate
 
 **Adaptive Planning (Pro)**
 
-- **FR-026**: The system MUST review logged performance weekly and adjust the following week's plan: progress load/reps when targets are met, maintain or reduce volume when sessions are missed or rated too hard. The review runs once per training week, at whichever comes first: the end of the user's training week (Sunday 23:59 in the user's local time zone) or the moment the last scheduled session of the week is logged. It runs regardless of how many sessions were completed; skipped sessions are treated as missed and are an input to the adjustment, never a reason to skip the review.
+- **FR-026**: The system MUST review logged performance weekly and adjust the following week's plan: progress load/reps when targets are met, maintain or reduce volume when sessions are missed or rated too hard. The review runs once per training week, at whichever comes first: the end of the user's training week (Sunday 23:59 in the user's local time zone) or the moment every session of that training week has been logged. It runs regardless of how many sessions were completed; skipped sessions are treated as missed and are an input to the adjustment, never a reason to skip the review.
 - **FR-027**: Every plan adaptation MUST display a brief explanation card to the user explaining what changed and why.
 - **FR-028**: Users MUST be able to swap any exercise for an equivalent alternative (same muscle group, available equipment) at any time.
 
