@@ -1,0 +1,119 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+
+import '../../../core/theme/app_theme.dart';
+import '../domain/plan_provider.dart';
+
+class PlanOverviewScreen extends ConsumerWidget {
+  const PlanOverviewScreen({super.key});
+
+  static const _days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final planAsync = ref.watch(activePlanProvider);
+
+    return Scaffold(
+      appBar: AppBar(title: const Text('My Plan')),
+      body: planAsync.when(
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (e, _) => Center(child: Text('Error: $e')),
+        data: (plan) {
+          if (plan == null) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text('No active plan.'),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: () => context.go('/onboarding/disclaimer'),
+                    child: const Text('Generate a plan'),
+                  ),
+                ],
+              ),
+            );
+          }
+
+          return CustomScrollView(
+            slivers: [
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.all(AppSpacing.base),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(plan.name,
+                          style: Theme.of(context).textTheme.headlineMedium),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Week ${plan.currentWeek} of ${plan.weeksTotal}',
+                        style: Theme.of(context).textTheme.bodyMedium,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              SliverList(
+                delegate: SliverChildBuilderDelegate(
+                  (context, index) {
+                    final dayIndex = index;
+                    final dayLabel = _days[dayIndex];
+                    // Sessions would be fetched per day; simplified here
+                    return _DayCard(
+                      dayLabel: dayLabel,
+                      dayNumber: dayIndex + 1,
+                      weekNumber: plan.currentWeek,
+                    );
+                  },
+                  childCount: 7,
+                ),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _DayCard extends ConsumerWidget {
+  const _DayCard({
+    required this.dayLabel,
+    required this.dayNumber,
+    required this.weekNumber,
+  });
+
+  final String dayLabel;
+  final int dayNumber;
+  final int weekNumber;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    // Simplified: show rest-day placeholder; real implementation queries sessions
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.base, vertical: AppSpacing.xs),
+      child: Card(
+        child: ListTile(
+          contentPadding: const EdgeInsets.all(AppSpacing.base),
+          leading: Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: AppColors.charcoalElevated,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Center(
+              child: Text(dayLabel,
+                  style: const TextStyle(fontWeight: FontWeight.w600)),
+            ),
+          ),
+          title: const Text('Rest day'),
+          subtitle: const Text('Recovery is part of the plan.'),
+        ),
+      ),
+    );
+  }
+}

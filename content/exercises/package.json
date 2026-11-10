@@ -1,0 +1,12 @@
+{
+  "name": "tekto-exercise-seed",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Exercise library seed script for Tekto",
+  "scripts": {
+    "seed": "node seed-exercises.js"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.45.0"
+  }
+}

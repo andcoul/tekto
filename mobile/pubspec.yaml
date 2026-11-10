@@ -1,0 +1,118 @@
+name: tekto
+description: A premium AI-first strength training app.
+publish_to: none
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+  flutter: ">=3.10.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+
+  # State management
+  flutter_riverpod: ^2.5.1       # reactive state management
+  riverpod_annotation: ^2.3.5    # @riverpod code-gen annotations
+
+  # Navigation
+  go_router: ^14.2.0             # declarative routing with guards
+
+  # Local database (offline-first SQLite ORM)
+  drift: ^2.21.0                 # type-safe SQLite ORM
+  drift_flutter: ^0.2.2          # Flutter integration for Drift
+
+  # HTTP client
+  dio: ^5.5.0                    # HTTP client with interceptors
+  retrofit: ^4.3.0               # type-safe HTTP via annotations
+
+  # Data classes
+  freezed_annotation: ^2.4.3     # immutable data classes via code-gen
+  json_annotation: ^4.9.0        # JSON serialization annotations
+
+  # Video playback
+  video_player: ^2.9.1           # platform video player
+  chewie: ^1.8.5                 # controls wrapper for video_player
+
+  # In-app purchases
+  purchases_flutter: ^8.2.3      # RevenueCat cross-platform IAP SDK
+
+  # Apple Health + Google Health Connect
+  health: ^12.1.0                # HealthKit + Health Connect bridge
+
+  # Secure storage (session tokens)
+  flutter_secure_storage: ^9.2.2 # encrypted key-value store
+
+  # Connectivity
+  connectivity_plus: ^6.0.3      # network connectivity state
+
+  # Localization
+  intl: ^0.19.0                  # ICU-based formatting for ARB files
+
+  # Animations & haptics
+  flutter_animate: ^4.5.0        # composable animations
+  lottie: ^3.1.2                 # Lottie JSON animation player
+  haptic_feedback: ^0.5.1        # semantic haptic feedback wrapper
+
+  # Offline video download
+  flutter_downloader: ^1.11.7    # background file download (required by T032)
+
+  # Firebase (crash reporting)
+  firebase_core: ^3.6.0          # required by T014 — Firebase initialization
+  firebase_crashlytics: ^4.1.3   # required by T014 — crash reporting
+
+  # Charts
+  fl_chart: ^0.69.0              # bar/line charts for Progress screen (T105)
+
+  # Pose detection (form check)
+  google_mlkit_pose_detection: ^0.12.0  # on-device pose estimation for form check
+
+  # Camera
+  camera: ^0.11.0+2              # camera preview + frame stream
+
+  # Supabase
+  supabase_flutter: ^2.7.0       # Supabase auth + realtime + REST client
+
+  # Utilities
+  uuid: ^4.5.1                   # UUID generation for local IDs (sync queue, offline writes)
+  path_provider: ^2.1.5          # Filesystem paths for video downloads and SQLite DB
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  integration_test:
+    sdk: flutter
+
+  # Code generation
+  build_runner: ^2.4.12           # runs all code generators
+  freezed: ^2.5.7                 # generates .freezed.dart
+  json_serializable: ^6.8.0       # generates .g.dart for JSON
+  riverpod_generator: ^2.4.3      # generates Riverpod providers
+  drift_dev: ^2.21.0              # generates Drift schema & DAOs
+  retrofit_generator: ^8.2.1      # generates Retrofit HTTP clients
+
+  # Testing
+  mocktail: ^1.0.4                # mock objects for unit tests
+  flutter_lints: ^4.0.0           # Flutter-recommended linting rules
+
+flutter:
+  uses-material-design: true
+  generate: true  # enables ARB localization code generation
+
+  assets:
+    - assets/images/
+    - assets/animations/
+    - assets/icons/
+
+  fonts:
+    - family: Inter
+      fonts:
+        - asset: assets/fonts/Inter-Regular.ttf
+        - asset: assets/fonts/Inter-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Inter-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/Inter-Bold.ttf
+          weight: 700

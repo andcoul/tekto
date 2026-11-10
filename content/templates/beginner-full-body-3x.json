@@ -1,0 +1,169 @@
+{
+  "name": "Beginner Full Body 3×",
+  "weeks_total": 8,
+  "rationale_en": "A 3-day full-body programme targeting all major muscle groups each session. Designed for beginners to build foundational strength and motor patterns with manageable volume and adequate recovery.",
+  "rationale_fr": "Un programme full-body de 3 jours ciblant tous les groupes musculaires à chaque séance. Conçu pour les débutants afin de développer des bases de force et des schémas moteurs avec un volume gérable et une récupération adéquate.",
+  "sessions": [
+    {
+      "template_session_ref": "A",
+      "week_number": 1,
+      "day_of_week": 1,
+      "name_en": "Full Body A",
+      "name_fr": "Corps Complet A",
+      "muscle_groups": ["quadriceps", "glutes", "chest", "lats", "shoulders"],
+      "estimated_min": 50
+    },
+    {
+      "template_session_ref": "B",
+      "week_number": 1,
+      "day_of_week": 3,
+      "name_en": "Full Body B",
+      "name_fr": "Corps Complet B",
+      "muscle_groups": ["hamstrings", "glutes", "chest", "lats", "triceps"],
+      "estimated_min": 50
+    },
+    {
+      "template_session_ref": "C",
+      "week_number": 1,
+      "day_of_week": 5,
+      "name_en": "Full Body C",
+      "name_fr": "Corps Complet C",
+      "muscle_groups": ["quadriceps", "glutes", "shoulders", "lats", "biceps"],
+      "estimated_min": 50
+    }
+  ],
+  "plan_exercises": [
+    {
+      "template_session_ref": "A",
+      "exercise_slug": "goblet-squat",
+      "sort_order": 0,
+      "sets": 3,
+      "reps_min": 8,
+      "reps_max": 12,
+      "rpe_target": 7.0,
+      "rest_sec": 120,
+      "suggested_weight_kg": null
+    },
+    {
+      "template_session_ref": "A",
+      "exercise_slug": "dumbbell-bench-press",
+      "sort_order": 1,
+      "sets": 3,
+      "reps_min": 8,
+      "reps_max": 12,
+      "rpe_target": 7.0,
+      "rest_sec": 90,
+      "suggested_weight_kg": null
+    },
+    {
+      "template_session_ref": "A",
+      "exercise_slug": "dumbbell-row",
+      "sort_order": 2,
+      "sets": 3,
+      "reps_min": 8,
+      "reps_max": 12,
+      "rpe_target": 7.0,
+      "rest_sec": 90,
+      "suggested_weight_kg": null
+    },
+    {
+      "template_session_ref": "A",
+      "exercise_slug": "dumbbell-shoulder-press",
+      "sort_order": 3,
+      "sets": 3,
+      "reps_min": 10,
+      "reps_max": 15,
+      "rpe_target": 7.0,
+      "rest_sec": 90,
+      "suggested_weight_kg": null
+    },
+    {
+      "template_session_ref": "B",
+      "exercise_slug": "romanian-deadlift",
+      "sort_order": 0,
+      "sets": 3,
+      "reps_min": 8,
+      "reps_max": 12,
+      "rpe_target": 7.0,
+      "rest_sec": 120,
+      "suggested_weight_kg": null
+    },
+    {
+      "template_session_ref": "B",
+      "exercise_slug": "dumbbell-bench-press",
+      "sort_order": 1,
+      "sets": 3,
+      "reps_min": 8,
+      "reps_max": 12,
+      "rpe_target": 7.0,
+      "rest_sec": 90,
+      "suggested_weight_kg": null
+    },
+    {
+      "template_session_ref": "B",
+      "exercise_slug": "lat-pulldown",
+      "sort_order": 2,
+      "sets": 3,
+      "reps_min": 10,
+      "reps_max": 15,
+      "rpe_target": 7.0,
+      "rest_sec": 90,
+      "suggested_weight_kg": null
+    },
+    {
+      "template_session_ref": "B",
+      "exercise_slug": "dumbbell-lunge",
+      "sort_order": 3,
+      "sets": 2,
+      "reps_min": 10,
+      "reps_max": 12,
+      "rpe_target": 6.0,
+      "rest_sec": 90,
+      "suggested_weight_kg": null
+    },
+    {
+      "template_session_ref": "C",
+      "exercise_slug": "goblet-squat",
+      "sort_order": 0,
+      "sets": 3,
+      "reps_min": 10,
+      "reps_max": 15,
+      "rpe_target": 7.0,
+      "rest_sec": 90,
+      "suggested_weight_kg": null
+    },
+    {
+      "template_session_ref": "C",
+      "exercise_slug": "dumbbell-shoulder-press",
+      "sort_order": 1,
+      "sets": 3,
+      "reps_min": 10,
+      "reps_max": 12,
+      "rpe_target": 7.0,
+      "rest_sec": 90,
+      "suggested_weight_kg": null
+    },
+    {
+      "template_session_ref": "C",
+      "exercise_slug": "dumbbell-row",
+      "sort_order": 2,
+      "sets": 3,
+      "reps_min": 10,
+      "reps_max": 12,
+      "rpe_target": 7.0,
+      "rest_sec": 90,
+      "suggested_weight_kg": null
+    },
+    {
+      "template_session_ref": "C",
+      "exercise_slug": "hip-thrust",
+      "sort_order": 3,
+      "sets": 3,
+      "reps_min": 12,
+      "reps_max": 15,
+      "rpe_target": 7.0,
+      "rest_sec": 90,
+      "suggested_weight_kg": null
+    }
+  ]
+}

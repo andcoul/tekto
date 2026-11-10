@@ -1,0 +1,400 @@
+[
+  {
+    "slug": "barbell-squat",
+    "name_en": "Barbell Back Squat",
+    "name_fr": "Squat Barre Haute",
+    "equipment": ["barbell"],
+    "muscle_primary": ["quadriceps", "glutes"],
+    "muscle_secondary": ["hamstrings", "core", "erectors"],
+    "cues_en": [
+      "Brace your core and take a big breath before descending.",
+      "Push your knees out in line with your toes.",
+      "Drive through your heels as you stand."
+    ],
+    "cues_fr": [
+      "Gainéz le gainage et inspirez avant de descendre.",
+      "Poussez les genoux vers l'extérieur dans l'axe des orteils.",
+      "Poussez à travers les talons en remontant."
+    ],
+    "common_mistakes_en": [
+      "Knees caving inward",
+      "Not reaching parallel depth",
+      "Excessive forward lean"
+    ],
+    "common_mistakes_fr": [
+      "Genoux qui rentrent vers l'intérieur",
+      "Ne pas atteindre la parallèle",
+      "Inclinaison excessive vers l'avant"
+    ],
+    "video_front_url": "https://customer-tekto.cloudflarestream.com/barbell-squat-front/manifest/video.m3u8",
+    "video_side_url": "https://customer-tekto.cloudflarestream.com/barbell-squat-side/manifest/video.m3u8",
+    "variation_easier_slug": "goblet-squat",
+    "variation_harder_slug": "pause-squat",
+    "form_check_supported": true,
+    "form_check_lift_key": "squat"
+  },
+  {
+    "slug": "goblet-squat",
+    "name_en": "Goblet Squat",
+    "name_fr": "Squat Goblet",
+    "equipment": ["dumbbell"],
+    "muscle_primary": ["quadriceps", "glutes"],
+    "muscle_secondary": ["core"],
+    "cues_en": [
+      "Hold the dumbbell at chest height with both hands.",
+      "Keep your elbows inside your knees at the bottom.",
+      "Sit tall and drive up through the heels."
+    ],
+    "cues_fr": [
+      "Tenez l'haltère à hauteur de poitrine avec les deux mains.",
+      "Gardez les coudes à l'intérieur des genoux en bas.",
+      "Montez droit et poussez à travers les talons."
+    ],
+    "common_mistakes_en": ["Rounding the upper back", "Heels lifting off the floor"],
+    "common_mistakes_fr": ["Dos voûté en haut", "Talons qui décollent du sol"],
+    "video_front_url": "https://customer-tekto.cloudflarestream.com/goblet-squat-front/manifest/video.m3u8",
+    "video_side_url": "https://customer-tekto.cloudflarestream.com/goblet-squat-side/manifest/video.m3u8",
+    "variation_easier_slug": "bodyweight-squat",
+    "variation_harder_slug": "barbell-squat",
+    "form_check_supported": true,
+    "form_check_lift_key": "squat"
+  },
+  {
+    "slug": "deadlift",
+    "name_en": "Conventional Deadlift",
+    "name_fr": "Soulevé de Terre Conventionnel",
+    "equipment": ["barbell"],
+    "muscle_primary": ["hamstrings", "glutes", "erectors"],
+    "muscle_secondary": ["traps", "lats", "core", "quadriceps"],
+    "cues_en": [
+      "Push the floor away rather than pulling the bar up.",
+      "Keep the bar close to your body throughout the lift.",
+      "Lock hips and knees out simultaneously at the top."
+    ],
+    "cues_fr": [
+      "Poussez le sol plutôt que de tirer la barre.",
+      "Gardez la barre proche du corps tout au long du mouvement.",
+      "Verrouillez hanches et genoux simultanément en haut."
+    ],
+    "common_mistakes_en": ["Rounding the lower back", "Bar drifting forward", "Hyperextending at the top"],
+    "common_mistakes_fr": ["Bas du dos arrondi", "La barre qui s'éloigne du corps", "Hyperextension en haut"],
+    "video_front_url": "https://customer-tekto.cloudflarestream.com/deadlift-front/manifest/video.m3u8",
+    "video_side_url": "https://customer-tekto.cloudflarestream.com/deadlift-side/manifest/video.m3u8",
+    "variation_easier_slug": "romanian-deadlift",
+    "variation_harder_slug": "deficit-deadlift",
+    "form_check_supported": true,
+    "form_check_lift_key": "deadlift"
+  },
+  {
+    "slug": "romanian-deadlift",
+    "name_en": "Romanian Deadlift",
+    "name_fr": "Soulevé de Terre Roumain",
+    "equipment": ["barbell"],
+    "muscle_primary": ["hamstrings", "glutes"],
+    "muscle_secondary": ["erectors", "core"],
+    "cues_en": [
+      "Hinge at the hips, pushing them back as you lower the bar.",
+      "Feel the stretch in your hamstrings before reversing.",
+      "Keep a neutral spine throughout."
+    ],
+    "cues_fr": [
+      "Charnière aux hanches en les poussant vers l'arrière en descendant.",
+      "Ressentez l'étirement des ischio-jambiers avant de remonter.",
+      "Gardez la colonne vertébrale neutre tout au long."
+    ],
+    "common_mistakes_en": ["Bending the knees too much", "Losing neutral spine", "Not reaching full hip extension"],
+    "common_mistakes_fr": ["Trop plier les genoux", "Perdre la colonne neutre", "Ne pas atteindre l'extension complète des hanches"],
+    "video_front_url": "https://customer-tekto.cloudflarestream.com/romanian-deadlift-front/manifest/video.m3u8",
+    "video_side_url": "https://customer-tekto.cloudflarestream.com/romanian-deadlift-side/manifest/video.m3u8",
+    "variation_easier_slug": "dumbbell-rdl",
+    "variation_harder_slug": "deadlift",
+    "form_check_supported": true,
+    "form_check_lift_key": "deadlift"
+  },
+  {
+    "slug": "bench-press",
+    "name_en": "Barbell Bench Press",
+    "name_fr": "Développé Couché Barre",
+    "equipment": ["barbell"],
+    "muscle_primary": ["chest"],
+    "muscle_secondary": ["triceps", "front_deltoid"],
+    "cues_en": [
+      "Retract your shoulder blades and arch slightly.",
+      "Lower the bar to your lower chest with elbows at ~45°.",
+      "Drive the bar up and slightly back toward your face."
+    ],
+    "cues_fr": [
+      "Rétractez les omoplates et créez une légère cambrure.",
+      "Descendez la barre vers la poitrine basse, coudes à ~45°.",
+      "Poussez la barre vers le haut et légèrement vers votre visage."
+    ],
+    "common_mistakes_en": ["Flaring elbows too wide", "Bouncing the bar off the chest", "Losing shoulder blade retraction"],
+    "common_mistakes_fr": ["Coudes trop écartés", "Rebondir la barre sur la poitrine", "Perdre la rétraction des omoplates"],
+    "video_front_url": "https://customer-tekto.cloudflarestream.com/bench-press-front/manifest/video.m3u8",
+    "video_side_url": "https://customer-tekto.cloudflarestream.com/bench-press-side/manifest/video.m3u8",
+    "variation_easier_slug": "dumbbell-bench-press",
+    "variation_harder_slug": "close-grip-bench-press",
+    "form_check_supported": true,
+    "form_check_lift_key": "bench_press"
+  },
+  {
+    "slug": "dumbbell-bench-press",
+    "name_en": "Dumbbell Bench Press",
+    "name_fr": "Développé Couché Haltères",
+    "equipment": ["dumbbell"],
+    "muscle_primary": ["chest"],
+    "muscle_secondary": ["triceps", "front_deltoid"],
+    "cues_en": [
+      "Start with dumbbells at shoulder width, palms facing forward.",
+      "Press up and together, squeezing chest at the top.",
+      "Control the descent over 2 seconds."
+    ],
+    "cues_fr": [
+      "Commencez avec les haltères à largeur d'épaules, paumes vers l'avant.",
+      "Poussez vers le haut et ensemblez en contractant la poitrine.",
+      "Contrôlez la descente sur 2 secondes."
+    ],
+    "common_mistakes_en": ["Going too heavy and losing control", "Not fully extending at the top"],
+    "common_mistakes_fr": ["Trop lourd et perte de contrôle", "Ne pas s'étendre complètement en haut"],
+    "video_front_url": "https://customer-tekto.cloudflarestream.com/dumbbell-bench-press-front/manifest/video.m3u8",
+    "video_side_url": "https://customer-tekto.cloudflarestream.com/dumbbell-bench-press-side/manifest/video.m3u8",
+    "variation_easier_slug": null,
+    "variation_harder_slug": "bench-press",
+    "form_check_supported": false,
+    "form_check_lift_key": null
+  },
+  {
+    "slug": "overhead-press",
+    "name_en": "Barbell Overhead Press",
+    "name_fr": "Développé Militaire Barre",
+    "equipment": ["barbell"],
+    "muscle_primary": ["shoulders"],
+    "muscle_secondary": ["triceps", "upper_chest", "core"],
+    "cues_en": [
+      "Grip just outside shoulder width, bar resting on front deltoids.",
+      "Press in a slight arc to avoid the chin, finishing over your ears.",
+      "Lock out elbows fully at the top."
+    ],
+    "cues_fr": [
+      "Prise légèrement plus large que les épaules, barre sur les deltoïdes.",
+      "Pressez en légère arc pour éviter le menton, terminer au-dessus des oreilles.",
+      "Verrouillez les coudes complètement en haut."
+    ],
+    "common_mistakes_en": ["Excessive lower back arch", "Not locking out at the top", "Pushing the bar in front of the face"],
+    "common_mistakes_fr": ["Cambrure excessive du bas du dos", "Ne pas verrouiller en haut", "Pousser la barre devant le visage"],
+    "video_front_url": "https://customer-tekto.cloudflarestream.com/overhead-press-front/manifest/video.m3u8",
+    "video_side_url": "https://customer-tekto.cloudflarestream.com/overhead-press-side/manifest/video.m3u8",
+    "variation_easier_slug": "dumbbell-shoulder-press",
+    "variation_harder_slug": "push-press",
+    "form_check_supported": true,
+    "form_check_lift_key": "overhead_press"
+  },
+  {
+    "slug": "dumbbell-shoulder-press",
+    "name_en": "Dumbbell Shoulder Press",
+    "name_fr": "Développé Épaules Haltères",
+    "equipment": ["dumbbell"],
+    "muscle_primary": ["shoulders"],
+    "muscle_secondary": ["triceps"],
+    "cues_en": [
+      "Start with dumbbells at ear level, palms facing forward.",
+      "Press up until arms are fully extended.",
+      "Lower under control back to ear level."
+    ],
+    "cues_fr": [
+      "Commencez avec les haltères à hauteur des oreilles, paumes vers l'avant.",
+      "Pressez jusqu'à l'extension complète des bras.",
+      "Descendez en contrôle jusqu'à hauteur des oreilles."
+    ],
+    "common_mistakes_en": ["Shrugging the traps up", "Not reaching full extension"],
+    "common_mistakes_fr": ["Hausser les trapèzes", "Ne pas atteindre l'extension complète"],
+    "video_front_url": "https://customer-tekto.cloudflarestream.com/dumbbell-shoulder-press-front/manifest/video.m3u8",
+    "video_side_url": null,
+    "variation_easier_slug": null,
+    "variation_harder_slug": "overhead-press",
+    "form_check_supported": false,
+    "form_check_lift_key": null
+  },
+  {
+    "slug": "barbell-row",
+    "name_en": "Barbell Bent-Over Row",
+    "name_fr": "Rowing Barre Penché",
+    "equipment": ["barbell"],
+    "muscle_primary": ["lats", "rhomboids"],
+    "muscle_secondary": ["biceps", "rear_deltoid", "erectors"],
+    "cues_en": [
+      "Hinge to roughly 45° and brace your core.",
+      "Pull the bar to your lower sternum, leading with your elbows.",
+      "Squeeze your shoulder blades together at the top."
+    ],
+    "cues_fr": [
+      "Inclinez-vous à environ 45° et gainéz.",
+      "Tirez la barre vers le sternum inférieur, coudes en tête.",
+      "Serrez les omoplates ensemble en haut."
+    ],
+    "common_mistakes_en": ["Using momentum to swing the bar", "Pulling too high to the chest", "Rounding the lower back"],
+    "common_mistakes_fr": ["Utiliser l'élan pour balancer la barre", "Tirer trop haut vers la poitrine", "Arrondir le bas du dos"],
+    "video_front_url": "https://customer-tekto.cloudflarestream.com/barbell-row-front/manifest/video.m3u8",
+    "video_side_url": "https://customer-tekto.cloudflarestream.com/barbell-row-side/manifest/video.m3u8",
+    "variation_easier_slug": "dumbbell-row",
+    "variation_harder_slug": "pendlay-row",
+    "form_check_supported": true,
+    "form_check_lift_key": "row"
+  },
+  {
+    "slug": "dumbbell-row",
+    "name_en": "Single-Arm Dumbbell Row",
+    "name_fr": "Rowing Unilatéral Haltère",
+    "equipment": ["dumbbell"],
+    "muscle_primary": ["lats"],
+    "muscle_secondary": ["biceps", "rear_deltoid"],
+    "cues_en": [
+      "Support with the opposite hand and knee on the bench.",
+      "Let the dumbbell hang with a natural arm extension.",
+      "Pull the elbow straight up past your hip."
+    ],
+    "cues_fr": [
+      "Soutenez-vous avec la main et le genou opposés sur le banc.",
+      "Laissez l'haltère pendre avec une extension naturelle du bras.",
+      "Tirez le coude directement vers le haut au-delà de la hanche."
+    ],
+    "common_mistakes_en": ["Rotating the torso to assist the pull", "Not reaching full extension at the bottom"],
+    "common_mistakes_fr": ["Rotation du torse pour aider la traction", "Ne pas atteindre l'extension complète en bas"],
+    "video_front_url": "https://customer-tekto.cloudflarestream.com/dumbbell-row-front/manifest/video.m3u8",
+    "video_side_url": null,
+    "variation_easier_slug": null,
+    "variation_harder_slug": "barbell-row",
+    "form_check_supported": false,
+    "form_check_lift_key": null
+  },
+  {
+    "slug": "hip-thrust",
+    "name_en": "Barbell Hip Thrust",
+    "name_fr": "Hip Thrust Barre",
+    "equipment": ["barbell"],
+    "muscle_primary": ["glutes"],
+    "muscle_secondary": ["hamstrings", "core"],
+    "cues_en": [
+      "Upper back rests on the bench, feet flat and hip-width apart.",
+      "Drive through heels, squeezing glutes at the top.",
+      "Full hip extension — don't hyperextend the lower back."
+    ],
+    "cues_fr": [
+      "Haut du dos appuyé sur le banc, pieds à plat à largeur de hanches.",
+      "Poussez à travers les talons en contractant les fessiers en haut.",
+      "Extension complète des hanches — ne pas hyperextendre le bas du dos."
+    ],
+    "common_mistakes_en": ["Hyperextending the lower back", "Not fully extending the hips", "Feet too far from the bench"],
+    "common_mistakes_fr": ["Hyperextension du bas du dos", "Ne pas étendre complètement les hanches", "Pieds trop loin du banc"],
+    "video_front_url": "https://customer-tekto.cloudflarestream.com/hip-thrust-front/manifest/video.m3u8",
+    "video_side_url": "https://customer-tekto.cloudflarestream.com/hip-thrust-side/manifest/video.m3u8",
+    "variation_easier_slug": "glute-bridge",
+    "variation_harder_slug": "single-leg-hip-thrust",
+    "form_check_supported": true,
+    "form_check_lift_key": "hip_thrust"
+  },
+  {
+    "slug": "pull-up",
+    "name_en": "Pull-Up",
+    "name_fr": "Traction",
+    "equipment": ["bodyweight"],
+    "muscle_primary": ["lats"],
+    "muscle_secondary": ["biceps", "rear_deltoid", "core"],
+    "cues_en": [
+      "Start from a dead hang with shoulder blades packed.",
+      "Pull elbows down and back, aiming chin over bar.",
+      "Lower under control to full extension."
+    ],
+    "cues_fr": [
+      "Partez d'une suspension morte avec les omoplates serrées.",
+      "Tirez les coudes vers le bas et l'arrière, menton au-dessus de la barre.",
+      "Descendez en contrôle jusqu'à l'extension complète."
+    ],
+    "common_mistakes_en": ["Kipping (swinging) to get up", "Not achieving full dead hang at bottom", "Chin not clearing the bar"],
+    "common_mistakes_fr": ["Balancement pour monter", "Ne pas atteindre la suspension morte en bas", "Menton ne dépassant pas la barre"],
+    "video_front_url": "https://customer-tekto.cloudflarestream.com/pull-up-front/manifest/video.m3u8",
+    "video_side_url": "https://customer-tekto.cloudflarestream.com/pull-up-side/manifest/video.m3u8",
+    "variation_easier_slug": "lat-pulldown",
+    "variation_harder_slug": "weighted-pull-up",
+    "form_check_supported": false,
+    "form_check_lift_key": null
+  },
+  {
+    "slug": "lat-pulldown",
+    "name_en": "Lat Pulldown",
+    "name_fr": "Tirage Vertical",
+    "equipment": ["cable"],
+    "muscle_primary": ["lats"],
+    "muscle_secondary": ["biceps", "rear_deltoid"],
+    "cues_en": [
+      "Grip slightly wider than shoulder width, slight back lean.",
+      "Pull the bar to your upper chest, leading with elbows.",
+      "Fully extend arms before each rep."
+    ],
+    "cues_fr": [
+      "Prise légèrement plus large que les épaules, léger recul.",
+      "Tirez la barre vers la poitrine haute, coudes en tête.",
+      "Étendez complètement les bras avant chaque répétition."
+    ],
+    "common_mistakes_en": ["Pulling behind the neck", "Using momentum", "Insufficient lat engagement"],
+    "common_mistakes_fr": ["Tirer derrière la nuque", "Utiliser l'élan", "Engagement insuffisant des dorsaux"],
+    "video_front_url": "https://customer-tekto.cloudflarestream.com/lat-pulldown-front/manifest/video.m3u8",
+    "video_side_url": null,
+    "variation_easier_slug": null,
+    "variation_harder_slug": "pull-up",
+    "form_check_supported": false,
+    "form_check_lift_key": null
+  },
+  {
+    "slug": "dumbbell-lunge",
+    "name_en": "Dumbbell Walking Lunge",
+    "name_fr": "Fente Marchée Haltères",
+    "equipment": ["dumbbell"],
+    "muscle_primary": ["quadriceps", "glutes"],
+    "muscle_secondary": ["hamstrings", "core"],
+    "cues_en": [
+      "Step forward and lower the back knee toward the ground.",
+      "Front knee stays over the ankle, not beyond the toes.",
+      "Drive through the front heel to stand and step through."
+    ],
+    "cues_fr": [
+      "Faites un pas en avant et descendez le genou arrière vers le sol.",
+      "Le genou avant reste au-dessus de la cheville, pas au-delà des orteils.",
+      "Poussez à travers le talon avant pour se relever."
+    ],
+    "common_mistakes_en": ["Front knee caving inward", "Leaning too far forward", "Steps too short"],
+    "common_mistakes_fr": ["Genou avant qui rentre vers l'intérieur", "Trop d'inclinaison vers l'avant", "Pas trop courts"],
+    "video_front_url": "https://customer-tekto.cloudflarestream.com/dumbbell-lunge-front/manifest/video.m3u8",
+    "video_side_url": null,
+    "variation_easier_slug": "bodyweight-lunge",
+    "variation_harder_slug": "barbell-lunge",
+    "form_check_supported": true,
+    "form_check_lift_key": "squat"
+  },
+  {
+    "slug": "push-up",
+    "name_en": "Push-Up",
+    "name_fr": "Pompe",
+    "equipment": ["bodyweight"],
+    "muscle_primary": ["chest"],
+    "muscle_secondary": ["triceps", "front_deltoid", "core"],
+    "cues_en": [
+      "Hands slightly wider than shoulder width, fingers spread.",
+      "Body forms a straight line from head to heels.",
+      "Lower chest to 1 cm above the ground, then press up."
+    ],
+    "cues_fr": [
+      "Mains légèrement plus larges que les épaules, doigts écartés.",
+      "Corps en ligne droite de la tête aux talons.",
+      "Descendez la poitrine à 1 cm du sol, puis poussez."
+    ],
+    "common_mistakes_en": ["Hips sagging or piking", "Flaring elbows too wide", "Not reaching full range of motion"],
+    "common_mistakes_fr": ["Hanches qui s'affaissent ou se soulèvent", "Coudes trop écartés", "Ne pas atteindre l'amplitude complète"],
+    "video_front_url": "https://customer-tekto.cloudflarestream.com/push-up-front/manifest/video.m3u8",
+    "video_side_url": "https://customer-tekto.cloudflarestream.com/push-up-side/manifest/video.m3u8",
+    "variation_easier_slug": "incline-push-up",
+    "variation_harder_slug": "diamond-push-up",
+    "form_check_supported": true,
+    "form_check_lift_key": "push_up"
+  }
+]
