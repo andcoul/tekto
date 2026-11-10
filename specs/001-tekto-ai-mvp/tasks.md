@@ -17,6 +17,22 @@ description: "Task list for Tekto AI MVP (regenerated after spec clarifications 
 
 **Organization**: Tasks are grouped by user story; story labels match spec.md (US1–US7). Phases follow spec priority: P1 = US6, US1, US2, US7, US4; P2 = US3, US5.
 
+## Progress (2026-11-10)
+
+**49 done / 65 open** of 114. Phases 1–4 (setup, foundations, US6 video library, US1 onboarding → first plan) are complete except:
+
+- **T114** — staging Supabase project + Vault secrets (needs account access)
+- **T022** — ≥ 150 filmed exercises (content workstream; 15 today)
+
+Partially done, deliberately left open:
+
+- **T049** — sync queue has ordered flush + `failed` status; its test (T046) does not compile yet
+- **T051** — haptics on "Done" use Flutter `HapticFeedback`; haptic on new PR still missing
+
+Not yet verified: the Pro AI plan path against the real Claude API (needs `ANTHROPIC_API_KEY`), and quickstart Scenarios 1 and 7 on a device. Next: Phase 5 (US2 Workout), then US7 and US4.
+
+---
+
 ## Format: `[ID] [P?] [Story] Description`
 
 - **[P]**: Can run in parallel (different files, no dependency on an incomplete task)
