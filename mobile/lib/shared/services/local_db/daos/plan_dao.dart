@@ -50,6 +50,11 @@ class PlanDao extends DatabaseAccessor<AppDatabase> with _$PlanDaoMixin {
         lastAdaptedWeek: Value(lastAdaptedWeek),
       ));
 
+  /// After a regeneration, keeps only [keepPlanId] active for [userId] on this device.
+  Future<void> archiveOtherPlans(String userId, {required String keepPlanId}) => (update(plans)
+        ..where((p) => p.userId.equals(userId) & p.status.equals('active') & p.id.equals(keepPlanId).not()))
+      .write(const PlansCompanion(status: Value('archived')));
+
   Future<void> archivePlan(String planId) => (update(plans)
         ..where((p) => p.id.equals(planId)))
       .write(PlansCompanion(status: const Value('archived')));

@@ -172,8 +172,8 @@
   "settingsDeleteAccountConfirm": "This will permanently delete all your data and cannot be undone. Are you sure?",
   "settingsDeleteAccountConfirmSecond": "Delete my account permanently",
   "paywallTitle": "Unlock Tekto Pro",
-  "paywallMonthly": "$12.99 / month",
-  "paywallAnnual": "$79.99 / year",
+  "paywallMonthly": "Monthly",
+  "paywallAnnual": "Annual",
   "paywallAnnualSavings": "Save 49%",
   "paywallTrialCta": "Start 7-day free trial",
   "paywallRestore": "Restore purchases",
@@ -232,5 +232,10 @@
   },
   "adaptationWhyLabel": "Why",
   "formCheckFreeTryUsed": "You've used your free form check for this lift.",
-  "libraryVideoUnavailable": "Video unavailable"
+  "libraryVideoUnavailable": "Video unavailable",
+  "trialStart": "Start 7-day free trial",
+  "trialSkip": "Skip for now",
+  "paywallPurchaseFailed": "Purchase failed. Please try again.",
+  "trialTitle": "Your plan is ready",
+  "trialSubtitle": "Try Tekto Pro free for 7 days: unlimited coach, camera form check, weekly plan updates and offline video."
 }

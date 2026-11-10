@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/app_theme.dart';
+import '../../../core/router/app_router.dart';
 import '../domain/onboarding_controller.dart';
 
 class PlanGenerationScreen extends ConsumerStatefulWidget {
@@ -32,9 +33,10 @@ class _PlanGenerationScreenState extends ConsumerState<PlanGenerationScreen> {
   Widget build(BuildContext context) {
     final state = ref.watch(onboardingControllerProvider);
 
-    // Navigate on success (no loading, no error)
-    ref.listen(onboardingControllerProvider, (_, next) {
-      if (!next.isLoading && next.error == null && !_timedOut) {
+    // The server always returns a plan (FR-003b); errors here are network/auth failures.
+    ref.listen(onboardingControllerProvider, (previous, next) {
+      if (next.result != null && previous?.result == null) {
+        ref.invalidate(userProfileProvider); // the profile now exists → router leaves onboarding
         context.go('/onboarding/trial');
       }
     });

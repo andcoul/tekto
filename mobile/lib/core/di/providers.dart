@@ -1,4 +1,5 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -30,10 +31,7 @@ FlutterSecureStorage secureStorage(Ref ref) {
 // ── API client (Dio) ──────────────────────────────────────────────────────
 
 @riverpod
-TektoDioClient dioClient(Ref ref) {
-  final storage = ref.watch(secureStorageProvider);
-  return TektoDioClient(storage);
-}
+TektoDioClient dioClient(Ref ref) => TektoDioClient();
 
 // ── Local database (Drift) ────────────────────────────────────────────────
 
@@ -69,4 +67,15 @@ Stream<bool> isOnline(Ref ref) async* {
   bool online(List<ConnectivityResult> r) => r.any((c) => c != ConnectivityResult.none);
   yield online(await connectivity.checkConnectivity());
   yield* connectivity.onConnectivityChanged.map(online);
+}
+
+// ── App language ──────────────────────────────────────────────────────────
+
+/// App locale chosen by the user (onboarding language step, Settings); null = device locale.
+@Riverpod(keepAlive: true)
+class AppLocale extends _$AppLocale {
+  @override
+  Locale? build() => null;
+
+  void set(String languageCode) => state = Locale(languageCode);
 }

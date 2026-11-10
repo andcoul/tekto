@@ -107,8 +107,8 @@
   "settingsDeleteAccountConfirm": "Toutes vos données seront définitivement supprimées. Cette action est irréversible. Êtes-vous sûr ?",
   "settingsDeleteAccountConfirmSecond": "Supprimer définitivement mon compte",
   "paywallTitle": "Débloquer Tekto Pro",
-  "paywallMonthly": "12,99 $ / mois",
-  "paywallAnnual": "79,99 $ / an",
+  "paywallMonthly": "Mensuel",
+  "paywallAnnual": "Annuel",
   "paywallAnnualSavings": "Économisez 49 %",
   "paywallTrialCta": "Démarrer l'essai de 7 jours",
   "paywallRestore": "Restaurer les achats",
@@ -140,5 +140,10 @@
   "adaptationSessionsCompleted": "{completed} séances sur {scheduled} effectuées",
   "adaptationWhyLabel": "Pourquoi",
   "formCheckFreeTryUsed": "Vous avez utilisé votre analyse de forme gratuite pour cet exercice.",
-  "libraryVideoUnavailable": "Vidéo indisponible"
+  "libraryVideoUnavailable": "Vidéo indisponible",
+  "trialStart": "Essai gratuit de 7 jours",
+  "trialSkip": "Plus tard",
+  "paywallPurchaseFailed": "L'achat a échoué. Veuillez réessayer.",
+  "trialTitle": "Votre programme est prêt",
+  "trialSubtitle": "Essayez Tekto Pro gratuitement pendant 7 jours : coach illimité, analyse de forme par caméra, ajustements hebdomadaires et vidéos hors ligne."
 }

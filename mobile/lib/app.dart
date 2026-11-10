@@ -32,6 +32,7 @@ class TektoApp extends ConsumerWidget {
       theme: AppTheme.light,
       darkTheme: AppTheme.dark,
       themeMode: ThemeMode.system,
+      locale: ref.watch(appLocaleProvider),
       routerConfig: router,
       localizationsDelegates: const [
         AppLocalizations.delegate,
