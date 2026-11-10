@@ -139,5 +139,6 @@
   "proUnavailableInRegion": "Tekto Pro n'est pas encore disponible dans votre région.",
   "adaptationSessionsCompleted": "{completed} séances sur {scheduled} effectuées",
   "adaptationWhyLabel": "Pourquoi",
-  "formCheckFreeTryUsed": "Vous avez utilisé votre analyse de forme gratuite pour cet exercice."
+  "formCheckFreeTryUsed": "Vous avez utilisé votre analyse de forme gratuite pour cet exercice.",
+  "libraryVideoUnavailable": "Vidéo indisponible"
 }

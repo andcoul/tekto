@@ -1,121 +1,89 @@
+// T020 — written before the ExerciseRepository update (Constitution V).
+// Uses a real in-memory Drift DB and a fake remote, so it exercises the repository itself.
+import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mocktail/mocktail.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
-
-import 'package:tekto/shared/models/exercise_model.dart';
-import 'package:tekto/shared/services/local_db/database.dart';
 import 'package:tekto/features/library/data/exercise_repository.dart';
+import 'package:tekto/shared/services/local_db/database.dart';
 
-// ── Mocks ──────────────────────────────────────────────────────────────────
+/// A Supabase `exercises` row as returned by PostgREST (snake_case columns).
+Map<String, dynamic> row(String slug, String nameEn, List<String> equipment) => {
+      'slug': slug,
+      'name_en': nameEn,
+      'name_fr': '$nameEn (fr)',
+      'equipment': equipment,
+      'muscle_primary': ['chest'],
+      'muscle_secondary': <String>[],
+      'cues_en': ['Cue 1 for $slug', 'Cue 2', 'Cue 3'],
+      'cues_fr': ['Consigne 1', 'Consigne 2', 'Consigne 3'],
+      'common_mistakes_en': ['Mistake'],
+      'common_mistakes_fr': ['Erreur'],
+      'video_front_url': 'https://video.test/$slug.m3u8',
+      'video_side_url': null,
+      'video_duration_sec': 10,
+      'captions_en_url': 'https://video.test/$slug.en.vtt',
+      'captions_fr_url': 'https://video.test/$slug.fr.vtt',
+      'contraindications': ['shoulder'],
+      'variation_easier_slug': null,
+      'variation_harder_slug': null,
+      'form_check_supported': false,
+      'form_check_lift_key': null,
+    };
 
-class MockAppDatabase extends Mock implements AppDatabase {}
-class MockSupabaseClient extends Mock implements SupabaseClient {}
-
-// ── Helpers ────────────────────────────────────────────────────────────────
-
-ExerciseModel _barbell({String slug = 'barbell-squat'}) => ExerciseModel(
-      slug: slug,
-      nameEn: 'Barbell Squat',
-      nameFr: 'Squat Barre',
-      equipment: const ['barbell'],
-      musclePrimary: const ['quadriceps', 'glutes'],
-      muscleSecondary: const ['hamstrings'],
-      cuesEn: const [],
-      cuesFr: const [],
-      commonMistakesEn: const [],
-      commonMistakesFr: const [],
-      formCheckSupported: true,
-      videoFrontUrl: 'https://cdn.example.com/squat.m3u8',
-    );
-
-ExerciseModel _dumbbell({String slug = 'dumbbell-row'}) => ExerciseModel(
-      slug: slug,
-      nameEn: 'Dumbbell Row',
-      nameFr: 'Rowing Haltère',
-      equipment: const ['dumbbell'],
-      musclePrimary: const ['lats'],
-      muscleSecondary: const ['biceps'],
-      cuesEn: const [],
-      cuesFr: const [],
-      commonMistakesEn: const [],
-      commonMistakesFr: const [],
-      formCheckSupported: false,
-      videoFrontUrl: 'https://cdn.example.com/row.m3u8',
-    );
+final remoteRows = [
+  row('push-up', 'Push-up', ['bodyweight']),
+  row('dumbbell-row', 'Dumbbell Row', ['dumbbell']),
+  row('bench-press', 'Bench Press', ['barbell']),
+  row('goblet-squat', 'Goblet Squat', ['dumbbell']),
+];
 
 void main() {
-  group('ExerciseRepository', () {
-    late MockAppDatabase mockDb;
-    late MockSupabaseClient mockSupabase;
+  late AppDatabase db;
+  setUp(() => db = AppDatabase.forTesting(NativeDatabase.memory()));
+  tearDown(() => db.close());
 
-    setUp(() {
-      mockDb = MockAppDatabase();
-      mockSupabase = MockSupabaseClient();
-    });
+  ExerciseRepository online() => ExerciseRepository(db: db, fetchRemote: () async => remoteRows);
+  ExerciseRepository offline() =>
+      ExerciseRepository(db: db, fetchRemote: () async => throw Exception('no network'));
 
-    test('getByEquipment returns only exercises with matching equipment', () async {
-      // The repository's getAll() path uses Supabase; simulate network error
-      // so it falls back to local DB.
-      // For this test we seed the local exercises list directly via getAll() mock.
-      final repo = ExerciseRepository(db: mockDb, supabase: mockSupabase);
+  test('online: parses snake_case rows and sorts alphabetically by English name', () async {
+    final all = await online().getAll();
+    expect(all.map((e) => e.slug), ['bench-press', 'dumbbell-row', 'goblet-squat', 'push-up']);
+    expect(all.first.captionsEnUrl, 'https://video.test/bench-press.en.vtt');
+    expect(all.first.contraindications, ['shoulder']);
+  });
 
-      // We test the filtering logic directly on a known exercise list.
-      final exercises = [_barbell(), _dumbbell()];
+  test('getByEquipment filters by equipment and keeps alphabetical order', () async {
+    final dumbbell = await online().getByEquipment(['dumbbell']);
+    expect(dumbbell.map((e) => e.slug), ['dumbbell-row', 'goblet-squat']);
+  });
 
-      final filtered = exercises
-          .where((e) => e.equipment.contains('barbell'))
-          .toList();
+  test('offline: serves cached text fields (names, cues, mistakes) — no Pro gating', () async {
+    await online().getAll(); // populate the cache while online
 
-      expect(filtered.length, 1);
-      expect(filtered.first.slug, 'barbell-squat');
-    });
+    final cached = await offline().getAll();
+    expect(cached.map((e) => e.slug), ['bench-press', 'dumbbell-row', 'goblet-squat', 'push-up']);
+    final pushUp = cached.last;
+    expect(pushUp.nameFr, 'Push-up (fr)');
+    expect(pushUp.cuesEn, ['Cue 1 for push-up', 'Cue 2', 'Cue 3']);
+    expect(pushUp.cuesFr.length, 3);
+    expect(pushUp.commonMistakesEn, ['Mistake']);
+  });
 
-    test('getByEquipment with dumbbell returns dumbbell exercises', () {
-      final exercises = [_barbell(), _dumbbell()];
-      final filtered = exercises
-          .where((e) => e.equipment.contains('dumbbell'))
-          .toList();
+  test('offline with an empty cache returns an empty list instead of throwing', () async {
+    expect(await offline().getAll(), isEmpty);
+  });
 
-      expect(filtered.length, 1);
-      expect(filtered.first.slug, 'dumbbell-row');
-    });
+  test('getBySlugs returns the cached exercises for a plan when offline', () async {
+    await online().getAll();
+    final plan = await offline().getBySlugs(['push-up', 'goblet-squat']);
+    expect(plan.map((e) => e.slug), ['goblet-squat', 'push-up']);
+  });
 
-    test('exercises are sorted alphabetically by nameEn', () {
-      final exercises = [
-        _dumbbell(slug: 'dumbbell-row'),
-        _barbell(slug: 'barbell-squat'),
-      ];
-
-      final sorted = [...exercises]
-        ..sort((a, b) => a.nameEn.compareTo(b.nameEn));
-
-      expect(sorted.first.nameEn, 'Barbell Squat');
-      expect(sorted.last.nameEn, 'Dumbbell Row');
-    });
-
-    test('getByMuscle returns exercises for a primary muscle group', () {
-      final exercises = [_barbell(), _dumbbell()];
-
-      final quadExercises = exercises
-          .where((e) =>
-              e.musclePrimary.contains('quadriceps') ||
-              e.muscleSecondary.contains('quadriceps'))
-          .toList();
-
-      expect(quadExercises.length, 1);
-      expect(quadExercises.first.slug, 'barbell-squat');
-    });
-
-    test('getByMuscle returns empty list when no exercises match', () {
-      final exercises = [_barbell(), _dumbbell()];
-
-      final nonExistent = exercises
-          .where((e) =>
-              e.musclePrimary.contains('calves') ||
-              e.muscleSecondary.contains('calves'))
-          .toList();
-
-      expect(nonExistent, isEmpty);
-    });
+  test('a refresh online replaces stale cached text', () async {
+    await online().getAll();
+    final updated = [for (final r in remoteRows) {...r, if (r['slug'] == 'push-up') 'cues_en': ['New cue']}];
+    await ExerciseRepository(db: db, fetchRemote: () async => updated).getAll();
+    final cached = await offline().getBySlugs(['push-up']);
+    expect(cached.single.cuesEn, ['New cue']);
   });
 }

@@ -231,5 +231,6 @@
     }
   },
   "adaptationWhyLabel": "Why",
-  "formCheckFreeTryUsed": "You've used your free form check for this lift."
+  "formCheckFreeTryUsed": "You've used your free form check for this lift.",
+  "libraryVideoUnavailable": "Video unavailable"
 }

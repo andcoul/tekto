@@ -1,3 +1,4 @@
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -57,4 +58,15 @@ SyncQueue syncQueue(Ref ref) {
 @Riverpod(keepAlive: true)
 RevenueCatService revenueCatService(Ref ref) {
   return RevenueCatService();
+}
+
+// ── Connectivity ──────────────────────────────────────────────────────────
+
+/// True while any network interface is up. Offline-first UI (Constitution I) branches on this.
+@Riverpod(keepAlive: true)
+Stream<bool> isOnline(Ref ref) async* {
+  final connectivity = Connectivity();
+  bool online(List<ConnectivityResult> r) => r.any((c) => c != ConnectivityResult.none);
+  yield online(await connectivity.checkConnectivity());
+  yield* connectivity.onConnectivityChanged.map(online);
 }

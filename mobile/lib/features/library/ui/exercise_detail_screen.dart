@@ -2,7 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/di/providers.dart';
+import '../../../core/l10n/gen/app_localizations.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../plan/domain/plan_provider.dart';
+import '../../subscription/domain/entitlement_provider.dart';
 import '../../../shared/widgets/video_player_widget.dart';
 import '../domain/exercise_provider.dart';
 
@@ -15,32 +19,30 @@ class ExerciseDetailScreen extends ConsumerStatefulWidget {
       _ExerciseDetailScreenState();
 }
 
-class _ExerciseDetailScreenState
-    extends ConsumerState<ExerciseDetailScreen> {
+class _ExerciseDetailScreenState extends ConsumerState<ExerciseDetailScreen> {
   bool _showSideView = false;
+  bool _downloading = false;
 
   @override
   Widget build(BuildContext context) {
-    final exerciseAsync = ref.watch(
-      // Re-use exercise provider filtered to single slug
-      exercisesProvider.selectAsync(
-        (all) => all.where((e) => e.slug == widget.exerciseSlug).firstOrNull,
-      ),
-    );
+    final exercisesAsync = ref.watch(exercisesProvider);
+    final isPro = ref.watch(entitlementProvider).value?.isPro ?? false;
+    final isOnline = ref.watch(isOnlineProvider).value ?? true;
+    final download = ref.watch(exerciseDownloadProvider(widget.exerciseSlug)).value;
+    final l10n = AppLocalizations.of(context);
+    final fr = Localizations.localeOf(context).languageCode == 'fr';
 
     return Scaffold(
-      body: exerciseAsync.when(
-        loading: () =>
-            const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text('Error: $e')),
-        data: (exercise) {
-          if (exercise == null) {
-            return const Center(child: Text('Exercise not found.'));
-          }
+      body: exercisesAsync.when(
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (e, _) => Center(child: Text(l10n.errorGeneric)),
+        data: (all) {
+          final exercise = all.where((e) => e.slug == widget.exerciseSlug).firstOrNull;
+          if (exercise == null) return Center(child: Text(l10n.errorGeneric));
 
-          final videoUrl = _showSideView
-              ? (exercise.videoSideUrl ?? exercise.videoFrontUrl)
-              : exercise.videoFrontUrl;
+          final videoUrl = _showSideView ? (exercise.videoSideUrl ?? exercise.videoFrontUrl) : exercise.videoFrontUrl;
+          final cues = fr ? exercise.cuesFr : exercise.cuesEn;
+          final mistakes = fr ? exercise.commonMistakesFr : exercise.commonMistakesEn;
 
           return CustomScrollView(
             slivers: [
@@ -49,21 +51,30 @@ class _ExerciseDetailScreenState
                 pinned: true,
                 flexibleSpace: FlexibleSpaceBar(
                   background: VideoPlayerWidget(
+                    isPro: isPro,
+                    isOnline: isOnline,
                     remoteUrl: videoUrl,
-                    isPro: true, // library browsing shows video regardless
-                    autoPlay: true,
-                    looping: true,
+                    // Downloads are front-angle only; the side view always streams.
+                    localPath: _showSideView ? null : download?.localPath,
+                    remoteCaptions: {
+                      if (exercise.captionsEnUrl != null) 'en': exercise.captionsEnUrl!,
+                      if (exercise.captionsFrUrl != null) 'fr': exercise.captionsFrUrl!,
+                    },
+                    localCaptions: download?.captions ?? const {},
                   ),
                 ),
                 actions: [
                   if (exercise.videoSideUrl != null)
                     TextButton(
-                      onPressed: () =>
-                          setState(() => _showSideView = !_showSideView),
-                      child: Text(
-                        _showSideView ? 'Front' : 'Side',
-                        style: const TextStyle(color: AppColors.accent),
-                      ),
+                      onPressed: () => setState(() => _showSideView = !_showSideView),
+                      child: Text(_showSideView ? 'Front' : 'Side', style: const TextStyle(color: AppColors.accent)),
+                    ),
+                  // Offline downloads are a Pro entitlement (FR-015); hidden for free users.
+                  if (isPro)
+                    IconButton(
+                      tooltip: l10n.libraryDownloadForOffline,
+                      onPressed: download != null || _downloading || !isOnline ? null : _downloadActivePlan,
+                      icon: Icon(download != null ? Icons.download_done : Icons.download, color: AppColors.accent),
                     ),
                 ],
               ),
@@ -71,40 +82,22 @@ class _ExerciseDetailScreenState
                 padding: const EdgeInsets.all(AppSpacing.base),
                 sliver: SliverList(
                   delegate: SliverChildListDelegate([
-                    Text(
-                      exercise.nameEn,
-                      style: Theme.of(context).textTheme.headlineMedium,
-                    ),
+                    Text(fr ? exercise.nameFr : exercise.nameEn, style: Theme.of(context).textTheme.headlineMedium),
                     const SizedBox(height: 4),
-                    Text(
-                      exercise.musclePrimary.join(' · '),
-                      style: Theme.of(context).textTheme.bodyMedium,
-                    ),
+                    Text(exercise.musclePrimary.join(' · '), style: Theme.of(context).textTheme.bodyMedium),
                     const SizedBox(height: AppSpacing.lg),
-                    _SectionHeader('Technique cues'),
-                    ...exercise.cuesEn.asMap().entries.map(
-                          (e) => _CueRow(number: e.key + 1, text: e.value),
-                        ),
+                    _SectionHeader(fr ? 'Consignes techniques' : 'Technique cues'),
+                    ...cues.asMap().entries.map((e) => _CueRow(number: e.key + 1, text: e.value)),
                     const SizedBox(height: AppSpacing.lg),
-                    _SectionHeader('Common mistakes'),
-                    ...exercise.commonMistakesEn
-                        .map((m) => _MistakeRow(text: m)),
-                    if (exercise.variationEasierSlug != null ||
-                        exercise.variationHarderSlug != null) ...[
+                    _SectionHeader(fr ? 'Erreurs fréquentes' : 'Common mistakes'),
+                    ...mistakes.map((m) => _MistakeRow(text: m)),
+                    if (exercise.variationEasierSlug != null || exercise.variationHarderSlug != null) ...[
                       const SizedBox(height: AppSpacing.lg),
-                      _SectionHeader('Variations'),
+                      _SectionHeader(fr ? 'Variantes' : 'Variations'),
                       if (exercise.variationEasierSlug != null)
-                        _VariationTile(
-                          slug: exercise.variationEasierSlug!,
-                          label: 'Easier',
-                          icon: Icons.arrow_downward,
-                        ),
+                        _VariationTile(slug: exercise.variationEasierSlug!, label: fr ? 'Plus facile' : 'Easier', icon: Icons.arrow_downward),
                       if (exercise.variationHarderSlug != null)
-                        _VariationTile(
-                          slug: exercise.variationHarderSlug!,
-                          label: 'Harder',
-                          icon: Icons.arrow_upward,
-                        ),
+                        _VariationTile(slug: exercise.variationHarderSlug!, label: fr ? 'Plus difficile' : 'Harder', icon: Icons.arrow_upward),
                     ],
                     const SizedBox(height: 80),
                   ]),
@@ -115,6 +108,24 @@ class _ExerciseDetailScreenState
         },
       ),
     );
+  }
+
+  /// Downloads every video in the active plan (the contract is per plan, so this exercise is
+  /// included when it is in the plan).
+  Future<void> _downloadActivePlan() async {
+    final plan = ref.read(activePlanProvider).value;
+    if (plan == null) return;
+    setState(() => _downloading = true);
+    try {
+      await ref.read(videoDownloadServiceProvider).downloadPlanVideos(plan.id, isPro: true).drain<void>();
+      ref.invalidate(exerciseDownloadProvider);
+    } on Exception {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppLocalizations.of(context).errorGeneric)));
+      }
+    } finally {
+      if (mounted) setState(() => _downloading = false);
+    }
   }
 }
 

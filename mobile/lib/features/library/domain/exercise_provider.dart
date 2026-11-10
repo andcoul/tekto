@@ -2,8 +2,9 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../shared/models/exercise_model.dart';
-import '../../../shared/services/local_db/database.dart';
+import '../../../core/di/providers.dart';
 import '../data/exercise_repository.dart';
+import '../data/video_download_service.dart';
 
 part 'exercise_provider.g.dart';
 
@@ -11,7 +12,7 @@ part 'exercise_provider.g.dart';
 ExerciseRepository exerciseRepository(Ref ref) {
   final db = ref.watch(appDatabaseProvider);
   final supabase = Supabase.instance.client;
-  return ExerciseRepository(db: db, supabase: supabase);
+  return ExerciseRepository.supabase(db: db, supabase: supabase);
 }
 
 @riverpod
@@ -55,3 +56,12 @@ class FilteredExercises extends _$FilteredExercises {
 // Forward the appDatabaseProvider so it doesn't need an import in this file.
 // The actual provider lives in core/di/providers.dart — referenced here via
 // generated code after build_runner runs.
+
+@Riverpod(keepAlive: true)
+VideoDownloadService videoDownloadService(Ref ref) =>
+    VideoDownloadService.live(db: ref.watch(appDatabaseProvider), dio: ref.watch(dioClientProvider));
+
+/// The offline copy of [slug]'s video, if one was downloaded on this device.
+@riverpod
+Future<DownloadedVideo?> exerciseDownload(Ref ref, String slug) =>
+    ref.watch(videoDownloadServiceProvider).getDownload(slug);

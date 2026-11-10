@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/di/providers.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../shared/widgets/video_player_widget.dart';
 import '../../../shared/widgets/set_log_row.dart';
@@ -80,8 +81,9 @@ class _WorkoutContent extends ConsumerWidget {
       children: [
         // Video player for current exercise
         VideoPlayerWidget(
-          remoteUrl: null, // populated by real exercise data
+          remoteUrl: null, // populated by real exercise data (T050)
           isPro: false,
+          isOnline: ref.watch(isOnlineProvider).value ?? true,
           aspectRatio: 16 / 9,
         ),
         const SizedBox(height: AppSpacing.sm),

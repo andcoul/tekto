@@ -1,102 +1,126 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:flutter_downloader/flutter_downloader.dart';
+import 'package:dio/dio.dart';
+import 'package:drift/drift.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../shared/services/api/supabase_client.dart';
 import '../../../shared/services/local_db/database.dart';
-import '../../../shared/services/local_db/daos/exercise_dao.dart';
 
+/// Calls `video-download-urls` for a plan (contracts/backend-api.md §5) and returns `downloads[]`.
+typedef DownloadUrlsFetcher = Future<List<Map<String, dynamic>>> Function(String planId);
 
+/// Downloads [url] to [path] and resolves when the file is complete.
+typedef FileDownloader = Future<void> Function(String url, String path, void Function(int received, int total) onProgress);
+
+class ProRequiredException implements Exception {
+  const ProRequiredException();
+  @override
+  String toString() => 'Offline video downloads require Tekto Pro';
+}
+
+/// Pro-only offline downloads (FR-015, Constitution I v2.0.0): MP4 + EN/FR WebVTT captions per
+/// exercise in the plan. A row is written to the device-only `exercise_video_downloads` table only
+/// after the video file has fully downloaded.
 class VideoDownloadService {
   VideoDownloadService({
-    required TektoDioClient dio,
     required AppDatabase db,
-    required String userId,
-  })  : _dio = dio,
-        _db = db,
-        _userId = userId;
+    required DownloadUrlsFetcher fetchUrls,
+    required FileDownloader download,
+    required Future<Directory> Function() storageDir,
+  })  : _db = db,
+        _fetchUrls = fetchUrls,
+        _download = download,
+        _storageDir = storageDir;
 
-  final TektoDioClient _dio;
-  final AppDatabase _db;
-  final String _userId;
-
-  /// Downloads all exercise videos for the given plan.
-  /// Returns a stream of [DownloadProgress] updates.
-  Stream<DownloadProgress> downloadPlanVideos(String planId) async* {
-    // 1. Request signed URLs from Edge Function
-    final response = await _dio.post<Map<String, dynamic>>(
-      '/functions/v1/video-download-urls',
-      data: {'plan_id': planId},
-    );
-
-    final downloads =
-        (response.data?['downloads'] as List? ?? []).cast<Map<String, dynamic>>();
-
-    final dir = await getApplicationDocumentsDirectory();
-    final videosDir = Directory('${dir.path}/videos');
-    if (!videosDir.existsSync()) videosDir.createSync(recursive: true);
-
-    int completed = 0;
-    for (final item in downloads) {
-      final slug = item['exercise_slug'] as String;
-      final signedUrl = item['signed_url'] as String;
-
-      yield DownloadProgress(
-        exerciseSlug: slug,
-        completed: completed,
-        total: downloads.length,
-        status: DownloadStatus.downloading,
+  /// Production wiring through the authenticated Dio client.
+  factory VideoDownloadService.live({required AppDatabase db, required TektoDioClient dio}) => VideoDownloadService(
+        db: db,
+        fetchUrls: (planId) async {
+          final response = await dio.post<Map<String, dynamic>>('/functions/v1/video-download-urls', data: {'plan_id': planId});
+          return (response.data?['downloads'] as List? ?? const []).cast<Map<String, dynamic>>();
+        },
+        download: (url, path, onProgress) => dio.dio.download(url, path, onReceiveProgress: onProgress),
+        storageDir: () async => Directory('${(await getApplicationDocumentsDirectory()).path}/videos'),
       );
 
-      final fileName = '$slug.mp4';
-      final localPath = '${videosDir.path}/$fileName';
+  final AppDatabase _db;
+  final DownloadUrlsFetcher _fetchUrls;
+  final FileDownloader _download;
+  final Future<Directory> Function() _storageDir;
+
+  /// Downloads every exercise video in [planId]. Throws [ProRequiredException] for free users.
+  Stream<DownloadProgress> downloadPlanVideos(String planId, {required bool isPro}) async* {
+    if (!isPro) throw const ProRequiredException();
+
+    final List<Map<String, dynamic>> downloads;
+    try {
+      downloads = await _fetchUrls(planId);
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 403) throw const ProRequiredException();
+      rethrow;
+    }
+
+    final dir = await _storageDir();
+    if (!dir.existsSync()) dir.createSync(recursive: true);
+
+    var completed = 0;
+    for (final item in downloads) {
+      final slug = item['exercise_slug'] as String;
+      final videoUrl = item['download_url_front'] as String;
+      final captions = (item['captions'] as Map? ?? const {}).cast<String, String>();
+      yield DownloadProgress(exerciseSlug: slug, completed: completed, total: downloads.length, status: DownloadStatus.downloading);
 
       try {
-        await FlutterDownloader.enqueue(
-          url: signedUrl,
-          savedDir: videosDir.path,
-          fileName: fileName,
-          showNotification: false,
-          openFileFromNotification: false,
-        );
+        final videoPath = '${dir.path}/$slug.mp4';
+        await _download(videoUrl, videoPath, (_, __) {});
 
-        // Record in Drift DB
-        // Device-only record (data-model entity 14). Captions are added by T028.
+        final captionPaths = <String, String>{};
+        for (final MapEntry(key: lang, value: url) in captions.entries) {
+          final path = '${dir.path}/${slug}_$lang.vtt';
+          try {
+            await _download(url, path, (_, __) {});
+            captionPaths[lang] = path;
+          } on Exception {
+            // A missing caption track never blocks the video download.
+          }
+        }
+
         await _db.into(_db.exerciseVideoDownloads).insertOnConflictUpdate(
               ExerciseVideoDownloadsCompanion.insert(
                 exerciseSlug: slug,
-                localPath: localPath,
+                localPath: videoPath,
+                captionsLocalPaths: Value(jsonEncode(captionPaths)),
+                fileSizeBytes: Value(File(videoPath).lengthSync()),
               ),
             );
-
         completed++;
-        yield DownloadProgress(
-          exerciseSlug: slug,
-          completed: completed,
-          total: downloads.length,
-          status: DownloadStatus.done,
-        );
-      } catch (_) {
-        yield DownloadProgress(
-          exerciseSlug: slug,
-          completed: completed,
-          total: downloads.length,
-          status: DownloadStatus.error,
-        );
+        yield DownloadProgress(exerciseSlug: slug, completed: completed, total: downloads.length, status: DownloadStatus.done);
+      } on Exception {
+        yield DownloadProgress(exerciseSlug: slug, completed: completed, total: downloads.length, status: DownloadStatus.error);
       }
     }
   }
 
-  /// Returns the local file path for a downloaded video, or null if not downloaded.
-  Future<String?> getLocalPath(String exerciseSlug) async {
-    final row = await (_db.select(_db.exerciseVideoDownloads)
-          ..where((d) => d.exerciseSlug.equals(exerciseSlug)))
+  /// The downloaded video and caption paths for [exerciseSlug], or null if not downloaded.
+  Future<DownloadedVideo?> getDownload(String exerciseSlug) async {
+    final row = await (_db.select(_db.exerciseVideoDownloads)..where((d) => d.exerciseSlug.equals(exerciseSlug)))
         .getSingleOrNull();
-    return row?.localPath;
+    if (row == null) return null;
+    return DownloadedVideo(
+      localPath: row.localPath,
+      captions: (jsonDecode(row.captionsLocalPaths) as Map).cast<String, String>(),
+    );
   }
+}
+
+class DownloadedVideo {
+  const DownloadedVideo({required this.localPath, required this.captions});
+  final String localPath;
+
+  /// Caption file paths keyed by language code.
+  final Map<String, String> captions;
 }
 
 enum DownloadStatus { downloading, done, error }

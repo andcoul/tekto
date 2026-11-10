@@ -99,19 +99,19 @@ description: "Task list for Tekto AI MVP (regenerated after spec clarifications 
 
 ### Tests for User Story 6 (write first, must fail)
 
-- [ ] T020 [P] [US6] Update `mobile/test/unit/exercise_repository_test.dart`: filters by equipment and sorts alphabetically; offline returns cached text fields (names, cues, mistakes) for every exercise in the active plan for a **free** user (Constitution I v2.0.0)
-- [ ] T021 [P] [US6] Create `mobile/test/widget/video_player_widget_test.dart`: free user offline → notice shown, no modal, no blocking overlay; Pro user offline with a download → plays the local file; captions track is attached in the user's language
+- [X] T020 [P] [US6] Update `mobile/test/unit/exercise_repository_test.dart`: filters by equipment and sorts alphabetically; offline returns cached text fields (names, cues, mistakes) for every exercise in the active plan for a **free** user (Constitution I v2.0.0)
+- [X] T021 [P] [US6] Create `mobile/test/widget/video_player_widget_test.dart`: free user offline → notice shown, no modal, no blocking overlay; Pro user offline with a download → plays the local file; captions track is attached in the user's language
 
 ### Implementation for User Story 6
 
 - [ ] T022 [US6] **Content dependency** — extend `content/exercises/exercises.json` from 15 to ≥ 150 entries covering barbell, dumbbell, cable, bodyweight and resistance-band movements (FR-013), including the 8 form-check lifts with `form_check_lift_key` in `squat, deadlift, bench_press, overhead_press, row, lunge, hip_thrust, push_up`; video URLs come from the content workstream (blocks Gate 1)
-- [ ] T023 [P] [US6] Add WebVTT caption files `content/exercises/captions/<slug>_en.vtt` and `<slug>_fr.vtt` for every exercise in `exercises.json` (FR-035)
-- [ ] T024 [US6] Update `content/exercises/seed-exercises.js`: fail on any row missing `video_front_url`, `captions_en_url` or `captions_fr_url`; upload each `.vtt` as a Cloudflare Stream caption track; warn when fewer than 150 rows in dev and exit non-zero when fewer than 150 with `--production`
-- [ ] T025 [P] [US6] Update `mobile/lib/features/library/data/exercise_repository.dart` to pass T020: cache text fields for every exercise in the active plan for all users; fetch online and refresh the cache
-- [ ] T026 [US6] Update `mobile/lib/shared/widgets/video_player_widget.dart` to pass T021: captions on by default when the OS caption setting is on; Pro offline uses `ExerciseVideoDownload.local_path` and `captions_local_paths`; free offline shows `offline_video_requires_pro` inline
-- [ ] T027 [US6] Update `supabase/functions/video-download-urls/index.ts` per contracts/backend-api.md §5: add signed `captions.en` / `captions.fr` URLs (24 h expiry); `PRO_REQUIRED` (403) for free users
-- [ ] T028 [US6] Update `mobile/lib/features/library/data/video_download_service.dart`: download MP4 + both `.vtt` files for Pro users only; write `local_path`, `captions_local_paths`, `file_size_bytes`; show progress per exercise
-- [ ] T029 [P] [US6] Update `mobile/lib/features/library/ui/exercise_detail_screen.dart`: front/side toggle, captions toggle, download button for Pro only
+- [X] T023 [P] [US6] Add WebVTT caption files `content/exercises/captions/<slug>_en.vtt` and `<slug>_fr.vtt` for every exercise in `exercises.json` (FR-035)
+- [X] T024 [US6] Update `content/exercises/seed-exercises.js`: fail on any row missing `video_front_url`, `captions_en_url` or `captions_fr_url`; upload each `.vtt` as a Cloudflare Stream caption track; warn when fewer than 150 rows in dev and exit non-zero when fewer than 150 with `--production`
+- [X] T025 [P] [US6] Update `mobile/lib/features/library/data/exercise_repository.dart` to pass T020: cache text fields for every exercise in the active plan for all users; fetch online and refresh the cache
+- [X] T026 [US6] Update `mobile/lib/shared/widgets/video_player_widget.dart` to pass T021: captions on by default when the OS caption setting is on; Pro offline uses `ExerciseVideoDownload.local_path` and `captions_local_paths`; free offline shows `offline_video_requires_pro` inline
+- [X] T027 [US6] Update `supabase/functions/video-download-urls/index.ts` per contracts/backend-api.md §5: add signed `captions.en` / `captions.fr` URLs (24 h expiry); `PRO_REQUIRED` (403) for free users
+- [X] T028 [US6] Update `mobile/lib/features/library/data/video_download_service.dart`: download MP4 + both `.vtt` files for Pro users only; write `local_path`, `captions_local_paths`, `file_size_bytes`; show progress per exercise
+- [X] T029 [P] [US6] Update `mobile/lib/features/library/ui/exercise_detail_screen.dart`: front/side toggle, captions toggle, download button for Pro only
 
 **Checkpoint**: Quickstart Scenario 7 and the free-offline part of Scenario 2 pass.
 

@@ -1,0 +1,7 @@
+targets:
+  $default:
+    builders:
+      json_serializable:
+        options:
+          # Models mirror Supabase rows, whose columns are snake_case (name_en, video_front_url…).
+          field_rename: snake
