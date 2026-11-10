@@ -4,7 +4,7 @@ part 'plan_model.freezed.dart';
 part 'plan_model.g.dart';
 
 @freezed
-class PlanModel with _$PlanModel {
+abstract class PlanModel with _$PlanModel {
   const factory PlanModel({
     required String id,
     required String userId,
@@ -12,7 +12,14 @@ class PlanModel with _$PlanModel {
     required String status,
     required int weeksTotal,
     required int currentWeek,
-    required String generatedBy,
+    /// Monday in the user's time zone; week N = startDate + 7·(N−1) … +6.
+    required DateTime startDate,
+    @Default(0) int lastAdaptedWeek,
+    /// 'ai' | 'template' | 'template_fallback'
+    required String source,
+    String? templateSlug,
+    /// Deprecated: superseded by [source] / [templateSlug].
+    String? generatedBy,
     String? rationaleEn,
     String? rationaleFr,
     @Default([]) List<Map<String, dynamic>> adaptationLog,
@@ -25,7 +32,7 @@ class PlanModel with _$PlanModel {
 }
 
 @freezed
-class SessionModel with _$SessionModel {
+abstract class SessionModel with _$SessionModel {
   const factory SessionModel({
     required String id,
     required String planId,
@@ -43,7 +50,7 @@ class SessionModel with _$SessionModel {
 }
 
 @freezed
-class PlanExerciseModel with _$PlanExerciseModel {
+abstract class PlanExerciseModel with _$PlanExerciseModel {
   const factory PlanExerciseModel({
     required String id,
     required String sessionId,

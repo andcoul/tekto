@@ -1,9 +1,9 @@
 {
   "@@locale": "en",
-
   "appName": "Tekto",
-  "@appName": { "description": "The app name" },
-
+  "@appName": {
+    "description": "The app name"
+  },
   "continueButton": "Continue",
   "skipButton": "Skip",
   "doneButton": "Done",
@@ -11,23 +11,19 @@
   "confirmButton": "Confirm",
   "retryButton": "Try again",
   "loadingLabel": "Loading…",
-
   "errorGeneric": "Something went wrong. Please try again.",
   "errorNoConnection": "No internet connection. Working offline.",
   "errorTimeout": "This is taking longer than expected. Please check your connection.",
   "errorAiUnavailable": "AI is temporarily unavailable. Please try again in a moment.",
   "errorPlanValidationFailed": "We had trouble building your plan. Retrying with adjustments…",
-
   "healthDisclaimerTitle": "Before we start",
   "healthDisclaimerBody": "Tekto provides AI-generated training plans for educational purposes only. Always consult a qualified healthcare professional before starting any exercise program, especially if you have a pre-existing condition, injury, or health concern. Stop exercising and seek medical advice if you experience pain, dizziness, or unusual symptoms.",
   "healthDisclaimerAcknowledge": "I understand — let's go",
-
   "onboardingGoalTitle": "What's your main goal?",
   "goalMuscle": "Build muscle",
   "goalStrength": "Get stronger",
   "goalFatLoss": "Lose fat",
   "goalGeneralFitness": "General fitness",
-
   "onboardingLevelTitle": "How experienced are you?",
   "levelBeginner": "Beginner",
   "levelBeginnerSub": "Less than 1 year of consistent training",
@@ -35,58 +31,65 @@
   "levelIntermediateSub": "1–3 years of consistent training",
   "levelAdvanced": "Advanced",
   "levelAdvancedSub": "3+ years, comfortable with compound lifts",
-
   "onboardingDaysTitle": "How many days per week can you train?",
   "onboardingDaysLabel": "{days} days/week",
   "@onboardingDaysLabel": {
-    "placeholders": { "days": { "type": "int" } }
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
   },
-
   "onboardingSessionLengthTitle": "How long is each session?",
   "onboardingSessionLengthLabel": "{minutes} minutes",
   "@onboardingSessionLengthLabel": {
-    "placeholders": { "minutes": { "type": "int" } }
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
   },
-
   "onboardingEquipmentTitle": "What equipment do you have?",
   "equipmentBarbell": "Barbell",
   "equipmentDumbbell": "Dumbbell",
   "equipmentCable": "Cable machine",
   "equipmentBodyweight": "Bodyweight only",
   "equipmentBands": "Resistance bands",
-
   "onboardingLimitationsTitle": "Any limitations we should know?",
   "onboardingLimitationsHint": "e.g. lower back injury, bad knees… (optional)",
-
   "generatingPlanTitle": "Building your plan…",
   "generatingPlanSubtitle": "Analysing your profile and selecting the best exercises for you.",
-
   "trialOfferTitle": "Start your free trial",
   "trialOfferSubtitle": "Get unlimited AI coaching, form check, and adaptive plans.",
   "trialOfferCta": "Start 7-day free trial",
   "trialOfferSkip": "Not now — start for free",
   "trialOfferCancelAnytime": "Cancel anytime. No charge until trial ends.",
-
   "homeTitle": "Today",
   "homeRestDay": "Rest day",
   "homeRestDaySubtitle": "Recovery is part of the plan. See you tomorrow.",
   "homeStartWorkout": "Start workout",
-
   "planTitle": "My Plan",
   "planWeekOf": "Week {week} of {total}",
   "@planWeekOf": {
     "placeholders": {
-      "week": { "type": "int" },
-      "total": { "type": "int" }
+      "week": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
     }
   },
-
   "workoutTitle": "Workout",
   "workoutSetOf": "Set {current} of {total}",
   "@workoutSetOf": {
     "placeholders": {
-      "current": { "type": "int" },
-      "total": { "type": "int" }
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
     }
   },
   "workoutDone": "Done",
@@ -99,9 +102,12 @@
   "workoutTotalVolume": "Total volume",
   "workoutKgMoved": "{kg} kg moved",
   "@workoutKgMoved": {
-    "placeholders": { "kg": { "type": "String" } }
+    "placeholders": {
+      "kg": {
+        "type": "String"
+      }
+    }
   },
-
   "libraryTitle": "Exercise Library",
   "librarySearchHint": "Search exercises…",
   "libraryFilterMuscle": "Muscle",
@@ -109,23 +115,29 @@
   "libraryDownloadForOffline": "Download for offline",
   "libraryDownloadProgress": "Downloading {progress}%…",
   "@libraryDownloadProgress": {
-    "placeholders": { "progress": { "type": "int" } }
+    "placeholders": {
+      "progress": {
+        "type": "int"
+      }
+    }
   },
   "libraryOfflineProRequired": "Offline video requires Tekto Pro",
-
   "coachTitle": "Coach",
   "coachInputHint": "Ask your coach…",
   "coachUnavailableOffline": "Your coach is unavailable offline. Connect to the internet to chat.",
   "coachQuotaRemaining": "{remaining} questions left this week",
   "@coachQuotaRemaining": {
-    "placeholders": { "remaining": { "type": "int" } }
+    "placeholders": {
+      "remaining": {
+        "type": "int"
+      }
+    }
   },
   "coachQuotaExhausted": "You've used all 3 free questions this week.",
   "coachSeeAProfessional": "For concerns about pain or injury, please consult a qualified physiotherapist or doctor.",
   "coachPlanChangePending": "I suggest this change to your plan:",
   "coachApplyChange": "Apply change",
   "coachDeclineChange": "No thanks",
-
   "formCheckTitle": "Form Check",
   "formCheckPlacementTitle": "Position your phone",
   "formCheckPlacementInstructions": "Place your phone on the floor about 2 m away, facing you. Make sure your whole body is visible in the frame.",
@@ -133,16 +145,18 @@
   "formCheckAdjustLighting": "Adjust lighting — room is too dark to track your form.",
   "formCheckReps": "{reps} reps",
   "@formCheckReps": {
-    "placeholders": { "reps": { "type": "int" } }
+    "placeholders": {
+      "reps": {
+        "type": "int"
+      }
+    }
   },
   "formCheckScoreLabel": "Form score",
   "formCheckTopTipLabel": "Top tip",
-
   "progressTitle": "Progress",
   "progressTabHistory": "History",
   "progressTabRecords": "Records",
   "progressTabVolume": "Volume",
-
   "settingsTitle": "Settings",
   "settingsPreferences": "Preferences",
   "settingsLanguage": "Language",
@@ -157,37 +171,71 @@
   "settingsDeleteAccount": "Delete account",
   "settingsDeleteAccountConfirm": "This will permanently delete all your data and cannot be undone. Are you sure?",
   "settingsDeleteAccountConfirmSecond": "Delete my account permanently",
-
   "paywallTitle": "Unlock Tekto Pro",
-  "paywallMonthly": "$12.99 / month",
-  "paywallAnnual": "$79.99 / year",
+  "paywallMonthly": "Monthly",
+  "paywallAnnual": "Annual",
   "paywallAnnualSavings": "Save 49%",
   "paywallTrialCta": "Start 7-day free trial",
   "paywallRestore": "Restore purchases",
   "paywallCancelAnytime": "Cancel anytime",
   "paywallNotNow": "Not now",
-
   "subscriptionSettingsTitle": "Subscription",
   "subscriptionProBadge": "Pro",
   "subscriptionFreeBadge": "Free",
   "subscriptionTrialEnds": "Trial ends {date}",
   "@subscriptionTrialEnds": {
-    "placeholders": { "date": { "type": "String" } }
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
   },
   "subscriptionRenews": "Renews {date}",
   "@subscriptionRenews": {
-    "placeholders": { "date": { "type": "String" } }
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
   },
   "subscriptionManage": "Manage subscription",
   "subscriptionRestorePurchases": "Restore purchases",
-
   "adaptationSummaryTitle": "Your plan has been updated",
   "adaptationSummarySubtitle": "Here's what changed for next week and why.",
   "adaptationGotIt": "Got it",
-
   "proGateCoachLimit": "You've reached the free coaching limit.",
   "proGateFormCheck": "Form check is a Pro feature.",
   "proGateOfflineVideo": "Download videos for offline playback with Pro.",
   "proGateAdaptivePlan": "Adaptive weekly plans require Pro.",
-  "proGateUnlimitedCoach": "Get unlimited coaching with Pro."
+  "proGateUnlimitedCoach": "Get unlimited coaching with Pro.",
+  "consentTitle": "Your health data",
+  "consentBody": "Tekto uses the training details you enter (goals, limitations, workouts, form-check results) to build and adapt your plan. This is health data. It is encrypted on your phone and on our servers, camera footage never leaves your device, and you can export or delete everything at any time in Settings.",
+  "consentAgree": "I agree",
+  "@consentAgree": {
+    "description": "Explicit GDPR consent button; required before the quiz"
+  },
+  "onboardingLanguageTitle": "Choose your language",
+  "planFallbackNotice": "We built you a starter plan. You can regenerate it later in Settings.",
+  "freePlanDaysCapped": "Your free plan has 4 sessions a week. Tekto Pro builds programs for 5 or more days.",
+  "coachUnavailable": "The coach is temporarily unavailable. Your plan still works — try again in a moment.",
+  "proUnavailableInRegion": "Tekto Pro is not yet available in your region.",
+  "adaptationSessionsCompleted": "{completed} of {scheduled} sessions completed",
+  "@adaptationSessionsCompleted": {
+    "placeholders": {
+      "completed": {
+        "type": "int"
+      },
+      "scheduled": {
+        "type": "int"
+      }
+    }
+  },
+  "adaptationWhyLabel": "Why",
+  "formCheckFreeTryUsed": "You've used your free form check for this lift.",
+  "libraryVideoUnavailable": "Video unavailable",
+  "trialStart": "Start 7-day free trial",
+  "trialSkip": "Skip for now",
+  "paywallPurchaseFailed": "Purchase failed. Please try again.",
+  "trialTitle": "Your plan is ready",
+  "trialSubtitle": "Try Tekto Pro free for 7 days: unlimited coach, camera form check, weekly plan updates and offline video."
 }

@@ -1,189 +1,154 @@
 {
-  "name": "Intermediate Push/Pull/Legs 4×",
+  "slug": "intermediate-ppl-4x",
+  "level": "intermediate",
+  "days_per_week": 4,
+  "equipment_required": [
+    "barbell",
+    "dumbbell",
+    "cable"
+  ],
+  "name_en": "Intermediate Push/Pull/Legs 4×",
+  "name_fr": "Push/Pull/Legs Intermédiaire 4×",
   "weeks_total": 8,
   "rationale_en": "A 4-day Push/Pull/Legs split for intermediate lifters with gym access. High frequency for upper body (2×/week), dedicated leg day, and structured progression using RPE.",
   "rationale_fr": "Un split Push/Pull/Legs de 4 jours pour les pratiquants intermédiaires avec accès à une salle. Haute fréquence pour le haut du corps (2×/semaine), journée jambes dédiée et progression structurée par RPE.",
+  "_comment": "Week-1 pattern; the template builder repeats it for weeks_total weeks. Exercises are ordered compound-first so trimming removes accessories. Starting weights are computed (starting-weights.ts).",
   "sessions": [
     {
-      "template_session_ref": "push",
-      "week_number": 1,
+      "ref": "push",
       "day_of_week": 1,
       "name_en": "Push — Chest / Shoulders / Triceps",
       "name_fr": "Push — Poitrine / Épaules / Triceps",
-      "muscle_groups": ["chest", "shoulders", "triceps"],
-      "estimated_min": 65
+      "exercises": [
+        {
+          "exercise_slug": "bench-press",
+          "sets": 4,
+          "reps_min": 6,
+          "reps_max": 8,
+          "rest_sec": 180,
+          "rpe_target": 8.0
+        },
+        {
+          "exercise_slug": "overhead-press",
+          "sets": 3,
+          "reps_min": 8,
+          "reps_max": 10,
+          "rest_sec": 150,
+          "rpe_target": 8.0
+        },
+        {
+          "exercise_slug": "dumbbell-bench-press",
+          "sets": 3,
+          "reps_min": 10,
+          "reps_max": 12,
+          "rest_sec": 90,
+          "rpe_target": 7.5
+        }
+      ]
     },
     {
-      "template_session_ref": "pull",
-      "week_number": 1,
+      "ref": "pull",
       "day_of_week": 2,
       "name_en": "Pull — Back / Biceps",
       "name_fr": "Pull — Dos / Biceps",
-      "muscle_groups": ["lats", "traps", "biceps", "rear_deltoid"],
-      "estimated_min": 65
+      "exercises": [
+        {
+          "exercise_slug": "barbell-row",
+          "sets": 4,
+          "reps_min": 6,
+          "reps_max": 8,
+          "rest_sec": 180,
+          "rpe_target": 8.0
+        },
+        {
+          "exercise_slug": "lat-pulldown",
+          "sets": 3,
+          "reps_min": 10,
+          "reps_max": 12,
+          "rest_sec": 90,
+          "rpe_target": 7.5
+        },
+        {
+          "exercise_slug": "dumbbell-row",
+          "sets": 3,
+          "reps_min": 10,
+          "reps_max": 12,
+          "rest_sec": 90,
+          "rpe_target": 7.5
+        }
+      ]
     },
     {
-      "template_session_ref": "legs",
-      "week_number": 1,
+      "ref": "legs",
       "day_of_week": 4,
       "name_en": "Legs — Quads / Glutes / Hamstrings",
       "name_fr": "Jambes — Quadriceps / Fessiers / Ischio-jambiers",
-      "muscle_groups": ["quadriceps", "glutes", "hamstrings"],
-      "estimated_min": 65
+      "exercises": [
+        {
+          "exercise_slug": "barbell-squat",
+          "sets": 4,
+          "reps_min": 5,
+          "reps_max": 8,
+          "rest_sec": 240,
+          "rpe_target": 8.5
+        },
+        {
+          "exercise_slug": "romanian-deadlift",
+          "sets": 3,
+          "reps_min": 8,
+          "reps_max": 10,
+          "rest_sec": 150,
+          "rpe_target": 8.0
+        },
+        {
+          "exercise_slug": "hip-thrust",
+          "sets": 3,
+          "reps_min": 10,
+          "reps_max": 12,
+          "rest_sec": 120,
+          "rpe_target": 7.5
+        }
+      ]
     },
     {
-      "template_session_ref": "upper",
-      "week_number": 1,
+      "ref": "upper",
       "day_of_week": 5,
       "name_en": "Upper Body — Full Upper",
       "name_fr": "Haut du Corps — Complet",
-      "muscle_groups": ["chest", "lats", "shoulders", "biceps", "triceps"],
-      "estimated_min": 65
-    }
-  ],
-  "plan_exercises": [
-    {
-      "template_session_ref": "push",
-      "exercise_slug": "bench-press",
-      "sort_order": 0,
-      "sets": 4,
-      "reps_min": 6,
-      "reps_max": 8,
-      "rpe_target": 8.0,
-      "rest_sec": 180,
-      "suggested_weight_kg": null
-    },
-    {
-      "template_session_ref": "push",
-      "exercise_slug": "overhead-press",
-      "sort_order": 1,
-      "sets": 3,
-      "reps_min": 8,
-      "reps_max": 10,
-      "rpe_target": 8.0,
-      "rest_sec": 150,
-      "suggested_weight_kg": null
-    },
-    {
-      "template_session_ref": "push",
-      "exercise_slug": "dumbbell-bench-press",
-      "sort_order": 2,
-      "sets": 3,
-      "reps_min": 10,
-      "reps_max": 12,
-      "rpe_target": 7.5,
-      "rest_sec": 90,
-      "suggested_weight_kg": null
-    },
-    {
-      "template_session_ref": "pull",
-      "exercise_slug": "barbell-row",
-      "sort_order": 0,
-      "sets": 4,
-      "reps_min": 6,
-      "reps_max": 8,
-      "rpe_target": 8.0,
-      "rest_sec": 180,
-      "suggested_weight_kg": null
-    },
-    {
-      "template_session_ref": "pull",
-      "exercise_slug": "lat-pulldown",
-      "sort_order": 1,
-      "sets": 3,
-      "reps_min": 10,
-      "reps_max": 12,
-      "rpe_target": 7.5,
-      "rest_sec": 90,
-      "suggested_weight_kg": null
-    },
-    {
-      "template_session_ref": "pull",
-      "exercise_slug": "dumbbell-row",
-      "sort_order": 2,
-      "sets": 3,
-      "reps_min": 10,
-      "reps_max": 12,
-      "rpe_target": 7.5,
-      "rest_sec": 90,
-      "suggested_weight_kg": null
-    },
-    {
-      "template_session_ref": "legs",
-      "exercise_slug": "barbell-squat",
-      "sort_order": 0,
-      "sets": 4,
-      "reps_min": 5,
-      "reps_max": 8,
-      "rpe_target": 8.5,
-      "rest_sec": 240,
-      "suggested_weight_kg": null
-    },
-    {
-      "template_session_ref": "legs",
-      "exercise_slug": "romanian-deadlift",
-      "sort_order": 1,
-      "sets": 3,
-      "reps_min": 8,
-      "reps_max": 10,
-      "rpe_target": 8.0,
-      "rest_sec": 150,
-      "suggested_weight_kg": null
-    },
-    {
-      "template_session_ref": "legs",
-      "exercise_slug": "hip-thrust",
-      "sort_order": 2,
-      "sets": 3,
-      "reps_min": 10,
-      "reps_max": 12,
-      "rpe_target": 7.5,
-      "rest_sec": 120,
-      "suggested_weight_kg": null
-    },
-    {
-      "template_session_ref": "upper",
-      "exercise_slug": "dumbbell-bench-press",
-      "sort_order": 0,
-      "sets": 3,
-      "reps_min": 10,
-      "reps_max": 12,
-      "rpe_target": 8.0,
-      "rest_sec": 120,
-      "suggested_weight_kg": null
-    },
-    {
-      "template_session_ref": "upper",
-      "exercise_slug": "barbell-row",
-      "sort_order": 1,
-      "sets": 3,
-      "reps_min": 8,
-      "reps_max": 10,
-      "rpe_target": 8.0,
-      "rest_sec": 120,
-      "suggested_weight_kg": null
-    },
-    {
-      "template_session_ref": "upper",
-      "exercise_slug": "overhead-press",
-      "sort_order": 2,
-      "sets": 3,
-      "reps_min": 10,
-      "reps_max": 12,
-      "rpe_target": 7.5,
-      "rest_sec": 90,
-      "suggested_weight_kg": null
-    },
-    {
-      "template_session_ref": "upper",
-      "exercise_slug": "lat-pulldown",
-      "sort_order": 3,
-      "sets": 3,
-      "reps_min": 10,
-      "reps_max": 12,
-      "rpe_target": 7.5,
-      "rest_sec": 90,
-      "suggested_weight_kg": null
+      "exercises": [
+        {
+          "exercise_slug": "dumbbell-bench-press",
+          "sets": 3,
+          "reps_min": 10,
+          "reps_max": 12,
+          "rest_sec": 120,
+          "rpe_target": 8.0
+        },
+        {
+          "exercise_slug": "barbell-row",
+          "sets": 3,
+          "reps_min": 8,
+          "reps_max": 10,
+          "rest_sec": 120,
+          "rpe_target": 8.0
+        },
+        {
+          "exercise_slug": "overhead-press",
+          "sets": 3,
+          "reps_min": 10,
+          "reps_max": 12,
+          "rest_sec": 90,
+          "rpe_target": 7.5
+        },
+        {
+          "exercise_slug": "lat-pulldown",
+          "sets": 3,
+          "reps_min": 10,
+          "reps_max": 12,
+          "rest_sec": 90,
+          "rpe_target": 7.5
+        }
+      ]
     }
   ]
 }

@@ -1,5 +1,6 @@
-// Shared TypeScript interfaces mirroring the 14 DB entities.
-// Keep in sync with supabase/migrations/001_initial_schema.sql
+// Shared TypeScript interfaces mirroring the DB entities.
+// Keep in sync with supabase/migrations/001_initial_schema.sql and 005_clarifications.sql
+// (data-model.md revision 2026-11-10).
 
 export type TrainingGoal = 'muscle' | 'strength' | 'fat_loss' | 'general_fitness';
 export type TrainingLevel = 'beginner' | 'intermediate' | 'advanced';
@@ -8,6 +9,12 @@ export type UnitPref = 'kg' | 'lb';
 export type PlanStatus = 'active' | 'completed' | 'archived';
 export type SubscriptionTier = 'free' | 'pro';
 export type CoachMessageRole = 'user' | 'assistant' | 'system';
+export type PlanSource = 'ai' | 'template' | 'template_fallback';
+export type LimitationTag =
+  | 'knee' | 'lower_back' | 'shoulder' | 'wrist' | 'elbow' | 'hip' | 'ankle' | 'neck';
+export type StrengthLift = 'squat' | 'bench_press' | 'deadlift';
+/** Optional onboarding strength check; a lift is absent when the user answered "I don't know". */
+export type StrengthEstimates = Partial<Record<StrengthLift, { weight_kg: number; reps: number }>>;
 
 export interface User {
   id: string;
@@ -16,10 +23,16 @@ export interface User {
   days_per_week: number;
   session_length_min: number;
   equipment: string[];
-  limitations?: string[];
+  limitations?: LimitationTag[];
+  limitations_note?: string | null;
   language: AppLanguage;
   unit: UnitPref;
+  /** IANA zone; drives the training-week boundary */
+  timezone: string;
   health_sync_enabled: boolean;
+  consent_at?: string | null;
+  consent_version?: string | null;
+  strength_estimates?: StrengthEstimates | null;
   onboarding_completed_at?: string;
   created_at: string;
   updated_at: string;
@@ -36,8 +49,12 @@ export interface Exercise {
   cues_fr: string[];
   common_mistakes_en: string[];
   common_mistakes_fr: string[];
-  video_front_url?: string;
-  video_side_url?: string;
+  video_front_url?: string | null;
+  video_side_url?: string | null;
+  video_duration_sec: number;
+  captions_en_url: string;
+  captions_fr_url: string;
+  contraindications: LimitationTag[];
   variation_easier_slug?: string;
   variation_harder_slug?: string;
   form_check_supported: boolean;
@@ -52,7 +69,13 @@ export interface Plan {
   status: PlanStatus;
   weeks_total: number;
   current_week: number;
-  generated_by: string;
+  /** Monday in users.timezone; week N = start_date + 7·(N−1) … +6 */
+  start_date: string;
+  last_adapted_week: number;
+  source: PlanSource;
+  template_slug?: string | null;
+  /** @deprecated superseded by source / template_slug (migration 005) */
+  generated_by?: string;
   rationale_en?: string;
   rationale_fr?: string;
   adaptation_log: AdaptationLogEntry[];
@@ -63,7 +86,11 @@ export interface Plan {
 export interface AdaptationLogEntry {
   week: number;
   adapted_at: string;
+  sessions_scheduled: number;
+  sessions_completed: number;
   changes: AdaptationEvent[];
+  summary_en: string;
+  summary_fr: string;
 }
 
 export interface AdaptationEvent {
@@ -150,17 +177,26 @@ export interface CoachMessage {
   content: string;
   context_screen?: string;
   context_exercise_slug?: string;
-  plan_change_proposed?: PlanChangeProposal;
+  plan_change_proposed?: CoachPlanChange | null;
   plan_change_applied: boolean;
   satisfaction_rating?: boolean;
   created_at: string;
 }
 
-export interface PlanChangeProposal {
-  type: 'swap_exercise';
-  plan_exercise_id: string;
-  old_exercise_slug: string;
-  new_exercise_slug: string;
+export type CoachPlanChangeType = 'exercise_swap' | 'session_shorten' | 'deload' | 'weight_adjustment';
+
+/** Coach-proposed plan change (contracts/ai-services.md §2). Fields not used by a type are null. */
+export interface CoachPlanChange {
+  type: CoachPlanChangeType;
+  plan_exercise_id: string | null;     // exercise_swap, weight_adjustment
+  session_id: string | null;           // session_shorten
+  week_number: number | null;          // deload
+  target_duration_min: number | null;  // session_shorten
+  old_exercise_slug: string | null;
+  new_exercise_slug: string | null;
+  new_weight_kg: number | null;
+  new_reps_min: number | null;
+  new_reps_max: number | null;
   reason_en: string;
   reason_fr: string;
 }
@@ -180,8 +216,12 @@ export interface FormCheckSession {
   rep_count: number;
   form_score?: number;
   cues_shown: string[];
+  /** 1-based reps with at least one cue (FR-024) */
+  flagged_reps: number[];
   top_tip_en?: string;
   top_tip_fr?: string;
+  /** Free tier: one try per lift (FR-029) */
+  was_free_try: boolean;
   user_shared: boolean;
   created_at: string;
 }
@@ -199,14 +239,28 @@ export interface Subscription {
   updated_at: string;
 }
 
-export interface ExerciseVideoDownload {
+// ExerciseVideoDownload is device-only (Drift) since migration 005 — no server type.
+
+/** Content table seeded from content/templates (migration 005). */
+export interface PlanTemplate {
+  slug: string;
+  level: TrainingLevel;
+  days_per_week: number;
+  equipment_required: string[];
+  body: unknown; // same schema as the generate-plan plan body
+  updated_at: string;
+}
+
+/** System table, service role only (migration 005). */
+export interface CoachResponseCacheRow {
   id: string;
-  user_id: string;
-  exercise_slug: string;
-  plan_id: string;
-  local_path?: string;
-  file_size_bytes?: number;
-  downloaded_at: string;
+  language: AppLanguage;
+  embedding: number[]; // 384-d gte-small
+  question_hash: string;
+  response_content: string;
+  prompt_version: string;
+  created_at: string;
+  expires_at: string;
 }
 
 // ── API payloads ───────────────────────────────────────────────────────────
@@ -217,7 +271,7 @@ export interface GeneratePlanRequest {
 }
 
 export interface GeneratePlanResponse {
-  plan: Plan;
+  plan: Plan & { fallback_notice: boolean; notices: string[] };
   sessions: Session[];
   plan_exercises: PlanExercise[];
 }
@@ -246,7 +300,9 @@ export interface VideoDownloadUrlsRequest {
 export interface VideoDownloadUrlsResponse {
   downloads: Array<{
     exercise_slug: string;
-    signed_url: string;
+    download_url_front: string;
+    download_url_side: string | null;
+    captions: { en: string; fr: string };
     expires_at: string;
   }>;
 }

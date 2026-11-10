@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/l10n/gen/app_localizations.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../onboarding/domain/onboarding_controller.dart';
 import '../domain/plan_provider.dart';
 
 class PlanOverviewScreen extends ConsumerWidget {
@@ -51,6 +53,7 @@ class PlanOverviewScreen extends ConsumerWidget {
                         'Week ${plan.currentWeek} of ${plan.weeksTotal}',
                         style: Theme.of(context).textTheme.bodyMedium,
                       ),
+                      _PlanNotices(planId: plan.id),
                     ],
                   ),
                 ),
@@ -114,6 +117,50 @@ class _DayCard extends ConsumerWidget {
           subtitle: const Text('Recovery is part of the plan.'),
         ),
       ),
+    );
+  }
+}
+
+
+/// Non-blocking cards from plan generation (FR-003b fallback, free 5–7 day cap). Dismissible,
+/// never modal (Constitution VI). Shown for the plan just created during onboarding.
+class _PlanNotices extends ConsumerStatefulWidget {
+  const _PlanNotices({required this.planId});
+  final String planId;
+
+  @override
+  ConsumerState<_PlanNotices> createState() => _PlanNoticesState();
+}
+
+class _PlanNoticesState extends ConsumerState<_PlanNotices> {
+  final _dismissed = <String>{};
+
+  @override
+  Widget build(BuildContext context) {
+    final result = ref.watch(onboardingControllerProvider).result;
+    if (result == null || result.planId != widget.planId) return const SizedBox.shrink();
+    final l10n = AppLocalizations.of(context);
+    final messages = <String, String>{
+      if (result.fallbackNotice) 'fallback': l10n.planFallbackNotice,
+      if (result.notices.contains('free_plan_days_capped')) 'days': l10n.freePlanDaysCapped,
+    }..removeWhere((key, _) => _dismissed.contains(key));
+
+    return Column(
+      children: [
+        for (final MapEntry(:key, :value) in messages.entries)
+          Card(
+            margin: const EdgeInsets.only(top: AppSpacing.base),
+            child: ListTile(
+              leading: const Icon(Icons.info_outline, color: AppColors.accent),
+              title: Text(value),
+              trailing: IconButton(
+                icon: const Icon(Icons.close),
+                tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
+                onPressed: () => setState(() => _dismissed.add(key)),
+              ),
+            ),
+          ),
+      ],
     );
   }
 }

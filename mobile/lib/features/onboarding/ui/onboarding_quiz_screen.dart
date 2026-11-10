@@ -1,68 +1,123 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/di/providers.dart';
+import '../../../core/l10n/gen/app_localizations.dart';
 import '../../../core/theme/app_theme.dart';
 import '../domain/onboarding_controller.dart';
 
+/// Onboarding quiz (FR-001, T039). Step order: language, goal, level, days, session length,
+/// equipment, limitations, optional strength check.
+///
+/// TODO(T094): step labels below use an inline EN/FR helper; move them to the ARB files.
 class OnboardingQuizScreen extends ConsumerStatefulWidget {
   const OnboardingQuizScreen({super.key});
 
   @override
-  ConsumerState<OnboardingQuizScreen> createState() =>
-      _OnboardingQuizScreenState();
+  ConsumerState<OnboardingQuizScreen> createState() => _OnboardingQuizScreenState();
 }
 
 class _OnboardingQuizScreenState extends ConsumerState<OnboardingQuizScreen> {
   int _step = 0;
 
   @override
+  void initState() {
+    super.initState();
+    // Pre-select the device language (en/fr) the first time the quiz opens.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || ref.read(onboardingControllerProvider).language != null) return;
+      final device = Localizations.localeOf(context).languageCode;
+      _setLanguage(device == 'fr' ? 'fr' : 'en');
+    });
+  }
+
+  void _setLanguage(String code) {
+    ref.read(onboardingControllerProvider.notifier).setLanguage(code);
+    ref.read(appLocaleProvider.notifier).set(code);
+  }
+
+  @override
   Widget build(BuildContext context) {
     final state = ref.watch(onboardingControllerProvider);
+    final ctrl = ref.read(onboardingControllerProvider.notifier);
+    final isLast = _step == OnboardingState.stepCount - 1;
 
-    final steps = [
-      _GoalStep(
-        selected: state.goal,
-        onSelect: (g) => ref.read(onboardingControllerProvider.notifier).setGoal(g),
-      ),
-      _LevelStep(
-        selected: state.level,
-        onSelect: (l) => ref.read(onboardingControllerProvider.notifier).setLevel(l),
-      ),
-      _DaysStep(
-        value: state.daysPerWeek,
-        onChanged: (d) =>
-            ref.read(onboardingControllerProvider.notifier).setDaysPerWeek(d),
-      ),
-      _SessionLengthStep(
-        value: state.sessionLengthMin,
-        onChanged: (m) =>
-            ref.read(onboardingControllerProvider.notifier).setSessionLength(m),
-      ),
-      _EquipmentStep(
-        selected: state.equipment,
-        onToggle: (e) =>
-            ref.read(onboardingControllerProvider.notifier).toggleEquipment(e),
-      ),
-      _LimitationsStep(
-        value: state.limitations,
-        onChanged: (l) =>
-            ref.read(onboardingControllerProvider.notifier).setLimitations(l),
-      ),
-    ];
-
-    final isLast = _step == steps.length - 1;
+    final step = switch (_step) {
+      0 => _ChoiceStep(
+          title: AppLocalizations.of(context).onboardingLanguageTitle,
+          options: const {'en': 'English', 'fr': 'Français'},
+          selected: state.language,
+          onSelect: _setLanguage,
+        ),
+      1 => _ChoiceStep(
+          title: _t(context, 'What is your main goal?', 'Quel est votre objectif principal ?'),
+          options: {
+            'muscle': _t(context, 'Build muscle', 'Prendre du muscle'),
+            'strength': _t(context, 'Get stronger', 'Gagner en force'),
+            'fat_loss': _t(context, 'Lose fat', 'Perdre du gras'),
+            'general_fitness': _t(context, 'General fitness', 'Forme générale'),
+          },
+          selected: state.goal,
+          onSelect: ctrl.setGoal,
+        ),
+      2 => _ChoiceStep(
+          title: _t(context, 'Your training level', 'Votre niveau'),
+          options: {
+            'beginner': _t(context, 'Beginner', 'Débutant'),
+            'intermediate': _t(context, 'Intermediate', 'Intermédiaire'),
+            'advanced': _t(context, 'Advanced', 'Avancé'),
+          },
+          selected: state.level,
+          onSelect: ctrl.setLevel,
+        ),
+      3 => _SliderStep(
+          title: _t(context, 'Days per week', 'Jours par semaine'),
+          value: state.daysPerWeek,
+          min: 1,
+          max: 7,
+          label: '${state.daysPerWeek}',
+          onChanged: ctrl.setDaysPerWeek,
+        ),
+      4 => _SliderStep(
+          title: _t(context, 'Session length', 'Durée des séances'),
+          value: state.sessionLengthMin,
+          min: 15,
+          max: 120,
+          divisions: 21,
+          label: '${state.sessionLengthMin} min',
+          onChanged: ctrl.setSessionLength,
+        ),
+      5 => _MultiStep(
+          title: _t(context, 'Your equipment', 'Votre équipement'),
+          options: {
+            'barbell': _t(context, 'Barbell', 'Barre'),
+            'dumbbell': _t(context, 'Dumbbells', 'Haltères'),
+            'cable': _t(context, 'Cable / machines', 'Poulie / machines'),
+            'bodyweight': _t(context, 'Bodyweight', 'Poids du corps'),
+            'bands': _t(context, 'Resistance bands', 'Élastiques'),
+          },
+          selected: state.equipment,
+          onToggle: ctrl.toggleEquipment,
+        ),
+      6 => _LimitationsStep(
+          selected: state.limitations,
+          note: state.limitationsNote,
+          onToggle: ctrl.toggleLimitation,
+          onNote: ctrl.setLimitationsNote,
+        ),
+      _ => _StrengthStep(values: state.strength, onChanged: ctrl.setStrength),
+    };
 
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         leading: _step > 0
-            ? IconButton(
-                icon: const Icon(Icons.arrow_back),
-                onPressed: () => setState(() => _step--),
-              )
+            ? IconButton(icon: const Icon(Icons.arrow_back), onPressed: () => setState(() => _step--))
             : null,
         title: LinearProgressIndicator(
-          value: (_step + 1) / steps.length,
+          value: (_step + 1) / OnboardingState.stepCount,
           backgroundColor: AppColors.charcoalElevated,
           valueColor: const AlwaysStoppedAnimation<Color>(AppColors.accent),
         ),
@@ -73,19 +128,20 @@ class _OnboardingQuizScreenState extends ConsumerState<OnboardingQuizScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Expanded(child: steps[_step]),
+              Expanded(child: step),
               const SizedBox(height: AppSpacing.lg),
               ElevatedButton(
                 onPressed: state.canProceed(_step)
                     ? () {
                         if (isLast) {
-                          _submit();
+                          ctrl.submit();
+                          context.go('/onboarding/generating');
                         } else {
                           setState(() => _step++);
                         }
                       }
                     : null,
-                child: Text(isLast ? 'Generate My Plan' : 'Next'),
+                child: Text(isLast ? _t(context, 'Build my plan', 'Créer mon programme') : _t(context, 'Next', 'Suivant')),
               ),
             ],
           ),
@@ -93,271 +149,242 @@ class _OnboardingQuizScreenState extends ConsumerState<OnboardingQuizScreen> {
       ),
     );
   }
-
-  void _submit() {
-    context.go('/onboarding/generating');
-    ref.read(onboardingControllerProvider.notifier).submit();
-  }
 }
 
-// ── Step widgets ───────────────────────────────────────────────────────────
+String _t(BuildContext context, String en, String fr) => Localizations.localeOf(context).languageCode == 'fr' ? fr : en;
 
-class _GoalStep extends StatelessWidget {
-  const _GoalStep({required this.selected, required this.onSelect});
+class _ChoiceStep extends StatelessWidget {
+  const _ChoiceStep({required this.title, required this.options, required this.selected, required this.onSelect});
+  final String title;
+  final Map<String, String> options;
   final String? selected;
   final ValueChanged<String> onSelect;
 
-  static const _goals = [
-    ('muscle', 'Build muscle', Icons.fitness_center),
-    ('strength', 'Get stronger', Icons.trending_up),
-    ('fat_loss', 'Lose fat', Icons.local_fire_department),
-    ('general_fitness', 'General fitness', Icons.directions_run),
-  ];
-
   @override
-  Widget build(BuildContext context) => Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+  Widget build(BuildContext context) => ListView(
         children: [
-          Text('What\'s your main goal?',
-              style: Theme.of(context).textTheme.headlineMedium),
+          Text(title, style: Theme.of(context).textTheme.headlineMedium),
           const SizedBox(height: AppSpacing.lg),
-          ..._goals.map(
-            (g) => _OptionCard(
-              label: g.$2,
-              icon: g.$3,
-              selected: selected == g.$1,
-              onTap: () => onSelect(g.$1),
-            ),
-          ),
+          for (final MapEntry(:key, :value) in options.entries)
+            _OptionCard(label: value, selected: selected == key, onTap: () => onSelect(key)),
         ],
       );
 }
 
-class _LevelStep extends StatelessWidget {
-  const _LevelStep({required this.selected, required this.onSelect});
-  final String? selected;
-  final ValueChanged<String> onSelect;
-
-  static const _levels = [
-    ('beginner', 'Beginner', 'Less than 1 year of consistent training'),
-    ('intermediate', 'Intermediate', '1–3 years of consistent training'),
-    ('advanced', 'Advanced', '3+ years, comfortable with compound lifts'),
-  ];
-
-  @override
-  Widget build(BuildContext context) => Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text('How experienced are you?',
-              style: Theme.of(context).textTheme.headlineMedium),
-          const SizedBox(height: AppSpacing.lg),
-          ..._levels.map(
-            (l) => _OptionCard(
-              label: l.$2,
-              subtitle: l.$3,
-              selected: selected == l.$1,
-              onTap: () => onSelect(l.$1),
-            ),
-          ),
-        ],
-      );
-}
-
-class _DaysStep extends StatelessWidget {
-  const _DaysStep({required this.value, required this.onChanged});
-  final int value;
-  final ValueChanged<int> onChanged;
-
-  @override
-  Widget build(BuildContext context) => Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text('How many days per week can you train?',
-              style: Theme.of(context).textTheme.headlineMedium),
-          const SizedBox(height: AppSpacing.xl),
-          Center(
-            child: Text(
-              '$value days/week',
-              style: Theme.of(context).textTheme.displayLarge,
-            ),
-          ),
-          Slider(
-            value: value.toDouble(),
-            min: 1,
-            max: 7,
-            divisions: 6,
-            activeColor: AppColors.accent,
-            onChanged: (v) => onChanged(v.round()),
-          ),
-        ],
-      );
-}
-
-class _SessionLengthStep extends StatelessWidget {
-  const _SessionLengthStep({required this.value, required this.onChanged});
-  final int value;
-  final ValueChanged<int> onChanged;
-
-  @override
-  Widget build(BuildContext context) => Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text('How long is each session?',
-              style: Theme.of(context).textTheme.headlineMedium),
-          const SizedBox(height: AppSpacing.xl),
-          Center(
-            child: Text(
-              '$value minutes',
-              style: Theme.of(context).textTheme.displayLarge,
-            ),
-          ),
-          Slider(
-            value: value.toDouble(),
-            min: 15,
-            max: 120,
-            divisions: 21,
-            activeColor: AppColors.accent,
-            onChanged: (v) => onChanged(v.round()),
-          ),
-        ],
-      );
-}
-
-class _EquipmentStep extends StatelessWidget {
-  const _EquipmentStep({required this.selected, required this.onToggle});
+class _MultiStep extends StatelessWidget {
+  const _MultiStep({required this.title, required this.options, required this.selected, required this.onToggle});
+  final String title;
+  final Map<String, String> options;
   final List<String> selected;
   final ValueChanged<String> onToggle;
 
-  static const _options = [
-    ('barbell', 'Barbell', Icons.sports_gymnastics),
-    ('dumbbell', 'Dumbbell', Icons.fitness_center),
-    ('cable', 'Cable machine', Icons.cable),
-    ('bodyweight', 'Bodyweight only', Icons.accessibility_new),
-    ('bands', 'Resistance bands', Icons.change_history),
-  ];
+  @override
+  Widget build(BuildContext context) => ListView(
+        children: [
+          Text(title, style: Theme.of(context).textTheme.headlineMedium),
+          const SizedBox(height: AppSpacing.lg),
+          for (final MapEntry(:key, :value) in options.entries)
+            _OptionCard(label: value, selected: selected.contains(key), onTap: () => onToggle(key)),
+        ],
+      );
+}
+
+class _SliderStep extends StatelessWidget {
+  const _SliderStep({
+    required this.title,
+    required this.value,
+    required this.min,
+    required this.max,
+    required this.label,
+    required this.onChanged,
+    this.divisions,
+  });
+  final String title;
+  final int value;
+  final int min;
+  final int max;
+  final int? divisions;
+  final String label;
+  final ValueChanged<int> onChanged;
 
   @override
   Widget build(BuildContext context) => Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text('What equipment do you have?',
-              style: Theme.of(context).textTheme.headlineMedium),
-          const SizedBox(height: AppSpacing.sm),
-          Text('Select all that apply',
-              style: Theme.of(context).textTheme.bodyMedium),
-          const SizedBox(height: AppSpacing.lg),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: _options
-                .map(
-                  (opt) => FilterChip(
-                    label: Text(opt.$2),
-                    avatar: Icon(opt.$3, size: 16),
-                    selected: selected.contains(opt.$1),
-                    onSelected: (_) => onToggle(opt.$1),
-                  ),
-                )
-                .toList(),
+          Text(title, style: Theme.of(context).textTheme.headlineMedium),
+          const SizedBox(height: AppSpacing.xl),
+          Text(label, style: Theme.of(context).textTheme.displayMedium, textAlign: TextAlign.center),
+          Slider(
+            value: value.toDouble(),
+            min: min.toDouble(),
+            max: max.toDouble(),
+            divisions: divisions ?? (max - min),
+            label: label,
+            onChanged: (v) => onChanged(v.round()),
           ),
         ],
       );
 }
 
-class _LimitationsStep extends StatefulWidget {
-  const _LimitationsStep({required this.value, required this.onChanged});
-  final String value;
-  final ValueChanged<String> onChanged;
+class _LimitationsStep extends StatelessWidget {
+  const _LimitationsStep({required this.selected, required this.note, required this.onToggle, required this.onNote});
+  final List<String> selected;
+  final String note;
+  final ValueChanged<String> onToggle;
+  final ValueChanged<String> onNote;
+
+  static const _labels = {
+    'knee': ('Knee', 'Genou'),
+    'lower_back': ('Lower back', 'Bas du dos'),
+    'shoulder': ('Shoulder', 'Épaule'),
+    'wrist': ('Wrist', 'Poignet'),
+    'elbow': ('Elbow', 'Coude'),
+    'hip': ('Hip', 'Hanche'),
+    'ankle': ('Ankle', 'Cheville'),
+    'neck': ('Neck', 'Cou'),
+  };
 
   @override
-  State<_LimitationsStep> createState() => _LimitationsStepState();
+  Widget build(BuildContext context) => ListView(
+        children: [
+          Text(_t(context, 'Any injuries or limitations?', 'Des blessures ou limitations ?'),
+              style: Theme.of(context).textTheme.headlineMedium),
+          const SizedBox(height: AppSpacing.sm),
+          Text(_t(context, 'Optional. We will avoid exercises that stress these areas.',
+              'Facultatif. Nous éviterons les exercices qui sollicitent ces zones.')),
+          const SizedBox(height: AppSpacing.lg),
+          Wrap(
+            spacing: AppSpacing.sm,
+            runSpacing: AppSpacing.sm,
+            children: [
+              for (final tag in kLimitationTags)
+                FilterChip(
+                  label: Text(_t(context, _labels[tag]!.$1, _labels[tag]!.$2)),
+                  selected: selected.contains(tag),
+                  onSelected: (_) => onToggle(tag),
+                ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.lg),
+          TextFormField(
+            initialValue: note,
+            onChanged: onNote,
+            maxLines: 3,
+            decoration: InputDecoration(labelText: _t(context, 'Anything else? (optional)', 'Autre chose ? (facultatif)')),
+          ),
+        ],
+      );
 }
 
-class _LimitationsStepState extends State<_LimitationsStep> {
-  late final TextEditingController _ctrl;
+/// Optional strength check: a recent working weight and reps per lift, or "I don't know".
+class _StrengthStep extends StatelessWidget {
+  const _StrengthStep({required this.values, required this.onChanged});
+  final Map<String, ({double weightKg, int reps})> values;
+  final void Function(String lift, ({double weightKg, int reps})? value) onChanged;
+
+  static const _labels = {'squat': ('Squat', 'Squat'), 'bench_press': ('Bench press', 'Développé couché'), 'deadlift': ('Deadlift', 'Soulevé de terre')};
 
   @override
-  void initState() {
-    super.initState();
-    _ctrl = TextEditingController(text: widget.value);
+  Widget build(BuildContext context) => ListView(
+        children: [
+          Text(_t(context, 'Strength check (optional)', 'Test de force (facultatif)'), style: Theme.of(context).textTheme.headlineMedium),
+          const SizedBox(height: AppSpacing.sm),
+          Text(_t(context, 'A recent weight (kg) you lifted and for how many reps. Leave empty if you don\'t know — we start conservatively.',
+              'Un poids récent (kg) et le nombre de répétitions. Laissez vide si vous ne savez pas — nous commencerons prudemment.')),
+          const SizedBox(height: AppSpacing.lg),
+          for (final lift in kStrengthLifts) _LiftRow(
+            label: _t(context, _labels[lift]!.$1, _labels[lift]!.$2),
+            value: values[lift],
+            onChanged: (v) => onChanged(lift, v),
+          ),
+        ],
+      );
+}
+
+class _LiftRow extends StatefulWidget {
+  const _LiftRow({required this.label, required this.value, required this.onChanged});
+  final String label;
+  final ({double weightKg, int reps})? value;
+  final ValueChanged<({double weightKg, int reps})?> onChanged;
+
+  @override
+  State<_LiftRow> createState() => _LiftRowState();
+}
+
+class _LiftRowState extends State<_LiftRow> {
+  late final _weight = TextEditingController(text: widget.value?.weightKg.toString() ?? '');
+  late final _reps = TextEditingController(text: widget.value?.reps.toString() ?? '');
+
+  void _emit() {
+    final w = double.tryParse(_weight.text.replaceAll(',', '.'));
+    final r = int.tryParse(_reps.text);
+    widget.onChanged(w != null && r != null ? (weightKg: w, reps: r) : null);
   }
 
   @override
   void dispose() {
-    _ctrl.dispose();
+    _weight.dispose();
+    _reps.dispose();
     super.dispose();
   }
 
   @override
-  Widget build(BuildContext context) => Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text('Any limitations we should know?',
-              style: Theme.of(context).textTheme.headlineMedium),
-          const SizedBox(height: AppSpacing.sm),
-          Text('Optional', style: Theme.of(context).textTheme.bodyMedium),
-          const SizedBox(height: AppSpacing.lg),
-          TextField(
-            controller: _ctrl,
-            onChanged: widget.onChanged,
-            maxLines: 4,
-            decoration: const InputDecoration(
-              hintText: 'e.g. lower back injury, bad knees…',
+  Widget build(BuildContext context) => Padding(
+        padding: const EdgeInsets.only(bottom: AppSpacing.base),
+        child: Row(children: [
+          Expanded(flex: 3, child: Text(widget.label)),
+          Expanded(
+            flex: 2,
+            child: TextField(
+              controller: _weight,
+              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              decoration: const InputDecoration(labelText: 'kg'),
+              onChanged: (_) => _emit(),
             ),
           ),
-        ],
+          const SizedBox(width: AppSpacing.sm),
+          Expanded(
+            flex: 2,
+            child: TextField(
+              controller: _reps,
+              keyboardType: TextInputType.number,
+              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+              decoration: InputDecoration(labelText: _t(context, 'reps', 'rép.')),
+              onChanged: (_) => _emit(),
+            ),
+          ),
+        ]),
       );
 }
 
 class _OptionCard extends StatelessWidget {
-  const _OptionCard({
-    required this.label,
-    required this.selected,
-    required this.onTap,
-    this.subtitle,
-    this.icon,
-  });
-
+  const _OptionCard({required this.label, required this.selected, required this.onTap});
   final String label;
-  final String? subtitle;
-  final IconData? icon;
   final bool selected;
   final VoidCallback onTap;
 
   @override
-  Widget build(BuildContext context) => GestureDetector(
-        onTap: onTap,
-        child: Container(
-          margin: const EdgeInsets.only(bottom: 8),
-          padding: const EdgeInsets.all(AppSpacing.base),
-          decoration: BoxDecoration(
-            color: selected ? AppColors.accent.withOpacity(0.15) : AppColors.charcoalSurface,
+  Widget build(BuildContext context) => Padding(
+        padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+        child: Material(
+          color: selected ? AppColors.accent.withValues(alpha: 0.15) : AppColors.charcoalElevated,
+          borderRadius: BorderRadius.circular(AppSizes.borderRadius),
+          child: InkWell(
             borderRadius: BorderRadius.circular(AppSizes.borderRadius),
-            border: Border.all(
-              color: selected ? AppColors.accent : Colors.transparent,
-              width: 2,
-            ),
-          ),
-          child: Row(
-            children: [
-              if (icon != null) ...[
-                Icon(icon, color: selected ? AppColors.accent : AppColors.onDarkSecondary),
-                const SizedBox(width: 12),
-              ],
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(label, style: Theme.of(context).textTheme.titleMedium),
-                    if (subtitle != null)
-                      Text(subtitle!,
-                          style: Theme.of(context).textTheme.bodyMedium),
-                  ],
-                ),
+            onTap: onTap,
+            child: Container(
+              constraints: const BoxConstraints(minHeight: AppSizes.minTapTarget + 8),
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.base),
+              alignment: Alignment.centerLeft,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(AppSizes.borderRadius),
+                border: Border.all(color: selected ? AppColors.accent : Colors.transparent, width: 2),
               ),
-              if (selected)
-                const Icon(Icons.check_circle, color: AppColors.accent),
-            ],
+              child: Row(children: [
+                Expanded(child: Text(label, style: Theme.of(context).textTheme.titleMedium)),
+                if (selected) const Icon(Icons.check_circle, color: AppColors.accent),
+              ]),
+            ),
           ),
         ),
       );

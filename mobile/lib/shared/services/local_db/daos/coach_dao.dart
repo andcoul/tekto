@@ -36,7 +36,7 @@ class CoachDao extends DatabaseAccessor<AppDatabase> with _$CoachDaoMixin {
       (update(coachMessages)..where((m) => m.id.equals(messageId)))
           .write(const CoachMessagesCompanion(planChangeApplied: Value(true)));
 
-  Future<CoachQuotaUsage?> getQuota(String userId, String isoWeek) =>
+  Future<CoachQuotaUsageData?> getQuota(String userId, String isoWeek) =>
       (select(coachQuotaUsage)
             ..where((q) => q.userId.equals(userId) & q.isoWeek.equals(isoWeek)))
           .getSingleOrNull();

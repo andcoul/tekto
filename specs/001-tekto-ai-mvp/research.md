@@ -348,7 +348,8 @@ Two triggers, one idempotent function:
 2. **Scheduled trigger** — `pg_cron` runs an hourly job that calls `adapt-plan` in batch mode (via `pg_net`, service-role key) for every active Pro plan whose current training week ended (Sunday 23:59 in `users.timezone`) and has not been adapted.
 
 ### Details
-- Training weeks are Monday–Sunday in the user's IANA time zone, counted from `plans.start_date` (the Monday of the week the plan started).
+- Training weeks are Monday–Sunday in the user's IANA time zone, counted from `plans.start_date`: the Monday of the creation week if the plan is created Monday–Wednesday, otherwise the next Monday, so week 1 always has at least 4 days. Workouts logged before `start_date` count toward week 1.
+- "Week complete" (early trigger) means every session with that `week_number` has a finished `workout_logs` row; `sessions.scheduled_date` is not used because it can be null.
 - Idempotency: `plans.last_adapted_week`. `adapt-plan` claims a week with `UPDATE plans SET last_adapted_week = :week WHERE id = :id AND last_adapted_week < :week RETURNING id`; a second trigger for the same week is a no-op that returns the stored summary.
 - Skipped sessions are input: the service receives scheduled vs completed counts. `WEEK_NOT_COMPLETE` is removed.
 - `current_week` advances for **all** active plans (free and Pro) at the same boundary; only Pro plans are adapted.

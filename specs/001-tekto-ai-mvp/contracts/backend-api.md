@@ -107,7 +107,7 @@ Generates a personalized training plan from the authenticated user's profile.
 Reviews one training week (Monday–Sunday in `users.timezone`) and adjusts the following week's `plan_exercises`. Pro plans only. Idempotent per `(plan_id, week)` via `plans.last_adapted_week`: a repeat call returns the stored summary with `already_adapted: true`.
 
 **Triggers** (whichever comes first — FR-026):
-1. **User mode** — mobile calls it after the last scheduled session of the week is logged. Auth: user JWT.
+1. **User mode** — mobile calls it when every session with that `week_number` has a finished workout log. Auth: user JWT.
 2. **Batch mode** — `pg_cron` job (hourly) calls it with the service-role key and `{ "mode": "batch" }`; the function finds every active Pro plan whose week has ended and is not yet adapted. Batch mode also advances `current_week` for free plans.
 
 **Request body (user mode)**:
@@ -151,7 +151,7 @@ Batch-mode response: `{ "processed": 12, "adapted": 9, "advanced_only": 3 }`.
 **Errors**:
 | Code | HTTP | Meaning |
 |---|---|---|
-| `WEEK_NOT_ENDED` | 400 | User mode called before the last scheduled session is logged and before the week boundary |
+| `WEEK_NOT_ENDED` | 400 | User mode called while a session of that week has no finished workout log and the week boundary has not passed |
 | `PRO_REQUIRED` | 403 | User mode on a free plan |
 | `PLAN_NOT_FOUND` | 404 | |
 

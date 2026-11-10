@@ -1,10 +1,54 @@
-import { requireAuth, errorResponse, jsonResponse } from '../_shared/auth.ts';
+// POST /generate-plan (contracts/backend-api.md §1). Decision logic lives in flow.ts (tested);
+// this file loads inputs, calls Claude, and persists the result.
+import { z } from 'npm:zod@4.6.7';
+import { errorResponse, jsonResponse, requireAuth } from '../_shared/auth.ts';
+import { CACHE_CONTROL, callStructured, PLAN_MODEL } from '../_shared/claude.ts';
 import { getDb } from '../_shared/db.ts';
-import { getAnthropicClient, PLAN_MODEL, CACHE_CONTROL } from '../_shared/claude.ts';
-import { validatePlan } from '../_shared/plan-validator.ts';
-import type { User, Plan, Session, PlanExercise } from '../_shared/types.ts';
+import { isPro } from '../_shared/entitlement.ts';
+import { isAllowed } from '../_shared/exercise-substitution.ts';
+import type { DraftPlan, Library } from '../_shared/plan-draft.ts';
+import { loadLibrary } from '../_shared/plan-validator.ts';
+import type { BuilderProfile, PlanTemplateDef } from '../_shared/template-plan-builder.ts';
+import { planStartDate } from '../_shared/week-boundary.ts';
+import { type AiPlan, runGeneratePlan } from './flow.ts';
 
-const MAX_RETRIES = 2;
+/** Per-attempt limit; with RETRY_CUTOFF_MS the whole call stays near the 30 s target (SC-002). */
+const ATTEMPT_TIMEOUT_MS = 25_000;
+
+const AiPlanSchema = z.object({
+  name_en: z.string(),
+  name_fr: z.string(),
+  weeks_total: z.number().int(),
+  rationale_en: z.string(),
+  rationale_fr: z.string(),
+  sessions: z.array(z.object({
+    week_number: z.number().int(),
+    day_of_week: z.number().int(),
+    name_en: z.string(),
+    name_fr: z.string(),
+    exercises: z.array(z.object({
+      exercise_slug: z.string(),
+      sets: z.number().int(),
+      reps_min: z.number().int(),
+      reps_max: z.number().int(),
+      rest_sec: z.number().int(),
+      rpe_target: z.number().nullable(),
+    })),
+  })),
+});
+
+// Stable system prompt (cache prefix): rules only, no per-user or per-request data.
+const SYSTEM_PROMPT = `You are Tekto's training plan generator. You create science-based, periodized strength training programs.
+
+RULES (non-negotiable):
+1. Use only exercise slugs from the AVAILABLE EXERCISES list in the user message.
+2. Weekly working sets per primary muscle: beginner 10–14, intermediate 14–18, advanced 16–22.
+3. Never schedule two consecutive days that train the same primary muscle.
+4. Each session must fit the user's session length (count ~45 s of work per set plus the prescribed rest).
+5. weeks_total is between 4 and 12; output every session of every week (week_number 1..weeks_total, day_of_week 1 = Monday … 7 = Sunday).
+6. Show progressive overload across weeks (reps, sets or intensity).
+7. Set rpe_target only for intermediate and advanced users; otherwise null.
+8. Write names and rationales in both English and French.`;
 
 Deno.serve(async (req: Request) => {
   if (req.method !== 'POST') return errorResponse('Method not allowed', 405);
@@ -12,305 +56,196 @@ Deno.serve(async (req: Request) => {
   let userId: string;
   try {
     userId = await requireAuth(req);
-  } catch (e: any) {
-    return errorResponse(e.message, e.statusCode ?? 401, 'UNAUTHORIZED');
+  } catch (e) {
+    return errorResponse((e as Error).message, 401, 'UNAUTHORIZED');
   }
-
+  const body = await req.json().catch(() => ({})) as { force_regenerate?: boolean };
   const db = getDb();
 
-  // 1. Reject if user already has an active plan
-  const { data: existingPlan } = await db
-    .from('plans')
-    .select('id')
-    .eq('user_id', userId)
-    .eq('status', 'active')
-    .maybeSingle();
+  const { data: user } = await db.from('users').select('*').eq('id', userId).maybeSingle();
+  if (!user) return errorResponse('User profile missing required fields.', 400, 'PROFILE_INCOMPLETE');
 
-  if (existingPlan) {
-    return errorResponse('User already has an active plan.', 409, 'ACTIVE_PLAN_EXISTS');
-  }
+  const [{ data: sub }, { data: active }, { data: templateRows }, library] = await Promise.all([
+    db.from('subscriptions').select('tier, is_trial, trial_ends_at, current_period_ends_at').eq('user_id', userId).maybeSingle(),
+    db.from('plans').select('id').eq('user_id', userId).eq('status', 'active').maybeSingle(),
+    db.from('plan_templates').select('body'),
+    loadLibrary(db),
+  ]);
 
-  // 2. Fetch user profile
-  const { data: user, error: userError } = await db
-    .from('users')
-    .select('*')
-    .eq('id', userId)
-    .maybeSingle();
-
-  if (userError || !user) {
-    return errorResponse(
-      'User profile not found. Complete onboarding first.',
-      422,
-      'PROFILE_INCOMPLETE',
-    );
-  }
-
-  // 3. Check subscription tier
-  const { data: sub } = await db
-    .from('subscriptions')
-    .select('tier, is_trial, trial_ends_at, current_period_ends_at')
-    .eq('user_id', userId)
-    .maybeSingle();
-
-  const isPro = isProSubscription(sub);
-
-  // 4a. Free tier — serve best-matching starter template
-  if (!isPro) {
-    return await serveFreeTemplate(db, user, userId);
-  }
-
-  // 4b. Pro tier — generate via Claude with rule-checker
-  return await generateWithAI(db, user, userId);
-});
-
-async function serveFreeTemplate(db: any, user: User, userId: string): Promise<Response> {
-  const templateName = selectTemplate(user);
-  let template: any;
-
-  try {
-    // Templates are stored in the Edge Function bundle (Deno.readTextFile)
-    const raw = await Deno.readTextFile(`./templates/${templateName}.json`);
-    template = JSON.parse(raw);
-  } catch {
-    return errorResponse('Starter template unavailable. Please try again.', 500, 'AI_UNAVAILABLE');
-  }
-
-  // Assign IDs and user_id to the template plan
-  const planId = crypto.randomUUID();
-  const now = new Date().toISOString();
-
-  const plan = {
-    id: planId,
-    user_id: userId,
-    name: template.name,
-    status: 'active',
-    weeks_total: template.weeks_total,
-    current_week: 1,
-    generated_by: `template:${templateName}`,
-    rationale_en: template.rationale_en,
-    rationale_fr: template.rationale_fr,
-    created_at: now,
-    updated_at: now,
+  const profile: BuilderProfile = {
+    goal: user.goal,
+    level: user.level,
+    equipment: user.equipment ?? [],
+    limitations: user.limitations ?? [],
+    session_length_min: user.session_length_min,
+    days_per_week: user.days_per_week,
+    strength_estimates: user.strength_estimates,
   };
 
-  const sessions = template.sessions.map((s: any) => ({
-    ...s,
-    id: crypto.randomUUID(),
+  const result = await runGeneratePlan(
+    {
+      profile,
+      isPro: isPro(sub),
+      consentAt: user.consent_at,
+      hasActivePlan: active !== null,
+      forceRegenerate: body.force_regenerate === true,
+    },
+    {
+      templates: (templateRows ?? []).map((r: { body: PlanTemplateDef }) => r.body),
+      library,
+      nowMs: () => Date.now(),
+      generateAiPlan: (previousErrors) => generateAiPlan(profile, user.language, library, previousErrors),
+    },
+  );
+  if (!result.ok) return errorResponse(result.message, result.status, result.code);
+
+  if (active && body.force_regenerate) {
+    await db.from('plans').update({ status: 'archived' }).eq('id', active.id);
+  }
+
+  const startDate = planStartDate(new Date(), user.timezone ?? 'UTC');
+  const { data: plan, error: planError } = await db.from('plans').insert({
+    user_id: userId,
+    name: result.plan.name_en,
+    weeks_total: result.plan.weeks_total,
+    rationale_en: result.rationale_en,
+    rationale_fr: result.rationale_fr,
+    source: result.source,
+    template_slug: result.template_slug,
+    start_date: startDate,
+    generated_by: result.source === 'ai' ? 'ai' : `template:${result.template_slug}`,
+  }).select('id').single();
+  if (planError || !plan) return errorResponse(`Failed to save plan: ${planError?.message}`, 500, 'SAVE_FAILED');
+
+  try {
+    const sessions = await saveSessions(db, plan.id, result.plan, library);
+    if (!user.onboarding_completed_at) {
+      await db.from('users').update({ onboarding_completed_at: new Date().toISOString() }).eq('id', userId);
+    }
+    console.log(JSON.stringify({ event: 'plan_generated', source: result.source, attempts: result.attempts }));
+    return jsonResponse({
+      plan: {
+        id: plan.id,
+        name_en: result.plan.name_en,
+        name_fr: result.plan.name_fr,
+        weeks_total: result.plan.weeks_total,
+        current_week: 1,
+        start_date: startDate,
+        source: result.source,
+        template_slug: result.template_slug,
+        fallback_notice: result.fallback_notice,
+        notices: result.notices,
+        sessions,
+      },
+    }, 201);
+  } catch (err) {
+    await db.from('plans').delete().eq('id', plan.id); // cascades to sessions + plan_exercises
+    return errorResponse(`Failed to save plan: ${(err as Error).message}`, 500, 'SAVE_FAILED');
+  }
+});
+
+async function generateAiPlan(
+  profile: BuilderProfile,
+  language: string,
+  library: Library,
+  previousErrors: string[] | null,
+): Promise<AiPlan> {
+  const available = [...library.values()]
+    .filter((e) => e.video_front_url && isAllowed(e, profile))
+    .map((e) => ({ slug: e.slug, equipment: e.equipment, muscle_primary: e.muscle_primary }));
+
+  const userMessage = [
+    'USER PROFILE:',
+    `- Goal: ${profile.goal}`,
+    `- Level: ${profile.level}`,
+    `- Days per week: ${profile.days_per_week}`,
+    `- Session length: ${profile.session_length_min} minutes`,
+    `- Equipment: ${profile.equipment.join(', ')}`,
+    `- Limitations: ${profile.limitations.length ? profile.limitations.join(', ') : 'none'}`,
+    `- Language preference: ${language}`,
+    '',
+    'AVAILABLE EXERCISES (only these, already filtered for equipment, video and limitations):',
+    JSON.stringify(available),
+  ].join('\n');
+
+  const messages: Array<{ role: 'user'; content: string }> = [{ role: 'user', content: userMessage }];
+  if (previousErrors) {
+    messages[0].content += `\n\nYour previous response had these issues: ${previousErrors.join(' | ')}\n` +
+      'Please regenerate the plan correcting these issues. All other rules still apply.';
+  }
+
+  const { output } = await callStructured({
+    fn: 'generate-plan',
+    model: PLAN_MODEL,
+    system: [{ type: 'text', text: SYSTEM_PROMPT, cache_control: CACHE_CONTROL }],
+    messages,
+    schema: AiPlanSchema,
+    effort: 'high',
+    maxTokens: 64_000,
+    timeoutMs: ATTEMPT_TIMEOUT_MS,
+    refusalFallback: true,
+  });
+  return output;
+}
+
+/** Inserts sessions and plan_exercises; returns the contract's nested session list. */
+async function saveSessions(
+  // deno-lint-ignore no-explicit-any -- supabase-js client from esm.sh
+  db: any,
+  planId: string,
+  plan: DraftPlan,
+  library: Library,
+) {
+  const sessionRows = plan.sessions.map((s) => ({
     plan_id: planId,
-    created_at: now,
+    week_number: s.week_number,
+    day_of_week: s.day_of_week,
+    name_en: s.name_en,
+    name_fr: s.name_fr,
+    muscle_groups: [...new Set(s.exercises.flatMap((e) => library.get(e.exercise_slug)?.muscle_primary ?? []))],
+    estimated_min: Math.ceil(s.exercises.reduce((sum, e) => sum + e.sets * (45 + e.rest_sec), 0) / 60),
   }));
+  const { data: savedSessions, error: sErr } = await db.from('sessions').insert(sessionRows).select('id');
+  if (sErr) throw new Error(sErr.message);
 
-  const planExercises = template.plan_exercises.map((pe: any) => ({
-    ...pe,
-    id: crypto.randomUUID(),
-    session_id: sessions.find((s: any) => s.template_session_ref === pe.template_session_ref)?.id,
+  const exerciseRows = plan.sessions.flatMap((s, i) =>
+    s.exercises.map((e, order) => ({
+      session_id: savedSessions[i].id,
+      exercise_slug: e.exercise_slug,
+      sort_order: order,
+      sets: e.sets,
+      reps_min: e.reps_min,
+      reps_max: e.reps_max,
+      rpe_target: e.rpe_target ?? null,
+      rest_sec: e.rest_sec,
+      suggested_weight_kg: e.suggested_weight_kg ?? null,
+    }))
+  );
+  const { data: savedExercises, error: eErr } = await db.from('plan_exercises').insert(exerciseRows).select('id, session_id');
+  if (eErr) throw new Error(eErr.message);
+
+  return plan.sessions.map((s, i) => ({
+    id: savedSessions[i].id,
+    week_number: s.week_number,
+    day_number: s.day_of_week,
+    name_en: s.name_en,
+    name_fr: s.name_fr,
+    target_muscles: sessionRows[i].muscle_groups,
+    estimated_duration_min: sessionRows[i].estimated_min,
+    exercises: s.exercises.map((e, order) => {
+      const ex = library.get(e.exercise_slug);
+      const saved = (savedExercises as Array<{ id: string; session_id: string }>)
+        .filter((x) => x.session_id === savedSessions[i].id)[order];
+      return {
+        plan_exercise_id: saved?.id,
+        exercise: { slug: e.exercise_slug, muscle_primary: ex?.muscle_primary ?? [] },
+        sets: e.sets,
+        reps_min: e.reps_min,
+        reps_max: e.reps_max,
+        rest_sec: e.rest_sec,
+        rpe_target: e.rpe_target ?? null,
+        suggested_weight_kg: e.suggested_weight_kg ?? null,
+      };
+    }),
   }));
-
-  // Video Gate: validate all exercise slugs before saving
-  const slugs = [...new Set(planExercises.map((pe: any) => pe.exercise_slug as string))];
-  const { data: exercises } = await db
-    .from('exercises')
-    .select('slug, video_front_url')
-    .in('slug', slugs);
-
-  const noVideo = (exercises ?? []).filter((e: any) => !e.video_front_url);
-  if (noVideo.length > 0) {
-    return errorResponse(
-      `Template exercise(s) missing video: ${noVideo.map((e: any) => e.slug).join(', ')}`,
-      500,
-      'PLAN_VALIDATION_FAILED',
-    );
-  }
-
-  // Persist to DB
-  await db.from('plans').insert(plan);
-  await db.from('sessions').insert(sessions);
-  await db.from('plan_exercises').insert(planExercises);
-
-  return jsonResponse({ plan, sessions, plan_exercises: planExercises });
-}
-
-async function generateWithAI(db: any, user: User, userId: string): Promise<Response> {
-  // Fetch exercise library filtered by user's equipment
-  const { data: exercises } = await db
-    .from('exercises')
-    .select('slug, name_en, equipment, muscle_primary, muscle_secondary, video_front_url')
-    .contains('equipment', user.equipment.length > 0 ? user.equipment : ['barbell'])
-    .not('video_front_url', 'is', null); // Video Gate: only include exercises with video
-
-  if (!exercises || exercises.length === 0) {
-    return errorResponse(
-      'No exercises found for the selected equipment.',
-      422,
-      'PROFILE_INCOMPLETE',
-    );
-  }
-
-  const exerciseLibraryJson = JSON.stringify(
-    exercises.map((e: any) => ({
-      slug: e.slug,
-      name: e.name_en,
-      equipment: e.equipment,
-      primary: e.muscle_primary,
-      secondary: e.muscle_secondary,
-    })),
-  );
-
-  const systemPrompt = buildSystemPrompt(user, exerciseLibraryJson);
-
-  const anthropic = getAnthropicClient();
-  let lastError = '';
-
-  for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
-    const errorFeedback = attempt > 0
-      ? `\n\nPrevious attempt failed validation. Fix these issues:\n${lastError}`
-      : '';
-
-    const message = await anthropic.messages.create({
-      model: PLAN_MODEL,
-      max_tokens: 4096,
-      system: [{ type: 'text', text: systemPrompt, cache_control: CACHE_CONTROL }],
-      messages: [
-        {
-          role: 'user',
-          content: `Generate a ${user.weeks_total ?? 8}-week training plan in JSON format following the schema provided.${errorFeedback}`,
-        },
-      ],
-    });
-
-    const responseText = message.content[0].type === 'text' ? message.content[0].text : '';
-
-    let planPayload: any;
-    try {
-      // Extract JSON from code block if present
-      const jsonMatch = responseText.match(/```json\n?([\s\S]*?)\n?```/) ?? [null, responseText];
-      planPayload = JSON.parse(jsonMatch[1]!);
-    } catch {
-      lastError = 'Response was not valid JSON.';
-      continue;
-    }
-
-    // Run rule-checker (Principle IV: Video Gate; volume; rest days; duration)
-    const validation = await validatePlan({
-      sessions: planPayload.sessions,
-      plan_exercises: planPayload.plan_exercises,
-      user_days_per_week: user.days_per_week,
-      user_session_length_min: user.session_length_min,
-    });
-
-    if (!validation.valid) {
-      lastError = validation.errors.join('\n');
-      continue;
-    }
-
-    // Persist to DB
-    const planId = crypto.randomUUID();
-    const now = new Date().toISOString();
-
-    const plan = {
-      id: planId,
-      user_id: userId,
-      name: planPayload.name ?? `${user.goal} plan`,
-      status: 'active',
-      weeks_total: planPayload.weeks_total ?? 8,
-      current_week: 1,
-      generated_by: 'ai',
-      rationale_en: planPayload.rationale_en,
-      rationale_fr: planPayload.rationale_fr,
-      created_at: now,
-      updated_at: now,
-    };
-
-    const sessions = planPayload.sessions.map((s: any) => ({ ...s, plan_id: planId }));
-    const planExercises = planPayload.plan_exercises;
-
-    await db.from('plans').insert(plan);
-    await db.from('sessions').insert(sessions);
-    await db.from('plan_exercises').insert(planExercises);
-
-    return jsonResponse({ plan, sessions, plan_exercises: planExercises });
-  }
-
-  return errorResponse(
-    `Plan validation failed after ${MAX_RETRIES} attempts: ${lastError}`,
-    500,
-    'PLAN_VALIDATION_FAILED',
-  );
-}
-
-function buildSystemPrompt(user: User, exerciseLibraryJson: string): string {
-  return `You are an expert strength and conditioning coach. Generate a personalized training plan.
-
-USER PROFILE:
-- Goal: ${user.goal}
-- Level: ${user.level}
-- Days/week: ${user.days_per_week}
-- Session length: ${user.session_length_min} minutes
-- Equipment: ${user.equipment.join(', ')}
-- Limitations: ${user.limitations?.join(', ') ?? 'none'}
-- Language: ${user.language}
-
-EXERCISE LIBRARY (only use slugs from this list):
-${exerciseLibraryJson}
-
-OUTPUT FORMAT (strict JSON):
-{
-  "name": "Plan name",
-  "weeks_total": 8,
-  "rationale_en": "Brief explanation of the plan design",
-  "rationale_fr": "Brève explication de la conception du programme",
-  "sessions": [
-    {
-      "id": "<uuid>",
-      "week_number": 1,
-      "day_of_week": 1,
-      "name_en": "Session name",
-      "name_fr": "Nom de la séance",
-      "muscle_groups": ["quadriceps", "glutes"],
-      "estimated_min": 60
-    }
-  ],
-  "plan_exercises": [
-    {
-      "id": "<uuid>",
-      "session_id": "<session uuid>",
-      "exercise_slug": "barbell-squat",
-      "sort_order": 0,
-      "sets": 4,
-      "reps_min": 6,
-      "reps_max": 8,
-      "rpe_target": 8.0,
-      "rest_sec": 180,
-      "suggested_weight_kg": null
-    }
-  ]
-}
-
-RULES (MUST follow, or plan will be rejected):
-1. Every exercise_slug MUST exist in the exercise library above.
-2. Each week must have at least 1 rest day (session count < 7).
-3. Session count per week must equal ${user.days_per_week}.
-4. Total session duration must be estimable within ${user.session_length_min + 10} minutes.
-5. No muscle group should exceed ~20 sets per week.`;
-}
-
-function selectTemplate(user: User): string {
-  if (user.level === 'beginner') return 'beginner-full-body-3x';
-  if (user.equipment.includes('bodyweight') && !user.equipment.includes('barbell')) {
-    return 'home-dumbbell-3x';
-  }
-  if (user.goal === 'general_fitness') return 'home-dumbbell-3x';
-  return 'intermediate-ppl-4x';
-}
-
-function isProSubscription(sub: any): boolean {
-  if (!sub || sub.tier !== 'pro') return false;
-  const now = Date.now();
-  if (sub.is_trial && sub.trial_ends_at) {
-    return new Date(sub.trial_ends_at).getTime() > now;
-  }
-  if (sub.current_period_ends_at) {
-    return new Date(sub.current_period_ends_at).getTime() > now;
-  }
-  return false;
 }

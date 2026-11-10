@@ -106,7 +106,7 @@ A complete 4–12 week training program belonging to a user. A user may have mul
 | `level` | enum | NOT NULL | |
 | `weeks_total` | int | 4–12, NOT NULL | |
 | `current_week` | int | 1–weeks_total, NOT NULL, default 1 | Advanced at each training-week boundary for all plans |
-| `start_date` | date | NOT NULL | Monday of the week the plan started, in `users.timezone`. Week N = `start_date + 7·(N−1)` … `+6`. |
+| `start_date` | date | NOT NULL | A Monday in `users.timezone`: the Monday of the creation week if the plan is created Monday–Wednesday, otherwise the next Monday (avoids a 1–2 day week 1). Workouts logged before it count toward week 1. Week N = `start_date + 7·(N−1)` … `+6`. |
 | `last_adapted_week` | int | NOT NULL, default 0 | Highest week already adapted; makes `adapt-plan` idempotent |
 | `source` | enum | NOT NULL | `ai \| template \| template_fallback` |
 | `template_slug` | text | nullable | Set when `source` is `template` or `template_fallback` |
@@ -341,14 +341,13 @@ Tracks the user's current subscription state, synced from RevenueCat webhooks.
 
 ---
 
-### 14. ExerciseVideoDownload (`exercise_video_downloads`)
+### 14. ExerciseVideoDownload (`exercise_video_downloads`) — **device-only (Drift)**
 
-Tracks which exercises a Pro user has downloaded for offline use.
+Tracks which exercises a Pro user has downloaded for offline use on this device. Never synced: file paths are only meaningful on the device. The remote table from migration 001 is dropped in migration 005.
 
 | Field | Type | Constraints | Notes |
 |---|---|---|---|
-| `user_id` | uuid | PK component, FK → users.id | |
-| `exercise_id` | uuid | PK component, FK → exercises.id | |
+| `exercise_id` | uuid | PK | One row per downloaded exercise on this device |
 | `local_path` | text | NOT NULL | On-device file path |
 | `captions_local_paths` | jsonb | NOT NULL | `{ "en": "<path>", "fr": "<path>" }` |
 | `downloaded_at` | timestamptz | NOT NULL | |
@@ -428,7 +427,7 @@ users ────────────────────────�
   ├── coach_quota_usage (1:many, one per week)      │
   ├── form_check_sessions (1:many)                  │
   ├── subscriptions (1:1)                           │
-  └── exercise_video_downloads (1:many)             │
+  └── (device only) exercise_video_downloads        │
                                                     │
 exercises ──────────────────────────────────────────┘
   (read-only master library; no user FK on exercises itself)

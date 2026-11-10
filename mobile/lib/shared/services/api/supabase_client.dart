@@ -1,11 +1,15 @@
 import 'package:dio/dio.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
-const _sessionKey = 'supabase_access_token';
+/// Returns the current access token, or null when signed out.
+typedef AccessTokenReader = String? Function();
+
+/// The live Supabase session token; supabase_flutter refreshes it before it expires.
+String? currentSupabaseAccessToken() => Supabase.instance.client.auth.currentSession?.accessToken;
 
 /// Dio client pre-configured for Supabase Edge Function calls.
 class TektoDioClient {
-  TektoDioClient(this._storage) {
+  TektoDioClient({AccessTokenReader accessToken = currentSupabaseAccessToken}) : _accessToken = accessToken {
     _dio = Dio(BaseOptions(
       baseUrl: const String.fromEnvironment('SUPABASE_URL'),
       connectTimeout: const Duration(seconds: 10),
@@ -15,11 +19,11 @@ class TektoDioClient {
         'Content-Type': 'application/json',
       },
     ))
-      ..interceptors.add(_AuthInterceptor(_storage))
+      ..interceptors.add(_AuthInterceptor(_accessToken))
       ..interceptors.add(_RetryInterceptor());
   }
 
-  final FlutterSecureStorage _storage;
+  final AccessTokenReader _accessToken;
   late final Dio _dio;
 
   Dio get dio => _dio;
@@ -50,16 +54,15 @@ class TektoDioClient {
       _dio.patch<T>(path, data: data);
 }
 
+/// Attaches the live session token. (A copy kept in secure storage went stale after the hourly
+/// refresh and was never written for OAuth sign-ins.)
 class _AuthInterceptor extends Interceptor {
-  _AuthInterceptor(this._storage);
-  final FlutterSecureStorage _storage;
+  _AuthInterceptor(this._accessToken);
+  final AccessTokenReader _accessToken;
 
   @override
-  Future<void> onRequest(
-    RequestOptions options,
-    RequestInterceptorHandler handler,
-  ) async {
-    final token = await _storage.read(key: _sessionKey);
+  void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
+    final token = _accessToken();
     if (token != null) {
       options.headers['Authorization'] = 'Bearer $token';
     }

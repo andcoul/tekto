@@ -32,6 +32,7 @@ mobile/coverage/
 mobile/**/*.g.dart
 mobile/**/*.freezed.dart
 mobile/**/*.gr.dart
+mobile/lib/core/l10n/gen/
 
 # ── iOS ────────────────────────────────────────────────────────────────────
 mobile/ios/.generated/
@@ -45,6 +46,7 @@ mobile/ios/Flutter/flutter_assets/
 mobile/ios/Flutter/flutter_export_environment.sh
 mobile/ios/ServiceDefinitions.json
 mobile/ios/Runner/GeneratedPluginRegistrant.*
+mobile/ios/Flutter/ephemeral/
 *.pbxuser
 !default.pbxuser
 *.mode1v3

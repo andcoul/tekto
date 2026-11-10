@@ -29,7 +29,7 @@ class ProGateWidget extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final entitlement = ref.watch(entitlementProvider);
-    final isPro = entitlement.valueOrNull?.isPro ?? false;
+    final isPro = entitlement.value?.isPro ?? false;
 
     if (isPro) return child;
 

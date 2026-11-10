@@ -14,22 +14,21 @@ dependencies:
     sdk: flutter
 
   # State management
-  flutter_riverpod: ^2.5.1       # reactive state management
-  riverpod_annotation: ^2.3.5    # @riverpod code-gen annotations
+  flutter_riverpod: ^3.5.0       # reactive state management
+  riverpod_annotation: ^4.0.8    # @riverpod code-gen annotations
 
   # Navigation
   go_router: ^14.2.0             # declarative routing with guards
 
   # Local database (offline-first SQLite ORM)
-  drift: ^2.21.0                 # type-safe SQLite ORM
-  drift_flutter: ^0.2.2          # Flutter integration for Drift
+  drift: ^2.35.4                 # type-safe SQLite ORM
+  sqlite3: ^3.9.1                # SQLite bindings for Drift; built as SQLCipher via `hooks` below — Constitution II
 
   # HTTP client
   dio: ^5.5.0                    # HTTP client with interceptors
-  retrofit: ^4.3.0               # type-safe HTTP via annotations
 
   # Data classes
-  freezed_annotation: ^2.4.3     # immutable data classes via code-gen
+  freezed_annotation: ^3.1.0     # immutable data classes via code-gen
   json_annotation: ^4.9.0        # JSON serialization annotations
 
   # Video playback
@@ -37,7 +36,7 @@ dependencies:
   chewie: ^1.8.5                 # controls wrapper for video_player
 
   # In-app purchases
-  purchases_flutter: ^8.2.3      # RevenueCat cross-platform IAP SDK
+  purchases_flutter: ^11.0.1      # RevenueCat cross-platform IAP SDK
 
   # Apple Health + Google Health Connect
   health: ^12.1.0                # HealthKit + Health Connect bridge
@@ -49,15 +48,11 @@ dependencies:
   connectivity_plus: ^6.0.3      # network connectivity state
 
   # Localization
-  intl: ^0.19.0                  # ICU-based formatting for ARB files
+  intl: ^0.20.3                  # ICU-based formatting for ARB files
 
-  # Animations & haptics
+  # Animations (haptics use Flutter's built-in HapticFeedback)
   flutter_animate: ^4.5.0        # composable animations
-  lottie: ^3.1.2                 # Lottie JSON animation player
-  haptic_feedback: ^0.5.1        # semantic haptic feedback wrapper
 
-  # Offline video download
-  flutter_downloader: ^1.11.7    # background file download (required by T032)
 
   # Firebase (crash reporting)
   firebase_core: ^3.6.0          # required by T014 — Firebase initialization
@@ -78,6 +73,7 @@ dependencies:
   # Utilities
   uuid: ^4.5.1                   # UUID generation for local IDs (sync queue, offline writes)
   path_provider: ^2.1.5          # Filesystem paths for video downloads and SQLite DB
+  flutter_timezone: ^3.0.1       # IANA time zone for the training-week boundary — FR-026
 
 dev_dependencies:
   flutter_test:
@@ -86,12 +82,11 @@ dev_dependencies:
     sdk: flutter
 
   # Code generation
-  build_runner: ^2.4.12           # runs all code generators
-  freezed: ^2.5.7                 # generates .freezed.dart
-  json_serializable: ^6.8.0       # generates .g.dart for JSON
-  riverpod_generator: ^2.4.3      # generates Riverpod providers
-  drift_dev: ^2.21.0              # generates Drift schema & DAOs
-  retrofit_generator: ^8.2.1      # generates Retrofit HTTP clients
+  build_runner: ^2.17.1           # runs all code generators
+  freezed: ^4.0.3                 # generates .freezed.dart
+  json_serializable: ^6.15.2       # generates .g.dart for JSON
+  riverpod_generator: ^4.0.10      # generates Riverpod providers
+  drift_dev: ^2.35.3              # generates Drift schema & DAOs
 
   # Testing
   mocktail: ^1.0.4                # mock objects for unit tests
@@ -103,16 +98,25 @@ flutter:
 
   assets:
     - assets/images/
-    - assets/animations/
     - assets/icons/
 
-  fonts:
-    - family: Inter
-      fonts:
-        - asset: assets/fonts/Inter-Regular.ttf
-        - asset: assets/fonts/Inter-Medium.ttf
-          weight: 500
-        - asset: assets/fonts/Inter-SemiBold.ttf
-          weight: 600
-        - asset: assets/fonts/Inter-Bold.ttf
-          weight: 700
+  # TECH DEBT (Constitution VII): the Inter font files were never added to assets/fonts/.
+  # Until they are (Inter is SIL OFL — https://github.com/rsms/inter), the theme's
+  # fontFamily 'Inter' falls back to the platform font. Re-enable this block with the files.
+  # fonts:
+  #   - family: Inter
+  #     fonts:
+  #       - asset: assets/fonts/Inter-Regular.ttf
+  #       - asset: assets/fonts/Inter-Medium.ttf
+  #         weight: 500
+  #       - asset: assets/fonts/Inter-SemiBold.ttf
+  #         weight: 600
+  #       - asset: assets/fonts/Inter-Bold.ttf
+  #         weight: 700
+
+# Native build hooks: bundle SQLCipher instead of plain SQLite so the local DB is encrypted at rest
+# (Constitution II; replaces the end-of-life sqlcipher_flutter_libs package).
+hooks:
+  user_defines:
+    sqlite3:
+      source: sqlcipher

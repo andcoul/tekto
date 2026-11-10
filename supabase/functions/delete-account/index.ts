@@ -1,5 +1,5 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
-import { requireAuth, errorResponse, jsonResponse } from '../_shared/auth.ts';
+import { getAuthUser, errorResponse, jsonResponse } from '../_shared/auth.ts';
 import { getDb } from '../_shared/db.ts';
 
 // ---------------------------------------------------------------------------
@@ -14,7 +14,7 @@ import { getDb } from '../_shared/db.ts';
 serve(async (req: Request) => {
   if (req.method !== 'DELETE') return errorResponse('Method not allowed', 405);
 
-  const user = await requireAuth(req);
+  const user = await getAuthUser(req);
   if (!user) return errorResponse('Unauthorized', 401);
 
   let body: { confirm: boolean };

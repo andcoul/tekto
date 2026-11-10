@@ -4,7 +4,7 @@ part 'workout_model.freezed.dart';
 part 'workout_model.g.dart';
 
 @freezed
-class WorkoutLogModel with _$WorkoutLogModel {
+abstract class WorkoutLogModel with _$WorkoutLogModel {
   const factory WorkoutLogModel({
     required String id,
     required String userId,
@@ -22,7 +22,7 @@ class WorkoutLogModel with _$WorkoutLogModel {
 }
 
 @freezed
-class SetLogModel with _$SetLogModel {
+abstract class SetLogModel with _$SetLogModel {
   const factory SetLogModel({
     required String id,
     required String workoutLogId,
@@ -40,7 +40,7 @@ class SetLogModel with _$SetLogModel {
 }
 
 @freezed
-class PersonalRecordModel with _$PersonalRecordModel {
+abstract class PersonalRecordModel with _$PersonalRecordModel {
   const factory PersonalRecordModel({
     required String id,
     required String userId,

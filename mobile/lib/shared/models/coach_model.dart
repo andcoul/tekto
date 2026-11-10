@@ -4,7 +4,21 @@ part 'coach_model.freezed.dart';
 part 'coach_model.g.dart';
 
 @freezed
-class CoachMessageModel with _$CoachMessageModel {
+abstract class CoachConversationModel with _$CoachConversationModel {
+  const factory CoachConversationModel({
+    required String id,
+    required String userId,
+    String? planId,
+    required DateTime createdAt,
+    required DateTime updatedAt,
+  }) = _CoachConversationModel;
+
+  factory CoachConversationModel.fromJson(Map<String, dynamic> json) =>
+      _$CoachConversationModelFromJson(json);
+}
+
+@freezed
+abstract class CoachMessageModel with _$CoachMessageModel {
   const factory CoachMessageModel({
     required String id,
     required String conversationId,
@@ -23,7 +37,7 @@ class CoachMessageModel with _$CoachMessageModel {
 }
 
 @freezed
-class CoachQuotaUsageModel with _$CoachQuotaUsageModel {
+abstract class CoachQuotaUsageModel with _$CoachQuotaUsageModel {
   const factory CoachQuotaUsageModel({
     required String userId,
     required String isoWeek,

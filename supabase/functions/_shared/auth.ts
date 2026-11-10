@@ -26,6 +26,19 @@ export async function requireAuth(req: Request): Promise<string> {
   return user.id;
 }
 
+/**
+ * Non-throwing variant for handlers written as `const user = await getAuthUser(req); if (!user) …`.
+ * Returns `{ id }` for a valid JWT, otherwise null (missing header, invalid or expired token).
+ */
+export async function getAuthUser(req: Request): Promise<{ id: string } | null> {
+  try {
+    return { id: await requireAuth(req) };
+  } catch (err) {
+    if (err instanceof AuthError) return null;
+    throw err;
+  }
+}
+
 export class AuthError extends Error {
   constructor(
     message: string,

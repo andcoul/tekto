@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:haptic_feedback/haptic_feedback.dart';
+import 'package:flutter/services.dart';
 
 import '../../core/theme/app_theme.dart';
 
@@ -40,7 +40,7 @@ class _RestTimerWidgetState extends State<RestTimerWidget>
   }
 
   Future<void> _onComplete() async {
-    await Haptics.vibrate(HapticsType.medium);
+    await HapticFeedback.mediumImpact();
   }
 
   @override

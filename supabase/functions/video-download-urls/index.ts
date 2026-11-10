@@ -1,5 +1,7 @@
 import { requireAuth, errorResponse, jsonResponse } from '../_shared/auth.ts';
 import { getDb } from '../_shared/db.ts';
+import { isPro } from '../_shared/entitlement.ts';
+import { buildDownloads, type DownloadableExercise } from './downloads.ts';
 
 const CF_ACCOUNT_ID = Deno.env.get('CLOUDFLARE_ACCOUNT_ID')!;
 const CF_API_TOKEN = Deno.env.get('CLOUDFLARE_STREAM_API_TOKEN')!;
@@ -25,8 +27,7 @@ Deno.serve(async (req: Request) => {
     .eq('user_id', userId)
     .maybeSingle();
 
-  const isPro = isProSubscription(sub);
-  if (!isPro) {
+  if (!isPro(sub)) {
     return errorResponse(
       'Pro subscription required for offline video downloads.',
       403,
@@ -68,61 +69,26 @@ Deno.serve(async (req: Request) => {
 
   const slugs = [...new Set(planExercises.map((pe: any) => pe.exercise_slug as string))];
 
-  // 5. Fetch exercise video URLs
+  // 5. Fetch exercise video + caption URLs
   const { data: exercises } = await db
     .from('exercises')
-    .select('slug, video_front_url')
+    .select('slug, video_front_url, video_side_url, captions_en_url, captions_fr_url')
     .in('slug', slugs);
 
   if (!exercises) {
     return errorResponse('Failed to fetch exercise data.', 500);
   }
 
-  // 6. Generate signed Cloudflare Stream download URLs (24-hour expiry)
+  // 6. Signed Cloudflare Stream MP4 download URLs (24-hour expiry)
   const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
-  const downloads: Array<{ exercise_slug: string; signed_url: string; expires_at: string }> = [];
-
-  for (const exercise of exercises) {
-    if (!exercise.video_front_url) continue;
-
-    // For Cloudflare Stream: request a signed download URL
-    // The video ID is extracted from the HLS manifest URL
-    const videoId = extractCloudflareVideoId(exercise.video_front_url);
-    if (!videoId) continue;
-
-    try {
-      const signedUrl = await getCloudflareSignedUrl(videoId, CF_ACCOUNT_ID, CF_API_TOKEN);
-      downloads.push({
-        exercise_slug: exercise.slug,
-        signed_url: signedUrl,
-        expires_at: expiresAt,
-      });
-    } catch {
-      // Skip exercises where signing fails; don't block the whole request
-      console.error(`Failed to sign URL for exercise: ${exercise.slug}`);
-    }
-  }
+  const downloads = await buildDownloads(
+    exercises as DownloadableExercise[],
+    (videoId) => getCloudflareSignedUrl(videoId, CF_ACCOUNT_ID, CF_API_TOKEN),
+    expiresAt,
+  );
 
   return jsonResponse({ downloads });
 });
-
-function isProSubscription(sub: any): boolean {
-  if (!sub || sub.tier !== 'pro') return false;
-  const now = Date.now();
-  if (sub.is_trial && sub.trial_ends_at) {
-    return new Date(sub.trial_ends_at).getTime() > now;
-  }
-  if (sub.current_period_ends_at) {
-    return new Date(sub.current_period_ends_at).getTime() > now;
-  }
-  return false;
-}
-
-function extractCloudflareVideoId(hlsUrl: string): string | null {
-  // HLS URL pattern: https://customer-*.cloudflarestream.com/<videoId>/manifest/video.m3u8
-  const match = hlsUrl.match(/cloudflarestream\.com\/([a-f0-9]+)\//);
-  return match?.[1] ?? null;
-}
 
 async function getCloudflareSignedUrl(
   videoId: string,

@@ -17,6 +17,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
   final _passwordController = TextEditingController();
   bool _loading = false;
   bool _showEmail = false;
+  bool _creatingAccount = false;
   String? _error;
 
   @override
@@ -51,13 +52,18 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
   Future<void> _signInEmail() async {
     setState(() { _loading = true; _error = null; });
     try {
-      await ref.read(authServiceProvider).signInWithEmail(
-        _emailController.text.trim(),
-        _passwordController.text,
-      );
+      final auth = ref.read(authServiceProvider);
+      final email = _emailController.text.trim();
+      if (_creatingAccount) {
+        await auth.signUp(email, _passwordController.text);
+      } else {
+        await auth.signInWithEmail(email, _passwordController.text);
+      }
       if (mounted) context.go('/home');
     } catch (e) {
-      setState(() => _error = 'Invalid email or password.');
+      setState(() => _error = _creatingAccount
+          ? 'Could not create the account. Check the email and use at least 8 characters.'
+          : 'Invalid email or password.');
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -147,7 +153,11 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                             color: AppColors.onDark,
                           ),
                         )
-                      : const Text('Sign in'),
+                      : Text(_creatingAccount ? 'Create account' : 'Sign in'),
+                ),
+                TextButton(
+                  onPressed: () => setState(() => _creatingAccount = !_creatingAccount),
+                  child: Text(_creatingAccount ? 'I already have an account' : 'New to Tekto? Create an account'),
                 ),
                 TextButton(
                   onPressed: () => setState(() => _showEmail = false),
