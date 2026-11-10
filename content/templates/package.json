@@ -1,0 +1,8 @@
+{
+  "name": "tekto-template-seed",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Plan template seed script for Tekto",
+  "scripts": { "seed": "node seed-templates.js" },
+  "dependencies": { "@supabase/supabase-js": "^2.45.0" }
+}
