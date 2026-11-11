@@ -80,7 +80,9 @@ time.
 
 - The plan generator's rule-checker MUST validate that every `exercise_slug`
   in a generated plan resolves to an `exercises` row with a non-null
-  `video_front_url`. Plans that fail this check MUST be rejected and retried.
+  `video_front_url`. Any exercise that fails this check MUST be replaced with
+  a validated alternative (Principle III) before the plan is shown; a plan
+  MUST never reach the user while it references a video-less exercise.
 - The exercise library MUST only be extended via the controlled content
   pipeline (`content/exercises/`); ad-hoc database inserts that bypass video
   upload are prohibited in production.
@@ -244,4 +246,4 @@ Violations require either a spec amendment with justification (documenting
 why the violation is necessary and time-bound) or a code change to restore
 compliance. Silent violations are not acceptable.
 
-**Version**: 2.0.0 | **Ratified**: 2026-11-09 | **Last Amended**: 2026-11-10
+**Version**: 2.0.1 | **Ratified**: 2026-11-09 | **Last Amended**: 2026-11-11
