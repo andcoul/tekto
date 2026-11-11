@@ -41,7 +41,7 @@ class ProGateWidget extends ConsumerWidget {
   }
 
   void _handleTap(BuildContext context, WidgetRef ref) {
-    final isWorkoutActive = ref.read(workoutControllerProvider).isActive;
+    final isWorkoutActive = ref.read(workoutControllerProvider).isWorkoutActive;
 
     if (isWorkoutActive) {
       // Workout in progress — show bottom sheet so the workout is not obscured.

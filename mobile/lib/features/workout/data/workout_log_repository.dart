@@ -1,3 +1,4 @@
+import 'package:drift/drift.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../shared/models/workout_model.dart';
@@ -8,61 +9,69 @@ import '../../../shared/services/sync/sync_queue.dart';
 const _uuid = Uuid();
 
 /// WorkoutLogRepository — offline-first (Principle I).
-/// All writes go to Drift first, then enqueue to SyncQueue.
+/// All writes go to Drift first, then enqueue to SyncQueue. Timestamps are sent in
+/// UTC so the server's `timestamptz` columns (and the FR-026 week boundary) are exact.
 class WorkoutLogRepository {
   WorkoutLogRepository({
     required AppDatabase db,
     required SyncQueue syncQueue,
     required String userId,
+    DateTime Function() clock = DateTime.now,
   })  : _workoutDao = WorkoutDao(db),
         _syncQueue = syncQueue,
-        _userId = userId;
+        _userId = userId,
+        _clock = clock;
 
   final WorkoutDao _workoutDao;
   final SyncQueue _syncQueue;
   final String _userId;
+  final DateTime Function() _clock;
 
   Future<String> startWorkout(String sessionId) async {
     final id = _uuid.v4();
-    final now = DateTime.now();
+    final now = _clock();
 
     await _workoutDao.startWorkout(WorkoutLogsCompanion.insert(
       id: id,
       userId: _userId,
       sessionId: sessionId,
+      startedAt: Value(now),
     ));
 
     await _syncQueue.enqueue(
-      operation: 'INSERT',
+      operation: 'insert',
       tableName: 'workout_logs',
       payload: {
         'id': id,
         'user_id': _userId,
         'session_id': sessionId,
-        'started_at': now.toIso8601String(),
+        'started_at': now.toUtc().toIso8601String(),
       },
     );
 
     return id;
   }
 
-  Future<void> finishWorkout(
+  /// Marks the workout finished and returns the finish time.
+  Future<DateTime> finishWorkout(
     String logId, {
     required int effortRating,
     required double totalVolumeKg,
   }) async {
-    await _workoutDao.finishWorkout(logId, effortRating, totalVolumeKg);
+    final now = _clock();
+    await _workoutDao.finishWorkout(logId, effortRating, totalVolumeKg, finishedAt: now);
 
     await _syncQueue.enqueue(
-      operation: 'UPDATE',
+      operation: 'update',
       tableName: 'workout_logs',
       payload: {
         'id': logId,
-        'finished_at': DateTime.now().toIso8601String(),
+        'finished_at': now.toUtc().toIso8601String(),
         'effort_rating': effortRating,
         'total_volume_kg': totalVolumeKg,
       },
     );
+    return now;
   }
 
   Future<WorkoutLogModel?> getActiveLog() async {

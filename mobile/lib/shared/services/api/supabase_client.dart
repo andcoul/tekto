@@ -9,13 +9,19 @@ String? currentSupabaseAccessToken() => Supabase.instance.client.auth.currentSes
 
 /// Dio client pre-configured for Supabase Edge Function calls.
 class TektoDioClient {
-  TektoDioClient({AccessTokenReader accessToken = currentSupabaseAccessToken}) : _accessToken = accessToken {
+  /// [baseUrl] and [anonKey] default to the build's `--dart-define` values; the offline-sync
+  /// integration test passes the local Supabase stack's values instead.
+  TektoDioClient({
+    AccessTokenReader accessToken = currentSupabaseAccessToken,
+    String baseUrl = const String.fromEnvironment('SUPABASE_URL'),
+    String anonKey = const String.fromEnvironment('SUPABASE_ANON_KEY'),
+  }) : _accessToken = accessToken {
     _dio = Dio(BaseOptions(
-      baseUrl: const String.fromEnvironment('SUPABASE_URL'),
+      baseUrl: baseUrl,
       connectTimeout: const Duration(seconds: 10),
       receiveTimeout: const Duration(seconds: 60),
       headers: {
-        'apikey': const String.fromEnvironment('SUPABASE_ANON_KEY'),
+        'apikey': anonKey,
         'Content-Type': 'application/json',
       },
     ))

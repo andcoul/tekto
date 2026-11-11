@@ -237,5 +237,88 @@
   "trialSkip": "Skip for now",
   "paywallPurchaseFailed": "Purchase failed. Please try again.",
   "trialTitle": "Your plan is ready",
-  "trialSubtitle": "Try Tekto Pro free for 7 days: unlimited coach, camera form check, weekly plan updates and offline video."
+  "trialSubtitle": "Try Tekto Pro free for 7 days: unlimited coach, camera form check, weekly plan updates and offline video.",
+  "workoutNextExercise": "Next exercise",
+  "workoutPreviousExercise": "Previous exercise",
+  "workoutFinishShort": "Finish",
+  "workoutRestAdd15": "Add 15 seconds",
+  "workoutRestRemove15": "Remove 15 seconds",
+  "workoutMoreReps": "More reps",
+  "workoutFewerReps": "Fewer reps",
+  "workoutRpe": "RPE",
+  "workoutReps": "reps",
+  "workoutEndTitle": "End workout?",
+  "workoutEndBody": "Your logged sets are saved.",
+  "workoutKeepGoing": "Keep going",
+  "workoutEnd": "End workout",
+  "workoutFormCheck": "Form check",
+  "workoutSummaryExercises": "Exercises",
+  "workoutSummaryPrs": "PRs",
+  "homeNoPlanTitle": "No active plan",
+  "homeNoPlanSubtitle": "Build your first training plan.",
+  "homeBuildPlan": "Build a plan",
+  "homeExercises": "Exercises",
+  "homeCoach": "Coach",
+  "homeProgress": "Progress",
+  "navHome": "Home",
+  "navPlan": "Plan",
+  "navLibrary": "Library",
+  "navProgress": "Progress",
+  "unitKg": "kg",
+  "unitLb": "lb",
+  "workoutExerciseOf": "Exercise {current} of {total}",
+  "@workoutExerciseOf": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "workoutTargetReps": "{min}–{max} reps",
+  "@workoutTargetReps": {
+    "placeholders": {
+      "min": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "homeEstimatedMin": "{minutes} min",
+  "@homeEstimatedMin": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "workoutSetDone": "{weight} {unit} × {reps}",
+  "@workoutSetDone": {
+    "placeholders": {
+      "weight": {
+        "type": "String"
+      },
+      "unit": {
+        "type": "String"
+      },
+      "reps": {
+        "type": "int"
+      }
+    }
+  },
+  "workoutVolumeValue": "{value} {unit}",
+  "@workoutVolumeValue": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      },
+      "unit": {
+        "type": "String"
+      }
+    }
+  }
 }

@@ -138,7 +138,7 @@ GoRouter appRouter(Ref ref) {
         path: '/workout/:sessionId/summary',
         builder: (context, state) {
           final sessionId = state.pathParameters['sessionId']!;
-          return WorkoutSummaryScreen(sessionId: sessionId);
+          return WorkoutSummaryScreen(sessionId: sessionId, workoutLogId: state.uri.queryParameters['log']);
         },
       ),
 

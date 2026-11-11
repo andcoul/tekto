@@ -23,10 +23,10 @@ class WorkoutDao extends DatabaseAccessor<AppDatabase> with _$WorkoutDaoMixin {
   Future<String> startWorkout(WorkoutLogsCompanion log) =>
       into(workoutLogs).insert(log).then((_) => log.id.value);
 
-  Future<void> finishWorkout(String logId, int effortRating, double totalVolumeKg) =>
+  Future<void> finishWorkout(String logId, int effortRating, double totalVolumeKg, {DateTime? finishedAt}) =>
       (update(workoutLogs)..where((w) => w.id.equals(logId))).write(
         WorkoutLogsCompanion(
-          finishedAt: Value(DateTime.now()),
+          finishedAt: Value(finishedAt ?? DateTime.now()),
           effortRating: Value(effortRating),
           totalVolumeKg: Value(totalVolumeKg),
         ),
