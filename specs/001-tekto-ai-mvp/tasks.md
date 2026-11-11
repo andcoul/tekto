@@ -13,7 +13,7 @@ description: "Task list for Tekto AI MVP (regenerated after spec clarifications 
 
 **Brownfield note**: a first implementation already exists for many files below. "Create" means create or update the file until it meets the task; "Verify" tasks cover features that already exist in code and must be checked against the spec, with gaps fixed. `/speckit-converge` and `/speckit-implement` decide what is already done. No task is pre-checked.
 
-**Remediation (2026-11-10, `/speckit-analyze` run 2)**: T099–T113 added inside their phases for E1 (existing features without coverage), U2 (starting weights); T114 (staging) added after run 3, with T006, T016, T039, T079, T081, T085 extended for U4, U5, U7, F2; T030, T040, T047, T080, T091 extended for U1, U2, C1, F3. Run 4 (2026-11-11): T115 (Gate 2 metrics, G1) and T116 (coach paywall test, G2) added; T060, T070, T077 extended for I2, G4, G2. IDs above T098 are therefore out of sequence; follow phase order.
+**Remediation (2026-11-10, `/speckit-analyze` run 2)**: T099–T113 added inside their phases for E1 (existing features without coverage), U2 (starting weights); T114 (staging) added after run 3, with T006, T016, T039, T079, T081, T085 extended for U4, U5, U7, F2; T030, T040, T047, T080, T091 extended for U1, U2, C1, F3. Run 4 (2026-11-11): T115 (Gate 2 metrics, G1) and T116 (coach paywall test, G2) added; T060, T070, T077 extended for I2, G4, G2; T047, T050 extended for G6 (adjustable rest timer) and G10 (in-workout PR badge). IDs above T098 are therefore out of sequence; follow phase order.
 
 **Organization**: Tasks are grouped by user story; story labels match spec.md (US1–US7). Phases follow spec priority: P1 = US6, US1, US2, US7, US4; P2 = US3, US5.
 
@@ -178,7 +178,7 @@ Not yet verified: the Pro AI plan path against the real Claude API (needs `ANTHR
 
 - [ ] T045 [P] [US2] Update `mobile/test/unit/pr_detection_service_test.dart`: e1RM `weight × (1 + reps/30)`; true above stored best, false below; sets with `weight_kg = 0` never count as PRs; zero-reps edge case
 - [ ] T046 [P] [US2] Update `mobile/test/integration/offline_sync_test.dart`: log 3 sets offline, reconnect, `SyncQueue.flush()`, assert 3 `set_logs` rows in the local Supabase instance; a row failing 3 times becomes `status = 'failed'` and does not block later rows
-- [ ] T047 [P] [US2] Create `mobile/test/widget/live_workout_screen_test.dart`: free user offline can log a set and the rest timer starts automatically with `plan_exercises.rest_sec` (FR-008); weight, reps and optional RPE (1–10, 0.5 steps) can be logged (FR-007); video area shows the inline notice; exactly one primary action visible
+- [ ] T047 [P] [US2] Create `mobile/test/widget/live_workout_screen_test.dart`: free user offline can log a set and the rest timer starts automatically with `plan_exercises.rest_sec` (FR-008); weight, reps and optional RPE (1–10, 0.5 steps) can be logged (FR-007); video area shows the inline notice; exactly one primary action visible; the running rest timer can be adjusted by −15 s / +15 s (clamped to 15–600 s) and the change applies to the current rest only (FR-008 "configurable"); a set that `PrDetectionService` flags as a PR shows an inline "New PR" badge on its row immediately, with no modal or dialog (FR-010, Constitution VI)
 - [ ] T103 [P] [US2] Create `mobile/test/widget/home_screen_test.dart` (FR-006, US2 scenario 1): on a training day shows today's session with estimated duration and target muscle groups and a "Start Workout" action; on a rest day shows the rest-day message
 - [ ] T106 [P] [US2] Create `mobile/test/unit/health_sync_service_test.dart` (FR-012): writes a strength-training workout on finish only when `users.health_sync_enabled` is true; sets `workout_logs.synced_to_health = true` on success; never blocks finishing a workout when the health API fails
 
@@ -186,7 +186,7 @@ Not yet verified: the Pro AI plan path against the real Claude API (needs `ANTHR
 
 - [ ] T048 [P] [US2] Update `mobile/lib/features/workout/domain/pr_detection_service.dart` until T045 passes
 - [ ] T049 [P] [US2] Update `mobile/lib/shared/services/sync/sync_queue.dart` until T046 passes (ordered flush, 3 retries, `failed` status)
-- [ ] T050 [US2] Update `mobile/lib/features/workout/ui/live_workout_screen.dart` until T047 passes: cues from the local cache, suggested weight pre-filled from `plan_exercises.suggested_weight_kg`, `RestTimerWidget` after each set
+- [ ] T050 [US2] Update `mobile/lib/features/workout/ui/live_workout_screen.dart` until T047 passes: cues from the local cache, suggested weight pre-filled from `plan_exercises.suggested_weight_kg`, `RestTimerWidget` after each set with −15 s / +15 s controls, PR detection on save via `PrDetectionService` (T048) with an inline "New PR" badge on the set row
 - [ ] T051 [P] [US2] Update `mobile/lib/shared/widgets/set_log_row.dart` to use Flutter's `HapticFeedback` on "Done" and on PR (no third-party haptics package)
 - [ ] T104 [US2] Verify `mobile/lib/features/workout/ui/home_screen.dart` until T103 passes
 - [ ] T105 [US2] Verify `mobile/lib/features/workout/ui/workout_summary_screen.dart` (US2 scenario 4): total volume in the user's unit, exercises completed, PRs hit, effort rating 1–10; "Finish" calls `WorkoutLogRepository.finishWorkout()` then `HealthSyncService`
