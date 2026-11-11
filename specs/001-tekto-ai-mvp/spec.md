@@ -160,7 +160,7 @@ A free user encounters a Pro feature, sees a contextual paywall that communicate
 - How does form check behave when the device has an older/slower CPU? → Confidence threshold is enforced; if below threshold, cues are suppressed rather than shown incorrectly.
 - What happens if a user changes their equipment mid-program? → They can trigger a plan re-generation from settings, or use the coach to request substitutions exercise-by-exercise.
 - What happens when a free user starts or continues a workout offline? → Logging, rest timer and text cues work normally; video areas show "Offline video requires Tekto Pro" without blocking the workout (FR-011, FR-030).
-- How does the app handle a user in a locale with no regional App Store pricing yet configured? → Falls back to USD pricing.
+- How does the app handle a user in a storefront where no Pro product is available? → Purchase buttons are hidden and a localized "Tekto Pro is not yet available in your region" message is shown; "Restore purchases" stays visible and the free tier is unaffected (FR-031, FR-032). Prices are never hard-coded or converted by the app.
 
 ---
 
@@ -206,7 +206,7 @@ A free user encounters a Pro feature, sees a contextual paywall that communicate
 
 - **FR-021**: The form check MUST run entirely on-device using pose estimation; no camera frames may be transmitted to any server without explicit user action.
 - **FR-022**: At launch, the form check MUST support at least 8 key lifts: squat, deadlift, bench press, overhead press, row, lunge, hip thrust, push-up.
-- **FR-023**: The system MUST provide real-time rep counting and up to 3 form cues per set during the session.
+- **FR-023**: The system MUST provide real-time rep counting and live form cues during the set, with no more than 3 cues on screen at any moment, ordered by severity.
 - **FR-024**: After each set, the system MUST display a form score, the reps flagged, and one prioritized tip.
 - **FR-025**: Form cues MUST only be displayed when pose estimation confidence exceeds the defined threshold; below threshold, cues are suppressed and the user is prompted to adjust setup.
 

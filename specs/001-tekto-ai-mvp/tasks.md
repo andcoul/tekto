@@ -13,13 +13,13 @@ description: "Task list for Tekto AI MVP (regenerated after spec clarifications 
 
 **Brownfield note**: a first implementation already exists for many files below. "Create" means create or update the file until it meets the task; "Verify" tasks cover features that already exist in code and must be checked against the spec, with gaps fixed. `/speckit-converge` and `/speckit-implement` decide what is already done. No task is pre-checked.
 
-**Remediation (2026-11-10, `/speckit-analyze` run 2)**: T099–T113 added inside their phases for E1 (existing features without coverage), U2 (starting weights); T114 (staging) added after run 3, with T006, T016, T039, T079, T081, T085 extended for U4, U5, U7, F2; T030, T040, T047, T080, T091 extended for U1, U2, C1, F3. IDs above T098 are therefore out of sequence; follow phase order.
+**Remediation (2026-11-10, `/speckit-analyze` run 2)**: T099–T113 added inside their phases for E1 (existing features without coverage), U2 (starting weights); T114 (staging) added after run 3, with T006, T016, T039, T079, T081, T085 extended for U4, U5, U7, F2; T030, T040, T047, T080, T091 extended for U1, U2, C1, F3. Run 4 (2026-11-11): T115 (Gate 2 metrics, G1) and T116 (coach paywall test, G2) added; T060, T070, T077 extended for I2, G4, G2. IDs above T098 are therefore out of sequence; follow phase order.
 
 **Organization**: Tasks are grouped by user story; story labels match spec.md (US1–US7). Phases follow spec priority: P1 = US6, US1, US2, US7, US4; P2 = US3, US5.
 
 ## Progress (2026-11-10)
 
-**49 done / 65 open** of 114. Phases 1–4 (setup, foundations, US6 video library, US1 onboarding → first plan) are complete except:
+**49 done / 67 open** of 116. Phases 1–4 (setup, foundations, US6 video library, US1 onboarding → first plan) are complete except:
 
 - **T114** — staging Supabase project + Vault secrets (needs account access)
 - **T022** — ≥ 150 filmed exercises (content workstream; 15 today)
@@ -230,7 +230,7 @@ Not yet verified: the Pro AI plan path against the real Claude API (needs `ANTHR
 
 - [ ] T058 [P] [US4] Update `mobile/test/unit/rep_counter_test.dart`: exactly 5 clean squat reps counted; a partial rep reversing before the bottom threshold is not counted; one passing case per launch lift key (`squat, deadlift, bench_press, overhead_press, row, lunge, hip_thrust, push_up`)
 - [ ] T059 [P] [US4] Update `mobile/test/unit/form_score_calculator_test.dart`: score 100 for zero violations, 0 for all violations; `topTip` is the most frequent cue; `flaggedReps` lists 1-based reps with ≥ 1 cue
-- [ ] T060 [P] [US4] Confirm `mobile/test/unit/cue_engine_test.dart`: confidence 0.5 → no cues + `adjust_lighting`; 0.65 → cues returned; never more than 3 cues per frame
+- [ ] T060 [P] [US4] Confirm `mobile/test/unit/cue_engine_test.dart`: confidence 0.5 → no cues + `adjust_lighting`; 0.65 → cues returned; never more than 3 cues per frame; when more than 3 violations occur in one frame, the 3 returned are the highest severity (error before warning)
 - [ ] T061 [P] [US4] Create `mobile/test/unit/form_check_free_try_test.dart`: free user's first try on a lift is allowed, the second on the same lift is blocked, a different lift is allowed once; Pro always allowed; decision made from the local DAO with no network
 
 ### Implementation for User Story 4
@@ -256,8 +256,9 @@ Not yet verified: the Pro AI plan path against the real Claude API (needs `ANTHR
 ### Tests for User Story 3 (write first, must fail)
 
 - [ ] T069 [P] [US3] Update `mobile/test/unit/coach_quota_service_test.dart`: blocked when `questions_used >= 3` in the current ISO week (`YYYY-Www`); resets on a new ISO week; an `AI_UNAVAILABLE` reply does not consume quota
-- [ ] T070 [P] [US3] Write failing tests `supabase/functions/coach-message/logic.test.ts`: EN and FR pain/injury keywords set `injury_flag` and bypass the cache; cache lookup filters by `language` and current `prompt_version` with cosine ≥ 0.92 and unexpired rows; a reply is cached only when `cacheable = true` and `plan_change = null`; quota counted only when a reply is returned; refusal → `AI_UNAVAILABLE`
+- [ ] T070 [P] [US3] Write failing tests `supabase/functions/coach-message/logic.test.ts`: EN and FR pain/injury keywords set `injury_flag` and bypass the cache; cache lookup filters by `language` and current `prompt_version` with cosine ≥ 0.92 and unexpired rows; a reply is cached only when `cacheable = true` and `plan_change = null`; quota counted only when a reply is returned; a free user's 4th question in the same ISO week returns `QUOTA_EXCEEDED` (429) **before** any cache lookup or Claude call, regardless of what the client reports; `quota_remaining` goes 2 → 1 → 0 across three answered questions; Pro users never receive `QUOTA_EXCEEDED`; an expired trial is treated as free; refusal → `AI_UNAVAILABLE`
 - [ ] T071 [P] [US3] Write failing tests `supabase/functions/coach-confirm-change/apply.test.ts`: `exercise_swap` (video and equipment/contraindication checks → `EXERCISE_NO_VIDEO`, `EXERCISE_NOT_ALLOWED`); `session_shorten` removes trailing exercises to fit `target_duration_min`, keeping ≥ 3; `deload` sets −40 % (rounded, min 1) and `suggested_weight_kg` −10 % for the target week; `weight_adjustment`; `NO_PENDING_CHANGE` when nothing is pending or already applied; `confirmed: false` records rejection
+- [ ] T116 [P] [US3] Create `mobile/test/widget/coach_paywall_test.dart` (paywall surface — Constitution V): a free user whose 4th question returns `QUOTA_EXCEEDED` sees the paywall through `ProGateWidget`; with `WorkoutController.isWorkoutActive == true` it is a bottom sheet and the live workout screen stays visible and usable; "Restore purchases" and cancel-anytime text are rendered; the typed question is kept in the input field
 - [ ] T072 [US3] Create the guardrail eval suite in `supabase/evals/coach-guardrails/`: `cases.json` with ≥ 20 adversarial prompts split across EN and FR (roleplay, "my doctor said it's fine", stepwise pain questions, prompt injection via exercise names); `run.ts` that runs each case through the `coach-message` logic in staging, checks the localized referral sentence, checks no loaded-movement `plan_change` for the painful area, and asks a `claude-haiku-5-5` judge (structured yes/no) whether the reply diagnoses, prescribes treatment or gives a prognosis; writes `results/<date>.json`; exits non-zero below 100 %
 
 ### Implementation for User Story 3
@@ -266,7 +267,7 @@ Not yet verified: the Pro AI plan path against the real Claude API (needs `ANTHR
 - [ ] T074 [US3] Create `supabase/functions/coach-confirm-change/apply.ts` until T071 passes, and update `coach-confirm-change/index.ts` to return `{applied, change_type, updated_plan_exercises[]}`
 - [ ] T075 [US3] Run `deno task eval:guardrails` against staging until it passes 100 %; commit the results file
 - [ ] T076 [US3] Update `mobile/lib/features/coach/domain/coach_quota_service.dart` until T069 passes
-- [ ] T077 [US3] Update `mobile/lib/features/coach/ui/coach_screen.dart`: render streamed content as it arrives; show `coach_unavailable` as an inline message (never a spinner) on `AI_UNAVAILABLE`
+- [ ] T077 [US3] Update `mobile/lib/features/coach/ui/coach_screen.dart`: render streamed content as it arrives; show `coach_unavailable` as an inline message (never a spinner) on `AI_UNAVAILABLE`; on `QUOTA_EXCEEDED` (429) open the paywall through `ProGateWidget` until T116 passes; show `quota_remaining` to free users
 - [ ] T078 [P] [US3] Update `mobile/lib/features/coach/ui/plan_change_pending_card.dart` to describe all four change types (swap old → new, shortened session length, deload week, new weight/reps)
 - [ ] T110 [US3] Verify coach access from any screen (FR-016): a global coach entry point in the app shell opens the slide-up `coach_screen.dart` from every primary screen and passes `context.screen` plus `exercise_slug` / `session_id` when applicable; during a live workout it never covers the primary action (Constitution VI)
 - [ ] T111 [P] [US3] Verify `mobile/lib/features/coach/ui/widgets/message_rating_widget.dart` (SC-011): thumbs up/down on each finished assistant message; one rating per message (buttons disable after tap); saves `coach_messages.satisfaction_rating`; never prompted or required
@@ -314,6 +315,7 @@ Not yet verified: the Pro AI plan path against the real Claude API (needs `ANTHR
 - [ ] T095 Performance run on iPhone 12 and Pixel 6 — cold start < 2 s, video first frame < 1 s (LTE profile), form-check median < 150 ms, coach first token < 3 s p95 (≥ 50 staging messages), plan generation < 30 s — and record results in `specs/001-tekto-ai-mvp/checklists/gate1.md`
 - [ ] T096 Privacy audit per quickstart Scenario 9 steps 1–2 (encrypted local DB, zero network bytes during form check); record results in `checklists/gate1.md`
 - [ ] T097 Add rows for quickstart Scenarios 8 and 9 to `specs/001-tekto-ai-mvp/checklists/gate1.md`, then run Scenarios 1–9 on iOS 16 and Android 10 and record pass/fail for each
+- [ ] T115 Create `supabase/migrations/007_metrics_views.sql` with aggregate-only views (service role only, no client policies; no per-user rows exposed): `v_onboarding_funnel` (accounts created → `consent_at` set → first plan created, by signup week), `v_trial_start_rate` (users with a `subscriptions` trial start ÷ new users, by signup week), `v_week4_retention` (users with ≥ 1 finished `workout_logs` row in days 22–28 after signup ÷ cohort), `v_workouts_per_active_week` (SC-009), `v_form_check_weekly_pro` (SC-010), `v_coach_thumbs_up` (SC-011). Create `specs/001-tekto-ai-mvp/checklists/gate2.md` with one row per Gate 2 metric: target, query, and the install count copied from App Store Connect / Play Console (onboarding completion = first plans ÷ installs). No analytics SDK (Constitution VII)
 - [ ] T098 [P] Create App Store and Google Play listings (EN + FR): title "Tekto — Build Your Strength", short and full descriptions, 6 screenshots per platform (onboarding, plan, workout, library, coach, form check), privacy policy URL, health-data disclosures
 
 ---
@@ -414,10 +416,10 @@ T079 · T080 · T081 (tests)
 
 ## Notes
 
-- **Total tasks**: 114 (T001–T098, plus T099–T114 added by remediation and placed inside their phases).
+- **Total tasks**: 116 (T001–T098, plus T099–T116 added by remediation and placed inside their phases).
 - Additional test-first pairs from remediation: starting weights (T112 → T113), RevenueCat webhook (T108 → T109), auth screen (T101 → T102), home screen (T103 → T104), health sync (T106 → T107).
 - Every Principle V unit has its test task before its implementation: `PlanAdaptationService` (T080 → T083), `FormScoreCalculator` (T059 → T063), `RepCounter` (T058 → T062), `CoachQuotaService` (T069 → T076), subscription gates (T053/T054 → T056/T057), plus `ExerciseSubstitution` (T012 → T014), `PlanValidator` (T013 → T015), `TemplatePlanBuilder` (T030 → T036), generate-plan flow (T031 → T037), week boundary (T079 → T082), free try (T061 → T064).
-- Paywall widget tests: `PaywallScreen` (T052), `TrialOfferScreen` (T033), in-workout bottom sheet (T053).
+- Paywall widget tests: `PaywallScreen` (T052), `TrialOfferScreen` (T033), in-workout bottom sheet (T053), coach quota paywall (T116).
 - Constitution IV (Video Gate) enforced in T013/T015, T024, T035, T037, T071/T074, T087.
 - Constitution III: T031/T037 (fallback flow), T072/T075 (guardrail eval), T032 (unskippable disclaimer).
 - Constitution II: T016 (SQLCipher), T038 (consent), T065 (`user_shared`), T070 (no personalized cache), T096 (privacy audit).
