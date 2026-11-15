@@ -5,7 +5,7 @@ import { getDb } from '../_shared/db.ts';
 // ---------------------------------------------------------------------------
 // GDPR data export — FR-034
 // ---------------------------------------------------------------------------
-// Serializes all user rows from all 14 tables to JSON.
+// Serializes all user rows from every user-owned table to JSON.
 // Uploads to private Supabase Storage.
 // Returns signed 1-hour download URL.
 
@@ -22,6 +22,7 @@ const USER_TABLES = [
   'coach_quota_usage',
   'form_check_sessions',
   'subscriptions',
+  'body_weight_entries', // FR-041 (T118)
 ];
 
 serve(async (req: Request) => {
