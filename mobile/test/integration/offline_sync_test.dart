@@ -18,6 +18,7 @@ import 'package:drift/drift.dart' hide isNull;
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tekto/shared/services/api/supabase_client.dart';
+import 'package:tekto/shared/services/sync/history_backfill_service.dart';
 import 'package:tekto/shared/services/local_db/database.dart';
 import 'package:tekto/shared/services/sync/sync_queue.dart';
 import 'package:uuid/uuid.dart';
@@ -69,7 +70,96 @@ Map<String, dynamic> _set(String id, {double kg = 80, int reps = 5}) => {
       'reps': reps,
     };
 
+/// Server rows for the backfill tests, served like PostgREST (`?user_id=eq.…`, `?id=in.(…)`).
+class _FakeHistoryServer implements TektoDioClient {
+  _FakeHistoryServer({this.offline = false});
+  bool offline;
+  final requests = <String>[];
+
+  static final _rows = <String, List<Map<String, dynamic>>>{
+    'workout_logs': [
+      for (var i = 1; i <= 3; i++)
+        {'id': 'w$i', 'user_id': 'u1', 'session_id': 's1', 'started_at': '2026-11-0${i}T18:00:00Z',
+          'finished_at': '2026-11-0${i}T19:00:00Z', 'effort_rating': 7, 'total_volume_kg': 1000.0 * i, 'synced_to_health': false},
+    ],
+    'set_logs': [
+      {'id': 'sl1', 'workout_log_id': 'w1', 'plan_exercise_id': 'pe1', 'set_number': 1, 'weight_kg': 20, 'reps': 10,
+        'rpe_actual': null, 'is_pr': true, 'logged_at': '2026-11-01T18:10:00Z'},
+    ],
+    'sessions': [
+      {'id': 's1', 'plan_id': 'p-old', 'week_number': 1, 'day_of_week': 1, 'name_en': 'Full Body A', 'name_fr': 'Corps entier A',
+        'muscle_groups': ['quads'], 'estimated_duration_min': 45},
+    ],
+    'plan_exercises': [
+      {'id': 'pe1', 'session_id': 's1', 'exercise_slug': 'goblet-squat', 'sort_order': 0, 'sets': 3, 'reps_min': 8,
+        'reps_max': 12, 'rpe_target': 7, 'rir_target': null, 'rest_sec': 90, 'suggested_weight_kg': 20},
+    ],
+    'personal_records': [
+      {'id': 'pr1', 'user_id': 'u1', 'exercise_slug': 'goblet-squat', 'best_weight_kg': 20, 'best_reps': 10,
+        'best_e1rm': 26.67, 'achieved_at': '2026-11-01T18:10:00Z'},
+    ],
+    'body_weight_entries': [
+      {'id': 'bw1', 'user_id': 'u1', 'weight_kg': 80.5, 'measured_on': '2026-11-01'},
+    ],
+  };
+
+  @override
+  Future<Response<T>> get<T>(String path, {Map<String, dynamic>? queryParameters}) async {
+    if (offline) throw DioException(requestOptions: RequestOptions(path: path), type: DioExceptionType.connectionError);
+    final table = path.replaceFirst('/rest/v1/', '');
+    requests.add(table);
+    var rows = _rows[table] ?? const [];
+    final q = queryParameters ?? const {};
+    for (final key in ['id', 'workout_log_id']) {
+      if (q[key] case final String filter when filter.startsWith('in.(')) {
+        final ids = filter.substring(4, filter.length - 1).split(',').toSet();
+        rows = rows.where((r) => ids.contains(r[key])).toList();
+      }
+    }
+    final offset = int.tryParse('${q['offset'] ?? 0}') ?? 0;
+    final limit = int.tryParse('${q['limit'] ?? 1000}') ?? 1000;
+    rows = rows.skip(offset).take(limit).toList();
+    return Response<T>(requestOptions: RequestOptions(path: path), data: rows as T, statusCode: 200);
+  }
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => throw UnimplementedError('${invocation.memberName}');
+}
+
 void main() {
+  group('History backfill after a reinstall (T127, M2)', () {
+    late AppDatabase db;
+    setUp(() => db = AppDatabase.forTesting(NativeDatabase.memory()));
+    tearDown(() => db.close());
+
+    test('empty local DB + 3 server workouts → 3 local rows, with their sets, sessions and records', () async {
+      final server = _FakeHistoryServer();
+      final done = await HistoryBackfillService(db: db, api: server, pageSize: 2).run('u1');
+      expect(done, isTrue);
+      expect((await db.select(db.workoutLogs).get()).map((w) => w.id).toSet(), {'w1', 'w2', 'w3'});
+      expect((await db.select(db.setLogs).getSingle()).isPr, isTrue);
+      expect((await db.select(db.sessions).getSingle()).nameEn, 'Full Body A');
+      expect((await db.select(db.planExercises).getSingle()).exerciseSlug, 'goblet-squat');
+      expect((await db.select(db.personalRecords).getSingle()).bestE1rm, 26.67);
+      expect((await db.select(db.bodyWeightEntries).getSingle()).measuredOn, DateTime(2026, 11, 1));
+      expect(await db.select(db.syncQueueTable).get(), isEmpty, reason: 'downloaded rows are never re-uploaded');
+    });
+
+    test('skipped when the device already has history (runs once per install)', () async {
+      await HistoryBackfillService(db: db, api: _FakeHistoryServer()).run('u1');
+      final server = _FakeHistoryServer();
+      expect(await HistoryBackfillService(db: db, api: server).run('u1'), isFalse);
+      expect(server.requests, isEmpty);
+    });
+
+    test('offline: no error, nothing written, retried on the next launch', () async {
+      final offline = _FakeHistoryServer(offline: true);
+      expect(await HistoryBackfillService(db: db, api: offline).run('u1'), isFalse);
+      expect(await db.select(db.workoutLogs).get(), isEmpty);
+      expect(await HistoryBackfillService(db: db, api: _FakeHistoryServer()).run('u1'), isTrue);
+    });
+  });
+
   group('SyncQueue — queue semantics (in-memory DB)', () {
     late AppDatabase db;
     late StreamController<List<ConnectivityResult>> connectivity;

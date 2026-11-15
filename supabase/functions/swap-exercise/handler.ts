@@ -16,7 +16,8 @@ export interface SwapExercise {
 
 export interface SwapPlanExercise {
   id: string;
-  exercise_id: string;
+  /** plan_exercises references exercises by slug (001_initial_schema.sql). */
+  exercise_slug: string;
   user_id: string;
   plan_status: string;
 }
@@ -33,7 +34,7 @@ export interface SwapDeps {
   loadExerciseBySlug(slug: string): Promise<SwapExercise | null>;
   loadPlanExercise(id: string): Promise<SwapPlanExercise | null>;
   loadProfile(userId: string): Promise<SwapProfile>;
-  applySwap(planExerciseId: string, newExerciseId: string): Promise<void>;
+  applySwap(planExerciseId: string, newExerciseSlug: string): Promise<void>;
 }
 
 export interface SwapRequest {
@@ -75,11 +76,11 @@ export async function handleSwap(userId: string, req: SwapRequest, deps: SwapDep
     return fail(400, 'EXERCISE_NOT_ALLOWED', `'${target.slug}' needs unavailable equipment or is contraindicated`);
   }
 
-  const current = await deps.loadExercise(planExercise.exercise_id);
+  const current = await deps.loadExerciseBySlug(planExercise.exercise_slug);
   const shared = current?.muscle_primary.some((m) => target.muscle_primary.includes(m)) ?? false;
   if (!shared) return fail(400, 'EXERCISE_NOT_EQUIVALENT', `'${target.slug}' does not train the same primary muscle`);
 
-  await deps.applySwap(planExercise.id, target.id);
+  await deps.applySwap(planExercise.id, target.slug);
   return {
     status: 200,
     body: {

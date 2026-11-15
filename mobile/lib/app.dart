@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -7,6 +9,7 @@ import 'core/l10n/gen/app_localizations.dart';
 import 'core/router/app_router.dart';
 import 'core/theme/app_theme.dart';
 import 'features/auth/data/auth_service.dart';
+import 'shared/services/sync/history_backfill_service.dart';
 
 class TektoApp extends ConsumerWidget {
   const TektoApp({super.key});
@@ -21,6 +24,10 @@ class TektoApp extends ConsumerWidget {
       final user = next.value;
       if (user != null) {
         revenueCat.identify(user.id);
+        // Fresh install: download past workouts, records and body weight (T127). Never blocks
+        // the UI; offline it does nothing and runs again on the next sign-in or launch.
+        unawaited(HistoryBackfillService(db: ref.read(appDatabaseProvider), api: ref.read(dioClientProvider))
+            .run(user.id));
       } else if (next.hasValue) {
         revenueCat.reset();
       }

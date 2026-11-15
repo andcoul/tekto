@@ -24,7 +24,7 @@ function deps(o: { owner?: string; status?: string; limitations?: LimitationTag[
     loadExercise: (id) => Promise.resolve(EXERCISES[id] ?? null),
     loadExerciseBySlug: (slug) => Promise.resolve(Object.values(EXERCISES).find((e) => e.slug === slug) ?? null),
     loadPlanExercise: (id) =>
-      Promise.resolve(id === 'pe-1' ? { id, exercise_id: 'goblet-squat', user_id: o.owner ?? 'u1', plan_status: o.status ?? 'active' } : null),
+      Promise.resolve(id === 'pe-1' ? { id, exercise_slug: 'goblet-squat', user_id: o.owner ?? 'u1', plan_status: o.status ?? 'active' } : null),
     loadProfile: () => Promise.resolve({ equipment: ['dumbbell', 'bodyweight'], limitations: o.limitations ?? [], tier: o.tier ?? 'free' }),
     applySwap: (pe, ex) => {
       applied.push([pe, ex]);

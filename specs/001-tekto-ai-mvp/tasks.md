@@ -19,9 +19,8 @@ description: "Task list for Tekto AI MVP (regenerated after spec clarifications 
 
 ## Progress (2026-11-15)
 
-**72 done / 55 open** of 127. Phases 1–5 (setup, foundations, US6 video library, US1 onboarding → first plan, US2 daily workout) have 3 open tasks:
+**73 done / 54 open** of 127. Phases 1–5 (setup, foundations, US6 video library, US1 onboarding → first plan, US2 daily workout) have 2 open tasks, both external:
 
-- **T127** — new in US2: history backfill after reinstall
 
 - **T114** — staging Supabase project + Vault secrets (needs account access)
 - **T022** — ≥ 150 filmed exercises (content workstream; 15 today)
@@ -198,7 +197,7 @@ Not yet verified: the Pro AI plan path against the real Claude API (needs `ANTHR
 - [X] T126 [US2] Update `mobile/lib/shared/widgets/set_log_row.dart` and `live_workout_screen.dart` (FR-007): when `plan_exercises.rir_target` is set, show "RIR n (≈ RPE 10−n)" next to the set counter (RPE targets show "Target RPE n"); effort input stays RPE; `plan_exercises.rir_target` added to the local DB in schema v2; add a case to `live_workout_screen_test.dart`
 - [X] T118 [US2] Create `supabase/migrations/008_body_weight.sql` (`body_weight_entries`: `id` uuid PK, `user_id` FK → users ON DELETE CASCADE, `weight_kg numeric(5,2) NOT NULL CHECK > 0`, `measured_on date NOT NULL`, `created_at`; UNIQUE `(user_id, measured_on)`; RLS owner-only) and mirror it in Drift with writes through `sync_queue`; include it in `export-data` (data-model.md entity 17)
 - [X] T119 [US2] Implement `mobile/lib/features/progress/ui/progress_screen.dart` (and a `progress_repository.dart` reading local `workout_logs`, `set_logs`, `personal_records`, `body_weight_entries`) until T117 passes; charts with `fl_chart`. Pro status comes from `isProProvider`: it reads `subscription_dao` (T017) until `entitlement_provider` (T057) lands
-- [ ] T127 [US2] Create `mobile/lib/shared/services/sync/history_backfill_service.dart`: after sign-in, when the local DB has no `workout_logs` for the user, fetch `workout_logs`, `set_logs`, `personal_records` and `body_weight_entries` from Supabase (paged, newest first) into Drift; runs once per install, safe to rerun, never blocks the home screen, retries on next launch if offline; add a case to `mobile/test/integration/offline_sync_test.dart` (empty local DB + 3 server workouts → 3 local rows)
+- [X] T127 [US2] Create `mobile/lib/shared/services/sync/history_backfill_service.dart`: after sign-in, when the local DB has no `workout_logs` for the user, fetch `workout_logs`, `set_logs`, `personal_records` and `body_weight_entries` from Supabase (paged, newest first) into Drift; runs once per install, safe to rerun, never blocks the home screen, retries on next launch if offline; add a case to `mobile/test/integration/offline_sync_test.dart` (empty local DB + 3 server workouts → 3 local rows)
 - [X] T087 [US2] Extract `supabase/functions/swap-exercise/handler.ts`, update `swap-exercise/index.ts` and `mobile/lib/features/plan/ui/exercise_swap_sheet.dart`: alternatives filtered by same `muscle_primary`, the user's equipment and `contraindications`; server returns `EXERCISE_NO_VIDEO` or `EXERCISE_NOT_ALLOWED` until T120 passes; available to free and Pro users (FR-028)
 
 **Checkpoint**: Quickstart Scenario 2 passes (online, airplane mode, free offline).
@@ -273,7 +272,7 @@ Not yet verified: the Pro AI plan path against the real Claude API (needs `ANTHR
 ### Implementation for User Story 3
 
 - [ ] T073 [US3] Create `supabase/functions/coach-message/logic.ts` until T070 passes, and update `coach-message/index.ts` per contracts/ai-services.md §2: `claude-haiku-5-5`, effort `low`, streaming, structured output `{content, cacheable, plan_change}`, prompt caching with stable prefix, replies in `users.language`, embeddings from `_shared/embeddings.ts`; the context includes the plan's limitation-driven substitutions so the coach can explain them when asked about an exercise (spec Edge Cases)
-- [ ] T074 [US3] Create `supabase/functions/coach-confirm-change/apply.ts` until T071 passes, and update `coach-confirm-change/index.ts` to return `{applied, change_type, updated_plan_exercises[]}`
+- [ ] T074 [US3] Create `supabase/functions/coach-confirm-change/apply.ts` until T071 passes, and update `coach-confirm-change/index.ts` to return `{applied, change_type, updated_plan_exercises[]}`; it currently writes `plan_exercises.exercise_id`, which does not exist — the column is `exercise_slug` (fixed the same way in `swap-exercise`)
 - [ ] T075 [US3] Run `deno task eval:guardrails` against staging until it passes 100 %; commit the results file
 - [ ] T076 [US3] Update `mobile/lib/features/coach/domain/coach_quota_service.dart` until T069 passes
 - [ ] T077 [US3] Update `mobile/lib/features/coach/ui/coach_screen.dart`: render streamed content as it arrives; show `coach_unavailable` as an inline message (never a spinner) on `AI_UNAVAILABLE`; on `QUOTA_EXCEEDED` (429) open the paywall through `ProGateWidget` until T116 passes; show `quota_remaining` to free users

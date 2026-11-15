@@ -202,7 +202,8 @@ tekto/
 │       ├── 005_clarifications.sql   # timezone, consent, plan source/start_date, contraindications, captions, flagged reps
 │       ├── 006_adaptation_cron.sql  # pg_cron + pg_net hourly job
 │       ├── 007_metrics_views.sql    # Aggregate-only Gate 2 / SC views
-│       └── 008_body_weight.sql      # body_weight_entries
+│       ├── 008_body_weight.sql      # body_weight_entries
+│       └── 009_rir_target.sql       # plan_exercises.rir_target (documented, never created)
 │
 ├── content/
 │   ├── exercises/

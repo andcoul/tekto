@@ -39,13 +39,13 @@ serve(async (req: Request) => {
     loadPlanExercise: async (id) => {
       const { data } = await db
         .from('plan_exercises')
-        .select('id, exercise_id, sessions!inner(plans!inner(user_id, status))')
+        .select('id, exercise_slug, sessions!inner(plans!inner(user_id, status))')
         .eq('id', id)
         .maybeSingle();
       if (!data) return null;
       // deno-lint-ignore no-explicit-any -- nested select shape
       const plan = (data as any).sessions?.plans;
-      return { id: data.id, exercise_id: data.exercise_id, user_id: plan?.user_id, plan_status: plan?.status };
+      return { id: data.id, exercise_slug: data.exercise_slug, user_id: plan?.user_id, plan_status: plan?.status };
     },
     loadProfile: async (userId) => {
       const [{ data: profile }, { data: sub }] = await Promise.all([
@@ -54,8 +54,8 @@ serve(async (req: Request) => {
       ]);
       return { equipment: profile?.equipment ?? [], limitations: profile?.limitations ?? [], tier: sub?.tier ?? 'free' };
     },
-    applySwap: async (planExerciseId, newExerciseId) => {
-      const { error } = await db.from('plan_exercises').update({ exercise_id: newExerciseId }).eq('id', planExerciseId);
+    applySwap: async (planExerciseId, newExerciseSlug) => {
+      const { error } = await db.from('plan_exercises').update({ exercise_slug: newExerciseSlug }).eq('id', planExerciseId);
       if (error) throw new Error(error.message);
     },
   };
