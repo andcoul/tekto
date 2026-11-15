@@ -13,13 +13,17 @@ description: "Task list for Tekto AI MVP (regenerated after spec clarifications 
 
 **Brownfield note**: a first implementation already exists for many files below. "Create" means create or update the file until it meets the task; "Verify" tasks cover features that already exist in code and must be checked against the spec, with gaps fixed. `/speckit-converge` and `/speckit-implement` decide what is already done. No task is pre-checked.
 
-**Remediation (2026-11-10, `/speckit-analyze` run 2)**: T099–T113 added inside their phases for E1 (existing features without coverage), U2 (starting weights); T114 (staging) added after run 3, with T006, T016, T039, T079, T081, T085 extended for U4, U5, U7, F2; T030, T040, T047, T080, T091 extended for U1, U2, C1, F3. Run 4 (2026-11-11): T115 (Gate 2 metrics, G1) and T116 (coach paywall test, G2) added; T060, T070, T077 extended for I2, G4, G2; T047, T050 extended for G6 (adjustable rest timer) and G10 (in-workout PR badge). IDs above T098 are therefore out of sequence; follow phase order.
+**Remediation (2026-11-10, `/speckit-analyze` run 2)**: T099–T113 added inside their phases for E1 (existing features without coverage), U2 (starting weights); T114 (staging) added after run 3, with T006, T016, T039, T079, T081, T085 extended for U4, U5, U7, F2; T030, T040, T047, T080, T091 extended for U1, U2, C1, F3. Run 4 (2026-11-11): T115 (Gate 2 metrics, G1) and T116 (coach paywall test, G2) added; T060, T070, T077 extended for I2, G4, G2; T047, T050 extended for G6 (adjustable rest timer) and G10 (in-workout PR badge). Run 5 (2026-11-15, against the PRD): T013, T015, T035 reopened for D1 (volume maximum on every plan); T033, T043 reopened for P3 (AI plan after onboarding trial); T117–T119 added for P2 (progress); T087 moved to US2 with test T120 for A1 (swap for all tiers). IDs above T098 are therefore out of sequence; follow phase order.
 
-**Organization**: Tasks are grouped by user story; story labels match spec.md (US1–US7). Phases follow spec priority: P1 = US6, US1, US2, US7, US4; P2 = US3, US5.
+**Organization**: Tasks are grouped by user story; story labels match spec.md (US1–US7). Phases follow spec priority: P1 = US6, US1, US2, US7, US4; P2 = US3, US5. Priority is build order only; every story is required at launch (spec **Launch scope** lines).
 
-## Progress (2026-11-11)
+## Progress (2026-11-15)
 
-**61 done / 55 open** of 116. Phases 1–5 (setup, foundations, US6 video library, US1 onboarding → first plan, US2 daily workout) are complete except:
+**56 done / 64 open** of 120. Phases 1–5 (setup, foundations, US6 video library, US1 onboarding → first plan, US2 daily workout) are complete except:
+
+- **T013, T015, T035** — reopened: volume maximum on template plans (analyze run 5, D1)
+- **T033, T043** — reopened: AI plan after a trial started during onboarding (P3)
+- **T117–T120, T087** — new in US2: progress screen, body weight, swap for all tiers (P2, A1)
 
 - **T114** — staging Supabase project + Vault secrets (needs account access)
 - **T022** — ≥ 150 filmed exercises (content workstream; 15 today)
@@ -85,9 +89,9 @@ Not yet verified: the Pro AI plan path against the real Claude API (needs `ANTHR
 ### Shared plan logic — tests first (Constitution V)
 
 - [X] T012 [P] Write failing tests `supabase/functions/_shared/exercise-substitution.test.ts`: returns an exercise with the same `muscle_primary`, doable with the user's equipment, with non-null `video_front_url`, and with no `contraindications` overlapping the user's `limitations`; prefers the closest equipment match; returns `null` when no candidate exists
-- [X] T013 [P] Write failing tests `supabase/functions/_shared/plan-validator.test.ts`: rejects any slug without a video (Video Gate); rejects exercises needing unavailable equipment or contraindicated by limitations; rejects two consecutive days training the same muscle group; rejects `estimated_duration_min > session_length_min + 10`; rejects `weeks_total` outside 4–12; applies the per-level volume bounds (beginner 10–14, intermediate 14–18, advanced 16–22 sets/muscle/week) **only** when `source = 'ai'`
+- [ ] T013 [P] Write failing tests `supabase/functions/_shared/plan-validator.test.ts`: rejects any slug without a video (Video Gate); rejects exercises needing unavailable equipment or contraindicated by limitations; rejects two consecutive days training the same muscle group; rejects `estimated_duration_min > session_length_min + 10`; rejects `weeks_total` outside 4–12; rejects volume above the per-level maximum (beginner 14, intermediate 18, advanced 22 sets/muscle/week) for every `source` (`ai`, `template`, `template_fallback`); applies the minimum (10 / 14 / 16) only when `source = 'ai'`, for major muscles, at ≥ 3 days per week (FR-002a)
 - [X] T014 Implement `supabase/functions/_shared/exercise-substitution.ts` until T012 passes
-- [X] T015 Update `supabase/functions/_shared/plan-validator.ts` until T013 passes (one validator for AI and template plans — FR-002a)
+- [ ] T015 Update `supabase/functions/_shared/plan-validator.ts` until T013 passes (one validator for AI and template plans — FR-002a)
 
 ### Mobile core
 
@@ -141,12 +145,12 @@ Not yet verified: the Pro AI plan path against the real Claude API (needs `ANTHR
 - [X] T112 [P] [US1] Write failing tests `supabase/functions/_shared/starting-weights.test.ts` (US1 scenario 3, FR-009): with strength-check answers (estimated working weight × reps for squat, bench press, deadlift), each plan exercise's `suggested_weight_kg` is derived from the matching lift's e1RM scaled to the prescribed rep range at RPE ≤ 7, then mapped to related exercises by a fixed ratio table; with the strength check skipped, conservative defaults by `level` and equipment apply (e.g. barbell beginner = empty bar 20 kg, dumbbell beginner = 4 kg per hand, bodyweight = 0); every value is rounded down to the equipment increment (2.5 kg barbell, 1 kg dumbbell); no value is negative; output never errors on missing answers
 - [X] T101 [P] [US1] Create `mobile/test/widget/auth_screen_test.dart` (FR-005): Apple Sign-In (iOS), Google Sign-In and email/password options are present; no "Continue as guest" option unless the spec adds one
 - [X] T032 [P] [US1] Create `mobile/test/widget/onboarding_gate_test.dart`: health disclaimer has no skip path; quiz cannot start until consent is accepted; language step defaults to the device locale
-- [X] T033 [P] [US1] Create `mobile/test/widget/trial_offer_screen_test.dart` (paywall surface — Constitution V): "Skip for now" always visible and leads to the plan; "Restore purchases" and cancel-anytime text always visible; prices rendered from `storeProduct.priceString`, never hard-coded
+- [ ] T033 [P] [US1] Create `mobile/test/widget/trial_offer_screen_test.dart` (paywall surface — Constitution V): "Skip for now" always visible and leads to the plan; "Restore purchases" and cancel-anytime text always visible; prices rendered from `storeProduct.priceString`, never hard-coded; a successful trial purchase calls `generate-plan` with `force_regenerate: true` and shows the plan generation screen (FR-004, US1 scenario 5)
 
 ### Implementation for User Story 1
 
 - [X] T034 [P] [US1] Update `content/templates/beginner-full-body-3x.json`, `home-dumbbell-3x.json`, `intermediate-ppl-4x.json`: only slugs present in `exercises.json` with a video; accessories ordered last in each session; `level`, `days_per_week`, `equipment_required` metadata at top level
-- [X] T035 [US1] Create `content/templates/seed-templates.js`: validate every `exercise_slug` resolves to an exercise with `video_front_url` (fail otherwise — Constitution IV) and upsert into `plan_templates`
+- [ ] T035 [US1] Create `content/templates/seed-templates.js`: validate every `exercise_slug` resolves to an exercise with `video_front_url` (fail otherwise — Constitution IV); fail if any template exceeds the volume maximum for its level (FR-002a, Constitution III); upsert into `plan_templates`
 - [X] T113 [US1] Create `supabase/functions/_shared/starting-weights.ts` until T112 passes; used by the template builder (T036) and by `generate-plan/flow.ts` (T037) for AI plans that omit weights
 - [X] T102 [US1] Verify `mobile/lib/features/auth/data/auth_service.dart` and `mobile/lib/features/auth/ui/auth_screen.dart` until T101 passes: `signInWithApple()`, `signInWithGoogle()`, `signInWithEmail()`, `signUp()`, `signOut()`, `currentUser` stream; session persisted in `flutter_secure_storage`; deep-link redirect `tekto://auth/callback`
 - [X] T036 [US1] Create `supabase/functions/_shared/template-plan-builder.ts` until T030 passes
@@ -156,7 +160,7 @@ Not yet verified: the Pro AI plan path against the real Claude API (needs `ANTHR
 - [X] T040 [US1] Update `mobile/lib/features/onboarding/domain/onboarding_controller.dart`: save profile including `language`, `limitations_note`, `timezone` (from `flutter_timezone`) and `strength_estimates` (null when the strength check is skipped); call `generate-plan`; pass `fallback_notice` and `notices` to the next screen
 - [X] T041 [US1] Update `mobile/lib/features/onboarding/ui/plan_generation_screen.dart`: remove the `AI_UNAVAILABLE` retry path (server always returns a plan); keep a 35 s client timeout with a retry button for network failure only
 - [X] T042 [US1] Update `mobile/lib/features/plan/data/plan_repository.dart` and `mobile/lib/features/plan/ui/plan_overview_screen.dart`: store and show `source`, `start_date`, "Week X of Y"; show `plan_fallback_notice` and `free_plan_days_capped` as dismissible cards (never modals — Constitution VI)
-- [X] T043 [US1] Update `mobile/lib/features/onboarding/ui/trial_offer_screen.dart` until T033 passes: prices from RevenueCat `priceString`; if `offerings.current` is null, hide purchase buttons and show `pro_unavailable_in_region` with restore still visible
+- [ ] T043 [US1] Update `mobile/lib/features/onboarding/ui/trial_offer_screen.dart` until T033 passes: prices from RevenueCat `priceString`; if `offerings.current` is null, hide purchase buttons and show `pro_unavailable_in_region` with restore still visible; after a successful trial purchase, call `generate-plan` with `force_regenerate: true`, show `plan_generation_screen.dart`, and keep the template plan with `plan_fallback_notice` if the result is `template_fallback` (FR-004)
 - [X] T044 [US1] Update `mobile/lib/core/router/app_router.dart`: add `/onboarding/consent`; guard so the quiz route requires disclaimer + consent; re-consent when the stored `consent_version` is older than the current one
 
 **Checkpoint**: Quickstart Scenario 1 passes on iOS and Android. This is the MVP increment.
@@ -175,6 +179,8 @@ Not yet verified: the Pro AI plan path against the real Claude API (needs `ANTHR
 - [X] T046 [P] [US2] Update `mobile/test/integration/offline_sync_test.dart`: log 3 sets offline, reconnect, `SyncQueue.flush()`, assert 3 `set_logs` rows in the local Supabase instance; a row failing 3 times becomes `status = 'failed'` and does not block later rows
 - [X] T047 [P] [US2] Create `mobile/test/widget/live_workout_screen_test.dart`: free user offline can log a set and the rest timer starts automatically with `plan_exercises.rest_sec` (FR-008); weight, reps and optional RPE (1–10, 0.5 steps) can be logged (FR-007); video area shows the inline notice; exactly one primary action visible; the running rest timer can be adjusted by −15 s / +15 s (clamped to 15–600 s) and the change applies to the current rest only (FR-008 "configurable"); a set that `PrDetectionService` flags as a PR shows an inline "New PR" badge on its row immediately, with no modal or dialog (FR-010, Constitution VI)
 - [X] T103 [P] [US2] Create `mobile/test/widget/home_screen_test.dart` (FR-006, US2 scenario 1): on a training day shows today's session with estimated duration and target muscle groups and a "Start Workout" action; on a rest day shows the rest-day message
+- [ ] T117 [P] [US2] Create `mobile/test/widget/progress_screen_test.dart` (FR-039, FR-040, FR-041): workout history (date, session, total volume in the user's unit); PR list per exercise (best weight × reps, best e1RM); e1RM trend per exercise; weekly sets per muscle group; free user sees the last 4 weeks and a non-blocking Pro card for older data and muscle balance; Pro user sees full history and muscle balance; body-weight entry saved in kg and shown in the user's unit; works offline from the local DB
+- [ ] T120 [P] [US2] Write failing tests `supabase/functions/swap-exercise/handler.test.ts` (FR-028, Constitution IV): a free user can swap and never receives `PRO_REQUIRED`; alternatives share `muscle_primary`, fit the user's equipment and avoid `contraindications`; video-less target → `EXERCISE_NO_VIDEO`; disallowed target → `EXERCISE_NOT_ALLOWED`; no Claude call
 - [X] T106 [P] [US2] Create `mobile/test/unit/health_sync_service_test.dart` (FR-012): writes a strength-training workout on finish only when `users.health_sync_enabled` is true; sets `workout_logs.synced_to_health = true` on success; never blocks finishing a workout when the health API fails
 
 ### Implementation for User Story 2
@@ -186,6 +192,9 @@ Not yet verified: the Pro AI plan path against the real Claude API (needs `ANTHR
 - [X] T104 [US2] Verify `mobile/lib/features/workout/ui/home_screen.dart` until T103 passes
 - [X] T105 [US2] Verify `mobile/lib/features/workout/ui/workout_summary_screen.dart` (US2 scenario 4): total volume in the user's unit, exercises completed, PRs hit, effort rating 1–10; "Finish" calls `WorkoutLogRepository.finishWorkout()` then `HealthSyncService`
 - [X] T107 [US2] Verify `mobile/lib/shared/services/health/health_sync_service.dart` until T106 passes (HealthKit on iOS, Health Connect on Android)
+- [ ] T118 [US2] Create `supabase/migrations/008_body_weight.sql` (`body_weight_entries`: `id` uuid PK, `user_id` FK → users ON DELETE CASCADE, `weight_kg numeric(5,2) NOT NULL CHECK > 0`, `measured_on date NOT NULL`, `created_at`; UNIQUE `(user_id, measured_on)`; RLS owner-only) and mirror it in Drift with writes through `sync_queue`; include it in `export-data` (data-model.md entity 17)
+- [ ] T119 [US2] Implement `mobile/lib/features/progress/ui/progress_screen.dart` (and a `progress_repository.dart` reading local `workout_logs`, `set_logs`, `personal_records`, `body_weight_entries`) until T117 passes; charts with `fl_chart`
+- [ ] T087 [US2] Extract `supabase/functions/swap-exercise/handler.ts`, update `swap-exercise/index.ts` and `mobile/lib/features/plan/ui/exercise_swap_sheet.dart`: alternatives filtered by same `muscle_primary`, the user's equipment and `contraindications`; server returns `EXERCISE_NO_VIDEO` or `EXERCISE_NOT_ALLOWED` until T120 passes; available to free and Pro users (FR-028)
 
 **Checkpoint**: Quickstart Scenario 2 passes (online, airplane mode, free offline).
 
@@ -290,7 +299,6 @@ Not yet verified: the Pro AI plan path against the real Claude API (needs `ANTHR
 - [ ] T084 [US5] Create `supabase/functions/adapt-plan/handler.ts` until T081 passes, and update `adapt-plan/index.ts` per contracts/backend-api.md §2 (user and batch modes; service-role check for batch; `claude-haiku-5-5` explanations per contracts/ai-services.md §2b; appends to `plans.adaptation_log`)
 - [ ] T085 [US5] Update `mobile/lib/features/plan/domain/adaptation_provider.dart`: call `adapt-plan` right after the workout that completes the week is finished — i.e. every session with that `week_number` now has a finished `workout_logs` row (`sessions.scheduled_date` is not used, since it can be null); on app open, fetch and show any summary produced by the batch run
 - [ ] T086 [P] [US5] Update `mobile/lib/features/plan/ui/adaptation_summary_screen.dart`: show sessions completed of scheduled and old → new values with reasons
-- [ ] T087 [US5] Update `supabase/functions/swap-exercise/index.ts` and `mobile/lib/features/plan/ui/exercise_swap_sheet.dart`: alternatives filtered by same `muscle_primary`, the user's equipment and `contraindications`; server returns `EXERCISE_NO_VIDEO` or `EXERCISE_NOT_ALLOWED` (FR-028)
 
 **Checkpoint**: Quickstart Scenario 5 passes (Paths A, B, C).
 
@@ -327,7 +335,8 @@ Not yet verified: the Pro AI plan path against the real Claude API (needs `ANTHR
 - **US7 (Phase 6)** → Phase 2; parallel with US2
 - **US4 (Phase 7)** → Phase 2 + US7 (`ProGateWidget`)
 - **US3 (Phase 8)** → Phase 2 + US7 (quota needs subscription state)
-- **US5 (Phase 9)** → US2 (workout logs) + US7 (Pro gate); T087 reuses `exercise-substitution.ts` (T014)
+- **US5 (Phase 9)** → US2 (workout logs) + US7 (Pro gate)
+- **T087 (US2, swap)** reuses `exercise-substitution.ts` (T014)
 - **Polish (Phase 10)** → all stories; T092 needs T088
 
 ### Story Independence
@@ -377,7 +386,7 @@ T058 · T059 · T060 · T061 (tests)
 
 ```
 T079 · T080 · T081 (tests)
-# Then: T082 · T083 (in parallel) → T084 → T085 · T086 → T087
+# Then: T082 · T083 (in parallel) → T084 → T085 · T086
 ```
 
 ---
@@ -411,11 +420,11 @@ T079 · T080 · T081 (tests)
 
 ## Notes
 
-- **Total tasks**: 116 (T001–T098, plus T099–T116 added by remediation and placed inside their phases).
-- Additional test-first pairs from remediation: starting weights (T112 → T113), RevenueCat webhook (T108 → T109), auth screen (T101 → T102), home screen (T103 → T104), health sync (T106 → T107).
+- **Total tasks**: 120 (T001–T098, plus T099–T120 added by remediation and placed inside their phases).
+- Additional test-first pairs from remediation: starting weights (T112 → T113), RevenueCat webhook (T108 → T109), auth screen (T101 → T102), home screen (T103 → T104), health sync (T106 → T107), progress screen (T117 → T119), swap for all tiers (T120 → T087).
 - Every Principle V unit has its test task before its implementation: `PlanAdaptationService` (T080 → T083), `FormScoreCalculator` (T059 → T063), `RepCounter` (T058 → T062), `CoachQuotaService` (T069 → T076), subscription gates (T053/T054 → T056/T057), plus `ExerciseSubstitution` (T012 → T014), `PlanValidator` (T013 → T015), `TemplatePlanBuilder` (T030 → T036), generate-plan flow (T031 → T037), week boundary (T079 → T082), free try (T061 → T064).
 - Paywall widget tests: `PaywallScreen` (T052), `TrialOfferScreen` (T033), in-workout bottom sheet (T053), coach quota paywall (T116).
-- Constitution IV (Video Gate) enforced in T013/T015, T024, T035, T037, T071/T074, T087.
-- Constitution III: T031/T037 (fallback flow), T072/T075 (guardrail eval), T032 (unskippable disclaimer).
+- Constitution IV (Video Gate) enforced in T013/T015, T024, T035, T037, T071/T074, T120/T087.
+- Constitution III: T013/T015/T035 (volume bounds on every plan), T031/T037 (fallback flow), T072/T075 (guardrail eval), T032 (unskippable disclaimer).
 - Constitution II: T016 (SQLCipher), T038 (consent), T065 (`user_shared`), T070 (no personalized cache), T096 (privacy audit).
 - Use branch `001-tekto-ai-mvp`; commit after each task or logical group.

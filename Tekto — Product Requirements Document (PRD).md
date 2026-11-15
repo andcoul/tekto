@@ -106,7 +106,7 @@ Five journeys define the MVP; each must be completable in the fewest taps possib
 1. Home shows today's session, duration and target muscles.
 2. Start: each exercise opens with its video and 3 key cues.
 3. Log sets; rest timer starts automatically; suggested weight shown.
-4. Finish: summary, records hit, effort rating; plan adjusts for next time.
+4. Finish: summary, records hit, effort rating; for Pro users the plan adjusts at the next weekly review.
 
 **Form check (Pro)**
 

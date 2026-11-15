@@ -27,11 +27,22 @@ Tekto is a premium, AI-first strength training app for iOS and Android. It build
 - Q: If the AI's plan keeps failing the safety check, what should the user see? → A: Video-less exercises are auto-swapped for a validated alternative; other failures get up to 2 retries; if all fail, the user receives the rule-based template plan with a note that they can regenerate later.
 - Q: Is camera form check required for the launch, or can it ship in the first update? → A: Required at launch (P1) with the 8 lifts in FR-022; part of Gate 1; more lifts and polish in v1.1.
 
+### Session 2026-11-15 (`/speckit-analyze` against the PRD)
+
+- Q: Must template plans pass the volume-per-muscle check? → A: Yes. The volume maximum applies to every plan; the minimum applies to AI plans only (FR-002a).
+- Q: How do story priorities relate to the PRD's P0/P1? → A: P1/P2 is build order. Each story carries a separate **Launch scope** line; every story is required at launch.
+- Q: Is progress tracking (history, records, e1RM, volume) in the MVP? → A: Yes (FR-039–FR-041). Body weight logging is in; progress photos are post-MVP.
+- Q: What plan does a user get after starting the trial during onboarding? → A: An AI plan generated immediately, replacing the template plan (FR-004).
+- Q: Does a "too hard" rating change the next session or next week? → A: Next week, at the weekly review (FR-026).
+- Q: Is exercise swap Pro-only? → A: No. Swap is available to all users and makes no AI call (FR-028).
+
 ---
 
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 — Onboarding to First Plan (Priority: P1)
+
+**Launch scope**: Required at launch (PRD P0).
 
 A new user opens the app, watches the welcome experience, completes a short onboarding quiz about their goal, training level, available days, session length, equipment and any limitations, and receives a personalized 4–12 week training program in under 3 minutes. They are offered a Pro trial before or after account creation.
 
@@ -45,10 +56,13 @@ A new user opens the app, watches the welcome experience, completes a short onbo
 2. **Given** a user who selects Home gym + dumbbells only, **When** the plan is generated, **Then** all exercises in the plan are achievable with dumbbells or bodyweight, with no barbell movements.
 3. **Given** a user who skips the strength-check step, **When** the plan is generated, **Then** conservative starter weights are pre-filled and no error occurs.
 4. **Given** a user who dismisses the Pro trial offer, **When** dismissed, **Then** the user proceeds to their plan on the free tier with no paywall blocking.
+5. **Given** a user who starts the trial from the onboarding offer, **When** the purchase succeeds, **Then** an AI plan is generated and replaces the template plan (`source = ai`), or the template plan is kept with the fallback note (`source = template_fallback`).
 
 ---
 
 ### User Story 2 — Daily Workout Execution (Priority: P1)
+
+**Launch scope**: Required at launch (PRD P0).
 
 An existing user opens the app on a training day, sees today's planned session on the home screen, starts the workout, watches the exercise video for each movement, logs sets with weight and reps, uses the auto-starting rest timer, and finishes with a session summary.
 
@@ -68,6 +82,8 @@ An existing user opens the app on a training day, sees today's planned session o
 
 ### User Story 3 — AI Chat Coach (Priority: P2)
 
+**Launch scope**: Required at launch (PRD P0); built after the P1 stories; part of Gate 1.
+
 A Pro user opens the AI coach from any screen, asks a training or technique question, and receives a contextual answer grounded in their profile, current plan and history. They can request plan adjustments through conversation; changes are shown for confirmation before being applied.
 
 **Why this priority**: Core Pro differentiator; drives trial-to-paid conversion and satisfaction metric.
@@ -84,6 +100,8 @@ A Pro user opens the AI coach from any screen, asks a training or technique ques
 ---
 
 ### User Story 4 — Camera Form Check (Priority: P1)
+
+**Launch scope**: Required at launch (raised from PRD P1 by Clarification Q5); more lifts and polish in v1.1.
 
 A Pro user starts a supported lift, taps the camera icon, follows the guided phone placement, performs the set, and receives rep counts, real-time form cues, and a post-set form score with one actionable tip.
 
@@ -103,6 +121,8 @@ A Pro user starts a supported lift, taps the camera icon, follows the guided pho
 
 ### User Story 5 — Adaptive Weekly Plan Updates (Priority: P2)
 
+**Launch scope**: Required at launch (PRD P0); built after the P1 stories.
+
 After completing workouts in a week, a Pro user's plan automatically adjusts for the following week: progressions are applied when targets are hit, volume or intensity is reduced when sessions were missed or rated too hard.
 
 **Why this priority**: Core Pro adaptive plan feature; drives week-4 retention metric.
@@ -113,12 +133,14 @@ After completing workouts in a week, a Pro user's plan automatically adjusts for
 
 1. **Given** a Pro user who hits all reps at target RPE across a week, **When** the week ends, **Then** next week's plan shows a progressive overload (increased load or reps).
 2. **Given** a Pro user who misses two sessions in a week, **When** the week ends (Sunday 23:59 local time), **Then** next week's plan maintains or slightly reduces volume rather than progressing.
-3. **Given** a Pro user who rates a workout as "too hard" (high RPE), **When** the plan updates, **Then** the following session is adjusted to be less demanding.
+3. **Given** a Pro user who rates a workout as "too hard" (high RPE), **When** the plan updates, **Then** at the next weekly review (FR-026), that session's exercises are adjusted to be less demanding (one load increment lower, or reps held).
 4. **Given** any plan adaptation, **When** the user views next week's plan, **Then** a short explanation card is shown for why the plan changed.
 
 ---
 
 ### User Story 6 — Exercise Video Library (Priority: P1)
+
+**Launch scope**: Required at launch (PRD P0).
 
 Any user (free or Pro) can browse and view the full exercise video library. Each exercise shows filmed demonstrations from front and side angles, target muscles, step-by-step cues, common mistakes, and easier/harder variations. Pro users can download exercise videos for offline use.
 
@@ -135,6 +157,8 @@ Any user (free or Pro) can browse and view the full exercise video library. Each
 ---
 
 ### User Story 7 — Subscription and Paywall (Priority: P1)
+
+**Launch scope**: Required at launch (PRD P0).
 
 A free user encounters a Pro feature, sees a contextual paywall that communicates value without blocking a workout in progress, and can start a 7-day free trial via App Store or Google Play billing.
 
@@ -172,10 +196,10 @@ A free user encounters a Pro feature, sees a contextual paywall that communicate
 
 - **FR-001**: The system MUST present an onboarding quiz collecting: goal (muscle, strength, fat loss, general fitness), training level, days per week, session length, available equipment, and physical limitations or injuries.
 - **FR-002**: The system MUST generate a 4–12 week periodized training plan with named exercises, sets, reps, rest periods and RPE/RIR targets within 30 seconds of onboarding completion. Pro users receive an AI-generated plan. Free users receive a rule-based plan built from one of the starter templates (FR-029), selected by equipment first, then level, then goal; the system adapts it to the user's chosen days per week (adding or merging sessions, up to a maximum of 4 sessions per week; a user who chooses 5–7 days receives 4 sessions and a non-blocking card explaining that Pro builds programs for 5 or more days) and session length (trimming exercises from the end of each session, keeping at least 3, then reducing sets and rest if needed). No AI call is made for free plans.
-- **FR-002a**: Every plan, AI-generated or template-based, MUST pass the same plan validator (every exercise has a video, uses only the user's available equipment, rest days present, session fits within the chosen session length) before it is shown to the user.
+- **FR-002a**: Every plan, AI-generated or template-based, MUST pass the same plan validator (every exercise has a video, uses only the user's available equipment, rest days present, session fits within the chosen session length, weekly sets per muscle group within the level's bounds) before it is shown to the user. The volume bounds are beginner 10–14, intermediate 14–18, advanced 16–22 sets per muscle per week. The maximum applies to every plan. The minimum applies to AI plans only, for major muscles when the user trains 3 or more days per week, because template plans trimmed to short sessions cannot always reach it.
 - **FR-003b**: When an AI-generated plan fails validation: (1) any exercise without a video MUST be replaced automatically with a validated alternative (same primary muscle, available equipment) without a new AI call; (2) any other validation failure MUST trigger up to 2 retries (3 attempts in total); (3) if every attempt fails, the user MUST receive the rule-based template plan (FR-002) with a visible note that they can regenerate later. Onboarding MUST never end without a valid plan.
 - **FR-003**: Every exercise in a generated plan MUST have a corresponding video in the exercise library; no plan may reference a movement without a video.
-- **FR-004**: The system MUST offer a 7-day Pro free trial after onboarding, skippable by the user, without blocking access to the generated plan.
+- **FR-004**: The system MUST offer a 7-day Pro free trial after onboarding, skippable by the user, without blocking access to the generated plan. If the user starts the trial from this offer, the system MUST immediately generate an AI plan (`force_regenerate`) that replaces the template plan; if AI generation falls back (FR-003b), the template plan is kept and the fallback note is shown.
 - **FR-005**: The system MUST support account creation via Apple Sign-In, Google Sign-In, or email/password.
 
 **Workout Tracking**
@@ -187,6 +211,13 @@ A free user encounters a Pro feature, sees a contextual paywall that communicate
 - **FR-010**: The system MUST detect and display personal records (PR) in real time during a workout.
 - **FR-011**: The system MUST work fully offline for the current day's workout for all users (set logging, rest timer, navigation between exercises, technique cues); data syncs when connectivity is restored. Offline exercise video is Pro-only (see FR-015); a free user offline sees the exercise's text cues and a message that offline video requires Pro, and the workout continues uninterrupted.
 - **FR-012**: The system MUST sync workout data with Apple Health (iOS) and Google Health Connect (Android).
+- **FR-028**: All users, free and Pro, MUST be able to swap any exercise for an equivalent alternative (same muscle group, available equipment) at any time. The swap uses rule-based substitution and makes no AI call.
+
+**Progress & Analytics**
+
+- **FR-039**: The system MUST show a workout history (date, session, total volume) and a personal-records list per exercise (best weight × reps and best e1RM).
+- **FR-040**: The system MUST show an e1RM trend per exercise and weekly sets per muscle group. Free users see the last 4 weeks; Pro users see the full history plus muscle balance (PRD analytics tiers).
+- **FR-041**: Users MUST be able to log body weight (in their unit) and see its trend. Progress photos are out of scope for the MVP.
 
 **Exercise Video Library**
 
@@ -214,7 +245,6 @@ A free user encounters a Pro feature, sees a contextual paywall that communicate
 
 - **FR-026**: The system MUST review logged performance weekly and adjust the following week's plan: progress load/reps when targets are met, maintain or reduce volume when sessions are missed or rated too hard. The review runs once per training week, at whichever comes first: the end of the user's training week (Sunday 23:59 in the user's local time zone) or the moment every session of that training week has been logged. It runs regardless of how many sessions were completed; skipped sessions are treated as missed and are an input to the adjustment, never a reason to skip the review.
 - **FR-027**: Every plan adaptation MUST display a brief explanation card to the user explaining what changed and why.
-- **FR-028**: Users MUST be able to swap any exercise for an equivalent alternative (same muscle group, available equipment) at any time.
 
 **Monetization**
 
@@ -245,6 +275,7 @@ A free user encounters a Pro feature, sees a contextual paywall that communicate
 - **Exercise**: An entry in the master library; has video assets, muscle targets, technique cues, variations, and equipment tags.
 - **WorkoutLog**: A user's recorded execution of a session; contains SetLog entries (actual weight, reps, RPE); drives adaptations and PR calculations.
 - **SetLog**: One logged set; weight, reps performed, RPE given, timestamp.
+- **BodyWeightEntry**: One body-weight measurement; weight (stored in kg), date; belongs to a user.
 - **CoachMessage**: A single turn in a coach conversation; references context (screen, session, plan) at the time of the question.
 - **FormCheckSession**: One camera form check; linked to a SetLog; contains rep count, cues shown, form score, and a flag indicating any user-initiated share.
 - **Subscription**: User's current plan tier (Free / Pro), store, billing period, trial status, expiry.
@@ -282,5 +313,5 @@ A free user encounters a Pro feature, sees a contextual paywall that communicate
 - English and French are the only supported languages at launch; the architecture supports adding more languages in future releases.
 - The trademark clearance for "Tekto" in Classes 9 and 41 is assumed to be completed before launch (open question from PRD).
 - Team size, budget, and target launch date are open questions to be resolved outside this spec.
-- Nutritional tracking, social features, wearable integrations beyond Apple Health / Google Health Connect, and a web app are explicitly out of scope for the MVP.
+- Nutritional tracking, social features, wearable integrations beyond Apple Health / Google Health Connect, progress photos, and a web app are explicitly out of scope for the MVP.
 - A human-reviewed content safety pass on the AI coach's guardrails will be conducted before launch to satisfy app store compliance.

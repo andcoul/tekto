@@ -393,6 +393,22 @@ Starter templates for free-tier plans and the Pro fallback. Seeded from `content
 
 ---
 
+### 17. BodyWeightEntry (`body_weight_entries`)
+
+One body-weight measurement (FR-041). Health data: encrypted at rest and included in GDPR export and deletion.
+
+| Field | Type | Constraints | Notes |
+|---|---|---|---|
+| `id` | uuid | PK | |
+| `user_id` | uuid | FK → users.id, NOT NULL, ON DELETE CASCADE | |
+| `weight_kg` | numeric(5,2) | NOT NULL, > 0 | Stored in kg; displayed in the user's unit |
+| `measured_on` | date | NOT NULL | UNIQUE with `user_id` (one entry per day; a new entry replaces it) |
+| `created_at` | timestamptz | NOT NULL | |
+
+**RLS**: owner-only read and write.
+
+---
+
 ### Local-only: SyncQueue (`sync_queue`, Drift only)
 
 | Field | Type | Notes |
@@ -427,6 +443,7 @@ users ────────────────────────�
   ├── coach_quota_usage (1:many, one per week)      │
   ├── form_check_sessions (1:many)                  │
   ├── subscriptions (1:1)                           │
+  ├── body_weight_entries (1:many)                  │
   └── (device only) exercise_video_downloads        │
                                                     │
 exercises ──────────────────────────────────────────┘
@@ -440,7 +457,7 @@ coach_response_cache ── standalone system table (no user FK)
 
 ## Offline Sync Strategy
 
-**Drift (SQLite, SQLCipher-encrypted) mirrors**: `plans`, `sessions`, `plan_exercises`, `exercises` (text fields for every exercise in the active plan, for **all** users — Constitution I), `workout_logs`, `set_logs`, `personal_records`, `form_check_sessions` (summaries, for the free-try check), `subscriptions`, `coach_quota_usage`.
+**Drift (SQLite, SQLCipher-encrypted) mirrors**: `plans`, `sessions`, `plan_exercises`, `exercises` (text fields for every exercise in the active plan, for **all** users — Constitution I), `workout_logs`, `set_logs`, `personal_records`, `form_check_sessions` (summaries, for the free-try check), `subscriptions`, `coach_quota_usage`, `body_weight_entries`.
 
 **Write queue**: Any write that occurs offline is appended to a `sync_queue` local table with `{operation, table, payload, created_at}`. On connectivity restore, the queue is flushed in order to Supabase REST API.
 

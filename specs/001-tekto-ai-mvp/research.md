@@ -390,7 +390,7 @@ Two triggers, one idempotent function:
 
 **4. Adapt to equipment and limitations:** any exercise not doable with the user's equipment, or contraindicated by their limitations, is replaced by `exercise-substitution.ts`.
 
-**5. Validate:** the result passes `plan-validator.ts` (video, equipment, rest days, duration). The volume-per-muscle bounds apply to AI plans only; templates are pre-validated content.
+**5. Validate:** the result passes `plan-validator.ts` (video, equipment, rest days, duration). The volume-per-muscle maximum applies to every plan, templates included; the minimum applies to AI plans only (FR-002a), because templates trimmed to short sessions cannot always reach it.
 
 ### Rationale
 Personalized enough to keep the free plan honest to the quiz answers, with zero AI cost and deterministic, testable behaviour.

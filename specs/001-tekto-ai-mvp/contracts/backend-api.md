@@ -289,7 +289,7 @@ Confirms or rejects a proposed plan modification from the coach.
 
 Swaps a `plan_exercise` for an equivalent alternative selected by the user (from the library or coach suggestion).
 
-**Auth**: Required (user JWT).
+**Auth**: Required (user JWT). Available to free and Pro users; never returns `PRO_REQUIRED` (FR-028).
 
 **Request body**:
 ```json
