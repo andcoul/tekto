@@ -11,6 +11,7 @@ import '../../../shared/widgets/set_log_row.dart';
 import '../../../shared/models/exercise_model.dart';
 import '../../../shared/utils/weight_units.dart';
 import '../../../shared/widgets/video_player_widget.dart';
+import '../../form_check/ui/form_check_screen.dart';
 import '../../plan/domain/plan_provider.dart';
 import '../../plan/ui/exercise_swap_sheet.dart';
 import 'plate_calculator_sheet.dart';
@@ -260,7 +261,7 @@ class _LiveWorkoutScreenState extends ConsumerState<LiveWorkoutScreen> {
                 IconButton(
                   icon: const Icon(Icons.videocam_outlined),
                   tooltip: l.workoutFormCheck,
-                  onPressed: () => context.push('/form-check/${ex.slug}'),
+                  onPressed: () => openFormCheck(context, ref, ex.slug),
                 ),
             ]),
             const SizedBox(height: AppSpacing.sm),

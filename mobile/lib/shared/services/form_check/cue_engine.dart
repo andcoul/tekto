@@ -29,7 +29,7 @@ enum CueSeverity { warning, error }
 /// Confidence gate: when pose.confidence < 0.6 all cues are suppressed and
 /// an "adjust_lighting" warning is emitted instead (Principle II).
 ///
-/// At most 3 cues are returned per frame.
+/// At most 3 cues are returned per frame, highest severity first (FR-023).
 ///
 /// Principle V: unit tested.
 class CueEngine {
@@ -83,6 +83,9 @@ class CueEngine {
     ),
   };
 
+  /// The cue for [key] (texts and severity), or null for an unknown key.
+  FormCue? cueFor(String key) => _cueLibrary[key];
+
   /// Converts a [FormFrameResult] into a list of [FormCue]s.
   ///
   /// Returns `[adjustLightingCue]` when confidence is below threshold.
@@ -91,11 +94,14 @@ class CueEngine {
       return [_cueLibrary['adjust_lighting']!];
     }
 
-    final cues = result.activeCues
-        .map((key) => _cueLibrary[key])
-        .whereType<FormCue>()
-        .toList()
-      ..sort((a, b) => b.severity.index.compareTo(a.severity.index)); // errors first
+    final cues = result.activeCues.map((key) => _cueLibrary[key]).whereType<FormCue>().toList();
+    // Errors before warnings; same severity keeps detection order (explicit, since
+    // List.sort is not guaranteed stable).
+    final order = {for (var i = 0; i < cues.length; i++) cues[i]: i};
+    cues.sort((a, b) {
+      final bySeverity = b.severity.index.compareTo(a.severity.index);
+      return bySeverity != 0 ? bySeverity : order[a]!.compareTo(order[b]!);
+    });
 
     return cues.take(_maxCuesPerFrame).toList();
   }

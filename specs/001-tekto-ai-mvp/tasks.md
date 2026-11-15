@@ -19,13 +19,13 @@ description: "Task list for Tekto AI MVP (regenerated after spec clarifications 
 
 ## Progress (2026-11-15)
 
-**81 done / 46 open** of 127. Phases 1–5 (setup, foundations, US6 video library, US1 onboarding → first plan, US2 daily workout) have 2 open tasks, both external:
+**92 done / 35 open** of 127. Phases 1–7 (setup, foundations, US6 video library, US1 onboarding → first plan, US2 daily workout, US7 subscription, US4 form check) have 2 open tasks, both external:
 
 
 - **T114** — staging Supabase project + Vault secrets (needs account access)
 - **T022** — ≥ 150 filmed exercises (content workstream; 15 today)
 
-Not yet verified: the Pro AI plan path against the real Claude API (needs `ANTHROPIC_API_KEY`), quickstart Scenarios 1, 2 and 7 on a device, and the Health write on a real iPhone / Android phone. The app does not build as a whole yet: coach, form-check, settings and subscription UI code (Phases 6–10) still has compile errors. Next: Phase 6 (US7 Subscription), then US4.
+Not yet verified: the Pro AI plan path against the real Claude API (needs `ANTHROPIC_API_KEY`), quickstart Scenarios 1, 2, 4 and 7 on a device (Scenario 4 also tunes the form-check angle thresholds), and the Health write on a real iPhone / Android phone. The app does not build as a whole yet: coach (Phase 8), adaptation and settings code (`tektoApiClientProvider`, Phases 9–10) still has compile errors. Next: Phase 8 (US3 coach).
 
 ---
 
@@ -236,20 +236,20 @@ Not yet verified: the Pro AI plan path against the real Claude API (needs `ANTHR
 
 ### Tests for User Story 4 (write first, must fail)
 
-- [ ] T058 [P] [US4] Update `mobile/test/unit/rep_counter_test.dart`: exactly 5 clean squat reps counted; a partial rep reversing before the bottom threshold is not counted; one passing case per launch lift key (`squat, deadlift, bench_press, overhead_press, row, lunge, hip_thrust, push_up`)
-- [ ] T059 [P] [US4] Update `mobile/test/unit/form_score_calculator_test.dart`: score 100 for zero violations, 0 for all violations; `topTip` is the most frequent cue; `flaggedReps` lists 1-based reps with ≥ 1 cue
-- [ ] T060 [P] [US4] Confirm `mobile/test/unit/cue_engine_test.dart`: confidence 0.5 → no cues + `adjust_lighting`; 0.65 → cues returned; never more than 3 cues per frame; when more than 3 violations occur in one frame, the 3 returned are the highest severity (error before warning)
-- [ ] T061 [P] [US4] Create `mobile/test/unit/form_check_free_try_test.dart`: free user's first try on a lift is allowed, the second on the same lift is blocked, a different lift is allowed once; Pro always allowed; decision made from the local DAO with no network
+- [X] T058 [P] [US4] Update `mobile/test/unit/rep_counter_test.dart`: exactly 5 clean squat reps counted; a partial rep reversing before the bottom threshold is not counted; one passing case per launch lift key (`squat, deadlift, bench_press, overhead_press, row, lunge, hip_thrust, push_up`)
+- [X] T059 [P] [US4] Update `mobile/test/unit/form_score_calculator_test.dart`: score 100 for zero violations, 0 for all violations; `topTip` is the most frequent cue; `flaggedReps` lists 1-based reps with ≥ 1 cue
+- [X] T060 [P] [US4] Confirm `mobile/test/unit/cue_engine_test.dart`: confidence 0.5 → no cues + `adjust_lighting`; 0.65 → cues returned; never more than 3 cues per frame; when more than 3 violations occur in one frame, the 3 returned are the highest severity (error before warning)
+- [X] T061 [P] [US4] Create `mobile/test/unit/form_check_free_try_test.dart`: free user's first try on a lift is allowed, the second on the same lift is blocked, a different lift is allowed once; Pro always allowed; decision made from the local DAO with no network
 
 ### Implementation for User Story 4
 
-- [ ] T062 [P] [US4] Update `mobile/lib/shared/services/form_check/rep_counter.dart` and `pose_analyzer.dart` until T058 passes for all 8 lift keys
-- [ ] T063 [P] [US4] Update `mobile/lib/shared/services/form_check/form_score_calculator.dart` until T059 passes (`FormSetSummary.flaggedReps`)
-- [ ] T064 [P] [US4] Create `mobile/lib/features/form_check/domain/form_check_free_try_service.dart` until T061 passes
-- [ ] T065 [US4] Update `mobile/lib/features/form_check/data/form_check_repository.dart`: save `flagged_reps` and `was_free_try` (true for free users); `user_shared` always false unless set by an explicit, confirmed user action; sync via the queue
-- [ ] T066 [US4] Update `mobile/lib/features/form_check/ui/form_check_screen.dart`: gate entry through `FormCheckFreeTryService` + `ProGateWidget` (bottom sheet during a workout); keep guided placement and the "Adjust lighting" message; show a "Beta" label on the camera screen and in `form_summary_screen.dart` (FR-022, US4 scenario 6)
-- [ ] T067 [P] [US4] Update `mobile/lib/features/form_check/ui/form_summary_screen.dart` to list flagged reps
-- [ ] T068 [US4] Update `mobile/lib/shared/services/form_check/form_check_service.dart`: record per-frame processing delta; log the median at session end in debug builds (Performance Standards < 150 ms); frames stay memory-only
+- [X] T062 [P] [US4] Update `mobile/lib/shared/services/form_check/rep_counter.dart` and `pose_analyzer.dart` until T058 passes for all 8 lift keys (geometry covered by `test/unit/pose_analyzer_test.dart`)
+- [X] T063 [P] [US4] Update `mobile/lib/shared/services/form_check/form_score_calculator.dart` until T059 passes (`FormSetSummary.flaggedReps`)
+- [X] T064 [P] [US4] Create `mobile/lib/features/form_check/domain/form_check_free_try_service.dart` until T061 passes
+- [X] T065 [US4] Update `mobile/lib/features/form_check/data/form_check_repository.dart`: save `flagged_reps` and `was_free_try` (true for free users); `user_shared` always false unless set by an explicit, confirmed user action; sync via the queue
+- [X] T066 [US4] Update `mobile/lib/features/form_check/ui/form_check_screen.dart`: gate entry through `FormCheckFreeTryService` + `ProGateWidget` (bottom sheet during a workout); keep guided placement and the "Adjust lighting" message; show a "Beta" label on the camera screen and in `form_summary_screen.dart` (FR-022, US4 scenario 6)
+- [X] T067 [P] [US4] Update `mobile/lib/features/form_check/ui/form_summary_screen.dart` to list flagged reps
+- [X] T068 [US4] Update `mobile/lib/shared/services/form_check/form_check_service.dart`: record per-frame processing delta; log the median at session end in debug builds (Performance Standards < 150 ms); frames stay memory-only. Camera-free logic (rep tagging, depth no-rep cue, timing) is in `form_check_pipeline.dart`, tested by `test/unit/form_check_pipeline_test.dart`; the gate and summary screens by `test/widget/form_check_screen_test.dart`; the repository by `test/unit/form_check_repository_test.dart`
 
 **Checkpoint**: Quickstart Scenario 4 passes on a physical iPhone and Android phone.
 

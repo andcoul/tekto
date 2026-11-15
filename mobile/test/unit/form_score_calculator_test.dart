@@ -4,7 +4,7 @@ import 'package:tekto/shared/services/form_check/form_score_calculator.dart';
 import 'package:tekto/shared/services/form_check/pose_analyzer.dart';
 
 // ---------------------------------------------------------------------------
-// T083 — FormScoreCalculator unit tests
+// T059 — FormScoreCalculator unit tests
 // ---------------------------------------------------------------------------
 
 void main() {
@@ -138,5 +138,44 @@ void main() {
 
     expect(summary.score, inInclusiveRange(0, 100));
     expect(summary.score, equals(50));
+  });
+
+  group('flaggedReps (FR-024)', () {
+    FormFrameResult frame(int rep, {List<String> cues = const [], double confidence = 0.9}) =>
+        FormFrameResult(activeCues: cues, repDetected: false, jointAngleSnapshot: const {}, confidence: confidence, repIndex: rep);
+
+    test('lists the 1-based reps that had at least one cue, in order', () {
+      final frames = [
+        for (var rep = 1; rep <= 5; rep++) ...[
+          frame(rep),
+          frame(rep, cues: rep == 2 || rep == 4 ? ['knee_cave'] : const []),
+          frame(rep),
+        ],
+      ];
+      final summary = calculator.calculate(frames: frames, liftKey: 'squat', language: 'en', repCount: 5);
+      expect(summary.flaggedReps, [2, 4]);
+    });
+
+    test('a rep with several cue frames is listed once', () {
+      final frames = [frame(1, cues: ['knee_cave']), frame(1, cues: ['depth_too_shallow']), frame(2)];
+      final summary = calculator.calculate(frames: frames, liftKey: 'squat', language: 'en', repCount: 2);
+      expect(summary.flaggedReps, [1]);
+    });
+
+    test('ignores frames outside a counted rep and low-confidence frames', () {
+      final frames = [
+        frame(0, cues: ['knee_cave']), // standing between reps
+        frame(1, cues: ['knee_cave'], confidence: 0.4), // only "adjust lighting" is shown
+        frame(2, cues: ['knee_cave']), // rep 2 was never completed
+      ];
+      final summary = calculator.calculate(frames: frames, liftKey: 'squat', language: 'en', repCount: 1);
+      expect(summary.flaggedReps, isEmpty);
+    });
+
+    test('clean set has no flagged reps', () {
+      final summary = calculator.calculate(frames: [frame(1), frame(2)], liftKey: 'squat', language: 'en', repCount: 2);
+      expect(summary.flaggedReps, isEmpty);
+      expect(summary.score, 100);
+    });
   });
 }

@@ -12,6 +12,7 @@ class FormSetSummary {
     required this.topTipEn,
     required this.topTipFr,
     required this.repCount,
+    this.flaggedReps = const [],
   });
 
   /// Form quality score 0–100.
@@ -27,6 +28,9 @@ class FormSetSummary {
   final String topTipFr;
 
   final int repCount;
+
+  /// 1-based reps with at least one cue, ascending (FR-024).
+  final List<int> flaggedReps;
 }
 
 // ---------------------------------------------------------------------------
@@ -37,6 +41,7 @@ class FormSetSummary {
 ///
 /// score = (1 - violationRate) × 100, rounded to int (0–100).
 /// topTip is the most frequently occurring cue key across all frames.
+/// flaggedReps lists the completed reps (1..repCount) with at least one shown cue.
 ///
 /// Principle V: unit tested.
 class FormScoreCalculator {
@@ -55,25 +60,23 @@ class FormScoreCalculator {
     required int repCount,
   }) {
     if (frames.isEmpty) {
-      return const FormSetSummary(
-        score: 100,
-        cuesShown: [],
-        topTipEn: '',
-        topTipFr: '',
-        repCount: 0,
-      );
+      return FormSetSummary(score: 100, cuesShown: const [], topTipEn: '', topTipFr: '', repCount: repCount);
     }
 
     // Count violations per frame (frames with ≥1 violation = violating frame)
     int violatingFrames = 0;
     final cueFrequency = <String, int>{};
+    final flagged = <int>{};
 
     for (final frame in frames) {
       final cues = _cueEngine.evaluate(frame);
       // Filter out the confidence-gate warning from violation count
       final realCues = cues.where((c) => c.key != 'adjust_lighting').toList();
 
-      if (realCues.isNotEmpty) violatingFrames++;
+      if (realCues.isNotEmpty) {
+        violatingFrames++;
+        if (frame.repIndex >= 1 && frame.repIndex <= repCount) flagged.add(frame.repIndex);
+      }
 
       for (final cue in realCues) {
         cueFrequency[cue.key] = (cueFrequency[cue.key] ?? 0) + 1;
@@ -113,6 +116,7 @@ class FormScoreCalculator {
       topTipEn: topTipEn,
       topTipFr: topTipFr,
       repCount: repCount,
+      flaggedReps: flagged.toList()..sort(),
     );
   }
 }

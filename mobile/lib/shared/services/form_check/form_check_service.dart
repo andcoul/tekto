@@ -1,151 +1,138 @@
 import 'dart:async';
+import 'dart:io' show Platform;
+import 'dart:ui' show Size;
 
 import 'package:camera/camera.dart';
+import 'package:flutter/foundation.dart';
 import 'package:google_mlkit_pose_detection/google_mlkit_pose_detection.dart';
-import 'package:tekto/shared/services/form_check/cue_engine.dart';
-import 'package:tekto/shared/services/form_check/form_score_calculator.dart';
-import 'package:tekto/shared/services/form_check/pose_analyzer.dart';
-import 'package:tekto/shared/services/form_check/rep_counter.dart';
 
-/// Orchestrates the camera → ML Kit → PoseAnalyzer → RepCounter → CueEngine
-/// pipeline.
+import 'cue_engine.dart';
+import 'form_check_pipeline.dart';
+import 'form_score_calculator.dart';
+import 'pose_analyzer.dart';
+
+/// Camera → ML Kit → [PoseAnalyzer] → [FormCheckPipeline].
 ///
-/// Camera frames are NEVER written to disk or transmitted (Principle II:
-/// memory-only processing).
+/// Camera frames live only in memory for the time it takes to analyse them: they are never
+/// written to disk or sent anywhere (Constitution II). Frames that arrive while the previous
+/// one is still being analysed are dropped, so latency does not build up.
 ///
 /// Usage:
-///   await service.startSession(exerciseSlug: 'squat');
-///   // listen to cueStream and repCountStream for live feedback
-///   final summary = await service.stopSession();
+///   await service.startSession(liftKey: 'squat');
+///   service.outcomes.listen(...);   // live cues + rep count
+///   final summary = await service.stopSession(language: 'fr');
 class FormCheckService {
-  FormCheckService({
-    required List<CameraDescription> cameras,
-    CueEngine? cueEngine,
-    FormScoreCalculator? scoreCalculator,
-  })  : _cameras = cameras,
-        _cueEngine = cueEngine ?? const CueEngine(),
-        _scoreCalculator = scoreCalculator ??
-            FormScoreCalculator(cueEngine: cueEngine ?? const CueEngine());
+  FormCheckService({required List<CameraDescription> cameras, CueEngine cueEngine = const CueEngine()})
+      : _cameras = cameras,
+        _cueEngine = cueEngine;
 
   final List<CameraDescription> _cameras;
   final CueEngine _cueEngine;
-  final FormScoreCalculator _scoreCalculator;
   final PoseAnalyzer _poseAnalyzer = const PoseAnalyzer();
 
   CameraController? _cameraController;
+  CameraDescription? _camera;
   PoseDetector? _poseDetector;
-  RepCounter? _repCounter;
+  FormCheckPipeline? _pipeline;
+  bool _busy = false;
 
-  final _cueController = StreamController<List<FormCue>>.broadcast();
-  final _repController = StreamController<int>.broadcast();
+  final _outcomes = StreamController<FrameOutcome>.broadcast();
 
-  final _frames = <FormFrameResult>[];
-  bool _isSessionActive = false;
+  /// One event per analysed frame.
+  Stream<FrameOutcome> get outcomes => _outcomes.stream;
 
-  Stream<List<FormCue>> get cueStream => _cueController.stream;
-  Stream<int> get repCountStream => _repController.stream;
-  bool get isSessionActive => _isSessionActive;
+  /// For [CameraPreview]; null until [startSession] has initialised the camera.
+  CameraController? get cameraController => _cameraController;
 
-  /// Starts the camera pipeline for [exerciseSlug].
-  Future<void> startSession({required String exerciseSlug}) async {
+  bool get isSessionActive => _pipeline != null;
+
+  /// Opens the back camera and starts analysing frames for [liftKey] (a launch lift key,
+  /// see `RepCounter.launchLifts`).
+  Future<void> startSession({required String liftKey}) async {
     if (_cameras.isEmpty) throw StateError('No cameras available');
+    _pipeline = FormCheckPipeline(liftKey: liftKey, cueEngine: _cueEngine);
+    _poseDetector = PoseDetector(options: PoseDetectorOptions(mode: PoseDetectionMode.stream));
 
-    _repCounter = RepCounter(liftKey: exerciseSlug);
-    _frames.clear();
-    _isSessionActive = true;
-
-    // Initialise pose detector (stream mode for live feedback)
-    _poseDetector = PoseDetector(
-      options: PoseDetectorOptions(mode: PoseDetectionMode.stream),
-    );
-
-    // Use back camera
-    final camera = _cameras.firstWhere(
-      (c) => c.lensDirection == CameraLensDirection.back,
-      orElse: () => _cameras.first,
-    );
-
-    _cameraController = CameraController(
+    final camera = _cameras.firstWhere((c) => c.lensDirection == CameraLensDirection.back, orElse: () => _cameras.first);
+    _camera = camera;
+    final controller = CameraController(
       camera,
-      ResolutionPreset.high,
+      ResolutionPreset.medium, // enough for pose landmarks; keeps per-frame work low
       enableAudio: false,
-      imageFormatGroup: ImageFormatGroup.nv21,
+      imageFormatGroup: Platform.isIOS ? ImageFormatGroup.bgra8888 : ImageFormatGroup.nv21,
     );
-    await _cameraController!.initialize();
-
-    await _cameraController!.startImageStream(_processFrame);
+    _cameraController = controller;
+    await controller.initialize();
+    await controller.startImageStream(_processFrame);
   }
 
-  /// Stops the pipeline and returns a [FormSetSummary].
-  Future<FormSetSummary> stopSession() async {
-    _isSessionActive = false;
-    await _cameraController?.stopImageStream();
-    await _cameraController?.dispose();
-    _cameraController = null;
+  /// Stops the camera and returns the post-set summary.
+  Future<FormSetSummary> stopSession({required String language}) async {
+    final pipeline = _pipeline;
+    _pipeline = null;
+    await _closeCamera();
+    if (pipeline == null) {
+      return const FormSetSummary(score: 100, cuesShown: [], topTipEn: '', topTipFr: '', repCount: 0);
+    }
+    final median = pipeline.medianProcessingMs;
+    if (kDebugMode && median != null) {
+      // Performance Standards: median per-frame processing < 150 ms.
+      debugPrint('[FormCheck] ${pipeline.liftKey}: median frame processing ${median.toStringAsFixed(0)} ms');
+    }
+    return pipeline.finish(language: language);
+  }
 
+  Future<void> dispose() async {
+    _pipeline = null;
+    await _closeCamera();
+    await _outcomes.close();
+  }
+
+  Future<void> _closeCamera() async {
+    final controller = _cameraController;
+    _cameraController = null;
+    if (controller != null) {
+      if (controller.value.isStreamingImages) await controller.stopImageStream();
+      await controller.dispose();
+    }
     await _poseDetector?.close();
     _poseDetector = null;
-
-    final summary = _scoreCalculator.calculate(
-      frames: List.unmodifiable(_frames),
-      liftKey: _repCounter?.liftKey ?? '',
-      language: 'en',
-      repCount: _repCounter?.repCount ?? 0,
-    );
-
-    return summary;
   }
-
-  void dispose() {
-    _isSessionActive = false;
-    _cameraController?.dispose();
-    _poseDetector?.close();
-    _cueController.close();
-    _repController.close();
-  }
-
-  // ---------------------------------------------------------------------------
-  // Frame processing pipeline (memory-only — Principle II)
-  // ---------------------------------------------------------------------------
 
   Future<void> _processFrame(CameraImage image) async {
-    if (!_isSessionActive || _poseDetector == null || _repCounter == null) {
-      return;
+    final pipeline = _pipeline, detector = _poseDetector;
+    if (pipeline == null || detector == null || _busy) return; // drop the frame
+    _busy = true;
+    final stopwatch = Stopwatch()..start();
+    try {
+      final input = _toInputImage(image);
+      if (input == null) return;
+      final poses = await detector.processImage(input);
+      if (poses.isEmpty || !identical(pipeline, _pipeline)) return;
+      final result = _poseAnalyzer.analyze(poses.first, pipeline.liftKey);
+      final outcome = pipeline.add(result, processing: stopwatch.elapsed);
+      if (!_outcomes.isClosed) _outcomes.add(outcome);
+    } finally {
+      _busy = false;
     }
-
-    final inputImage = _cameraImageToInputImage(image);
-    if (inputImage == null) return;
-
-    final poses = await _poseDetector!.processImage(inputImage);
-    if (poses.isEmpty) return;
-
-    final pose = poses.first;
-    final result = _poseAnalyzer.analyze(pose, _repCounter!.liftKey);
-
-    _frames.add(result);
-
-    // Rep counting
-    final repCompleted = _repCounter!.update(
-      result.jointAngleSnapshot['knee_angle'] ?? 180,
-    );
-    if (repCompleted) {
-      _repController.add(_repCounter!.repCount);
-    }
-
-    // Cue evaluation
-    final cues = _cueEngine.evaluate(result);
-    _cueController.add(cues);
   }
 
-  InputImage? _cameraImageToInputImage(CameraImage image) {
-    // Convert NV21 CameraImage to ML Kit InputImage
-    final bytes = image.planes.first.bytes;
-    final metadata = InputImageMetadata(
-      size: Size(image.width.toDouble(), image.height.toDouble()),
-      rotation: InputImageRotation.rotation0deg,
-      format: InputImageFormat.nv21,
-      bytesPerRow: image.planes.first.bytesPerRow,
+  InputImage? _toInputImage(CameraImage image) {
+    final camera = _camera;
+    if (camera == null || image.planes.isEmpty) return null;
+    final rotation = InputImageRotationValue.fromRawValue(camera.sensorOrientation);
+    final format = InputImageFormatValue.fromRawValue(image.format.raw as int);
+    if (rotation == null || format == null) return null;
+    // One plane for NV21 (Android) and BGRA8888 (iOS), as requested above.
+    final plane = image.planes.first;
+    return InputImage.fromBytes(
+      bytes: plane.bytes,
+      metadata: InputImageMetadata(
+        size: Size(image.width.toDouble(), image.height.toDouble()),
+        rotation: rotation,
+        format: format,
+        bytesPerRow: plane.bytesPerRow,
+      ),
     );
-    return InputImage.fromBytes(bytes: bytes, metadata: metadata);
   }
 }

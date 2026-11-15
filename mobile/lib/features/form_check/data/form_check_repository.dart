@@ -1,60 +1,85 @@
-import 'package:tekto/shared/models/subscription_model.dart';
-import 'package:tekto/shared/services/form_check/form_score_calculator.dart';
-import 'package:tekto/shared/services/local_db/daos/form_check_dao.dart';
-import 'package:tekto/shared/services/sync/sync_queue.dart';
+import 'dart:convert';
 
-/// Saves form check session results to the local Drift DB and syncs via queue.
+import 'package:drift/drift.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:uuid/uuid.dart';
+
+import '../../../core/di/providers.dart';
+import '../../../shared/services/form_check/form_score_calculator.dart';
+import '../../../shared/services/local_db/daos/form_check_dao.dart';
+import '../../../shared/services/local_db/database.dart';
+import '../../../shared/services/sync/sync_queue.dart';
+import '../domain/form_check_free_try_service.dart';
+
+part 'form_check_repository.g.dart';
+
+const _uuid = Uuid();
+
+/// Saves form-check results locally and queues them for the server (Constitution I).
 ///
-/// user_shared defaults to false (Principle II).
+/// Only the summary is stored: no frames, images or landmarks (Constitution II).
+/// `user_shared` is always false here; footage sharing is out of scope (FR-021).
 class FormCheckRepository {
-  const FormCheckRepository({
-    required FormCheckDao dao,
-    required SyncQueue syncQueue,
-    required String userId,
-  })  : _dao = dao,
-        _syncQueue = syncQueue,
-        _userId = userId;
+  FormCheckRepository({required AppDatabase db, required SyncQueue queue})
+      : _dao = FormCheckDao(db),
+        _queue = queue;
 
   final FormCheckDao _dao;
-  final SyncQueue _syncQueue;
-  final String _userId;
+  final SyncQueue _queue;
 
-  /// Persists a completed form check session.
-  ///
-  /// Returns the created [FormCheckSessionModel].
-  Future<FormCheckSessionModel> saveSession({
+  /// Persists a finished set and returns the new session id.
+  /// [wasFreeTry] is true when a free user ran it under the one-try-per-lift rule (FR-029).
+  Future<String> saveSession({
+    required String userId,
     required String exerciseSlug,
     required FormSetSummary summary,
+    required bool wasFreeTry,
+    String? workoutLogId,
   }) async {
-    final session = FormCheckSessionModel(
-      id: _uuid(),
-      userId: _userId,
+    final id = _uuid.v4();
+    final createdAt = DateTime.now().toUtc();
+    await _dao.insertSession(FormCheckSessionsCompanion.insert(
+      id: id,
+      userId: userId,
       exerciseSlug: exerciseSlug,
-      repCount: summary.repCount,
-      formScore: summary.score,
-      cuesShown: summary.cuesShown,
-      topTipEn: summary.topTipEn,
-      topTipFr: summary.topTipFr,
-      userShared: false, // Privacy default — Principle II
-      createdAt: DateTime.now(),
+      workoutLogId: Value(workoutLogId),
+      repCount: Value(summary.repCount),
+      formScore: Value(summary.score),
+      cuesShown: Value(jsonEncode(summary.cuesShown)),
+      flaggedReps: Value(jsonEncode(summary.flaggedReps)),
+      topTipEn: Value(summary.topTipEn),
+      topTipFr: Value(summary.topTipFr),
+      wasFreeTry: Value(wasFreeTry),
+      userShared: const Value(false),
+      createdAt: Value(createdAt),
+    ));
+    await _queue.enqueue(
+      operation: 'insert',
+      tableName: 'form_check_sessions',
+      payload: {
+        'id': id,
+        'user_id': userId,
+        'exercise_slug': exerciseSlug,
+        'workout_log_id': workoutLogId,
+        'rep_count': summary.repCount,
+        'form_score': summary.score,
+        'cues_shown': summary.cuesShown,
+        'flagged_reps': summary.flaggedReps,
+        'top_tip_en': summary.topTipEn,
+        'top_tip_fr': summary.topTipFr,
+        'was_free_try': wasFreeTry,
+        'user_shared': false,
+        'created_at': createdAt.toIso8601String(),
+      },
     );
-
-    await _dao.insertSession(session);
-
-    // Enqueue for server sync
-    await _syncQueue.enqueue(
-      table: 'form_check_sessions',
-      operation: 'INSERT',
-      payload: session.toJson(),
-    );
-
-    return session;
+    return id;
   }
-
-  /// Stream of all form check sessions for the current user.
-  Stream<List<FormCheckSessionModel>> watchSessions() =>
-      _dao.watchForUser(_userId);
-
-  static String _uuid() =>
-      DateTime.now().microsecondsSinceEpoch.toRadixString(16);
 }
+
+@riverpod
+FormCheckRepository formCheckRepository(Ref ref) =>
+    FormCheckRepository(db: ref.watch(appDatabaseProvider), queue: ref.watch(syncQueueProvider));
+
+@riverpod
+FormCheckFreeTryService formCheckFreeTryService(Ref ref) =>
+    FormCheckFreeTryService(dao: FormCheckDao(ref.watch(appDatabaseProvider)));

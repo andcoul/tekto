@@ -141,7 +141,7 @@
   "formCheckTitle": "Form Check",
   "formCheckPlacementTitle": "Position your phone",
   "formCheckPlacementInstructions": "Place your phone on the floor about 2 m away, facing you. Make sure your whole body is visible in the frame.",
-  "formCheckStartButton": "Start recording",
+  "formCheckStartButton": "Start form check",
   "formCheckAdjustLighting": "Adjust lighting — room is too dark to track your form.",
   "formCheckReps": "{reps} reps",
   "@formCheckReps": {
@@ -330,21 +330,47 @@
   "swapNotAllowed": "This exercise can't replace the current one.",
   "swapFailed": "Couldn't swap the exercise. Check your connection and try again.",
   "workoutTargetRpe": "Target RPE {rpe}",
-  "@workoutTargetRpe": {"placeholders": {"rpe": {"type": "String"}}},
+  "@workoutTargetRpe": {
+    "placeholders": {
+      "rpe": {
+        "type": "String"
+      }
+    }
+  },
   "workoutTargetRir": "RIR {rir} (≈ RPE {rpe})",
-  "@workoutTargetRir": {"placeholders": {"rir": {"type": "int"}, "rpe": {"type": "String"}}},
+  "@workoutTargetRir": {
+    "placeholders": {
+      "rir": {
+        "type": "int"
+      },
+      "rpe": {
+        "type": "String"
+      }
+    }
+  },
   "platesTitle": "Plate calculator",
   "platesWeightLabel": "Weight",
   "platesPerSide": "Per side",
   "platesEmptyBar": "Empty bar",
   "platesBar": "Bar: {bar}",
-  "@platesBar": {"placeholders": {"bar": {"type": "String"}}},
+  "@platesBar": {
+    "placeholders": {
+      "bar": {
+        "type": "String"
+      }
+    }
+  },
   "platesNotExact": "{weight} can't be loaded exactly — nearest is {nearest}",
-  "@platesNotExact": {"placeholders": {"weight": {"type": "String"}, "nearest": {"type": "String"}}},
-  "progressTitle": "Progress",
-  "progressTabHistory": "History",
-  "progressTabRecords": "Records",
-  "progressTabVolume": "Volume",
+  "@platesNotExact": {
+    "placeholders": {
+      "weight": {
+        "type": "String"
+      },
+      "nearest": {
+        "type": "String"
+      }
+    }
+  },
   "progressTabBodyWeight": "Body weight",
   "progressLimited": "Showing the last 4 weeks",
   "progressProCard": "Tekto Pro shows your full history and muscle balance.",
@@ -352,27 +378,99 @@
   "progressNoHistory": "No finished workouts yet.",
   "progressNoRecords": "No records yet.",
   "progressRecord": "{weight} × {reps}",
-  "@progressRecord": {"placeholders": {"weight": {"type": "String"}, "reps": {"type": "int"}}},
+  "@progressRecord": {
+    "placeholders": {
+      "weight": {
+        "type": "String"
+      },
+      "reps": {
+        "type": "int"
+      }
+    }
+  },
   "progressE1rm": "e1RM {weight}",
-  "@progressE1rm": {"placeholders": {"weight": {"type": "String"}}},
+  "@progressE1rm": {
+    "placeholders": {
+      "weight": {
+        "type": "String"
+      }
+    }
+  },
   "progressWeeklySets": "Sets per muscle — week of {date}",
-  "@progressWeeklySets": {"placeholders": {"date": {"type": "String"}}},
+  "@progressWeeklySets": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
   "progressSets": "{count} sets",
-  "@progressSets": {"placeholders": {"count": {"type": "int"}}},
+  "@progressSets": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "progressE1rmTrend": "e1RM trend",
   "progressBalanceTitle": "Muscle balance",
   "progressBalance": "Push {push} · Pull {pull}",
-  "@progressBalance": {"placeholders": {"push": {"type": "int"}, "pull": {"type": "int"}}},
+  "@progressBalance": {
+    "placeholders": {
+      "push": {
+        "type": "int"
+      },
+      "pull": {
+        "type": "int"
+      }
+    }
+  },
   "progressLogBodyWeight": "Log body weight",
   "progressSave": "Save",
   "progressNoBodyWeight": "No entries yet.",
   "paywallOffline": "Connect to the internet to start your trial.",
   "paywallSave": "Save {percent}%",
-  "@paywallSave": {"placeholders": {"percent": {"type": "int"}}},
+  "@paywallSave": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
   "paywallContinueWorkout": "Continue workout",
   "paywallRestoreFailed": "Couldn't restore purchases. Try again later.",
   "paywallFeatureFormCheck": "Real-time form feedback on your key lifts.",
   "paywallFeatureCoach": "Unlimited questions to your AI coach.",
   "paywallFeatureAdaptivePlan": "A plan that adapts to you every week.",
-  "paywallFeatureGeneral": "AI plans, coach, form check and offline video."
+  "paywallFeatureGeneral": "AI plans, coach, form check and offline video.",
+  "formCheckBeta": "Beta",
+  "formCheckBetaNote": "Form check is in beta: it can miss a rep or misjudge one.",
+  "formCheckPrivacy": "The camera image stays on your phone and is never saved or sent.",
+  "formCheckStop": "Stop",
+  "formCheckFreeTryNote": "Free try: one form check per lift.",
+  "formCheckUnlock": "Unlock unlimited form checks",
+  "formCheckNotSupported": "Form check isn't available for this exercise.",
+  "formCheckNoCamera": "The camera is unavailable. Allow camera access in Settings.",
+  "formCheckSummaryTitle": "Form summary",
+  "formCheckRepsCounted": "{reps} reps counted",
+  "@formCheckRepsCounted": {
+    "placeholders": {
+      "reps": {
+        "type": "int"
+      }
+    }
+  },
+  "formCheckFlaggedReps": "Reps to review: {reps}",
+  "@formCheckFlaggedReps": {
+    "placeholders": {
+      "reps": {
+        "type": "String"
+      }
+    }
+  },
+  "formCheckNoFlaggedReps": "No reps flagged",
+  "formCheckTechniqueNotes": "Technique notes",
+  "formCheckGreatForm": "Great form! Keep it up.",
+  "formCheckDone": "Done",
+  "formCheckTryAgain": "Try again"
 }
