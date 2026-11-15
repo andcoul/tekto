@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:tekto/core/theme/app_theme.dart';
-import 'package:tekto/shared/services/api/supabase_client.dart';
+import 'package:tekto/core/di/providers.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 /// General settings screen — Preferences, Subscription, Account.
@@ -109,7 +109,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     setState(() => _language = lang);
     // Persist to Supabase
     try {
-      final client = ref.read(tektoApiClientProvider);
+      final client = ref.read(dioClientProvider);
       await client.patch<void>(
         '/rest/v1/users',
         data: {'language': lang},
@@ -121,7 +121,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   Future<void> _setUnits(String unit) async {
     setState(() => _units = unit);
     try {
-      final client = ref.read(tektoApiClientProvider);
+      final client = ref.read(dioClientProvider);
       await client.patch<void>(
         '/rest/v1/users',
         data: {'unit': unit},
@@ -133,7 +133,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   Future<void> _setHealthSync(bool enabled) async {
     setState(() => _healthSync = enabled);
     try {
-      final client = ref.read(tektoApiClientProvider);
+      final client = ref.read(dioClientProvider);
       await client.patch<void>(
         '/rest/v1/users',
         data: {'health_sync_enabled': enabled},
@@ -144,7 +144,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
   Future<void> _exportData() async {
     try {
-      final client = ref.read(tektoApiClientProvider);
+      final client = ref.read(dioClientProvider);
       final resp = await client.post<Map<String, dynamic>>(
         '/functions/v1/export-data',
         data: {},
@@ -189,7 +189,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     if (confirmed != true || !mounted) return;
 
     try {
-      final client = ref.read(tektoApiClientProvider);
+      final client = ref.read(dioClientProvider);
       await client.delete<void>(
         '/functions/v1/delete-account',
         data: {'confirm': true},

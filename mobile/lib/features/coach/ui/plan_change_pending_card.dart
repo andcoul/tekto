@@ -16,8 +16,8 @@ class PlanChangePendingCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final change = message.planChangeProposed!;
-    final applied = message.planChangeApplied ?? false;
-    final rejected = message.planChangeRejected ?? false;
+    final applied = message.planChangeApplied;
+    final rejected = ref.watch(coachControllerProvider.select((s) => s.rejectedChangeIds.contains(message.id)));
 
     if (applied) {
       return _StatusChip(

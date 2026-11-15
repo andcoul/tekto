@@ -1,50 +1,88 @@
+import 'dart:convert';
+
+import 'package:drift/drift.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:uuid/uuid.dart';
+
+import 'package:tekto/core/di/providers.dart';
 import 'package:tekto/shared/models/coach_model.dart';
 import 'package:tekto/shared/services/local_db/daos/coach_dao.dart';
+import 'package:tekto/shared/services/local_db/database.dart';
 
-/// Manages individual coach messages within a conversation.
+const _uuid = Uuid();
+
+/// Manages individual coach messages within a conversation (local Drift cache).
 class CoachMessageRepository {
-  const CoachMessageRepository({required CoachDao dao}) : _dao = dao;
+  const CoachMessageRepository({required CoachDao dao, DateTime Function() clock = DateTime.now})
+      : _dao = dao,
+        _clock = clock;
 
   final CoachDao _dao;
+  final DateTime Function() _clock;
 
-  /// Inserts a new message and returns it.
+  /// Stores a new message and returns it.
   Future<CoachMessageModel> addMessage({
     required String conversationId,
     required String role,
     required String content,
     String? screenContext,
+    String? exerciseSlug,
+    Map<String, dynamic>? planChangeProposed,
   }) async {
     final message = CoachMessageModel(
-      id: _uuid(),
+      id: _uuid.v4(),
       conversationId: conversationId,
       role: role,
       content: content,
-      screenContext: screenContext,
-      createdAt: DateTime.now(),
+      contextScreen: screenContext,
+      contextExerciseSlug: exerciseSlug,
+      planChangeProposed: planChangeProposed,
+      planChangeApplied: false,
+      createdAt: _clock(),
     );
-    await _dao.insertMessage(message);
+    await _dao.insertMessage(CoachMessagesCompanion.insert(
+      id: message.id,
+      conversationId: conversationId,
+      role: role,
+      content: content,
+      contextScreen: Value(screenContext),
+      contextExerciseSlug: Value(exerciseSlug),
+      planChangeProposed: Value(planChangeProposed == null ? null : jsonEncode(planChangeProposed)),
+      createdAt: Value(message.createdAt),
+    ));
     return message;
   }
 
-  /// Stream of messages for a conversation, oldest first.
+  /// Messages of a conversation, oldest first.
   Stream<List<CoachMessageModel>> watchMessages(String conversationId) =>
-      _dao.watchMessages(conversationId);
+      _dao.watchMessages(conversationId).map((rows) => rows.map(toModel).toList());
 
-  /// Returns the [limit] most-recent messages (for context window injection).
-  Future<List<CoachMessageModel>> getRecentMessages(
-    String conversationId, {
-    int limit = 10,
-  }) =>
-      _dao.getRecentMessages(conversationId, limit: limit);
+  /// Marks a message's proposed plan change as applied.
+  Future<void> markPlanChangeApplied(String messageId) => _dao.markChangeApplied(messageId);
 
-  /// Marks a message's plan-change as applied.
-  Future<void> markPlanChangeApplied(String messageId) =>
-      _dao.markPlanChangeApplied(messageId);
-
-  /// Records a satisfaction rating (thumbs up/down).
+  /// Records a satisfaction rating (thumbs up/down, SC-011).
   Future<void> rateSatisfaction(String messageId, {required bool thumbsUp}) =>
-      _dao.rateSatisfaction(messageId, thumbsUp: thumbsUp);
+      _dao.updateMessageRating(messageId, thumbsUp);
 
-  static String _uuid() =>
-      DateTime.now().microsecondsSinceEpoch.toRadixString(16);
+  static CoachMessageModel toModel(CoachMessage row) => CoachMessageModel(
+        id: row.id,
+        conversationId: row.conversationId,
+        role: row.role,
+        content: row.content,
+        contextScreen: row.contextScreen,
+        contextExerciseSlug: row.contextExerciseSlug,
+        planChangeProposed: row.planChangeProposed == null
+            ? null
+            : Map<String, dynamic>.from(jsonDecode(row.planChangeProposed!) as Map),
+        planChangeApplied: row.planChangeApplied,
+        satisfactionRating: row.satisfactionRating,
+        createdAt: row.createdAt,
+      );
 }
+
+final coachMessageRepositoryProvider = Provider<CoachMessageRepository>(
+  (ref) => CoachMessageRepository(
+    dao: CoachDao(ref.watch(appDatabaseProvider)),
+    clock: ref.watch(clockProvider),
+  ),
+);

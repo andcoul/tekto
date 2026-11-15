@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:tekto/shared/services/api/supabase_client.dart';
+import 'package:tekto/core/di/providers.dart';
 
 // ---------------------------------------------------------------------------
 // Adaptation state
@@ -49,7 +49,7 @@ class AdaptationNotifier extends AsyncNotifier<AdaptationSummary?> {
     state = const AsyncLoading();
 
     state = await AsyncValue.guard(() async {
-      final client = ref.read(tektoApiClientProvider);
+      final client = ref.read(dioClientProvider);
       final response = await client.post<Map<String, dynamic>>(
         '/functions/v1/adapt-plan',
         data: {

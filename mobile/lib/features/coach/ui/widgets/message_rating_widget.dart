@@ -76,9 +76,3 @@ class _MessageRatingWidgetState extends ConsumerState<MessageRatingWidget> {
     }
   }
 }
-
-/// Provider — resolved in core/di/providers.dart.
-final coachMessageRepositoryProvider =
-    Provider<CoachMessageRepository>((ref) {
-  throw UnimplementedError('Override in ProviderScope');
-});

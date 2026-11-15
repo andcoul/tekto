@@ -52,10 +52,10 @@ class _FakeApi implements TektoDioClient {
       _handle<T>('POST', path, data);
 
   @override
-  Future<Response<T>> patch<T>(String path, {Object? data}) => _handle<T>('PATCH', path, data);
+  Future<Response<T>> patch<T>(String path, {Object? data, Map<String, dynamic>? queryParameters}) => _handle<T>('PATCH', path, data);
 
   @override
-  Future<Response<T>> delete<T>(String path, {Object? data}) => _handle<T>('DELETE', path, data);
+  Future<Response<T>> delete<T>(String path, {Object? data, Map<String, dynamic>? queryParameters}) => _handle<T>('DELETE', path, data);
 
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);

@@ -50,14 +50,16 @@ class TektoDioClient {
   Future<Response<T>> delete<T>(
     String path, {
     Object? data,
+    Map<String, dynamic>? queryParameters,
   }) =>
-      _dio.delete<T>(path, data: data);
+      _dio.delete<T>(path, data: data, queryParameters: queryParameters);
 
   Future<Response<T>> patch<T>(
     String path, {
     Object? data,
+    Map<String, dynamic>? queryParameters,
   }) =>
-      _dio.patch<T>(path, data: data);
+      _dio.patch<T>(path, data: data, queryParameters: queryParameters);
 }
 
 /// Attaches the live session token. (A copy kept in secure storage went stale after the hourly
