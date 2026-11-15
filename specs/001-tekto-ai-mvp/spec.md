@@ -39,6 +39,8 @@ Tekto is a premium, AI-first strength training app for iOS and Android. It build
 - Q: What does a free user who picks 1 training day get? → A: One session per week (FR-002).
 - Q: Is effort logged as RPE or RIR? → A: RPE. Targets can be RPE or RIR; when a target is RIR the screen also shows its RPE equivalent (RPE = 10 − RIR) (FR-007).
 - Q: Do tablets need support? → A: The phone layout must run on tablets without clipping or broken layouts; no tablet-specific layouts in the MVP.
+- Q: Does "support" in FR-022 include live cues for every lift? → A: Yes — rep counting, no-rep detection and at least one lift-specific live cue per launch lift.
+- Q: Can users change their onboarding answers later? → A: Yes, from settings, followed by an offer to regenerate the plan (FR-046).
 
 ---
 
@@ -187,7 +189,7 @@ A free user encounters a Pro feature, sees a contextual paywall that communicate
 - How does the system handle a user with conflicting limitations (e.g., knee injury + lower-body goal)? → The plan avoids contraindicated exercises and the coach explains the substitutions when the user asks about an affected exercise.
 - What happens when the LLM service is unavailable during a coach session? → The last generated plan continues to function; the coach shows a "temporarily unavailable" message.
 - How does form check behave when the device has an older/slower CPU? → Confidence threshold is enforced; if below threshold, cues are suppressed rather than shown incorrectly.
-- What happens if a user changes their equipment mid-program? → They can trigger a plan re-generation from settings, or use the coach to request substitutions exercise-by-exercise.
+- What happens if a user changes their equipment mid-program? → They can trigger a plan re-generation from settings (FR-046), or use the coach to request substitutions exercise-by-exercise.
 - What happens when a free user starts or continues a workout offline? → Logging, rest timer and text cues work normally; video areas show "Offline video requires Tekto Pro" without blocking the workout (FR-011, FR-030).
 - How does the app handle a user in a storefront where no Pro product is available? → Purchase buttons are hidden and a localized "Tekto Pro is not yet available in your region" message is shown; "Restore purchases" stays visible and the free tier is unaffected (FR-031, FR-032). Prices are never hard-coded or converted by the app.
 
@@ -245,7 +247,7 @@ A free user encounters a Pro feature, sees a contextual paywall that communicate
 **Camera Form Check (Pro)**
 
 - **FR-021**: The form check MUST run entirely on-device using pose estimation; no camera frames may be transmitted to any server without explicit user action. Sharing footage is post-MVP, so `user_shared` stays `false` in the MVP.
-- **FR-022**: At launch, the form check MUST support at least 8 key lifts: squat, deadlift, bench press, overhead press, row, lunge, hip thrust, push-up. Pull-up and further lifts follow in v1.1. Form check carries a "Beta" label at launch.
+- **FR-022**: At launch, the form check MUST support at least 8 key lifts: squat, deadlift, bench press, overhead press, row, lunge, hip thrust, push-up. "Supported" means, for each lift: reps are counted, a partial rep is not counted, and at least one live form cue specific to the lift can fire (FR-023). Pull-up and further lifts follow in v1.1. Form check carries a "Beta" label at launch.
 - **FR-023**: The system MUST provide real-time rep counting and live form cues during the set, with no more than 3 cues on screen at any moment, ordered by severity.
 - **FR-024**: After each set, the system MUST display a form score, the reps flagged, and one prioritized tip.
 - **FR-025**: Form cues MUST only be displayed when pose estimation confidence exceeds the defined threshold; below threshold, cues are suppressed and the user is prompted to adjust setup.
@@ -266,6 +268,7 @@ A free user encounters a Pro feature, sees a contextual paywall that communicate
 
 - **FR-033**: The full UI, coach responses and all copy MUST be available in English and French; the user's language preference is set during onboarding and can be changed in settings.
 - **FR-034**: The app MUST support kg and lb unit selection, persisted per user.
+- **FR-046**: Users MUST be able to edit their onboarding answers (goal, level, days per week, session length, equipment, limitations and note, strength check) from settings. Saving updates the profile and offers "Regenerate my plan" (FR-002, `force_regenerate`); the current plan stays active until the user confirms. Editing limitations does not require new consent; only a new consent version does (FR-045).
 - **FR-035**: The app MUST meet WCAG 2.1 AA targets including dynamic type, screen-reader labels (VoiceOver / TalkBack), and captions on all exercise videos.
 
 **Safety & Privacy**

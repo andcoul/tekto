@@ -13,19 +13,19 @@ description: "Task list for Tekto AI MVP (regenerated after spec clarifications 
 
 **Brownfield note**: a first implementation already exists for many files below. "Create" means create or update the file until it meets the task; "Verify" tasks cover features that already exist in code and must be checked against the spec, with gaps fixed. `/speckit-converge` and `/speckit-implement` decide what is already done. No task is pre-checked.
 
-**Remediation (2026-11-10, `/speckit-analyze` run 2)**: T099–T113 added inside their phases for E1 (existing features without coverage), U2 (starting weights); T114 (staging) added after run 3, with T006, T016, T039, T079, T081, T085 extended for U4, U5, U7, F2; T030, T040, T047, T080, T091 extended for U1, U2, C1, F3. Run 4 (2026-11-11): T115 (Gate 2 metrics, G1) and T116 (coach paywall test, G2) added; T060, T070, T077 extended for I2, G4, G2; T047, T050 extended for G6 (adjustable rest timer) and G10 (in-workout PR badge). Run 5 (2026-11-15, against the PRD): T013, T015, T035 reopened for D1 (volume maximum on every plan); T033, T043 reopened for P3 (AI plan after onboarding trial); T117–T119 added for P2 (progress); T087 moved to US2 with test T120 for A1 (swap for all tiers). Run 5b (2026-11-15): T030, T036 reopened for I2 (1 day → 1 session); T121–T126 added for P8, P10, U2 (plate calculator, welcome screen, plan rationale, RIR display); open tasks T052, T055, T066, T073, T091, T093, T115 extended for P11, U3, U5, U1, P6, C1. Run 6 (2026-11-15): T127 (history backfill, M2) added; T013, T052, T055, T095, T097, T115, T119, T123–T125 extended for H1, H2, M1, M3–M7. IDs above T098 are therefore out of sequence; follow phase order.
+**Remediation (2026-11-10, `/speckit-analyze` run 2)**: T099–T113 added inside their phases for E1 (existing features without coverage), U2 (starting weights); T114 (staging) added after run 3, with T006, T016, T039, T079, T081, T085 extended for U4, U5, U7, F2; T030, T040, T047, T080, T091 extended for U1, U2, C1, F3. Run 4 (2026-11-11): T115 (Gate 2 metrics, G1) and T116 (coach paywall test, G2) added; T060, T070, T077 extended for I2, G4, G2; T047, T050 extended for G6 (adjustable rest timer) and G10 (in-workout PR badge). Run 5 (2026-11-15, against the PRD): T013, T015, T035 reopened for D1 (volume maximum on every plan); T033, T043 reopened for P3 (AI plan after onboarding trial); T117–T119 added for P2 (progress); T087 moved to US2 with test T120 for A1 (swap for all tiers). Run 5b (2026-11-15): T030, T036 reopened for I2 (1 day → 1 session); T121–T126 added for P8, P10, U2 (plate calculator, welcome screen, plan rationale, RIR display); open tasks T052, T055, T066, T073, T091, T093, T115 extended for P11, U3, U5, U1, P6, C1. Run 6 (2026-11-15): T127 (history backfill, M2) added; T013, T052, T055, T095, T097, T115, T119, T123–T125 extended for H1, H2, M1, M3–M7. Converge run (2026-11-15): T128–T133 appended as Phase 11; analyze run 7 fixed their ordering (see Dependencies). IDs above T098 are therefore out of sequence; follow phase order, except for the Phase 11 ordering in Dependencies.
 
 **Organization**: Tasks are grouped by user story; story labels match spec.md (US1–US7). Phases follow spec priority: P1 = US6, US1, US2, US7, US4; P2 = US3, US5. Priority is build order only; every story is required at launch (spec **Launch scope** lines).
 
 ## Progress (2026-11-15)
 
-**92 done / 35 open** of 127. Phases 1–7 (setup, foundations, US6 video library, US1 onboarding → first plan, US2 daily workout, US7 subscription, US4 form check) have 2 open tasks, both external:
+**92 done / 41 open** of 133. Phases 1–7 (setup, foundations, US6 video library, US1 onboarding → first plan, US2 daily workout, US7 subscription, US4 form check) have 2 open tasks, both external (below). Phase 11 (Convergence, 2026-11-15) adds T128–T133; **T128 comes next** because the app does not compile without it.
 
 
 - **T114** — staging Supabase project + Vault secrets (needs account access)
 - **T022** — ≥ 150 filmed exercises (content workstream; 15 today)
 
-Not yet verified: the Pro AI plan path against the real Claude API (needs `ANTHROPIC_API_KEY`), quickstart Scenarios 1, 2, 4 and 7 on a device (Scenario 4 also tunes the form-check angle thresholds), and the Health write on a real iPhone / Android phone. The app does not build as a whole yet: coach (Phase 8), adaptation and settings code (`tektoApiClientProvider`, Phases 9–10) still has compile errors. Next: Phase 8 (US3 coach).
+Not yet verified: the Pro AI plan path against the real Claude API (needs `ANTHROPIC_API_KEY`), quickstart Scenarios 1, 2, 4 and 7 on a device (Scenario 4 also tunes the form-check angle thresholds), and the Health write on a real iPhone / Android phone. The app does not build as a whole yet: coach (Phase 8), adaptation and settings code (`tektoApiClientProvider`, Phases 9–10) still has compile errors. Next: T128, then Phase 8 (US3 coach).
 
 ---
 
@@ -153,7 +153,7 @@ Not yet verified: the Pro AI plan path against the real Claude API (needs `ANTHR
 - [X] T102 [US1] Verify `mobile/lib/features/auth/data/auth_service.dart` and `mobile/lib/features/auth/ui/auth_screen.dart` until T101 passes: `signInWithApple()`, `signInWithGoogle()`, `signInWithEmail()`, `signUp()`, `signOut()`, `currentUser` stream; session persisted in `flutter_secure_storage`; deep-link redirect `tekto://auth/callback`
 - [X] T036 [US1] Create `supabase/functions/_shared/template-plan-builder.ts` until T030 passes
 - [X] T037 [US1] Create `supabase/functions/generate-plan/flow.ts` until T031 passes, and update `supabase/functions/generate-plan/index.ts` to call it and return the contracts/backend-api.md §1 response (`start_date`, `source`, `template_slug`, `fallback_notice`, `notices[]`); system prompt filters the library by equipment, video and contraindications (contracts/ai-services.md §1)
-- [X] T125 [P] [US1] Create `mobile/lib/features/onboarding/ui/welcome_screen.dart` and route `/onboarding/welcome` as the first route for signed-out users until T124 passes: the sign-in redirect in `app_router.dart` lets `/onboarding/welcome` through, and "Get started" / "Skip" go to `/auth`, then the disclaimer; video asset in `mobile/assets/video/welcome.mp4` with EN/FR captions (content workstream supplies the clip)
+- [X] T125 [P] [US1] Create `mobile/lib/features/onboarding/ui/welcome_screen.dart` and route `/onboarding/welcome` as the first route for signed-out users until T124 passes: the sign-in redirect in `app_router.dart` lets `/onboarding/welcome` through, and "Get started" / "Skip" go to `/auth`, then the disclaimer; video asset in `mobile/assets/video/welcome.mp4` with EN/FR captions (content workstream supplies the clip — still missing, tracked in T132)
 - [X] T123 [US1] Verify plan rationale end to end (FR-044): `generate-plan` returns `rationale_en` / `rationale_fr` for `ai` (from the model), `template` and `template_fallback` (from the template JSON) per contracts/backend-api.md §1; add a case to `generate-plan/flow.test.ts`; `trial_offer_screen.dart` (the screen shown right after generation; the generation screen moves on as soon as the plan arrives) shows the rationale in the user's language and `plan_overview_screen.dart` shows it under the plan name; `plans.rationale_en/fr` exist since migration 001, so no migration is needed
 - [X] T038 [P] [US1] Create `mobile/lib/features/onboarding/ui/consent_screen.dart`: shown after `health_disclaimer_screen.dart` and before the quiz; explicit health-data consent text version `2026-11-v1`; "I agree" required; saves `users.consent_at` and `consent_version`
 - [X] T039 [US1] Update `mobile/lib/features/onboarding/ui/onboarding_quiz_screen.dart`: first step is language (`en | fr`, default device locale, switches app locale immediately); limitations as tags from `knee | lower_back | shoulder | wrist | elbow | hip | ankle | neck` plus optional free-text note; keep goal, level, days 1–7, session 15–120 min, equipment; optional strength-check step collecting a recent working weight (in the user's unit, stored in kg) and reps for `squat`, `bench_press` and `deadlift`, each with an "I don't know" option that leaves that lift out of `strength_estimates` (skipping the whole step stores null)
@@ -219,7 +219,7 @@ Not yet verified: the Pro AI plan path against the real Claude API (needs `ANTHR
 
 ### Implementation for User Story 7
 
-- [X] T055 [US7] Update `mobile/lib/features/subscription/ui/paywall_screen.dart` until T052 passes: remove hard-coded `$12.99` / `$79.99`; annual package selected by default; take a `PaywallFeature` argument and play the matching bundled clip from `mobile/assets/video/paywall_<feature>.mp4` (≤ 15 s, content workstream supplies the clips); add the `paywall_offline` key to `app_en.arb` / `app_fr.arb`
+- [X] T055 [US7] Update `mobile/lib/features/subscription/ui/paywall_screen.dart` until T052 passes: remove hard-coded `$12.99` / `$79.99`; annual package selected by default; take a `PaywallFeature` argument and play the matching bundled clip from `mobile/assets/video/paywall_<feature>.mp4` (≤ 15 s, content workstream supplies the clips — still missing, tracked in T132); add the `paywall_offline` key to `app_en.arb` / `app_fr.arb`
 - [X] T056 [P] [US7] Update `mobile/lib/shared/widgets/pro_gate_widget.dart` until T053 passes
 - [X] T057 [P] [US7] Update `mobile/lib/features/subscription/domain/entitlement_provider.dart` and `mobile/lib/features/subscription/data/subscription_repository.dart` until T054 passes
 - [X] T109 [US7] Extract `supabase/functions/revenuecat-webhook/handler.ts` and update `revenuecat-webhook/index.ts` until T108 passes; verify `mobile/lib/features/subscription/ui/subscription_settings_screen.dart` shows tier, trial end, period end, "Manage subscription" deep link and "Restore purchases"
@@ -321,8 +321,8 @@ Not yet verified: the Pro AI plan path against the real Claude API (needs `ANTHR
 - [ ] T094 [P] Localization audit of `app_en.arb` / `app_fr.arb`: no hard-coded user-facing strings in `mobile/lib/`; French copy reviewed by a native speaker
 - [ ] T095 Performance run on iPhone 12 and Pixel 6 — cold start < 2 s, video first frame < 1 s (LTE profile), form-check median < 150 ms, coach first token < 3 s p95 (≥ 50 staging messages, SC-015), plan generation < 30 s p95 (≥ 20 runs, SC-002) — and record results in `specs/001-tekto-ai-mvp/checklists/gate1.md`
 - [ ] T096 Privacy audit per quickstart Scenario 9 steps 1–2 (encrypted local DB, zero network bytes during form check); record results in `checklists/gate1.md`
-- [ ] T097 Add rows for quickstart Scenarios 8 and 9 to `specs/001-tekto-ai-mvp/checklists/gate1.md`, then run Scenarios 1–9 on iOS 16 and Android 10 and record pass/fail for each, including the Scenario 1–2 steps for FR-039–FR-045; time Scenario 1 from account creation to plan and record it (SC-016)
-- [ ] T115 Create `supabase/migrations/007_metrics_views.sql` with aggregate-only views (service role only, no client policies; no per-user rows exposed): `v_onboarding_funnel` (accounts created → `consent_at` set → first plan created, by signup week), `v_trial_start_rate` (users with a `subscriptions` trial start ÷ new users, by signup week), `v_week4_retention` (users with ≥ 1 finished `workout_logs` row in days 22–28 after signup ÷ cohort), `v_workouts_per_active_week` (SC-009), `v_form_check_weekly_pro` (SC-010), `v_coach_thumbs_up` (SC-011), `v_trial_to_paid` (trials converted ÷ trials ended, SC-007), `v_north_star` (finished workouts per paying user per ISO week), `v_onboarding_duration` (median `plans.created_at − auth.users.created_at` for each user's first plan, by signup week — SC-016). Create `specs/001-tekto-ai-mvp/checklists/gate2.md` with one row per Gate 2 metric: target, query, and the install count copied from App Store Connect / Play Console (onboarding completion = first plans ÷ installs). No analytics SDK (Constitution VII)
+- [ ] T097 Add rows for quickstart Scenarios 8 and 9 to `specs/001-tekto-ai-mvp/checklists/gate1.md`, then run Scenarios 1–9 on iOS 16 and Android 10 and record pass/fail for each, including the Scenario 1–2 steps for FR-039–FR-045; time Scenario 1 from account creation to plan and record it (SC-016); Scenario 4 is recorded after the T130 tuning
+- [ ] T115 Create `supabase/migrations/007_metrics_views.sql` with aggregate-only views (service role only, no client policies; no per-user rows exposed): `v_onboarding_funnel` (accounts created → `consent_at` set → first plan created, by signup week), `v_trial_start_rate` (users with a `subscriptions` trial start ÷ new users, by signup week), `v_week4_retention` (users with ≥ 1 finished `workout_logs` row in days 22–28 after signup ÷ cohort), `v_workouts_per_active_week` (SC-009), `v_form_check_weekly_pro` (SC-010), `v_coach_thumbs_up` (SC-011), `v_trial_to_paid` (trials converted ÷ trials ended, SC-007), `v_north_star` (finished workouts per paying user per ISO week), `v_onboarding_duration` (median `plans.created_at − auth.users.created_at` for each user's first plan, by signup week — SC-016). Create `specs/001-tekto-ai-mvp/checklists/gate2.md` with one row per Gate 2 metric: target, query, and the install count copied from App Store Connect / Play Console (onboarding completion = first plans ÷ installs). No analytics SDK (Constitution VII). Once 007 exists, re-run T133
 - [ ] T098 [P] Create App Store and Google Play listings (EN + FR): title "Tekto — Build Your Strength", short and full descriptions, 6 screenshots per platform (onboarding, plan, workout, library, coach, form check), privacy policy URL, health-data disclosures
 
 ---
@@ -344,6 +344,13 @@ Not yet verified: the Pro AI plan path against the real Claude API (needs `ANTHR
 - **T117/T119** use `isProProvider`; they run before US7 using `subscription_dao` and switch to T057 when it lands
 - **T127** before T119 (progress reads backfilled history)
 - **Polish (Phase 10)** → all stories; T092 needs T088
+- **Convergence (Phase 11)** is not run last:
+  - **T128** runs **before Phase 8** and before any device check (T130, T095–T097), because the app does not compile without it.
+  - **T129 → T130**: tune thresholds once every lift has its cues; T130 also needs T128 to build on a device.
+  - **T131** after T091 (same `settings_screen.dart`).
+  - **T132** blocks the FR-031 / FR-043 rows of T097.
+  - **T133**: run once now, then again after T115 adds migration 007.
+  - **T130 → T097**: T130 tunes Scenario 4; T097 records its final pass/fail.
 
 ### Story Independence
 
@@ -356,6 +363,7 @@ Not yet verified: the Pro AI plan path against the real Claude API (needs `ANTHR
 | US4 Form Check | US7 | Pro gate |
 | US3 Coach | US7 | Subscription state |
 | US5 Adaptation | US2 + US7 | Workout logs, Pro gate |
+| Convergence T128 | Now | — (blocks Phases 8–10 builds) |
 
 ### Within Each Story
 
@@ -426,7 +434,7 @@ T079 · T080 · T081 (tests)
 
 ## Notes
 
-- **Total tasks**: 127 (T001–T098, plus T099–T127 added by remediation and placed inside their phases).
+- **Total tasks**: 133 (T001–T098, plus T099–T127 added by remediation and placed inside their phases, plus T128–T133 in Phase 11 Convergence).
 - Additional test-first pairs from remediation: starting weights (T112 → T113), RevenueCat webhook (T108 → T109), auth screen (T101 → T102), home screen (T103 → T104), health sync (T106 → T107), progress screen (T117 → T119), swap for all tiers (T120 → T087), plate calculator (T121 → T122), welcome screen (T124 → T125).
 - Every Principle V unit has its test task before its implementation: `PlanAdaptationService` (T080 → T083), `FormScoreCalculator` (T059 → T063), `RepCounter` (T058 → T062), `CoachQuotaService` (T069 → T076), subscription gates (T053/T054 → T056/T057), plus `ExerciseSubstitution` (T012 → T014), `PlanValidator` (T013 → T015), `TemplatePlanBuilder` (T030 → T036), generate-plan flow (T031 → T037), week boundary (T079 → T082), free try (T061 → T064).
 - Paywall widget tests: `PaywallScreen` (T052), `TrialOfferScreen` (T033), in-workout bottom sheet (T053), coach quota paywall (T116).
@@ -434,3 +442,16 @@ T079 · T080 · T081 (tests)
 - Constitution III: T013/T015/T035 (volume bounds on every plan), T031/T037 (fallback flow), T072/T075 (guardrail eval), T032 (unskippable disclaimer).
 - Constitution II: T016 (SQLCipher), T038 (consent), T065 (`user_shared`), T070 (no personalized cache), T096 (privacy audit).
 - Use branch `001-tekto-ai-mvp`; commit after each task or logical group.
+
+---
+
+## Phase 11: Convergence
+
+**Purpose**: Gaps found by `/speckit-converge` (2026-11-15) that no existing task covers. Remaining work already tracked by the open tasks of Phases 8–10, T022 and T114 is not repeated here.
+
+- [ ] T128 CRITICAL Make the mobile app compile: expose `tektoApiClientProvider` from `mobile/lib/core/di/providers.dart` as a provider around the existing `TektoDioClient` in `mobile/lib/shared/services/api/supabase_client.dart` (plan.md: `shared/services/api/` holds the Edge Function client; no second client). It is read by `mobile/lib/features/settings/ui/settings_screen.dart` and `mobile/lib/features/plan/domain/adaptation_provider.dart` and is undefined today. Then bring `mobile/lib/features/coach/` (`coach_conversation_repository.dart`, `coach_message_repository.dart`, `coach_provider.dart`, `coach_quota_service.dart`) in line with the current Drift `CoachDao` and Riverpod 3 (no `StateNotifierProvider`) so `flutter analyze` reports 0 errors (135 issues today) and the app builds on iOS and Android; lands before T073–T077 so the P1 stories can be checked on a device per US1–US7 baseline (missing)
+- [ ] T129 [US4] Add live cues for `overhead_press` and `hip_thrust`, which today produce none, per FR-022 ("supported" = at least one live cue per lift) / FR-023 / FR-024 (partial): judge the cue at the top of each rep from the pipeline's rep phase, not per frame (overhead-press incomplete lockout; hip-thrust incomplete hip extension); write failing cases in `mobile/test/unit/pose_analyzer_test.dart` and `form_check_pipeline_test.dart` first; add EN/FR cue text to `cue_engine.dart`
+- [ ] T130 [US4] Tune the form-check angle thresholds (`LiftThresholds` in `rep_counter.dart`, cue limits in `pose_analyzer.dart`) on a physical iPhone and Android phone per US4 Independent Test / quickstart Scenario 4 (partial): log joint angles in debug builds only (never frames), adjust until 5 squats with knee cave on reps 2 and 4 give `rep_count = 5`, `flagged_reps = {2,4}`, and each of the 8 lifts counts 5 clean reps; record the values in `specs/001-tekto-ai-mvp/checklists/gate1.md`
+- [ ] T131 Let users edit their onboarding answers from `mobile/lib/features/settings/ui/settings_screen.dart` per FR-046 (missing): reuse the quiz steps of `onboarding_quiz_screen.dart` (no language step — FR-033 has its own setting), save to `users` through the sync queue, then offer "Regenerate my plan" (`force_regenerate: true`, confirm dialog — same action as T091); the current plan is untouched until confirmed; widget test first in `mobile/test/widget/profile_edit_test.dart` (saved fields, regenerate offered, plan unchanged on cancel)
+- [ ] T132 **Content dependency** — deliver the bundled clips that `mobile/assets/video/` is still missing (only `.gitkeep` today): `welcome.mp4` (≤ 20 s) and `paywall_form_check.mp4`, `paywall_coach.mp4`, `paywall_adaptive_plan.mp4`, `paywall_general.mp4` (≤ 15 s each), each with `_en.vtt` / `_fr.vtt` captions; confirm they play muted, looping and offline in `welcome_screen.dart` and `paywall_screen.dart` per FR-031 / FR-043 (partial)
+- [ ] T133 Run `supabase db reset` and confirm migrations 001–006, 008 and 009 apply cleanly (T008 covered only 001–006), then again after T115 adds 007, per plan: migrations (partial)
