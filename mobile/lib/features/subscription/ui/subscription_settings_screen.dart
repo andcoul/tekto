@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:tekto/core/iap/revenuecat_service.dart';
+import 'package:tekto/core/di/providers.dart';
 import 'package:tekto/core/theme/app_theme.dart';
 import 'package:tekto/features/subscription/domain/entitlement_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -54,7 +54,7 @@ class _Body extends ConsumerWidget {
           leading: const Icon(Icons.open_in_new),
           title: const Text('Manage subscription'),
           subtitle: const Text('Opens App Store or Google Play'),
-          onTap: _openManageSubscription,
+          onTap: () => _openManageSubscription(Theme.of(context).platform),
         ),
         ListTile(
           leading: const Icon(Icons.restore),
@@ -89,29 +89,29 @@ class _Body extends ConsumerWidget {
     return null;
   }
 
-  Future<void> _openManageSubscription() async {
+  Future<void> _openManageSubscription(TargetPlatform platform) async {
     // Platform-specific subscription management URL
     const iosUrl = 'https://apps.apple.com/account/subscriptions';
     const androidUrl =
         'https://play.google.com/store/account/subscriptions';
     final uri = Uri.parse(
-      Theme.of(_scaffoldContext!).platform == TargetPlatform.iOS
+      platform == TargetPlatform.iOS
           ? iosUrl
           : androidUrl,
     );
     if (await canLaunchUrl(uri)) await launchUrl(uri);
   }
 
-  // ignore: use_build_context_synchronously
   Future<void> _restorePurchases(BuildContext context, WidgetRef ref) async {
     final service = ref.read(revenueCatServiceProvider);
+    final messenger = ScaffoldMessenger.of(context);
     try {
       await service.restorePurchases();
-      ScaffoldMessenger.of(context).showSnackBar(
+      messenger.showSnackBar(
         const SnackBar(content: Text('Purchases restored.')),
       );
-    } catch (_) {
-      ScaffoldMessenger.of(context).showSnackBar(
+    } on Object {
+      messenger.showSnackBar(
         const SnackBar(content: Text('Restore failed. Try again.')),
       );
     }
@@ -124,9 +124,6 @@ class _Body extends ConsumerWidget {
 
   String _formatDate(DateTime dt) =>
       '${dt.year}-${dt.month.toString().padLeft(2, '0')}-${dt.day.toString().padLeft(2, '0')}';
-
-  // Workaround: store context ref for platform check
-  BuildContext? _scaffoldContext;
 }
 
 class _SectionHeader extends StatelessWidget {

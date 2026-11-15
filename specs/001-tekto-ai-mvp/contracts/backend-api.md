@@ -377,15 +377,21 @@ Receives RevenueCat event webhooks and updates the `subscriptions` table.
 
 **Handled event types**:
 
+RevenueCat reports a trial start as `INITIAL_PURCHASE` with `period_type = "TRIAL"` and a trial conversion as `RENEWAL` with `is_trial_conversion = true`. `TRIAL_STARTED` and `TRIAL_CONVERTED` are accepted as aliases. Rules live in `revenuecat-webhook/handler.ts`; every event computes the next row from the current one, so replays are idempotent.
+
 | Event | Action |
 |---|---|
-| `INITIAL_PURCHASE` | Set `tier = 'pro'`, `is_trial = false` |
-| `RENEWAL` | Update `current_period_ends_at` |
-| `TRIAL_STARTED` | Set `is_trial = true`, `trial_ends_at` |
-| `TRIAL_CONVERTED` | Set `is_trial = false`, `tier = 'pro'` |
-| `CANCELLATION` | Set `cancelled_at`; keep tier until period ends |
-| `EXPIRATION` | Set `tier = 'free'`, clear period fields |
-| `BILLING_ISSUE` | Log; do not immediately downgrade (grace period) |
+| `INITIAL_PURCHASE` (`period_type` ≠ `TRIAL`) | Upsert `tier = 'pro'`, `is_trial = false`, `current_period_ends_at = expiration_at_ms`, `cancelled_at = null` |
+| `INITIAL_PURCHASE` (`period_type = TRIAL`) / `TRIAL_STARTED` | Upsert `tier = 'pro'`, `is_trial = true`, `trial_ends_at = current_period_ends_at = expiration_at_ms` |
+| `RENEWAL` | Update `current_period_ends_at`; clear `cancelled_at` |
+| `RENEWAL` (`is_trial_conversion = true`) / `TRIAL_CONVERTED` | Also `is_trial = false`, `trial_ends_at = null` |
+| `CANCELLATION` | Set `cancelled_at = event_timestamp_ms`; keep `tier` until `EXPIRATION` |
+| `UNCANCELLATION` | Clear `cancelled_at` |
+| `EXPIRATION` | Set `tier = 'free'`, clear `is_trial`, period, trial and cancellation fields |
+| `BILLING_ISSUE` | Log; do not downgrade (grace period) |
+| Any other type, or an update event for a user with no row | Acknowledged (`200`), no write |
+
+`revenuecat_customer_id` is the event's `original_app_user_id` (never the event `id`). A storage error returns `500` so RevenueCat retries.
 
 **Response `200 OK`**: `{ "received": true }`
 
