@@ -37,6 +37,7 @@ Tekto is a premium, AI-first strength training app for iOS 16+ and Android 10+ p
 | Latency/uptime instrumentation for every Performance Standard | Constitution Performance Standards |
 | Coach cache limited to generic answers (never personalized ones) | Constitution II (cross-user leak risk) |
 | Model IDs moved to the current generation | research.md §2 |
+| Analyze runs 5–6 (2026-11-15): progress, plate calculator, welcome, rationale, consent FRs (FR-039–045); volume max on all plans; push:pull check for AI plans; swap for all tiers; onboarding order welcome → auth → disclaimer → consent → quiz → plan → trial | spec Clarifications 2026-11-15 |
 
 ---
 
@@ -143,7 +144,7 @@ tekto/
 │   │   │   ├── auth/
 │   │   │   ├── onboarding/          # Welcome, disclaimer, consent, language, quiz, plan generation, trial offer
 │   │   │   ├── plan/                # Overview, swap sheet, adaptation summary
-│   │   │   ├── workout/             # Home, live workout, summary
+│   │   │   ├── workout/             # Home, live workout (+ plate calculator), summary
 │   │   │   ├── library/             # Browse, detail, video download
 │   │   │   ├── coach/               # Chat panel, change card, rating
 │   │   │   ├── form_check/          # Camera, summary, free-try tracking
@@ -155,10 +156,11 @@ tekto/
 │   │       ├── services/
 │   │       │   ├── api/             # Dio client for Edge Functions
 │   │       │   ├── local_db/        # Drift database (SQLCipher) + DAOs
-│   │       │   ├── sync/            # Offline write queue
+│   │       │   ├── sync/            # Offline write queue + history backfill
 │   │       │   ├── health/          # HealthKit / Health Connect
 │   │       │   └── form_check/      # PoseAnalyzer, RepCounter, CueEngine, FormScoreCalculator
 │   │       └── widgets/             # VideoPlayer (+captions), SetLogRow, RestTimer, ProGate
+│   ├── assets/video/                # Bundled welcome + paywall clips (with EN/FR captions)
 │   ├── test/
 │   │   ├── unit/
 │   │   ├── widget/
@@ -173,7 +175,7 @@ tekto/
 │   │   ├── adapt-plan/              # Weekly adaptation (user-triggered or cron batch mode)
 │   │   ├── coach-message/           # AI coach
 │   │   ├── coach-confirm-change/    # Apply a confirmed coach proposal (all change types)
-│   │   ├── swap-exercise/           # User-initiated swap
+│   │   ├── swap-exercise/           # User-initiated swap, all tiers (handler.ts + test)
 │   │   ├── video-download-urls/     # Signed MP4 + caption URLs (Pro)
 │   │   ├── revenuecat-webhook/      # Subscription sync
 │   │   ├── export-data/             # GDPR export
@@ -198,7 +200,9 @@ tekto/
 │       ├── 003_pgvector_cache.sql   # vector(384) for gte-small
 │       ├── 004_pr_trigger.sql
 │       ├── 005_clarifications.sql   # timezone, consent, plan source/start_date, contraindications, captions, flagged reps
-│       └── 006_adaptation_cron.sql  # pg_cron + pg_net hourly job
+│       ├── 006_adaptation_cron.sql  # pg_cron + pg_net hourly job
+│       ├── 007_metrics_views.sql    # Aggregate-only Gate 2 / SC views
+│       └── 008_body_weight.sql      # body_weight_entries
 │
 ├── content/
 │   ├── exercises/
@@ -230,5 +234,5 @@ tekto/
 | SQLCipher | Added | Constitution II: health data encrypted at rest on device |
 | Guardrail eval suite (real API calls) | Added | Constitution III requires adversarial validation. Costs a few cents per run; runs only when the coach prompt or model changes, and before each release. |
 | `plan_templates` table | Added | Free-tier plans (FR-002) need templates reachable at runtime; seeding keeps Video Gate checks |
-| **Tracked risk: content volume** | 15 of ≥ 150 exercises exist | Blocks Gate 1 and makes the Pro plan validator reject most AI plans for narrow equipment sets. Owner: content workstream. Seeding warns below 150 in dev and fails in production. |
+| **Tracked risk: content volume** | 15 of ≥ 150 exercises exist, plus the welcome clip (T125) and 4 paywall clips (T055), each ≤ 20 s with EN/FR captions | Blocks Gate 1 and makes the Pro plan validator reject most AI plans for narrow equipment sets. Owner: content workstream. Seeding warns below 150 in dev and fails in production. |
 | **Tech debt resolved: tasks.md drift** | tasks.md regenerated on 2026-11-10 with no pre-checked tasks | Progress is tracked in tasks.md; `/speckit-converge` reconciles code against it. |

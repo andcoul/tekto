@@ -107,10 +107,10 @@ flutter run -d iPhone-15-Pro
 **Goal**: Verify SC-001, SC-002 (< 30 s), FR-001–FR-005, FR-002/002a (free rule-based plan), FR-003b (fallback), FR-036 (disclaimer), consent.
 
 **Steps (free user)**:
-1. Fresh install (or clear app data).
+1. Fresh install (or clear app data). Signed out, the app opens on the welcome screen (video, value promise; FR-043) → Get started → sign in.
 2. Health disclaimer → confirm it cannot be skipped. Consent screen → accept. Language → French.
 3. Quiz: Goal = Muscle, Level = Intermediate, 4 days/week, 45 min, equipment **dumbbells + bodyweight only**, limitation tag `knee`.
-4. Observe plan generation; skip the Pro trial offer.
+4. Observe plan generation; check the plan rationale appears in French (FR-044); skip the Pro trial offer.
 
 **Expected outcomes (free)**:
 - Plan appears in < 30 s (no AI call: `source = 'template'`, `template_slug = 'home-dumbbell-3x'` in `plans`).
@@ -118,6 +118,9 @@ flutter run -d iPhone-15-Pro
 - No barbell exercise anywhere (US1 scenario 2) and no exercise whose `contraindications` include `knee`.
 - UI and plan name in French. Every exercise has a video thumbnail.
 - `users.consent_at` and `consent_version` populated.
+- Time from sign-in to plan recorded (SC-016, target < 3 min).
+
+**Steps (trial at onboarding, FR-004)**: repeat with a new account and start a sandbox trial on the trial offer → a new plan with `source = 'ai'` replaces the template plan (or `template_fallback` with the notice card).
 
 **Steps (free, 6 days/week)**: repeat with 6 days → plan has 4 sessions and shows the `free_plan_days_capped` card.
 
@@ -148,6 +151,11 @@ flutter run -d iPhone-15-Pro
 7. Continue logging remaining exercises offline.
 8. Re-enable connectivity.
 9. Finish workout; submit effort rating.
+10. On a barbell exercise enter 100 kg → plate calculator shows 20 + 10 per side (FR-042).
+11. On an exercise with an RIR target → the row shows "RIR 2 (≈ RPE 8)" (FR-007).
+12. As a free user, swap an exercise → works with no paywall (FR-028).
+13. Open Progress → the workout, PRs and weekly sets per muscle appear; log a body weight → shown in the user's unit (FR-039–FR-041).
+14. Reinstall the app and sign in → history reappears (T127).
 
 **Expected outcomes**:
 - Home screen shows today's session with duration and muscle targets.

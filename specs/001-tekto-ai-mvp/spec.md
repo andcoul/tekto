@@ -48,7 +48,7 @@ Tekto is a premium, AI-first strength training app for iOS and Android. It build
 
 **Launch scope**: Required at launch (PRD P0).
 
-A new user opens the app, watches the welcome experience, completes a short onboarding quiz about their goal, training level, available days, session length, equipment and any limitations, and receives a personalized 4–12 week training program in under 3 minutes. They are offered a Pro trial before or after account creation.
+A new user opens the app, watches the welcome experience, completes a short onboarding quiz about their goal, training level, available days, session length, equipment and any limitations, and receives a personalized 4–12 week training program in under 3 minutes. The order is: welcome → account creation → health disclaimer → consent → quiz → plan → Pro trial offer.
 
 **Why this priority**: Without a generated plan the app has no value proposition; this is the entry point for every other feature.
 
@@ -184,7 +184,7 @@ A free user encounters a Pro feature, sees a contextual paywall that communicate
 
 - What happens when the AI plan generator produces an exercise that has no video in the library? → The exercise is automatically replaced with a validated alternative that has a video (same primary muscle, available equipment); the plan is never shown with a video-less exercise (FR-003b).
 - What happens when an AI-generated plan fails validation for any other reason (volume, rest days, duration)? → The generator retries up to 2 times; if the plan still fails, the user receives the rule-based template plan (FR-002) with a note that they can regenerate their plan later from settings (FR-003b).
-- How does the system handle a user with conflicting limitations (e.g., knee injury + lower-body goal)? → The plan avoids contraindicated exercises and the coach proactively explains substitutions.
+- How does the system handle a user with conflicting limitations (e.g., knee injury + lower-body goal)? → The plan avoids contraindicated exercises and the coach explains the substitutions when the user asks about an affected exercise.
 - What happens when the LLM service is unavailable during a coach session? → The last generated plan continues to function; the coach shows a "temporarily unavailable" message.
 - How does form check behave when the device has an older/slower CPU? → Confidence threshold is enforced; if below threshold, cues are suppressed rather than shown incorrectly.
 - What happens if a user changes their equipment mid-program? → They can trigger a plan re-generation from settings, or use the coach to request substitutions exercise-by-exercise.
@@ -200,12 +200,12 @@ A free user encounters a Pro feature, sees a contextual paywall that communicate
 **Onboarding & Plan Generation**
 
 - **FR-001**: The system MUST present an onboarding quiz collecting: goal (muscle, strength, fat loss, general fitness), training level, days per week, session length, available equipment, and physical limitations or injuries.
-- **FR-002**: The system MUST generate a 4–12 week periodized training plan with named exercises, sets, reps, rest periods and RPE/RIR targets within 30 seconds of onboarding completion. Pro users receive an AI-generated plan. Free users receive a rule-based plan built from one of the starter templates (FR-029), selected by equipment first, then level, then goal; the system adapts it to the user's chosen days per week (1 day → 1 session; otherwise adding or merging sessions, up to a maximum of 4 sessions per week; a user who chooses 5–7 days receives 4 sessions and a non-blocking card explaining that Pro builds programs for 5 or more days) and session length (trimming exercises from the end of each session, keeping at least 3, then reducing sets and rest if needed). No AI call is made for free plans.
-- **FR-002a**: Every plan, AI-generated or template-based, MUST pass the same plan validator (every exercise has a video, uses only the user's available equipment, rest days present, estimated session duration at most 10 minutes over the chosen session length (template plans are trimmed to fit within it), weekly sets per muscle group within the level's bounds) before it is shown to the user. The volume bounds are beginner 10–14, intermediate 14–18, advanced 16–22 sets per muscle per week. The maximum applies to every plan. The minimum applies to AI plans only, for major muscles when the user trains 3 or more days per week, because template plans trimmed to short sessions cannot always reach it.
+- **FR-002**: The system MUST generate a 4–12 week periodized training plan with named exercises, sets, reps, rest periods and RPE/RIR targets within 30 seconds (p95) of onboarding completion; if no plan arrives within the 35-second client timeout, the app offers a retry (network failures only; FR-003b covers AI failures). Pro users receive an AI-generated plan. Free users receive a rule-based plan built from one of the starter templates (FR-029), selected by equipment first, then level, then goal; the system adapts it to the user's chosen days per week (1 day → 1 session; otherwise adding or merging sessions, up to a maximum of 4 sessions per week; a user who chooses 5–7 days receives 4 sessions and a non-blocking card explaining that Pro builds programs for 5 or more days) and session length (trimming exercises from the end of each session, keeping at least 3, then reducing sets and rest if needed). No AI call is made for free plans.
+- **FR-002a**: Every plan, AI-generated or template-based, MUST pass the same plan validator (every exercise has a video, uses only the user's available equipment, rest days present, estimated session duration at most 10 minutes over the chosen session length (template plans are trimmed to fit within it), weekly sets per muscle group within the level's bounds, and for AI plans weekly push sets ÷ pull sets between 0.67 and 1.5) before it is shown to the user. The volume bounds are beginner 10–14, intermediate 14–18, advanced 16–22 sets per muscle per week. The maximum applies to every plan. The minimum applies to AI plans only, for major muscles when the user trains 3 or more days per week, because template plans trimmed to short sessions cannot always reach it.
 - **FR-003**: Every exercise in a generated plan MUST have a corresponding video in the exercise library; no plan may reference a movement without a video.
 - **FR-003b**: When an AI-generated plan fails validation: (1) any exercise without a video MUST be replaced automatically with a validated alternative (same primary muscle, available equipment) without a new AI call; (2) any other validation failure MUST trigger up to 2 retries (3 attempts in total); (3) if every attempt fails, the user MUST receive the rule-based template plan (FR-002) with a visible note that they can regenerate later. Onboarding MUST never end without a valid plan.
 - **FR-004**: The system MUST offer a 7-day Pro free trial after onboarding, skippable by the user, without blocking access to the generated plan. If the user starts the trial from this offer, the system MUST immediately generate an AI plan (`force_regenerate`) that replaces the template plan; if AI generation falls back (FR-003b), the template plan is kept and the fallback note is shown. The trial offer appears once, during onboarding; afterwards a paywall appears only when a free user taps a Pro feature.
-- **FR-043**: Onboarding MUST open with a short welcome screen (looping video of at most 20 seconds, the value promise, and a "Get started" action); the video is bundled with the app, plays muted with captions, and can be skipped.
+- **FR-043**: Onboarding MUST open with a short welcome screen (looping video of at most 20 seconds, the value promise, and a "Get started" action); the video is bundled with the app, plays muted with captions, and can be skipped. It is the only onboarding screen shown before sign-in.
 - **FR-044**: After plan generation, the system MUST show a 1–2 sentence explanation of why the plan fits the user, in their language: written by the model for AI plans, and the template's fixed rationale for template and fallback plans.
 - **FR-045**: Before the quiz, the system MUST collect explicit, versioned consent to process health data (after the health disclaimer, FR-036); no plan is generated without it, and the user is asked again when the consent version changes.
 - **FR-005**: The system MUST support account creation via Apple Sign-In, Google Sign-In, or email/password.
@@ -257,9 +257,9 @@ A free user encounters a Pro feature, sees a contextual paywall that communicate
 
 **Monetization**
 
-- **FR-029**: The system MUST enforce free-tier limits (3 starter plan templates, 3 coach questions/week, 1 form-check try per lift) and present a contextual paywall when limits are reached.
+- **FR-029**: The system MUST enforce free-tier limits (3 starter plan templates, 3 coach questions/week, 1 form-check try per lift, progress history limited to the last 4 weeks without muscle balance — FR-040) and present a contextual paywall when limits are reached.
 - **FR-030**: The paywall MUST NEVER interrupt a workout that is currently in progress.
-- **FR-031**: The paywall MUST always display cancel-anytime instructions and a restore-purchases option, and MUST show a short looping value video (at most 15 seconds, bundled with the app) for the feature that opened it (form check, coach, adaptive plan, or a general video).
+- **FR-031**: The paywall MUST always display cancel-anytime instructions and a restore-purchases option, and MUST show a short looping value video (at most 15 seconds, bundled with the app) for the feature that opened it (form check, coach, adaptive plan, or a general video). Offline, the purchase and restore buttons are disabled with a "Connect to the internet to start your trial" message; the video still plays and nothing blocks the workout.
 - **FR-032**: The system MUST use App Store and Google Play regional pricing to offer locally appropriate prices.
 
 **Localization & Accessibility**
@@ -296,7 +296,7 @@ A free user encounters a Pro feature, sees a contextual paywall that communicate
 ### Measurable Outcomes
 
 - **SC-001**: At least 70% of installs complete onboarding and receive a generated plan.
-- **SC-002**: The 30-second plan generation target in FR-002 holds for at least 95% of generations in the beta.
+- **SC-002**: Plan generation (FR-002) completes in under 30 seconds at p95, measured from the `generate-plan` timing log.
 - **SC-003**: Cold start time is under 2 seconds on a mid-range device.
 - **SC-004**: Exercise videos begin playing in under 1 second on a 4G connection.
 - **SC-005**: Form-check feedback is delivered in under 150 ms per frame on a supported device.
@@ -310,6 +310,7 @@ A free user encounters a Pro feature, sees a contextual paywall that communicate
 - **SC-013**: The backend and AI services maintain 99.5% uptime; when AI is unavailable, the last generated plan continues to function without error.
 - **SC-014**: The privacy audit before Gate 1 confirms FR-021, FR-037 and FR-038: an encrypted local database, zero camera bytes sent during form check, and working export and deletion.
 - **SC-015**: The AI coach's first streamed token arrives in under 3 seconds at p95 (Constitution Performance Standards).
+- **SC-016**: Median time from account creation to a displayed plan is under 3 minutes in the beta.
 
 ---
 

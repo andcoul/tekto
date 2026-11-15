@@ -110,6 +110,8 @@ A complete 4–12 week training program belonging to a user. A user may have mul
 | `last_adapted_week` | int | NOT NULL, default 0 | Highest week already adapted; makes `adapt-plan` idempotent |
 | `source` | enum | NOT NULL | `ai \| template \| template_fallback` |
 | `template_slug` | text | nullable | Set when `source` is `template` or `template_fallback` |
+| `rationale_en` | text | nullable | Why the plan fits (FR-044): from the model for `ai`, from the template for `template` / `template_fallback` |
+| `rationale_fr` | text | nullable | |
 | `generation_prompt_hash` | text | nullable | For dedup / debugging |
 | `adaptation_log` | jsonb | nullable | Array of adaptation events `[{week, sessions_scheduled, sessions_completed, changes, summary_en, summary_fr}]` |
 | `created_at` | timestamptz | NOT NULL | |
@@ -460,6 +462,8 @@ coach_response_cache ── standalone system table (no user FK)
 **Drift (SQLite, SQLCipher-encrypted) mirrors**: `plans`, `sessions`, `plan_exercises`, `exercises` (text fields for every exercise in the active plan, for **all** users — Constitution I), `workout_logs`, `set_logs`, `personal_records`, `form_check_sessions` (summaries, for the free-try check), `subscriptions`, `coach_quota_usage`, `body_weight_entries`.
 
 **Write queue**: Any write that occurs offline is appended to a `sync_queue` local table with `{operation, table, payload, created_at}`. On connectivity restore, the queue is flushed in order to Supabase REST API.
+
+**Backfill**: on a fresh install, history (`workout_logs`, `set_logs`, `personal_records`, `body_weight_entries`) is pulled once from the server (T127).
 
 **Conflict resolution**: Last-write-wins for `workout_logs` and `set_logs` (append-only); plans are always read from server when online.
 

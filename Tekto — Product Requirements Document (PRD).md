@@ -97,10 +97,11 @@ Five journeys define the MVP; each must be completable in the fewest taps possib
 **Onboarding to first plan (target: under 3 minutes)**
 
 1. Welcome video and value promise.
-2. Quiz: goal, level, days per week, session length, equipment, limitations.
-3. Optional quick strength check (estimated weights for 3 lifts, or "I don't know").
-4. Tekto generates the plan (AI for Pro, rule-based template for free users) with a short explanation of why it fits.
-5. Pro trial offer, skippable; starting the trial upgrades the plan to an AI plan right away; account created with Apple, Google or email.
+2. Create an account with Apple, Google or email; accept the health disclaimer and data consent.
+3. Quiz: goal, level, days per week, session length, equipment, limitations.
+4. Optional quick strength check (estimated weights for 3 lifts, or "I don't know").
+5. Tekto generates the plan (AI for Pro, rule-based template for free users) with a short explanation of why it fits.
+6. Pro trial offer, skippable; starting the trial upgrades the plan to an AI plan right away.
 
 **Daily workout**
 
