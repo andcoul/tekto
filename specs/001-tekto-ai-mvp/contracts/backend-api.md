@@ -46,6 +46,8 @@ Generates a personalized training plan from the authenticated user's profile.
     "source": "ai",
     "template_slug": null,
     "fallback_notice": false,
+    "rationale_en": "A 4-day upper/lower split that fits your 45-minute sessions…",
+    "rationale_fr": "Un split haut/bas sur 4 jours adapté à vos séances de 45 minutes…",
     "notices": [],
     "sessions": [
       {
@@ -86,6 +88,7 @@ Generates a personalized training plan from the authenticated user's profile.
 | Response field | Values | Meaning |
 |---|---|---|
 | `source` | `ai \| template \| template_fallback` | How the plan was built |
+| `rationale_en` / `rationale_fr` | string | Why the plan fits (FR-044): from the model for `ai`, from the template JSON for `template` and `template_fallback` |
 | `fallback_notice` | bool | `true` only for `template_fallback`; the app shows "We built you a starter plan — you can regenerate it later in Settings" |
 | `notices` | string[] | Localization keys for non-blocking cards, e.g. `free_plan_days_capped` when 5–7 days were requested on the free tier |
 

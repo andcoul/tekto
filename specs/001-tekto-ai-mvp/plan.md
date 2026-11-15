@@ -4,7 +4,7 @@
 
 **Input**: Feature specification from `specs/001-tekto-ai-mvp/spec.md`, including Clarifications Session 2026-11-10
 
-**Constitution**: v2.0.0 (amended 2026-11-10)
+**Constitution**: v2.0.1 (amended 2026-11-11)
 
 ---
 
@@ -53,7 +53,7 @@ Tekto is a premium, AI-first strength training app for iOS 16+ and Android 10+ p
 
 **Testing**: `flutter_test` (unit + widget), `integration_test` (Flutter), `deno test` (Edge Function business logic), guardrail eval suite (`deno task eval:guardrails`, runs against the real coach model in staging)
 
-**Target Platform**: iOS 16+, Android 10+; **phones only** (tablet layouts out of scope for the MVP, per spec Assumptions)
+**Target Platform**: iOS 16+, Android 10+; **phones first**. Tablets run the phone layout without clipping; no tablet-specific layouts in the MVP (spec Assumptions)
 
 **Project Type**: Mobile app (cross-platform) + serverless backend (Edge Functions)
 
@@ -77,7 +77,7 @@ Tekto is a premium, AI-first strength training app for iOS 16+ and Android 10+ p
 **Scale/Scope**:
 - ≥ 150 exercises at launch (currently 15 in `content/exercises/exercises.json` — content workstream must close this gap before Gate 1)
 - 4 personas; English and French
-- MVP: ~20 screens; 10 Edge Functions; 14 user/content entities + 2 system tables (`coach_response_cache`, `plan_templates`) + 1 local-only table (`sync_queue`)
+- MVP: ~20 screens; 10 Edge Functions; 15 user/content entities (incl. `body_weight_entries`) + 2 system tables (`coach_response_cache`, `plan_templates`) + 1 local-only table (`sync_queue`)
 
 **Unknowns**: none remaining. The embedding provider (previously unresolved; contract referenced an OpenAI model) is resolved in research.md §8.
 
@@ -85,7 +85,7 @@ Tekto is a premium, AI-first strength training app for iOS 16+ and Android 10+ p
 
 ## Constitution Check
 
-*GATE: evaluated against constitution v2.0.0. Re-checked after Phase 1 design (below).*
+*GATE: evaluated against constitution v2.0.1 (2.0.1 only clarifies the wording of §IV; no new checks). Re-checked after Phase 1 design (below).*
 
 | Principle | Requirement | Design response | Status |
 |---|---|---|---|
@@ -122,7 +122,7 @@ specs/001-tekto-ai-mvp/
 ├── checklists/
 │   ├── requirements.md  ← Specification quality checklist
 │   └── gate1.md         ← Gate 1 validation record
-└── tasks.md             ← /speckit-tasks output (must be regenerated after this revision)
+└── tasks.md             ← /speckit-tasks output (regenerated 2026-11-10; remediations since)
 ```
 
 ### Source Code (repository root)
@@ -141,13 +141,13 @@ tekto/
 │   │   │   └── l10n/                # app_en.arb, app_fr.arb
 │   │   ├── features/
 │   │   │   ├── auth/
-│   │   │   ├── onboarding/          # Disclaimer, consent, language, quiz, plan generation, trial offer
+│   │   │   ├── onboarding/          # Welcome, disclaimer, consent, language, quiz, plan generation, trial offer
 │   │   │   ├── plan/                # Overview, swap sheet, adaptation summary
 │   │   │   ├── workout/             # Home, live workout, summary
 │   │   │   ├── library/             # Browse, detail, video download
 │   │   │   ├── coach/               # Chat panel, change card, rating
 │   │   │   ├── form_check/          # Camera, summary, free-try tracking
-│   │   │   ├── progress/            # History, records, volume
+│   │   │   ├── progress/            # History, records, e1RM, volume, body weight
 │   │   │   ├── settings/            # Preferences, regenerate plan, export/delete
 │   │   │   └── subscription/        # Paywall, subscription settings
 │   │   └── shared/
@@ -231,4 +231,4 @@ tekto/
 | Guardrail eval suite (real API calls) | Added | Constitution III requires adversarial validation. Costs a few cents per run; runs only when the coach prompt or model changes, and before each release. |
 | `plan_templates` table | Added | Free-tier plans (FR-002) need templates reachable at runtime; seeding keeps Video Gate checks |
 | **Tracked risk: content volume** | 15 of ≥ 150 exercises exist | Blocks Gate 1 and makes the Pro plan validator reject most AI plans for narrow equipment sets. Owner: content workstream. Seeding warns below 150 in dev and fails in production. |
-| **Tracked tech debt: tasks.md drift** | 105 tasks marked done, several not reflected in code (e.g. 5 of 14 model files, 0 caption files, gate1.md all pending) | `/speckit-tasks` must regenerate; `/speckit-converge` must reconcile. |
+| **Tech debt resolved: tasks.md drift** | tasks.md regenerated on 2026-11-10 with no pre-checked tasks | Progress is tracked in tasks.md; `/speckit-converge` reconciles code against it. |

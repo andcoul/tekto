@@ -35,6 +35,10 @@ Tekto is a premium, AI-first strength training app for iOS and Android. It build
 - Q: What plan does a user get after starting the trial during onboarding? → A: An AI plan generated immediately, replacing the template plan (FR-004).
 - Q: Does a "too hard" rating change the next session or next week? → A: Next week, at the weekly review (FR-026).
 - Q: Is exercise swap Pro-only? → A: No. Swap is available to all users and makes no AI call (FR-028).
+- Q: Which PRD items left out of the spec are in the MVP? → A: Plate calculator (FR-042), welcome video (FR-043), plan rationale at onboarding (FR-044), feature value video on the paywall (FR-031), Beta label on form check (FR-022). Voice questions use the phone's keyboard dictation, with no in-app speech pipeline (FR-016). Pull-up form check, progress photos, footage sharing and full program editing are post-MVP.
+- Q: What does a free user who picks 1 training day get? → A: One session per week (FR-002).
+- Q: Is effort logged as RPE or RIR? → A: RPE. Targets can be RPE or RIR; when a target is RIR the screen also shows its RPE equivalent (RPE = 10 − RIR) (FR-007).
+- Q: Do tablets need support? → A: The phone layout must run on tablets without clipping or broken layouts; no tablet-specific layouts in the MVP.
 
 ---
 
@@ -115,7 +119,8 @@ A Pro user starts a supported lift, taps the camera icon, follows the guided pho
 2. **Given** correct phone placement, **When** the user performs reps, **Then** the app counts reps and displays up to 3 live cues (e.g., "knees caving").
 3. **Given** a completed set, **When** the form check ends, **Then** a summary shows rep count, a form score and one prioritized tip.
 4. **Given** low-confidence pose estimation (poor lighting, obstructed view), **When** confidence falls below threshold, **Then** no cues are shown and the user is told to adjust lighting or angle.
-5. **Given** any form check session, **When** the session ends, **Then** no camera footage is uploaded to any server unless the user explicitly chooses to share it.
+5. **Given** any form check session, **When** the session ends, **Then** no camera footage is uploaded to any server (sharing footage is post-MVP).
+6. **Given** form check at launch, **When** the camera screen or the summary is shown, **Then** a "Beta" label is visible.
 
 ---
 
@@ -195,20 +200,24 @@ A free user encounters a Pro feature, sees a contextual paywall that communicate
 **Onboarding & Plan Generation**
 
 - **FR-001**: The system MUST present an onboarding quiz collecting: goal (muscle, strength, fat loss, general fitness), training level, days per week, session length, available equipment, and physical limitations or injuries.
-- **FR-002**: The system MUST generate a 4–12 week periodized training plan with named exercises, sets, reps, rest periods and RPE/RIR targets within 30 seconds of onboarding completion. Pro users receive an AI-generated plan. Free users receive a rule-based plan built from one of the starter templates (FR-029), selected by equipment first, then level, then goal; the system adapts it to the user's chosen days per week (adding or merging sessions, up to a maximum of 4 sessions per week; a user who chooses 5–7 days receives 4 sessions and a non-blocking card explaining that Pro builds programs for 5 or more days) and session length (trimming exercises from the end of each session, keeping at least 3, then reducing sets and rest if needed). No AI call is made for free plans.
-- **FR-002a**: Every plan, AI-generated or template-based, MUST pass the same plan validator (every exercise has a video, uses only the user's available equipment, rest days present, session fits within the chosen session length, weekly sets per muscle group within the level's bounds) before it is shown to the user. The volume bounds are beginner 10–14, intermediate 14–18, advanced 16–22 sets per muscle per week. The maximum applies to every plan. The minimum applies to AI plans only, for major muscles when the user trains 3 or more days per week, because template plans trimmed to short sessions cannot always reach it.
-- **FR-003b**: When an AI-generated plan fails validation: (1) any exercise without a video MUST be replaced automatically with a validated alternative (same primary muscle, available equipment) without a new AI call; (2) any other validation failure MUST trigger up to 2 retries (3 attempts in total); (3) if every attempt fails, the user MUST receive the rule-based template plan (FR-002) with a visible note that they can regenerate later. Onboarding MUST never end without a valid plan.
+- **FR-002**: The system MUST generate a 4–12 week periodized training plan with named exercises, sets, reps, rest periods and RPE/RIR targets within 30 seconds of onboarding completion. Pro users receive an AI-generated plan. Free users receive a rule-based plan built from one of the starter templates (FR-029), selected by equipment first, then level, then goal; the system adapts it to the user's chosen days per week (1 day → 1 session; otherwise adding or merging sessions, up to a maximum of 4 sessions per week; a user who chooses 5–7 days receives 4 sessions and a non-blocking card explaining that Pro builds programs for 5 or more days) and session length (trimming exercises from the end of each session, keeping at least 3, then reducing sets and rest if needed). No AI call is made for free plans.
+- **FR-002a**: Every plan, AI-generated or template-based, MUST pass the same plan validator (every exercise has a video, uses only the user's available equipment, rest days present, estimated session duration at most 10 minutes over the chosen session length (template plans are trimmed to fit within it), weekly sets per muscle group within the level's bounds) before it is shown to the user. The volume bounds are beginner 10–14, intermediate 14–18, advanced 16–22 sets per muscle per week. The maximum applies to every plan. The minimum applies to AI plans only, for major muscles when the user trains 3 or more days per week, because template plans trimmed to short sessions cannot always reach it.
 - **FR-003**: Every exercise in a generated plan MUST have a corresponding video in the exercise library; no plan may reference a movement without a video.
-- **FR-004**: The system MUST offer a 7-day Pro free trial after onboarding, skippable by the user, without blocking access to the generated plan. If the user starts the trial from this offer, the system MUST immediately generate an AI plan (`force_regenerate`) that replaces the template plan; if AI generation falls back (FR-003b), the template plan is kept and the fallback note is shown.
+- **FR-003b**: When an AI-generated plan fails validation: (1) any exercise without a video MUST be replaced automatically with a validated alternative (same primary muscle, available equipment) without a new AI call; (2) any other validation failure MUST trigger up to 2 retries (3 attempts in total); (3) if every attempt fails, the user MUST receive the rule-based template plan (FR-002) with a visible note that they can regenerate later. Onboarding MUST never end without a valid plan.
+- **FR-004**: The system MUST offer a 7-day Pro free trial after onboarding, skippable by the user, without blocking access to the generated plan. If the user starts the trial from this offer, the system MUST immediately generate an AI plan (`force_regenerate`) that replaces the template plan; if AI generation falls back (FR-003b), the template plan is kept and the fallback note is shown. The trial offer appears once, during onboarding; afterwards a paywall appears only when a free user taps a Pro feature.
+- **FR-043**: Onboarding MUST open with a short welcome screen (looping video of at most 20 seconds, the value promise, and a "Get started" action); the video is bundled with the app, plays muted with captions, and can be skipped.
+- **FR-044**: After plan generation, the system MUST show a 1–2 sentence explanation of why the plan fits the user, in their language: written by the model for AI plans, and the template's fixed rationale for template and fallback plans.
+- **FR-045**: Before the quiz, the system MUST collect explicit, versioned consent to process health data (after the health disclaimer, FR-036); no plan is generated without it, and the user is asked again when the consent version changes.
 - **FR-005**: The system MUST support account creation via Apple Sign-In, Google Sign-In, or email/password.
 
 **Workout Tracking**
 
 - **FR-006**: The system MUST present a home screen showing today's planned workout with estimated duration and target muscle groups.
-- **FR-007**: The system MUST provide a live workout screen allowing the user to log sets with weight, reps and an optional RPE rating per set.
+- **FR-007**: The system MUST provide a live workout screen allowing the user to log sets with weight, reps and an optional RPE rating per set. Effort is always logged as RPE; when the target is RIR, the screen shows both the RIR target and its RPE equivalent (RPE = 10 − RIR).
 - **FR-008**: The system MUST start a configurable rest timer automatically after each logged set.
 - **FR-009**: The system MUST display suggested weights based on the user's history and the plan's progression targets.
 - **FR-010**: The system MUST detect and display personal records (PR) in real time during a workout.
+- **FR-042**: For barbell exercises, the live workout screen MUST offer a plate calculator that shows the plates per side for the entered weight, in the user's unit (bar 20 kg / 45 lb; kg plates 25, 20, 15, 10, 5, 2.5, 1.25; lb plates 45, 35, 25, 10, 5, 2.5), works offline, and says when the weight cannot be loaded exactly (showing the nearest loadable weight).
 - **FR-011**: The system MUST work fully offline for the current day's workout for all users (set logging, rest timer, navigation between exercises, technique cues); data syncs when connectivity is restored. Offline exercise video is Pro-only (see FR-015); a free user offline sees the exercise's text cues and a message that offline video requires Pro, and the workout continues uninterrupted.
 - **FR-012**: The system MUST sync workout data with Apple Health (iOS) and Google Health Connect (Android).
 - **FR-028**: All users, free and Pro, MUST be able to swap any exercise for an equivalent alternative (same muscle group, available equipment) at any time. The swap uses rule-based substitution and makes no AI call.
@@ -227,7 +236,7 @@ A free user encounters a Pro feature, sees a contextual paywall that communicate
 
 **AI Chat Coach (Pro)**
 
-- **FR-016**: The AI coach MUST be accessible from any screen and receive contextual information about the screen the user is currently on.
+- **FR-016**: The AI coach MUST be accessible from any screen and receive contextual information about the screen the user is currently on. Questions are typed; voice input uses the phone's keyboard dictation (no in-app speech recognition in the MVP).
 - **FR-017**: The coach MUST ground all answers in the user's profile, current plan and training history.
 - **FR-018**: The coach MUST support plan modifications on request (exercise swap, session shortening, deload) and require user confirmation before applying any change.
 - **FR-019**: The coach MUST detect injury and pain language and respond with advice to consult a professional; it MUST NOT provide medical diagnoses.
@@ -235,8 +244,8 @@ A free user encounters a Pro feature, sees a contextual paywall that communicate
 
 **Camera Form Check (Pro)**
 
-- **FR-021**: The form check MUST run entirely on-device using pose estimation; no camera frames may be transmitted to any server without explicit user action.
-- **FR-022**: At launch, the form check MUST support at least 8 key lifts: squat, deadlift, bench press, overhead press, row, lunge, hip thrust, push-up.
+- **FR-021**: The form check MUST run entirely on-device using pose estimation; no camera frames may be transmitted to any server without explicit user action. Sharing footage is post-MVP, so `user_shared` stays `false` in the MVP.
+- **FR-022**: At launch, the form check MUST support at least 8 key lifts: squat, deadlift, bench press, overhead press, row, lunge, hip thrust, push-up. Pull-up and further lifts follow in v1.1. Form check carries a "Beta" label at launch.
 - **FR-023**: The system MUST provide real-time rep counting and live form cues during the set, with no more than 3 cues on screen at any moment, ordered by severity.
 - **FR-024**: After each set, the system MUST display a form score, the reps flagged, and one prioritized tip.
 - **FR-025**: Form cues MUST only be displayed when pose estimation confidence exceeds the defined threshold; below threshold, cues are suppressed and the user is prompted to adjust setup.
@@ -250,7 +259,7 @@ A free user encounters a Pro feature, sees a contextual paywall that communicate
 
 - **FR-029**: The system MUST enforce free-tier limits (3 starter plan templates, 3 coach questions/week, 1 form-check try per lift) and present a contextual paywall when limits are reached.
 - **FR-030**: The paywall MUST NEVER interrupt a workout that is currently in progress.
-- **FR-031**: The paywall MUST always display cancel-anytime instructions and a restore-purchases option.
+- **FR-031**: The paywall MUST always display cancel-anytime instructions and a restore-purchases option, and MUST show a short looping value video (at most 15 seconds, bundled with the app) for the feature that opened it (form check, coach, adaptive plan, or a general video).
 - **FR-032**: The system MUST use App Store and Google Play regional pricing to offer locally appropriate prices.
 
 **Localization & Accessibility**
@@ -263,7 +272,7 @@ A free user encounters a Pro feature, sees a contextual paywall that communicate
 
 - **FR-036**: A health disclaimer MUST be shown at onboarding before the first plan is generated.
 - **FR-037**: All health and body data MUST be encrypted at rest and in transit; users MUST be able to export their data and delete their account from within the app.
-- **FR-038**: The app MUST be GDPR-compliant.
+- **FR-038**: The app MUST be GDPR-compliant: consent before processing (FR-045), in-app export and deletion (FR-037), data used only for the purposes stated in the privacy policy, a privacy policy linked from onboarding and settings, and compliance verified before each major release (Constitution II).
 
 ---
 
@@ -287,7 +296,7 @@ A free user encounters a Pro feature, sees a contextual paywall that communicate
 ### Measurable Outcomes
 
 - **SC-001**: At least 70% of installs complete onboarding and receive a generated plan.
-- **SC-002**: The app generates and displays a personalized plan in under 30 seconds after the last onboarding step.
+- **SC-002**: The 30-second plan generation target in FR-002 holds for at least 95% of generations in the beta.
 - **SC-003**: Cold start time is under 2 seconds on a mid-range device.
 - **SC-004**: Exercise videos begin playing in under 1 second on a 4G connection.
 - **SC-005**: Form-check feedback is delivered in under 150 ms per frame on a supported device.
@@ -299,19 +308,20 @@ A free user encounters a Pro feature, sees a contextual paywall that communicate
 - **SC-011**: AI coach answers receive a thumbs-up rating from at least 85% of rated responses.
 - **SC-012**: The app achieves an average App Store and Google Play rating of 4.6 or above.
 - **SC-013**: The backend and AI services maintain 99.5% uptime; when AI is unavailable, the last generated plan continues to function without error.
-- **SC-014**: All user health data is encrypted; no camera frames leave the device without an explicit user action; GDPR compliance is verified before launch.
+- **SC-014**: The privacy audit before Gate 1 confirms FR-021, FR-037 and FR-038: an encrypted local database, zero camera bytes sent during form check, and working export and deletion.
+- **SC-015**: The AI coach's first streamed token arrives in under 3 seconds at p95 (Constitution Performance Standards).
 
 ---
 
 ## Assumptions
 
-- The app targets iOS 16+ and Android 10+ from a single cross-platform codebase; web and tablet optimizations are out of scope for the MVP.
+- The app targets iOS 16+ and Android 10+ from a single cross-platform codebase, phones first. On tablets the phone layout must run without clipping or broken layouts; tablet-specific layouts and a web app are out of scope for the MVP.
 - At least 150 filmed exercise videos will be available before launch; video production timeline is a separate workstream with studio/coach resources.
-- The specific LLM and on-device pose-estimation library will be determined in the technical design phase (TRD); the spec is agnostic to vendor choices.
+- Vendor choices (LLM, pose estimation, video delivery, billing) are recorded in research.md; the requirements in this spec stay vendor-agnostic.
 - Subscription billing is handled entirely through App Store and Google Play in-app purchase APIs; no direct payment processing is in scope for the MVP.
 - Local payment methods (Wave, Orange Money, etc.) are post-MVP.
 - English and French are the only supported languages at launch; the architecture supports adding more languages in future releases.
 - The trademark clearance for "Tekto" in Classes 9 and 41 is assumed to be completed before launch (open question from PRD).
 - Team size, budget, and target launch date are open questions to be resolved outside this spec.
-- Nutritional tracking, social features, wearable integrations beyond Apple Health / Google Health Connect, progress photos, and a web app are explicitly out of scope for the MVP.
+- Nutritional tracking, social features, wearable integrations beyond Apple Health / Google Health Connect, progress photos, form-check footage sharing, pull-up form check, full program editing (beyond swap and regeneration), in-app speech recognition, and a web app are explicitly out of scope for the MVP.
 - A human-reviewed content safety pass on the AI coach's guardrails will be conducted before launch to satisfy app store compliance.
