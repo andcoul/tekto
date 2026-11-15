@@ -1,65 +1,60 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:purchases_flutter/purchases_flutter.dart';
-import 'package:tekto/core/di/providers.dart';
-import 'package:tekto/features/subscription/data/subscription_repository.dart';
-import 'package:tekto/shared/models/subscription_model.dart';
+import 'dart:async';
 
-/// Combined entitlement state: server-side `subscriptions.tier` is authoritative
-/// on mismatch with the RevenueCat SDK's local cache.
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../../core/di/providers.dart';
+import '../../../shared/services/local_db/daos/subscription_dao.dart';
+import '../../../shared/services/local_db/database.dart';
+import '../data/subscription_repository.dart';
+
+/// Whether the user has Pro right now, and when it ends.
 class EntitlementState {
-  const EntitlementState({
-    required this.isPro,
-    required this.isTrial,
-    this.periodEndsAt,
-  });
+  const EntitlementState({required this.isPro, required this.isTrial, this.periodEndsAt});
 
   final bool isPro;
+
+  /// True only while a trial is active.
   final bool isTrial;
+
+  /// End of the active trial or billing period.
   final DateTime? periodEndsAt;
 
   static const free = EntitlementState(isPro: false, isTrial: false);
 }
 
-/// [entitlementProvider] merges RevenueCat SDK `CustomerInfo` with the
-/// Supabase-backed `SubscriptionRepository`.
-///
-/// The server-side record is always authoritative when the two disagree —
-/// this prevents client-side entitlement spoofing.
-final entitlementProvider = StreamProvider<EntitlementState>((ref) async* {
-  final revenueCat = ref.watch(revenueCatServiceProvider);
-  final subRepo = ref.watch(subscriptionRepositoryProvider);
-
-  // Start from the RevenueCat customer info stream.
-  await for (final customerInfo in revenueCat.customerInfoStream) {
-    final rcIsPro = customerInfo.entitlements.active.containsKey('pro');
-
-    // Cross-check with our server-side subscription record.
-    // `auth.currentUser` is assumed accessible via a separate auth provider;
-    // for now we derive userId from the RevenueCat app user ID.
-    final userId = customerInfo.originalAppUserId;
-    final serverIsPro = await subRepo.isPro(userId);
-
-    // Server wins on mismatch.
-    final effectiveIsPro = rcIsPro && serverIsPro;
-
-    // Build state from server record for accurate trial/period data.
-    final serverSub = await _fetchSub(subRepo, userId);
-
-    yield EntitlementState(
-      isPro: effectiveIsPro,
-      isTrial: serverSub?.isTrial ?? false,
-      periodEndsAt: serverSub?.currentPeriodEndsAt ?? serverSub?.trialEndsAt,
-    );
+/// Entitlement rule (data-model subscriptions; T057). When the server row exists it decides:
+/// `tier == 'pro' AND (period active OR active trial)`; an expired trial is free. RevenueCat's
+/// cache is used only before the webhook has created the row (e.g. seconds after a purchase).
+EntitlementState resolveEntitlement({required Subscription? server, bool? revenueCatIsPro, required DateTime now}) {
+  if (server == null) {
+    return (revenueCatIsPro ?? false) ? const EntitlementState(isPro: true, isTrial: false) : EntitlementState.free;
   }
-});
-
-Future<SubscriptionModel?> _fetchSub(
-  SubscriptionRepository repo,
-  String userId,
-) async {
-  SubscriptionModel? result;
-  await for (final sub in repo.watchSubscription(userId).take(1)) {
-    result = sub;
-  }
-  return result;
+  final isPro = SubscriptionDao.isProRow(server, now: now);
+  if (!isPro) return EntitlementState.free;
+  final trialActive = server.isTrial && (server.trialEndsAt?.isAfter(now) ?? false);
+  return EntitlementState(
+    isPro: true,
+    isTrial: trialActive,
+    periodEndsAt: trialActive ? server.trialEndsAt : server.currentPeriodEndsAt,
+  );
 }
+
+/// The signed-in user's entitlement, from the device cache of `subscriptions` (works offline).
+/// The cache is refreshed from the server on start and whenever RevenueCat reports a change.
+final entitlementProvider = StreamProvider<EntitlementState>((ref) {
+  final userId = ref.watch(currentUserIdProvider);
+  if (userId == null) return Stream.value(EntitlementState.free);
+  final repo = ref.watch(subscriptionRepositoryProvider);
+  final revenueCat = ref.watch(revenueCatServiceProvider);
+  final clock = ref.watch(clockProvider);
+
+  unawaited(repo.refreshFromServer(userId));
+  final changes = revenueCat.customerInfoStream.listen((_) => unawaited(repo.refreshFromServer(userId)));
+  ref.onDispose(changes.cancel);
+
+  return repo.watchRow(userId).asyncMap((row) async => resolveEntitlement(
+        server: row,
+        revenueCatIsPro: row == null ? await revenueCat.isPro() : null,
+        now: clock(),
+      ));
+});

@@ -19,7 +19,7 @@ description: "Task list for Tekto AI MVP (regenerated after spec clarifications 
 
 ## Progress (2026-11-15)
 
-**75 done / 52 open** of 127. Phases 1–5 (setup, foundations, US6 video library, US1 onboarding → first plan, US2 daily workout) have 2 open tasks, both external:
+**81 done / 46 open** of 127. Phases 1–5 (setup, foundations, US6 video library, US1 onboarding → first plan, US2 daily workout) have 2 open tasks, both external:
 
 
 - **T114** — staging Supabase project + Vault secrets (needs account access)
@@ -212,16 +212,16 @@ Not yet verified: the Pro AI plan path against the real Claude API (needs `ANTHR
 
 ### Tests for User Story 7 (write first, must fail)
 
-- [ ] T052 [P] [US7] Update `mobile/test/widget/paywall_screen_test.dart`: "Restore purchases" and cancel-anytime always rendered; prices from `priceString`; null offerings → purchase hidden, region message shown, restore still visible; the value video for the triggering feature (`form_check`, `coach`, `adaptive_plan`, else `general`) is shown, muted and looping, and works offline (FR-031); offline (`connectivity_plus` none) → purchase and restore disabled with the `paywall_offline` message
-- [ ] T053 [P] [US7] Move `mobile/test/unit/pro_gate_widget_test.dart` to `mobile/test/widget/pro_gate_widget_test.dart` and assert: when `WorkoutController.isWorkoutActive == true` the paywall is a bottom sheet and the workout screen stays visible; otherwise the full paywall opens
-- [ ] T054 [P] [US7] Create `mobile/test/unit/entitlement_test.dart`: `isPro` is `tier == 'pro' AND (current_period_ends_at > now() OR (is_trial AND trial_ends_at > now()))`; server `subscriptions.tier` wins over the RevenueCat cache on mismatch
+- [X] T052 [P] [US7] Update `mobile/test/widget/paywall_screen_test.dart`: "Restore purchases" and cancel-anytime always rendered; prices from `priceString`; null offerings → purchase hidden, region message shown, restore still visible; the value video for the triggering feature (`form_check`, `coach`, `adaptive_plan`, else `general`) is shown, muted and looping, and works offline (FR-031); offline (`connectivity_plus` none) → purchase and restore disabled with the `paywall_offline` message
+- [X] T053 [P] [US7] Move `mobile/test/unit/pro_gate_widget_test.dart` to `mobile/test/widget/pro_gate_widget_test.dart` and assert: when `WorkoutController.isWorkoutActive == true` the paywall is a bottom sheet and the workout screen stays visible; otherwise the full paywall opens
+- [X] T054 [P] [US7] Create `mobile/test/unit/entitlement_test.dart`: `isPro` is `tier == 'pro' AND (current_period_ends_at > now() OR (is_trial AND trial_ends_at > now()))`; server `subscriptions.tier` wins over the RevenueCat cache on mismatch
 - [X] T108 [P] [US7] Write failing tests `supabase/functions/revenuecat-webhook/handler.test.ts` per contracts/backend-api.md §6: rejects a wrong `Authorization` secret; `INITIAL_PURCHASE` → `tier = 'pro'`, `is_trial = false`; `RENEWAL` → `current_period_ends_at` updated; `TRIAL_STARTED` → `is_trial = true`, `trial_ends_at` set; `TRIAL_CONVERTED` → `is_trial = false`, `tier = 'pro'`; `CANCELLATION` → `cancelled_at` set, tier unchanged; `EXPIRATION` → `tier = 'free'`, period fields cleared; `BILLING_ISSUE` → logged, no downgrade; replays of the same event are idempotent
 
 ### Implementation for User Story 7
 
-- [ ] T055 [US7] Update `mobile/lib/features/subscription/ui/paywall_screen.dart` until T052 passes: remove hard-coded `$12.99` / `$79.99`; annual package selected by default; take a `PaywallFeature` argument and play the matching bundled clip from `mobile/assets/video/paywall_<feature>.mp4` (≤ 15 s, content workstream supplies the clips); add the `paywall_offline` key to `app_en.arb` / `app_fr.arb`
-- [ ] T056 [P] [US7] Update `mobile/lib/shared/widgets/pro_gate_widget.dart` until T053 passes
-- [ ] T057 [P] [US7] Update `mobile/lib/features/subscription/domain/entitlement_provider.dart` and `mobile/lib/features/subscription/data/subscription_repository.dart` until T054 passes
+- [X] T055 [US7] Update `mobile/lib/features/subscription/ui/paywall_screen.dart` until T052 passes: remove hard-coded `$12.99` / `$79.99`; annual package selected by default; take a `PaywallFeature` argument and play the matching bundled clip from `mobile/assets/video/paywall_<feature>.mp4` (≤ 15 s, content workstream supplies the clips); add the `paywall_offline` key to `app_en.arb` / `app_fr.arb`
+- [X] T056 [P] [US7] Update `mobile/lib/shared/widgets/pro_gate_widget.dart` until T053 passes
+- [X] T057 [P] [US7] Update `mobile/lib/features/subscription/domain/entitlement_provider.dart` and `mobile/lib/features/subscription/data/subscription_repository.dart` until T054 passes
 - [X] T109 [US7] Extract `supabase/functions/revenuecat-webhook/handler.ts` and update `revenuecat-webhook/index.ts` until T108 passes; verify `mobile/lib/features/subscription/ui/subscription_settings_screen.dart` shows tier, trial end, period end, "Manage subscription" deep link and "Restore purchases"
 
 **Checkpoint**: Quickstart Scenario 6 passes in the App Store and Play sandboxes.

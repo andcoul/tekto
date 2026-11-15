@@ -204,10 +204,8 @@ GoRouter appRouter(Ref ref) {
       // ── Paywall ─────────────────────────────────────────────────────────
       GoRoute(
         path: '/paywall',
-        builder: (context, state) {
-          // Feature-specific copy is chosen by the caller via ProGateWidget (T055/T056).
-          return const PaywallScreen();
-        },
+        // Feature-specific clip and copy: /paywall?feature=form_check|coach|adaptive_plan|general.
+        builder: (context, state) => PaywallScreen(feature: PaywallFeature.fromKey(state.uri.queryParameters['feature'])),
       ),
 
       // ── Plan adaptation ─────────────────────────────────────────────────

@@ -19,8 +19,11 @@ class SubscriptionDao extends DatabaseAccessor<AppDatabase> with _$SubscriptionD
 
   /// data-model rule: `tier == 'pro' AND (current_period_ends_at > now() OR
   /// (is_trial AND trial_ends_at > now()))`.
-  bool isPro(Subscription? sub, {DateTime? now}) {
-    if (sub == null || sub.tier != 'pro') return false;
+  bool isPro(Subscription? sub, {DateTime? now}) => sub != null && isProRow(sub, now: now);
+
+  /// The same rule as a static, for code that already holds the row.
+  static bool isProRow(Subscription sub, {DateTime? now}) {
+    if (sub.tier != 'pro') return false;
     final at = now ?? DateTime.now();
     final periodActive = sub.currentPeriodEndsAt?.isAfter(at) ?? false;
     final trialActive = sub.isTrial && (sub.trialEndsAt?.isAfter(at) ?? false);

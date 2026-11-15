@@ -1,77 +1,52 @@
 import 'package:drift/drift.dart' show Value;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:tekto/shared/models/subscription_model.dart';
-import 'package:tekto/shared/services/local_db/database.dart';
-import 'package:tekto/shared/services/local_db/daos/subscription_dao.dart';
 
-/// Reads the user's subscription state.
-///
-/// Source of truth: Supabase `subscriptions` table (written by the RevenueCat
-/// webhook). The local Drift cache is kept in sync for offline access.
-///
-/// `isPro` = tier == 'pro' AND the period has not yet expired, OR an active
-/// trial period is still running.
+import '../../../core/di/providers.dart';
+import '../../../shared/services/api/supabase_client.dart';
+import '../../../shared/services/local_db/daos/subscription_dao.dart';
+import '../../../shared/services/local_db/database.dart';
+
+/// The user's subscription row. Source of truth: Supabase `subscriptions` (written by the
+/// RevenueCat webhook); the device cache serves offline reads (Constitution I).
 class SubscriptionRepository {
-  const SubscriptionRepository({
-    required SubscriptionDao subscriptionDao,
-  }) : _dao = subscriptionDao;
+  SubscriptionRepository({required SubscriptionDao subscriptionDao, required TektoDioClient api})
+      : _dao = subscriptionDao,
+        _api = api;
 
   final SubscriptionDao _dao;
+  final TektoDioClient _api;
 
-  /// Stream of the current user's subscription, updated whenever the DB row
-  /// changes.
-  Stream<SubscriptionModel?> watchSubscription(String userId) =>
-      _dao.watchForUser(userId).map((row) => row == null ? null : _toModel(row));
+  /// The cached row; emits again whenever it changes.
+  Stream<Subscription?> watchRow(String userId) => _dao.watchForUser(userId);
 
-  /// Returns true when the current subscription grants Pro entitlement.
-  Future<bool> isPro(String userId) async {
-    final sub = await _dao.getForUser(userId);
-    if (sub == null) return false;
-    return _isPro(_toModel(sub));
-  }
-
-  /// Upsert a subscription record — called by the entitlement provider when
-  /// RevenueCat SDK reports a customer-info update.
-  Future<void> upsert(SubscriptionModel model) => _dao.upsert(SubscriptionsCompanion.insert(
-        id: model.id,
-        userId: model.userId,
-        tier: Value(model.tier),
-        isTrial: Value(model.isTrial),
-        trialEndsAt: Value(model.trialEndsAt),
-        currentPeriodEndsAt: Value(model.currentPeriodEndsAt),
-        cancelledAt: Value(model.cancelledAt),
-        revenuecatCustomerId: Value(model.revenuecatCustomerId),
-        createdAt: Value(model.createdAt),
-        updatedAt: Value(model.updatedAt),
+  /// Copies the server row to the device cache. Offline or on error the cache is kept.
+  Future<void> refreshFromServer(String userId) async {
+    try {
+      final response = await _api.get<List<dynamic>>('/rest/v1/subscriptions',
+          queryParameters: {'select': '*', 'user_id': 'eq.$userId', 'limit': '1'});
+      final rows = (response.data ?? const []).cast<Map<String, dynamic>>();
+      if (rows.isEmpty) return;
+      final r = rows.single;
+      DateTime? date(Object? v) => v == null ? null : DateTime.parse(v as String).toLocal();
+      await _dao.upsert(SubscriptionsCompanion.insert(
+        id: r['id'] as String,
+        userId: r['user_id'] as String,
+        tier: Value(r['tier'] as String? ?? 'free'),
+        isTrial: Value(r['is_trial'] as bool? ?? false),
+        trialEndsAt: Value(date(r['trial_ends_at'])),
+        currentPeriodEndsAt: Value(date(r['current_period_ends_at'])),
+        cancelledAt: Value(date(r['cancelled_at'])),
+        revenuecatCustomerId: Value(r['revenuecat_customer_id'] as String?),
+        createdAt: Value(date(r['created_at']) ?? DateTime.now()),
+        updatedAt: Value(date(r['updated_at']) ?? DateTime.now()),
       ));
-
-  static SubscriptionModel _toModel(Subscription r) => SubscriptionModel(
-        id: r.id,
-        userId: r.userId,
-        tier: r.tier,
-        isTrial: r.isTrial,
-        trialEndsAt: r.trialEndsAt,
-        currentPeriodEndsAt: r.currentPeriodEndsAt,
-        cancelledAt: r.cancelledAt,
-        revenuecatCustomerId: r.revenuecatCustomerId,
-        createdAt: r.createdAt,
-        updatedAt: r.updatedAt,
-      );
-
-  static bool _isPro(SubscriptionModel s) {
-    if (s.tier != 'pro') return false;
-    final now = DateTime.now();
-    if (s.isTrial && s.trialEndsAt != null) {
-      return s.trialEndsAt!.isAfter(now);
+    } on Object {
+      // Offline: keep the cached row.
     }
-    if (s.currentPeriodEndsAt != null) {
-      return s.currentPeriodEndsAt!.isAfter(now);
-    }
-    return false;
   }
 }
 
-/// Riverpod provider — resolved in `core/di/providers.dart`.
-final subscriptionRepositoryProvider = Provider<SubscriptionRepository>((ref) {
-  throw UnimplementedError('Override in ProviderScope');
-});
+final subscriptionRepositoryProvider = Provider<SubscriptionRepository>((ref) => SubscriptionRepository(
+      subscriptionDao: SubscriptionDao(ref.watch(appDatabaseProvider)),
+      api: ref.watch(dioClientProvider),
+    ));

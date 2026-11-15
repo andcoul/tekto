@@ -214,5 +214,13 @@
   "progressBalance": "Poussée {push} · Tirage {pull}",
   "progressLogBodyWeight": "Noter mon poids",
   "progressSave": "Enregistrer",
-  "progressNoBodyWeight": "Aucune mesure pour l'instant."
+  "progressNoBodyWeight": "Aucune mesure pour l'instant.",
+  "paywallOffline": "Connectez-vous à Internet pour commencer votre essai.",
+  "paywallSave": "Économisez {percent} %",
+  "paywallContinueWorkout": "Continuer la séance",
+  "paywallRestoreFailed": "Impossible de restaurer les achats. Réessayez plus tard.",
+  "paywallFeatureFormCheck": "Une analyse de forme en temps réel sur vos mouvements clés.",
+  "paywallFeatureCoach": "Des questions illimitées à votre coach IA.",
+  "paywallFeatureAdaptivePlan": "Un programme qui s'adapte à vous chaque semaine.",
+  "paywallFeatureGeneral": "Programmes IA, coach, analyse de forme et vidéos hors ligne."
 }

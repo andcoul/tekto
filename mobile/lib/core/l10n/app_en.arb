@@ -365,5 +365,14 @@
   "@progressBalance": {"placeholders": {"push": {"type": "int"}, "pull": {"type": "int"}}},
   "progressLogBodyWeight": "Log body weight",
   "progressSave": "Save",
-  "progressNoBodyWeight": "No entries yet."
+  "progressNoBodyWeight": "No entries yet.",
+  "paywallOffline": "Connect to the internet to start your trial.",
+  "paywallSave": "Save {percent}%",
+  "@paywallSave": {"placeholders": {"percent": {"type": "int"}}},
+  "paywallContinueWorkout": "Continue workout",
+  "paywallRestoreFailed": "Couldn't restore purchases. Try again later.",
+  "paywallFeatureFormCheck": "Real-time form feedback on your key lifts.",
+  "paywallFeatureCoach": "Unlimited questions to your AI coach.",
+  "paywallFeatureAdaptivePlan": "A plan that adapts to you every week.",
+  "paywallFeatureGeneral": "AI plans, coach, form check and offline video."
 }
