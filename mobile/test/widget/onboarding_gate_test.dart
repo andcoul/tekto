@@ -16,7 +16,7 @@ class FakeApi implements OnboardingApi {
   @override
   Future<void> saveProfile(Map<String, dynamic> profile) async => saved = profile;
   @override
-  Future<GeneratedPlanInfo> generatePlan() async =>
+  Future<GeneratedPlanInfo> generatePlan({bool forceRegenerate = false}) async =>
       const GeneratedPlanInfo(planId: 'p1', source: 'template', fallbackNotice: false, notices: ['free_plan_days_capped']);
   @override
   Future<String> deviceTimezone() async => 'Europe/Paris';
@@ -50,6 +50,11 @@ void main() {
     test('the quiz cannot start until consent is given', () {
       expect(onboardingRedirect(location: '/onboarding/quiz', disclaimerAccepted: true, consentGiven: false), '/onboarding/consent');
       expect(onboardingRedirect(location: '/onboarding/quiz', disclaimerAccepted: true, consentGiven: true), isNull);
+    });
+    test('the trial offer is shown only right after this session generated a plan (FR-004)', () {
+      expect(onboardingRedirect(location: '/onboarding/trial', disclaimerAccepted: true, consentGiven: true, planGenerated: true), isNull);
+      // A later app open: no plan generated in this session → never shown again.
+      expect(onboardingRedirect(location: '/onboarding/trial', disclaimerAccepted: true, consentGiven: true), '/home');
     });
     test('other routes are not affected', () {
       expect(onboardingRedirect(location: '/onboarding/disclaimer', disclaimerAccepted: false, consentGiven: false), isNull);

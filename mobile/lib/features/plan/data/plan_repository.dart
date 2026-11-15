@@ -74,6 +74,8 @@ class PlanRepository {
       lastAdaptedWeek: Value(row['last_adapted_week'] as int? ?? 0),
       source: Value(row['source'] as String? ?? 'ai'),
       templateSlug: Value(row['template_slug'] as String?),
+      rationaleEn: Value(row['rationale_en'] as String?),
+      rationaleFr: Value(row['rationale_fr'] as String?),
     ));
   }
 

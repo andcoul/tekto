@@ -320,5 +320,9 @@
         "type": "String"
       }
     }
-  }
+  },
+  "welcomeTitle": "Build your strength",
+  "welcomeBody": "Your plan, real video for every move, form feedback and a coach — in one app.",
+  "welcomeGetStarted": "Get started",
+  "welcomeSkip": "Skip"
 }

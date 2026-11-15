@@ -6,6 +6,7 @@ import '../../../core/di/providers.dart';
 import '../../../core/l10n/gen/app_localizations.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../subscription/domain/pro_offers.dart';
+import '../domain/onboarding_controller.dart';
 
 /// Skippable post-plan trial offer (FR-004, T043). Never blocks the plan: "Skip for now" is
 /// always visible. Prices come from the store (FR-032); Restore and cancel-anytime are always
@@ -23,15 +24,15 @@ class _TrialOfferScreenState extends ConsumerState<TrialOfferScreen> {
   String? _error;
 
   Future<void> _purchase(ProOffer offer) async {
-    if (offer.package == null) return;
     setState(() {
       _busy = true;
       _error = null;
     });
     try {
-      await ref.read(revenueCatServiceProvider).purchasePackage(offer.package!);
-      if (mounted) context.go('/plan');
-    } on Exception {
+      await ref.read(proPurchaseProvider)(offer);
+      // Trial started: replace the template plan with an AI plan (FR-004).
+      if (mounted) context.go('/onboarding/generating?upgrade=1');
+    } on Object {
       if (mounted)
         setState(
             () => _error = AppLocalizations.of(context).paywallPurchaseFailed);
@@ -55,6 +56,11 @@ class _TrialOfferScreenState extends ConsumerState<TrialOfferScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final offers = ref.watch(proOffersProvider);
+    final rationale = ref
+            .watch(onboardingControllerProvider)
+            .result
+            ?.rationaleFor(Localizations.localeOf(context).languageCode) ??
+        '';
 
     return Scaffold(
       body: SafeArea(
@@ -73,6 +79,14 @@ class _TrialOfferScreenState extends ConsumerState<TrialOfferScreen> {
                 Text(l10n.trialTitle,
                     style: Theme.of(context).textTheme.displayMedium,
                     textAlign: TextAlign.center),
+                // Why this plan fits (FR-044), right after generation.
+                if (rationale.isNotEmpty) ...[
+                  const SizedBox(height: AppSpacing.sm),
+                  Text(rationale,
+                      key: const Key('plan-rationale'),
+                      style: Theme.of(context).textTheme.bodyLarge,
+                      textAlign: TextAlign.center),
+                ],
                 const SizedBox(height: AppSpacing.sm),
                 Text(l10n.trialSubtitle, textAlign: TextAlign.center),
                 const SizedBox(height: AppSpacing.xl),

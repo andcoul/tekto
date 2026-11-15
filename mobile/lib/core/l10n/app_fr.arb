@@ -178,5 +178,9 @@
   "workoutTargetReps": "{min}–{max} rép.",
   "homeEstimatedMin": "{minutes} min",
   "workoutSetDone": "{weight} {unit} × {reps}",
-  "workoutVolumeValue": "{value} {unit}"
+  "workoutVolumeValue": "{value} {unit}",
+  "welcomeTitle": "Construisez votre force",
+  "welcomeBody": "Votre programme, une vraie vidéo pour chaque mouvement, l'analyse de votre forme et un coach — dans une seule app.",
+  "welcomeGetStarted": "Commencer",
+  "welcomeSkip": "Passer"
 }

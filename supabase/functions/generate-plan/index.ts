@@ -133,6 +133,8 @@ Deno.serve(async (req: Request) => {
         start_date: startDate,
         source: result.source,
         template_slug: result.template_slug,
+        rationale_en: result.rationale_en,
+        rationale_fr: result.rationale_fr,
         fallback_notice: result.fallback_notice,
         notices: result.notices,
         sessions,

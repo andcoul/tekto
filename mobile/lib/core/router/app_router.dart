@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../features/auth/data/auth_service.dart';
+import '../../features/auth/data/user_profile_provider.dart';
 import '../../features/auth/ui/auth_screen.dart';
 import '../../features/coach/ui/coach_screen.dart';
 import '../../features/form_check/ui/form_check_screen.dart';
@@ -18,6 +18,7 @@ import '../../features/onboarding/ui/health_disclaimer_screen.dart';
 import '../../features/onboarding/ui/onboarding_quiz_screen.dart';
 import '../../features/onboarding/ui/plan_generation_screen.dart';
 import '../../features/onboarding/ui/trial_offer_screen.dart';
+import '../../features/onboarding/ui/welcome_screen.dart';
 import '../../features/plan/domain/adaptation_provider.dart';
 import '../../features/plan/ui/adaptation_summary_screen.dart';
 import '../../features/plan/ui/plan_overview_screen.dart';
@@ -31,15 +32,6 @@ import '../../features/workout/ui/workout_summary_screen.dart';
 import '../../shared/services/form_check/form_score_calculator.dart';
 
 part 'app_router.g.dart';
-
-/// The signed-in user's `users` row (null before onboarding saves it). Drives onboarding
-/// entry and re-consent in the router.
-@riverpod
-Future<Map<String, dynamic>?> userProfile(Ref ref) async {
-  final user = ref.watch(authStateProvider).value;
-  if (user == null) return null;
-  return Supabase.instance.client.from('users').select('consent_version').eq('id', user.id).maybeSingle();
-}
 
 @Riverpod(keepAlive: true)
 GoRouter appRouter(Ref ref) {
@@ -61,8 +53,8 @@ GoRouter appRouter(Ref ref) {
       final profile = ref.read(userProfileProvider);
       final onboarding = ref.read(onboardingControllerProvider);
 
-      // 1. Everything except /auth needs a signed-in user (the profile is saved per user).
-      if (!isAuthenticated) return location == '/auth' ? null : '/auth';
+      // 1. Signed out: only the welcome screen and sign-in (the profile is saved per user).
+      if (!isAuthenticated) return signedOutRedirect(location);
 
       final inOnboarding = location.startsWith('/onboarding');
       if (profile.hasValue) {
@@ -74,13 +66,14 @@ GoRouter appRouter(Ref ref) {
           return '/onboarding/reconsent';
         }
       }
-      if (location == '/auth') return '/home';
+      if (location == '/auth' || location == '/onboarding/welcome') return '/home';
 
       // 4. Disclaimer → consent → quiz order (Constitution II/III).
       return onboardingRedirect(
         location: location,
         disclaimerAccepted: onboarding.disclaimerAccepted,
         consentGiven: onboarding.consentGiven,
+        planGenerated: onboarding.result != null,
       );
     },
     routes: [
@@ -91,6 +84,10 @@ GoRouter appRouter(Ref ref) {
       ),
 
       // ── Onboarding ──────────────────────────────────────────────────────
+      GoRoute(
+        path: '/onboarding/welcome',
+        builder: (context, state) => const WelcomeScreen(),
+      ),
       GoRoute(
         path: '/onboarding/disclaimer',
         builder: (context, state) => const HealthDisclaimerScreen(),
@@ -109,7 +106,8 @@ GoRouter appRouter(Ref ref) {
       ),
       GoRoute(
         path: '/onboarding/generating',
-        builder: (context, state) => const PlanGenerationScreen(),
+        // `?upgrade=1`: a trial was just started → regenerate as an AI plan (FR-004).
+        builder: (context, state) => PlanGenerationScreen(upgrade: state.uri.queryParameters['upgrade'] == '1'),
       ),
       GoRoute(
         path: '/onboarding/trial',

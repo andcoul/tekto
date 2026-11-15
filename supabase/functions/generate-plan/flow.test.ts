@@ -146,3 +146,19 @@ Deno.test('PLAN_VALIDATION_FAILED and AI_UNAVAILABLE are never returned', async 
     assert(r.ok, 'onboarding must always end with a plan');
   }
 });
+
+Deno.test('every source returns a rationale in both languages (FR-044)', async () => {
+  const free = await runGeneratePlan(input({ isPro: false }), deps([]).d);
+  const ppl = TEMPLATES.find((t) => t.slug === 'intermediate-ppl-4x')!;
+  assert(free.ok);
+  assertEquals([free.rationale_en, free.rationale_fr], [ppl.rationale_en, ppl.rationale_fr]);
+
+  const ai = await runGeneratePlan(input(), deps([{ ...aiPlan(), rationale_en: 'Fits your 3 days.', rationale_fr: 'Adapté à vos 3 jours.' }]).d);
+  assert(ai.ok);
+  assertEquals([ai.rationale_en, ai.rationale_fr], ['Fits your 3 days.', 'Adapté à vos 3 jours.']);
+
+  const fallback = await runGeneratePlan(input(), deps([new Error('503')]).d);
+  assert(fallback.ok);
+  assertEquals(fallback.source, 'template_fallback');
+  assert(fallback.rationale_en.length > 0 && fallback.rationale_fr.length > 0);
+});

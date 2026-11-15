@@ -16,18 +16,32 @@ const kStrengthLifts = ['squat', 'bench_press', 'deadlift'];
 
 /// Result of `generate-plan` that the next screens need (contracts/backend-api.md §1).
 class GeneratedPlanInfo {
-  const GeneratedPlanInfo({required this.planId, required this.source, required this.fallbackNotice, required this.notices});
+  const GeneratedPlanInfo({
+    required this.planId,
+    required this.source,
+    required this.fallbackNotice,
+    required this.notices,
+    this.rationaleEn = '',
+    this.rationaleFr = '',
+  });
   final String planId;
   final String source;
   final bool fallbackNotice;
   final List<String> notices;
+
+  /// Why the plan fits the user (FR-044); empty when the server sent none.
+  final String rationaleEn;
+  final String rationaleFr;
+
+  String rationaleFor(String languageCode) => languageCode == 'fr' ? rationaleFr : rationaleEn;
 }
 
 /// Backend calls made by onboarding; injectable for tests.
 abstract class OnboardingApi {
   /// Upserts the `users` row for the signed-in user.
   Future<void> saveProfile(Map<String, dynamic> profile);
-  Future<GeneratedPlanInfo> generatePlan();
+  /// `forceRegenerate` replaces the active plan (used after a trial starts — FR-004).
+  Future<GeneratedPlanInfo> generatePlan({bool forceRegenerate = false});
   Future<String> deviceTimezone();
 }
 
@@ -44,10 +58,10 @@ class SupabaseOnboardingApi implements OnboardingApi {
   }
 
   @override
-  Future<GeneratedPlanInfo> generatePlan() async {
+  Future<GeneratedPlanInfo> generatePlan({bool forceRegenerate = false}) async {
     final response = await _ref.read(dioClientProvider).post<Map<String, dynamic>>(
           '/functions/v1/generate-plan',
-          data: const <String, dynamic>{},
+          data: <String, dynamic>{if (forceRegenerate) 'force_regenerate': true},
         );
     final plan = response.data!['plan'] as Map<String, dynamic>;
     return GeneratedPlanInfo(
@@ -55,6 +69,8 @@ class SupabaseOnboardingApi implements OnboardingApi {
       source: plan['source'] as String,
       fallbackNotice: plan['fallback_notice'] as bool? ?? false,
       notices: (plan['notices'] as List? ?? const []).cast<String>(),
+      rationaleEn: plan['rationale_en'] as String? ?? '',
+      rationaleFr: plan['rationale_fr'] as String? ?? '',
     );
   }
 
@@ -81,6 +97,7 @@ class OnboardingState {
     this.isLoading = false,
     this.error,
     this.result,
+    this.upgradeResult,
   });
 
   final bool disclaimerAccepted;
@@ -101,6 +118,9 @@ class OnboardingState {
   final bool isLoading;
   final String? error;
   final GeneratedPlanInfo? result;
+
+  /// The plan generated after a trial started during onboarding (FR-004); null until then.
+  final GeneratedPlanInfo? upgradeResult;
 
   bool get consentGiven => consentAt != null;
 
@@ -130,6 +150,7 @@ class OnboardingState {
     bool? isLoading,
     String? error,
     GeneratedPlanInfo? result,
+    GeneratedPlanInfo? upgradeResult,
   }) =>
       OnboardingState(
         disclaimerAccepted: disclaimerAccepted ?? this.disclaimerAccepted,
@@ -146,6 +167,7 @@ class OnboardingState {
         isLoading: isLoading ?? this.isLoading,
         error: error,
         result: result ?? this.result,
+        upgradeResult: upgradeResult ?? this.upgradeResult,
       );
 }
 
@@ -213,6 +235,25 @@ class OnboardingController extends _$OnboardingController {
       await api.saveProfile(profileRow(timezone: timezone));
       final result = await api.generatePlan();
       state = state.copyWith(isLoading: false, result: result);
+    } on Exception catch (e) {
+      state = state.copyWith(isLoading: false, error: e.toString());
+    }
+  }
+
+  /// After a trial starts during onboarding, replaces the template plan with an AI plan
+  /// (FR-004). The server reads Pro status from `subscriptions`, which the RevenueCat webhook
+  /// updates a few seconds after purchase, so a plain `template` answer is retried up to
+  /// [attempts] times. A `template_fallback` answer is final (the AI was tried and failed).
+  Future<void> upgradeToAiPlan({int attempts = 3, Duration retryDelay = const Duration(seconds: 2)}) async {
+    state = state.copyWith(isLoading: true);
+    final api = ref.read(onboardingApiProvider);
+    try {
+      var result = await api.generatePlan(forceRegenerate: true);
+      for (var i = 1; i < attempts && result.source == 'template'; i++) {
+        await Future<void>.delayed(retryDelay);
+        result = await api.generatePlan(forceRegenerate: true);
+      }
+      state = state.copyWith(isLoading: false, upgradeResult: result);
     } on Exception catch (e) {
       state = state.copyWith(isLoading: false, error: e.toString());
     }

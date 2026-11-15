@@ -48,6 +48,12 @@ class PlanOverviewScreen extends ConsumerWidget {
                     children: [
                       Text(plan.name,
                           style: Theme.of(context).textTheme.headlineMedium),
+                      // Why this plan fits (FR-044).
+                      if ((Localizations.localeOf(context).languageCode == 'fr' ? plan.rationaleFr : plan.rationaleEn)
+                          case final rationale? when rationale.isNotEmpty) ...[
+                        const SizedBox(height: AppSpacing.xs),
+                        Text(rationale, style: Theme.of(context).textTheme.bodyMedium),
+                      ],
                       const SizedBox(height: 4),
                       Text(
                         'Week ${plan.currentWeek} of ${plan.weeksTotal}',

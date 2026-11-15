@@ -99,6 +99,7 @@ flutter:
   assets:
     - assets/images/
     - assets/icons/
+    - assets/video/   # welcome + paywall clips with EN/FR captions (FR-031, FR-043)
 
   # TECH DEBT (Constitution VII): the Inter font files were never added to assets/fonts/.
   # Until they are (Inter is SIL OFL — https://github.com/rsms/inter), the theme's

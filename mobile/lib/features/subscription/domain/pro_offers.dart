@@ -17,6 +17,17 @@ class ProOffer {
   final Package? package;
 }
 
+/// Buys a Pro offer through the store; throws when the purchase fails or is cancelled.
+typedef ProPurchase = Future<void> Function(ProOffer offer);
+
+/// Store purchase seam: the default buys through RevenueCat; widget tests override it.
+@riverpod
+ProPurchase proPurchase(Ref ref) => (offer) async {
+      final package = offer.package;
+      if (package == null) throw StateError('Offer has no store package');
+      await ref.read(revenueCatServiceProvider).purchasePackage(package);
+    };
+
 /// Pro offers in the current storefront, annual first; null when Pro is not sold there
 /// (paywalls then hide purchase buttons but keep Restore — contracts/ai-services.md §4).
 @riverpod
