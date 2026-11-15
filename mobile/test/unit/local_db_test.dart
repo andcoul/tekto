@@ -15,6 +15,30 @@ void main() {
   setUp(() => db = AppDatabase.forTesting(NativeDatabase.memory()));
   tearDown(() => db.close());
 
+  test('schema v1 → v2 adds plan_exercises.rir_target and body_weight_entries, keeping data', () async {
+    final dir = await Directory.systemTemp.createTemp('tekto_migration');
+    addTearDown(() => dir.delete(recursive: true));
+    final file = File('${dir.path}/db.sqlite');
+
+    // Build a v2 file, then roll it back to the v1 shape.
+    final v2 = AppDatabase.forTesting(NativeDatabase(file));
+    await v2.customStatement("INSERT INTO plan_exercises (id, session_id, exercise_slug, sets, reps_min, reps_max) VALUES ('pe1', 's1', 'goblet-squat', 3, 8, 12)");
+    await v2.customStatement('DROP TABLE body_weight_entries');
+    await v2.customStatement('ALTER TABLE plan_exercises DROP COLUMN rir_target');
+    await v2.customStatement('PRAGMA user_version = 1');
+    await v2.close();
+
+    final upgraded = AppDatabase.forTesting(NativeDatabase(file));
+    addTearDown(upgraded.close);
+    final columns = await upgraded.customSelect('PRAGMA table_info(plan_exercises)').get();
+    expect(columns.map((c) => c.read<String>('name')), contains('rir_target'));
+    final kept = await upgraded.select(upgraded.planExercises).getSingle();
+    expect([kept.id, kept.rirTarget], ['pe1', null]);
+    await upgraded.into(upgraded.bodyWeightEntries).insert(BodyWeightEntriesCompanion.insert(
+          id: 'bw1', userId: 'u1', weightKg: 80, measuredOn: DateTime(2026, 11, 15)));
+    expect(await upgraded.select(upgraded.bodyWeightEntries).get(), hasLength(1));
+  });
+
   test('the bundled SQLite is SQLCipher (Constitution II)', () async {
     final row = await db.customSelect('PRAGMA cipher_version;').getSingleOrNull();
     expect(row, isNotNull, reason: 'pubspec hooks must build sqlite3 with source: sqlcipher');

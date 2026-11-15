@@ -328,5 +328,17 @@
   "swapTitle": "Swap exercise",
   "swapNoAlternatives": "No alternative fits your equipment and limitations.",
   "swapNotAllowed": "This exercise can't replace the current one.",
-  "swapFailed": "Couldn't swap the exercise. Check your connection and try again."
+  "swapFailed": "Couldn't swap the exercise. Check your connection and try again.",
+  "workoutTargetRpe": "Target RPE {rpe}",
+  "@workoutTargetRpe": {"placeholders": {"rpe": {"type": "String"}}},
+  "workoutTargetRir": "RIR {rir} (≈ RPE {rpe})",
+  "@workoutTargetRir": {"placeholders": {"rir": {"type": "int"}, "rpe": {"type": "String"}}},
+  "platesTitle": "Plate calculator",
+  "platesWeightLabel": "Weight",
+  "platesPerSide": "Per side",
+  "platesEmptyBar": "Empty bar",
+  "platesBar": "Bar: {bar}",
+  "@platesBar": {"placeholders": {"bar": {"type": "String"}}},
+  "platesNotExact": "{weight} can't be loaded exactly — nearest is {nearest}",
+  "@platesNotExact": {"placeholders": {"weight": {"type": "String"}, "nearest": {"type": "String"}}}
 }

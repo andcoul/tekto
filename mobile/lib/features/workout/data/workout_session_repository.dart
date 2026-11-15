@@ -125,6 +125,7 @@ class WorkoutSessionRepository {
         repsMax: slot.repsMax,
         restSec: slot.restSec,
         rpeTarget: slot.rpeTarget,
+        rirTarget: slot.rirTarget,
         suggestedWeightKg: slot.suggestedWeightKg,
         videoUrl: e?.videoFrontUrl,
         captions: {
@@ -134,6 +135,7 @@ class WorkoutSessionRepository {
         localVideoPath: d?.localPath,
         localCaptions: d == null ? const {} : (jsonDecode(d.captionsLocalPaths) as Map).cast<String, String>(),
         formCheckSupported: e?.formCheckSupported ?? false,
+        equipment: e == null ? const [] : _strings(e.equipment),
       );
 
   static List<String> _strings(String json) => (jsonDecode(json) as List).cast<String>();

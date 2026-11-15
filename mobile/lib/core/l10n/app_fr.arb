@@ -186,5 +186,13 @@
   "swapTitle": "Remplacer l'exercice",
   "swapNoAlternatives": "Aucune alternative ne correspond à votre équipement et à vos limitations.",
   "swapNotAllowed": "Cet exercice ne peut pas remplacer l'exercice actuel.",
-  "swapFailed": "Impossible de remplacer l'exercice. Vérifiez votre connexion et réessayez."
+  "swapFailed": "Impossible de remplacer l'exercice. Vérifiez votre connexion et réessayez.",
+  "workoutTargetRpe": "RPE cible {rpe}",
+  "workoutTargetRir": "RIR {rir} (≈ RPE {rpe})",
+  "platesTitle": "Calculateur de disques",
+  "platesWeightLabel": "Charge",
+  "platesPerSide": "Par côté",
+  "platesEmptyBar": "Barre seule",
+  "platesBar": "Barre : {bar}",
+  "platesNotExact": "Impossible de charger exactement {weight} — le plus proche est {nearest}"
 }

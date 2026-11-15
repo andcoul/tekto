@@ -9,9 +9,11 @@ import '../../../core/theme/app_theme.dart';
 import '../../../shared/widgets/rest_timer_widget.dart';
 import '../../../shared/widgets/set_log_row.dart';
 import '../../../shared/models/exercise_model.dart';
+import '../../../shared/utils/weight_units.dart';
 import '../../../shared/widgets/video_player_widget.dart';
 import '../../plan/domain/plan_provider.dart';
 import '../../plan/ui/exercise_swap_sheet.dart';
+import 'plate_calculator_sheet.dart';
 import '../../subscription/domain/entitlement_provider.dart';
 import '../domain/live_session.dart';
 import '../domain/workout_controller.dart';
@@ -156,6 +158,20 @@ class _LiveWorkoutScreenState extends ConsumerState<LiveWorkoutScreen> {
     );
   }
 
+  /// 7.0 → "7", 7.5 → "7.5".
+  static String _rpe(num v) => v == v.roundToDouble() ? v.round().toString() : v.toString();
+
+  /// Plate calculator for the current set's weight, in the user's unit (FR-042). A bottom sheet,
+  /// never a dialog over the set (Constitution VI).
+  void _openPlates(LiveExercise ex, String unit) {
+    final weight = kgToUnit(ex.suggestedWeightKg ?? 0, unit);
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      builder: (_) => PlateCalculatorSheet(initialWeight: weight, unit: unit),
+    );
+  }
+
   /// Opens the swap sheet; on success refreshes the cached plan and reloads this session.
   Future<void> _openSwap(String planExerciseId, String slug) async {
     final prefs = ref.read(userPrefsProvider).value ?? const UserPrefs();
@@ -234,6 +250,12 @@ class _LiveWorkoutScreenState extends ConsumerState<LiveWorkoutScreen> {
                   tooltip: l.swapTitle,
                   onPressed: isOnline ? () => _openSwap(ex.planExerciseId, ex.slug) : null,
                 ),
+              if (ex.usesBarbell)
+                IconButton(
+                  icon: const Icon(Icons.calculate_outlined),
+                  tooltip: l.platesTitle,
+                  onPressed: () => _openPlates(ex, unit),
+                ),
               if (ex.formCheckSupported)
                 IconButton(
                   icon: const Icon(Icons.videocam_outlined),
@@ -242,10 +264,20 @@ class _LiveWorkoutScreenState extends ConsumerState<LiveWorkoutScreen> {
                 ),
             ]),
             const SizedBox(height: AppSpacing.sm),
-            Text(
-              l.workoutSetOf((logged.length + 1).clamp(1, ex.sets), ex.sets),
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
+            // Same line as the set counter so the logged rows (and their PR badges) stay on screen.
+            Row(children: [
+              Expanded(
+                child: Text(
+                  l.workoutSetOf((logged.length + 1).clamp(1, ex.sets), ex.sets),
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+              ),
+              // Effort target (FR-007): RIR targets also show the RPE they correspond to.
+              if (ex.rirTarget case final rir?)
+                Text(l.workoutTargetRir(rir, _rpe(10 - rir)), key: const Key('effort-target'))
+              else if (ex.rpeTarget case final rpe?)
+                Text(l.workoutTargetRpe(_rpe(rpe)), key: const Key('effort-target')),
+            ]),
             const SizedBox(height: AppSpacing.sm),
             for (final cue in ex.keyCues(lang)) _CueBubble(text: cue),
             const SizedBox(height: AppSpacing.sm),

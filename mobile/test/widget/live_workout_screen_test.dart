@@ -94,6 +94,13 @@ void main() {
 
   Finder primaryActions() => find.byType(ElevatedButton);
 
+  /// Scrolls the exercise list until [finder] is built (the list builds lazily; the logged rows
+  /// sit below the rest timer on a 360×780 dp phone).
+  Future<void> scrollTo(WidgetTester tester, Finder finder) async {
+    await tester.scrollUntilVisible(finder, 120, scrollable: find.byType(Scrollable).last);
+    await tester.pump();
+  }
+
   Future<List<SetLog>> setLogs() async =>
       (await t.runAsync(() => (db.select(db.setLogs)..orderBy([(s) => OrderingTerm.asc(s.loggedAt)])).get()))!;
 
@@ -257,6 +264,7 @@ void main() {
     await pumpWorkout(tester);
 
     await logCurrentSet(tester, weight: '18'); // no record yet → PR
+    await scrollTo(tester, find.text('New PR! 🎉'));
 
     expect(find.text('New PR! 🎉'), findsOneWidget);
     expect(find.byType(Dialog), findsNothing);
@@ -272,6 +280,7 @@ void main() {
     await tester.pump();
 
     await logCurrentSet(tester, weight: '14');
+    await scrollTo(tester, find.text('New PR! 🎉'));
 
     expect(find.text('New PR! 🎉'), findsOneWidget, reason: 'only set 1 keeps its badge');
     expect((await setLogs()).map((s) => s.isPr), [true, false]);
@@ -308,6 +317,39 @@ void main() {
     expect(find.text('1:00'), findsNothing, reason: 'no rest after the final set');
     expect(primaryActions(), findsOneWidget);
     expect(find.widgetWithText(ElevatedButton, 'Finish workout'), findsOneWidget);
+    await unmount(tester);
+  });
+
+  testWidgets('barbell exercises offer the plate calculator; others do not (FR-042)', (tester) async {
+    await setUpDb();
+    await pumpWorkout(tester);
+    expect(find.byTooltip('Plate calculator'), findsNothing, reason: 'goblet squat is a dumbbell exercise');
+    await unmount(tester);
+
+    await (db.update(db.exercises)..where((e) => e.slug.equals('goblet-squat')))
+        .write(ExercisesCompanion(equipment: Value(jsonEncode(['barbell']))));
+    await pumpWorkout(tester);
+    await tester.tap(find.byTooltip('Plate calculator'));
+    await tester.pumpAndSettle();
+    expect(find.text('Per side'), findsOneWidget);
+    expect(find.byType(Dialog), findsNothing, reason: 'a bottom sheet, never a dialog over the set');
+    await unmount(tester);
+  });
+
+  testWidgets('an RPE target is shown as is (FR-007)', (tester) async {
+    await setUpDb();
+    await pumpWorkout(tester);
+    expect(find.text('Target RPE 7'), findsOneWidget);
+    await unmount(tester);
+  });
+
+  testWidgets('an RIR target also shows its RPE equivalent; effort is still logged as RPE (FR-007)', (tester) async {
+    await setUpDb();
+    await (db.update(db.planExercises)..where((p) => p.exerciseSlug.equals('goblet-squat')))
+        .write(const PlanExercisesCompanion(rpeTarget: Value(null), rirTarget: Value(2)));
+    await pumpWorkout(tester);
+    expect(find.text('RIR 2 (≈ RPE 8)'), findsOneWidget);
+    expect(find.byKey(const Key('rpe-select')), findsOneWidget);
     await unmount(tester);
   });
 

@@ -15,12 +15,14 @@ class LiveExercise {
     required this.repsMax,
     required this.restSec,
     this.rpeTarget,
+    this.rirTarget,
     this.suggestedWeightKg,
     this.videoUrl,
     this.captions = const {},
     this.localVideoPath,
     this.localCaptions = const {},
     this.formCheckSupported = false,
+    this.equipment = const [],
   });
 
   final String planExerciseId;
@@ -34,12 +36,19 @@ class LiveExercise {
   final int repsMax;
   final int restSec;
   final double? rpeTarget;
+
+  /// Reps in reserve target (0–5). Effort is always logged as RPE (FR-007).
+  final int? rirTarget;
   final double? suggestedWeightKg;
   final String? videoUrl;
   final Map<String, String> captions;
   final String? localVideoPath;
   final Map<String, String> localCaptions;
   final bool formCheckSupported;
+
+  /// Equipment the exercise needs; barbell exercises offer the plate calculator (FR-042).
+  final List<String> equipment;
+  bool get usesBarbell => equipment.contains('barbell');
 
   String name(String lang) => lang == 'fr' ? nameFr : nameEn;
 

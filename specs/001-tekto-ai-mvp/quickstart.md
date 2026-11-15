@@ -151,7 +151,7 @@ flutter run -d iPhone-15-Pro
 7. Continue logging remaining exercises offline.
 8. Re-enable connectivity.
 9. Finish workout; submit effort rating.
-10. On a barbell exercise enter 100 kg → plate calculator shows 20 + 10 per side (FR-042).
+10. On a barbell exercise enter 100 kg → plate calculator shows 25 + 15 per side (FR-042).
 11. On an exercise with an RIR target → the row shows "RIR 2 (≈ RPE 8)" (FR-007).
 12. As a free user, swap an exercise → works with no paywall (FR-028).
 13. Open Progress → the workout, PRs and weekly sets per muscle appear; log a body weight → shown in the user's unit (FR-039–FR-041).

@@ -108,6 +108,8 @@ class PlanExercises extends Table {
   IntColumn get repsMin => integer()();
   IntColumn get repsMax => integer()();
   RealColumn get rpeTarget => real().nullable()();
+  /// Reps in reserve target (0–5); exclusive with [rpeTarget] (data-model plan_exercises). v2.
+  IntColumn get rirTarget => integer().nullable()();
   IntColumn get restSec => integer().withDefault(const Constant(90))();
   RealColumn get suggestedWeightKg => real().nullable()();
 
@@ -230,6 +232,23 @@ class Subscriptions extends Table {
   Set<Column> get primaryKey => {id};
 }
 
+/// One body-weight measurement (FR-041, data-model entity 17). Synced through the queue. v2.
+class BodyWeightEntries extends Table {
+  TextColumn get id => text()();
+  TextColumn get userId => text()();
+  RealColumn get weightKg => real()(); // always kg; shown in the user's unit
+  DateTimeColumn get measuredOn => dateTime()(); // local date at midnight
+  DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
+
+  @override
+  Set<Column> get primaryKey => {id};
+
+  @override
+  List<Set<Column>> get uniqueKeys => [
+        {userId, measuredOn},
+      ];
+}
+
 /// Device-only (never synced): one row per exercise downloaded on this device (Pro only).
 class ExerciseVideoDownloads extends Table {
   TextColumn get exerciseSlug => text()();
@@ -274,6 +293,7 @@ class SyncQueueTable extends Table {
   Subscriptions,
   ExerciseVideoDownloads,
   SyncQueueTable,
+  BodyWeightEntries,
 ])
 class AppDatabase extends _$AppDatabase {
   /// Production database: SQLCipher-encrypted file, key in the OS keystore (Constitution II).
@@ -282,8 +302,20 @@ class AppDatabase extends _$AppDatabase {
   /// Tests: pass e.g. `NativeDatabase.memory()`.
   AppDatabase.forTesting(super.executor);
 
+  /// v2 (2026-11-15): plan_exercises.rir_target, body_weight_entries.
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
+
+  @override
+  MigrationStrategy get migration => MigrationStrategy(
+        onCreate: (m) => m.createAll(),
+        onUpgrade: (m, from, to) async {
+          if (from < 2) {
+            await m.addColumn(planExercises, planExercises.rirTarget);
+            await m.createTable(bodyWeightEntries);
+          }
+        },
+      );
 
   /// Deletes the encrypted database file and its key (account deletion). The instance is
   /// unusable afterwards; recreate the provider.
