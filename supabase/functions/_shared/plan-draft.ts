@@ -58,7 +58,8 @@ export interface ValidationError {
     | 'REST_DAYS'
     | 'DURATION'
     | 'WEEKS'
-    | 'VOLUME';
+    | 'VOLUME'
+    | 'BALANCE';
   message: string;
   exercise_slug?: string;
 }

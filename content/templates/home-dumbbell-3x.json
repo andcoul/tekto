@@ -100,7 +100,7 @@
       "exercises": [
         {
           "exercise_slug": "goblet-squat",
-          "sets": 4,
+          "sets": 3,
           "reps_min": 8,
           "reps_max": 12,
           "rest_sec": 120,
@@ -123,10 +123,10 @@
           "rpe_target": 8.0
         },
         {
-          "exercise_slug": "hip-thrust",
+          "exercise_slug": "dumbbell-shoulder-press",
           "sets": 3,
-          "reps_min": 10,
-          "reps_max": 15,
+          "reps_min": 8,
+          "reps_max": 10,
           "rest_sec": 90,
           "rpe_target": 7.5
         }

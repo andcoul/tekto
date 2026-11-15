@@ -8,6 +8,7 @@ import {
   type Library,
   type PlanProfile,
 } from './plan-draft.ts';
+import { VOLUME_BOUNDS } from './plan-validator.ts';
 import { startingWeightKg } from './starting-weights.ts';
 import type { StrengthEstimates, TrainingGoal, TrainingLevel } from './types.ts';
 
@@ -75,8 +76,9 @@ export function buildTemplatePlan(
   const notices: string[] = [];
   if (profile.days_per_week > MAX_FREE_SESSIONS) notices.push('free_plan_days_capped');
 
-  const pattern = scheduleWeek(template, Math.min(profile.days_per_week, MAX_FREE_SESSIONS))
-    .map((s) => ({ ...s, exercises: fitSession(adaptExercises(s.exercises, profile, library), profile.session_length_min) }))
+  const fitted = scheduleWeek(template, Math.min(profile.days_per_week, MAX_FREE_SESSIONS))
+    .map((s) => ({ ...s, exercises: fitSession(adaptExercises(s.exercises, profile, library), profile.session_length_min) }));
+  const pattern = capWeeklyVolume(fitted, VOLUME_BOUNDS[profile.level].max, library)
     .map((s) => ({
       ...s,
       exercises: s.exercises.map((e) => ({
@@ -146,6 +148,25 @@ function adaptExercises(exercises: DraftExercise[], profile: PlanProfile, librar
     }
   }
   return out;
+}
+
+/**
+ * Keeps weekly sets per primary muscle at or below the level maximum (FR-002a, Constitution III):
+ * a repeated session or a substitution can push a template over it. Takes one set at a time from
+ * the exercise with the most sets that trains the over-limit muscle, never below MIN_SETS.
+ */
+function capWeeklyVolume(sessions: TemplateSessionDef[], max: number, library: Library): TemplateSessionDef[] {
+  const out = sessions.map((s) => ({ ...s, exercises: s.exercises.map((e) => ({ ...e })) }));
+  const all = out.flatMap((s) => s.exercises);
+  const muscles = (e: DraftExercise) => library.get(e.exercise_slug)?.muscle_primary ?? [];
+  const setsFor = (m: string) => all.filter((e) => muscles(e).includes(m)).reduce((n, e) => n + e.sets, 0);
+  for (;;) {
+    const over = [...new Set(all.flatMap(muscles))].find((m) => setsFor(m) > max);
+    if (!over) return out;
+    const candidates = all.filter((e) => muscles(e).includes(over) && e.sets > MIN_SETS);
+    if (candidates.length === 0) return out; // cannot trim further; the validator reports it
+    candidates.reduce((a, b) => (b.sets > a.sets ? b : a)).sets--;
+  }
 }
 
 /** Trims accessories from the end (keeping ≥ 3), then sets, then rest, until the session fits. */
