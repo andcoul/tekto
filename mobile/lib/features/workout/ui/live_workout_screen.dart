@@ -8,7 +8,10 @@ import '../../../core/l10n/gen/app_localizations.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../shared/widgets/rest_timer_widget.dart';
 import '../../../shared/widgets/set_log_row.dart';
+import '../../../shared/models/exercise_model.dart';
 import '../../../shared/widgets/video_player_widget.dart';
+import '../../plan/domain/plan_provider.dart';
+import '../../plan/ui/exercise_swap_sheet.dart';
 import '../../subscription/domain/entitlement_provider.dart';
 import '../domain/live_session.dart';
 import '../domain/workout_controller.dart';
@@ -153,6 +156,31 @@ class _LiveWorkoutScreenState extends ConsumerState<LiveWorkoutScreen> {
     );
   }
 
+  /// Opens the swap sheet; on success refreshes the cached plan and reloads this session.
+  Future<void> _openSwap(String planExerciseId, String slug) async {
+    final prefs = ref.read(userPrefsProvider).value ?? const UserPrefs();
+    final chosen = await showModalBottomSheet<ExerciseModel>(
+      context: context,
+      isScrollControlled: true,
+      builder: (_) => ExerciseSwapSheet(
+        planExerciseId: planExerciseId,
+        currentExerciseSlug: slug,
+        userEquipment: prefs.equipment,
+        userLimitations: prefs.limitations,
+      ),
+    );
+    if (chosen == null || !mounted) return;
+    final userId = ref.read(currentUserIdProvider);
+    if (userId != null) {
+      try {
+        await ref.read(planRepositoryProvider).refreshActivePlan(userId);
+      } on Object {
+        // Swap is applied on the server; the cache catches up on the next refresh.
+      }
+    }
+    ref.invalidate(liveSessionProvider(widget.sessionId));
+  }
+
   Widget _body(BuildContext context, AppLocalizations l, String lang, LiveSession session, WorkoutState state) {
     final index = state.currentExerciseIndex.clamp(0, session.exercises.length - 1);
     final ex = session.exercises[index];
@@ -199,6 +227,13 @@ class _LiveWorkoutScreenState extends ConsumerState<LiveWorkoutScreen> {
                 tooltip: l.workoutNextExercise,
                 onPressed: isLast ? null : () => controller.goToExercise(index + 1),
               ),
+              // Swap before the first set only (FR-028, every tier); it needs the server.
+              if (logged.isEmpty)
+                IconButton(
+                  icon: const Icon(Icons.swap_horiz),
+                  tooltip: l.swapTitle,
+                  onPressed: isOnline ? () => _openSwap(ex.planExerciseId, ex.slug) : null,
+                ),
               if (ex.formCheckSupported)
                 IconButton(
                   icon: const Icon(Icons.videocam_outlined),

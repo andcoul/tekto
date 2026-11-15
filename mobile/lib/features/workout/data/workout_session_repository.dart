@@ -104,7 +104,12 @@ class WorkoutSessionRepository {
     if (userId == null) return const UserPrefs();
     final row = await (_db.select(_db.users)..where((u) => u.id.equals(userId))).getSingleOrNull();
     if (row == null) return const UserPrefs();
-    return UserPrefs(unit: row.unit == 'lb' ? 'lb' : 'kg', healthSyncEnabled: row.healthSyncEnabled);
+    return UserPrefs(
+      unit: row.unit == 'lb' ? 'lb' : 'kg',
+      healthSyncEnabled: row.healthSyncEnabled,
+      equipment: _strings(row.equipment),
+      limitations: row.limitations == null ? const [] : _strings(row.limitations!),
+    );
   }
 
   static LiveExercise _liveExercise(PlanExercise slot, Exercise? e, ExerciseVideoDownload? d) => LiveExercise(

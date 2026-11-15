@@ -182,5 +182,9 @@
   "welcomeTitle": "Construisez votre force",
   "welcomeBody": "Votre programme, une vraie vidéo pour chaque mouvement, l'analyse de votre forme et un coach — dans une seule app.",
   "welcomeGetStarted": "Commencer",
-  "welcomeSkip": "Passer"
+  "welcomeSkip": "Passer",
+  "swapTitle": "Remplacer l'exercice",
+  "swapNoAlternatives": "Aucune alternative ne correspond à votre équipement et à vos limitations.",
+  "swapNotAllowed": "Cet exercice ne peut pas remplacer l'exercice actuel.",
+  "swapFailed": "Impossible de remplacer l'exercice. Vérifiez votre connexion et réessayez."
 }

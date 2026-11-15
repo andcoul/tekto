@@ -19,9 +19,9 @@ description: "Task list for Tekto AI MVP (regenerated after spec clarifications 
 
 ## Progress (2026-11-15)
 
-**64 done / 63 open** of 127. Phases 1–5 (setup, foundations, US6 video library, US1 onboarding → first plan, US2 daily workout) have 11 open tasks:
+**66 done / 61 open** of 127. Phases 1–5 (setup, foundations, US6 video library, US1 onboarding → first plan, US2 daily workout) have 9 open tasks:
 
-- **T117–T120, T087** — new in US2: progress screen, body weight, swap for all tiers (P2, A1)
+- **T117–T119** — new in US2: progress screen, body weight (P2)
 - **T121, T122, T126** — new in US2: plate calculator, RIR display
 - **T127** — new in US2: history backfill after reinstall
 
@@ -184,7 +184,7 @@ Not yet verified: the Pro AI plan path against the real Claude API (needs `ANTHR
 - [X] T103 [P] [US2] Create `mobile/test/widget/home_screen_test.dart` (FR-006, US2 scenario 1): on a training day shows today's session with estimated duration and target muscle groups and a "Start Workout" action; on a rest day shows the rest-day message
 - [ ] T117 [P] [US2] Create `mobile/test/widget/progress_screen_test.dart` (FR-039, FR-040, FR-041): workout history (date, session, total volume in the user's unit); PR list per exercise (best weight × reps, best e1RM); e1RM trend per exercise; weekly sets per muscle group; free user sees the last 4 weeks and a non-blocking Pro card for older data and muscle balance; Pro user sees full history and muscle balance; body-weight entry saved in kg and shown in the user's unit; works offline from the local DB
 - [ ] T121 [P] [US2] Write failing tests `mobile/test/unit/plate_calculator_test.dart` (FR-042): 100 kg → 20 + 10 per side on a 20 kg bar; 225 lb → 45 + 45 per side on a 45 lb bar; 61 kg → "not exact" flag with nearest loadable 60 kg (20 kg per side; the smallest plate is 1.25 kg, so 62.5 kg is the next step up); weight below the bar → empty bar; unit follows `users.unit`
-- [ ] T120 [P] [US2] Write failing tests `supabase/functions/swap-exercise/handler.test.ts` (FR-028, Constitution IV): a free user can swap and never receives `PRO_REQUIRED`; alternatives share `muscle_primary`, fit the user's equipment and avoid `contraindications`; video-less target → `EXERCISE_NO_VIDEO`; disallowed target → `EXERCISE_NOT_ALLOWED`; no Claude call
+- [X] T120 [P] [US2] Write failing tests `supabase/functions/swap-exercise/handler.test.ts` (FR-028, Constitution IV): a free user can swap and never receives `PRO_REQUIRED`; alternatives share `muscle_primary`, fit the user's equipment and avoid `contraindications`; video-less target → `EXERCISE_NO_VIDEO`; disallowed target → `EXERCISE_NOT_ALLOWED`; no Claude call
 - [X] T106 [P] [US2] Create `mobile/test/unit/health_sync_service_test.dart` (FR-012): writes a strength-training workout on finish only when `users.health_sync_enabled` is true; sets `workout_logs.synced_to_health = true` on success; never blocks finishing a workout when the health API fails
 
 ### Implementation for User Story 2
@@ -201,7 +201,7 @@ Not yet verified: the Pro AI plan path against the real Claude API (needs `ANTHR
 - [ ] T118 [US2] Create `supabase/migrations/008_body_weight.sql` (`body_weight_entries`: `id` uuid PK, `user_id` FK → users ON DELETE CASCADE, `weight_kg numeric(5,2) NOT NULL CHECK > 0`, `measured_on date NOT NULL`, `created_at`; UNIQUE `(user_id, measured_on)`; RLS owner-only) and mirror it in Drift with writes through `sync_queue`; include it in `export-data` (data-model.md entity 17)
 - [ ] T119 [US2] Implement `mobile/lib/features/progress/ui/progress_screen.dart` (and a `progress_repository.dart` reading local `workout_logs`, `set_logs`, `personal_records`, `body_weight_entries`) until T117 passes; charts with `fl_chart`. Pro status comes from `isProProvider`: it reads `subscription_dao` (T017) until `entitlement_provider` (T057) lands
 - [ ] T127 [US2] Create `mobile/lib/shared/services/sync/history_backfill_service.dart`: after sign-in, when the local DB has no `workout_logs` for the user, fetch `workout_logs`, `set_logs`, `personal_records` and `body_weight_entries` from Supabase (paged, newest first) into Drift; runs once per install, safe to rerun, never blocks the home screen, retries on next launch if offline; add a case to `mobile/test/integration/offline_sync_test.dart` (empty local DB + 3 server workouts → 3 local rows)
-- [ ] T087 [US2] Extract `supabase/functions/swap-exercise/handler.ts`, update `swap-exercise/index.ts` and `mobile/lib/features/plan/ui/exercise_swap_sheet.dart`: alternatives filtered by same `muscle_primary`, the user's equipment and `contraindications`; server returns `EXERCISE_NO_VIDEO` or `EXERCISE_NOT_ALLOWED` until T120 passes; available to free and Pro users (FR-028)
+- [X] T087 [US2] Extract `supabase/functions/swap-exercise/handler.ts`, update `swap-exercise/index.ts` and `mobile/lib/features/plan/ui/exercise_swap_sheet.dart`: alternatives filtered by same `muscle_primary`, the user's equipment and `contraindications`; server returns `EXERCISE_NO_VIDEO` or `EXERCISE_NOT_ALLOWED` until T120 passes; available to free and Pro users (FR-028)
 
 **Checkpoint**: Quickstart Scenario 2 passes (online, airplane mode, free offline).
 

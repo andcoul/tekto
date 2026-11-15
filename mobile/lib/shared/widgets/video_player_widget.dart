@@ -155,7 +155,9 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
           showSubtitles: subtitles != null,
         );
       });
-    } on Exception {
+    } on Object {
+      // Any player failure (including platform Errors) shows the error state; it never
+      // breaks the workout (Constitution I).
       if (mounted) setState(() => _error = true);
     }
   }

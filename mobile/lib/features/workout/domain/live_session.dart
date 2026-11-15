@@ -129,11 +129,15 @@ class WorkoutSummary {
   final int prCount;
 }
 
-/// The two profile settings the workout screens need, with safe defaults offline.
+/// The profile settings the workout screens need, with safe defaults offline.
 class UserPrefs {
-  const UserPrefs({this.unit = 'kg', this.healthSyncEnabled = false});
+  const UserPrefs({this.unit = 'kg', this.healthSyncEnabled = false, this.equipment = const [], this.limitations = const []});
 
   /// 'kg' | 'lb' (FR-034).
   final String unit;
   final bool healthSyncEnabled;
+
+  /// Used to list swap alternatives (FR-028).
+  final List<String> equipment;
+  final List<String> limitations;
 }

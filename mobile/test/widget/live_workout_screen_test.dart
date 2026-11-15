@@ -11,7 +11,10 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:tekto/core/di/providers.dart';
 import 'package:tekto/core/l10n/gen/app_localizations.dart';
+import 'package:tekto/features/library/domain/exercise_provider.dart';
+import 'package:tekto/features/plan/ui/exercise_swap_sheet.dart';
 import 'package:tekto/features/subscription/domain/entitlement_provider.dart';
+import 'package:tekto/shared/models/exercise_model.dart';
 import 'package:tekto/features/workout/ui/live_workout_screen.dart';
 import 'package:tekto/shared/services/api/supabase_client.dart';
 import 'package:tekto/shared/services/local_db/database.dart';
@@ -43,7 +46,7 @@ void main() {
     await db.close();
   });
 
-  Future<void> pumpWorkout(WidgetTester tester) async {
+  Future<void> pumpWorkout(WidgetTester tester, {bool online = false}) async {
     t = tester;
     tester.view.physicalSize = const Size(1080, 2340); // phone portrait, 360×780 dp
     tester.view.devicePixelRatio = 3;
@@ -63,7 +66,15 @@ void main() {
         syncQueueProvider.overrideWithValue(queue),
         currentUserIdProvider.overrideWithValue(kUserId),
         clockProvider.overrideWithValue(() => kWednesday),
-        isOnlineProvider.overrideWith((ref) => Stream.value(false)),
+        isOnlineProvider.overrideWith((ref) => Stream.value(online)),
+        exercisesProvider.overrideWith((ref) async => [
+              for (final slug in ['goblet-squat', 'dumbbell-lunge'])
+                ExerciseModel(
+                  slug: slug, nameEn: slug, nameFr: slug, equipment: const ['dumbbell'],
+                  musclePrimary: const ['quadriceps'], muscleSecondary: const [], cuesEn: const [], cuesFr: const [],
+                  commonMistakesEn: const [], commonMistakesFr: const [], videoFrontUrl: 'v.m3u8', formCheckSupported: false,
+                ),
+            ]),
         entitlementProvider.overrideWith((ref) => Stream.value(EntitlementState.free)),
       ],
       child: MaterialApp.router(
@@ -297,6 +308,27 @@ void main() {
     expect(find.text('1:00'), findsNothing, reason: 'no rest after the final set');
     expect(primaryActions(), findsOneWidget);
     expect(find.widgetWithText(ElevatedButton, 'Finish workout'), findsOneWidget);
+    await unmount(tester);
+  });
+
+  testWidgets('a free user can swap the current exercise before logging it (FR-028)', (tester) async {
+    await setUpDb();
+    await pumpWorkout(tester, online: true);
+    await tester.tap(find.byTooltip('Swap exercise'));
+    await tester.pumpAndSettle();
+    expect(find.byType(ExerciseSwapSheet), findsOneWidget);
+    expect(find.text('dumbbell-lunge'), findsOneWidget, reason: 'alternative with the same muscle and equipment');
+    expect(primaryActions(), findsOneWidget, reason: 'the sheet adds no second primary action');
+    await unmount(tester);
+  });
+
+  testWidgets('swap is disabled offline and hidden once a set of the exercise is logged', (tester) async {
+    await setUpDb();
+    await pumpWorkout(tester);
+    final offline = tester.widget<IconButton>(find.widgetWithIcon(IconButton, Icons.swap_horiz));
+    expect(offline.onPressed, isNull, reason: 'the swap needs the server');
+    await logCurrentSet(tester);
+    expect(find.byTooltip('Swap exercise'), findsNothing);
     await unmount(tester);
   });
 

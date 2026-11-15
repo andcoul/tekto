@@ -324,5 +324,9 @@
   "welcomeTitle": "Build your strength",
   "welcomeBody": "Your plan, real video for every move, form feedback and a coach — in one app.",
   "welcomeGetStarted": "Get started",
-  "welcomeSkip": "Skip"
+  "welcomeSkip": "Skip",
+  "swapTitle": "Swap exercise",
+  "swapNoAlternatives": "No alternative fits your equipment and limitations.",
+  "swapNotAllowed": "This exercise can't replace the current one.",
+  "swapFailed": "Couldn't swap the exercise. Check your connection and try again."
 }

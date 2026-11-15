@@ -301,19 +301,25 @@ Swaps a `plan_exercise` for an equivalent alternative selected by the user (from
   "new_exercise_id": "uuid"
 }
 ```
+`new_exercise_slug` (string) may be sent instead of `new_exercise_id`; the app caches exercises by slug.
 
 **Response `200 OK`**:
 ```json
 {
   "plan_exercise_id": "uuid",
-  "new_exercise": { "id": "uuid", "slug": "...", "name_en": "..." }
+  "new_exercise": { "id": "uuid", "slug": "...", "name_en": "...", "name_fr": "..." }
 }
 ```
 
 **Errors**:
 | Code | HTTP | Meaning |
 |---|---|---|
-| `EXERCISE_NO_VIDEO` | 400 | Replacement exercise has no video |
+| `INVALID_REQUEST` | 400 | Missing `plan_exercise_id` or `new_exercise_id` |
+| `EXERCISE_NO_VIDEO` | 400 | Replacement exercise has no video (Constitution IV) |
+| `EXERCISE_NOT_ALLOWED` | 400 | Replacement needs equipment the user lacks or is contraindicated by their limitations |
+| `EXERCISE_NOT_EQUIVALENT` | 400 | Replacement shares no primary muscle with the current exercise |
+| `PLAN_NOT_ACTIVE` | 400 | The plan exercise belongs to an archived or completed plan |
+| `FORBIDDEN` | 403 | The plan exercise belongs to another user |
 | `EXERCISE_NOT_FOUND` | 404 | |
 | `PLAN_EXERCISE_NOT_FOUND` | 404 | |
 
