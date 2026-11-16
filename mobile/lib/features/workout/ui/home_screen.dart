@@ -1,3 +1,4 @@
+import 'package:tekto/features/coach/ui/coach_launcher.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -29,6 +30,7 @@ class HomeScreen extends ConsumerWidget {
       appBar: AppBar(
         title: Text(l.homeTitle),
         actions: [
+          const CoachButton(screen: 'home'),
           IconButton(
             icon: const Icon(Icons.settings_outlined),
             onPressed: () => context.push('/settings'),
@@ -209,7 +211,7 @@ class _QuickAccessRow extends StatelessWidget {
         child: _QuickButton(icon: Icons.library_books_outlined, label: l.homeExercises, onTap: () => context.push('/library')),
       ),
       const SizedBox(width: 8),
-      Expanded(child: _QuickButton(icon: Icons.chat_bubble_outline, label: l.homeCoach, onTap: () => context.push('/coach'))),
+      Expanded(child: _QuickButton(icon: Icons.chat_bubble_outline, label: l.homeCoach, onTap: () => openCoach(context, screen: 'home'))),
       const SizedBox(width: 8),
       Expanded(
         child: _QuickButton(icon: Icons.bar_chart_outlined, label: l.homeProgress, onTap: () => context.push('/progress')),

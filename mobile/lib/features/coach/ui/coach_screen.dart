@@ -18,10 +18,14 @@ import 'package:tekto/shared/widgets/pro_gate_widget.dart';
 ///   a workout) and keeps the typed question in the input to re-send after upgrading.
 /// - Free users see how many questions they have left this ISO week.
 class CoachScreen extends ConsumerStatefulWidget {
-  const CoachScreen({super.key, this.screenContext, this.onShowPaywall});
+  const CoachScreen({super.key, this.screenContext, this.exerciseSlug, this.sessionId, this.onShowPaywall});
 
-  /// Current route + optional context (e.g. "library/barbell-squat").
+  /// The screen the coach was opened from (e.g. `live_workout`, `exercise_detail`).
   final String? screenContext;
+
+  /// The exercise and session in view, when there is one (FR-016).
+  final String? exerciseSlug;
+  final String? sessionId;
 
   /// Opens the full-screen paywall; defaults to `/paywall?feature=coach` (see [showProPaywall]).
   final void Function(PaywallFeature feature)? onShowPaywall;
@@ -118,7 +122,12 @@ class _CoachScreenState extends ConsumerState<CoachScreen> {
     if (text.isEmpty) return;
     _lastQuestion = text;
     _inputController.clear();
-    ref.read(coachControllerProvider.notifier).sendMessage(text, screenContext: widget.screenContext);
+    ref.read(coachControllerProvider.notifier).sendMessage(
+          text,
+          screenContext: widget.screenContext,
+          exerciseSlug: widget.exerciseSlug,
+          sessionId: widget.sessionId,
+        );
   }
 
   void _onQuotaExceeded() {

@@ -79,9 +79,9 @@ class CoachController extends Notifier<CoachState> {
 
   /// Sends a message to the AI coach.
   ///
-  /// [screenContext] is the current route name + optional exerciseSlug or
-  /// sessionId, injected automatically by the UI layer.
-  Future<void> sendMessage(String text, {String? screenContext}) async {
+  /// [screenContext], [exerciseSlug] and [sessionId] describe where the question was asked
+  /// (FR-016); the coach button of each screen passes them (coach_launcher.dart).
+  Future<void> sendMessage(String text, {String? screenContext, String? exerciseSlug, String? sessionId}) async {
     final userId = ref.read(currentUserIdProvider);
     if (userId == null) {
       state = state.copyWith(status: CoachStatus.error, errorMessage: 'NOT_SIGNED_IN');
@@ -102,6 +102,7 @@ class CoachController extends Notifier<CoachState> {
       role: 'user',
       content: text,
       screenContext: screenContext,
+      exerciseSlug: exerciseSlug,
     );
     state = state.copyWith(
       messages: [...state.messages, userMsg],
@@ -127,7 +128,12 @@ class CoachController extends Notifier<CoachState> {
         data: {
           'conversation_id': conversationId,
           'message': text,
-          if (screenContext != null) 'context': {'screen': screenContext},
+          if (screenContext != null)
+            'context': {
+              'screen': screenContext,
+              if (exerciseSlug != null) 'exercise_slug': exerciseSlug,
+              if (sessionId != null) 'session_id': sessionId,
+            },
         },
       );
 

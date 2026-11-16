@@ -1,3 +1,4 @@
+import 'package:tekto/features/coach/ui/coach_launcher.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -40,6 +41,7 @@ class _ExerciseListScreenState extends ConsumerState<ExerciseListScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Exercise Library'),
+        actions: const [CoachButton(screen: 'library')],
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(60),
           child: Padding(

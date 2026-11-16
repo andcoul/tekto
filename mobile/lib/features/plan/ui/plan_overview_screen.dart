@@ -1,3 +1,4 @@
+import 'package:tekto/features/coach/ui/coach_launcher.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -17,7 +18,7 @@ class PlanOverviewScreen extends ConsumerWidget {
     final planAsync = ref.watch(activePlanProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('My Plan')),
+      appBar: AppBar(title: const Text('My Plan'), actions: const [CoachButton(screen: 'plan_overview')]),
       body: planAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(child: Text('Error: $e')),

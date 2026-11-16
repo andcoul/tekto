@@ -1,3 +1,4 @@
+import 'package:tekto/features/coach/ui/coach_launcher.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -64,6 +65,7 @@ class _ExerciseDetailScreenState extends ConsumerState<ExerciseDetailScreen> {
                   ),
                 ),
                 actions: [
+                  CoachButton(screen: 'exercise_detail', exerciseSlug: exercise.slug),
                   if (exercise.videoSideUrl != null)
                     TextButton(
                       onPressed: () => setState(() => _showSideView = !_showSideView),

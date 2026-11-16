@@ -1,3 +1,4 @@
+import 'package:tekto/features/coach/ui/coach_launcher.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -147,7 +148,15 @@ class _LiveWorkoutScreenState extends ConsumerState<LiveWorkoutScreen> {
       appBar: AppBar(
         title: Text(session?.name(lang) ?? l.workoutTitle),
         leading: IconButton(icon: const Icon(Icons.close), tooltip: l.workoutEnd, onPressed: _confirmEnd),
-        actions: [TextButton(onPressed: ready ? _finish : null, child: Text(l.workoutFinishShort))],
+        actions: [
+          // The coach sits in the app bar, away from the set's one primary action (Constitution VI).
+          CoachButton(
+            screen: 'live_workout',
+            sessionId: widget.sessionId,
+            exerciseSlug: session?.exercises.elementAtOrNull(state.currentExerciseIndex)?.slug,
+          ),
+          TextButton(onPressed: ready ? _finish : null, child: Text(l.workoutFinishShort)),
+        ],
       ),
       body: SafeArea(
         child: switch (sessionAsync) {

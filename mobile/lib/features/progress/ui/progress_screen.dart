@@ -1,3 +1,4 @@
+import 'package:tekto/features/coach/ui/coach_launcher.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -29,6 +30,7 @@ class ProgressScreen extends ConsumerWidget {
       child: Scaffold(
         appBar: AppBar(
           title: Text(l.progressTitle),
+          actions: const [CoachButton(screen: 'progress')],
           bottom: TabBar(isScrollable: true, tabs: [
             Tab(text: l.progressTabHistory),
             Tab(text: l.progressTabRecords),
