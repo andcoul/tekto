@@ -68,6 +68,14 @@ class CoachController extends Notifier<CoachState> {
 
   bool get _isPro => ref.read(entitlementProvider).value?.isPro ?? false;
 
+  /// Loads the free questions left this ISO week from the local count (shown on open).
+  Future<void> refreshQuota() async {
+    final userId = ref.read(currentUserIdProvider);
+    if (userId == null || _isPro) return;
+    final remaining = await _quotaService.questionsRemaining(userId, isPro: false);
+    if (remaining != null) state = state.copyWith(status: state.status, errorMessage: state.errorMessage, quotaRemaining: remaining);
+  }
+
   /// Sends a message to the AI coach.
   ///
   /// [screenContext] is the current route name + optional exerciseSlug or
@@ -81,7 +89,7 @@ class CoachController extends Notifier<CoachState> {
 
     final canSend = await _quotaService.canSendMessage(userId, isPro: _isPro);
     if (!canSend) {
-      state = state.copyWith(status: CoachStatus.error, errorMessage: 'QUOTA_EXCEEDED');
+      state = state.copyWith(status: CoachStatus.error, errorMessage: 'QUOTA_EXCEEDED', quotaRemaining: 0);
       return;
     }
 
@@ -155,7 +163,16 @@ class CoachController extends Notifier<CoachState> {
       if (!finished) _failStream('AI_UNAVAILABLE');
     } on ApiStatusException catch (e) {
       await _quotaService.recordReply(userId, statusCode: e.statusCode);
-      _failStream(e.code ?? _codeForStatus(e.statusCode));
+      final code = e.code ?? _codeForStatus(e.statusCode);
+      if (code == 'QUOTA_EXCEEDED') {
+        // Not answered: drop the question (the screen keeps it in the input to re-send later).
+        await _messageRepo.removeMessage(userMsg.id);
+        state = state.copyWith(
+          messages: [for (final m in state.messages) if (m.id != userMsg.id) m],
+          quotaRemaining: 0,
+        );
+      }
+      _failStream(code);
     } on DioException {
       _failStream('NETWORK_ERROR');
     } catch (e) {

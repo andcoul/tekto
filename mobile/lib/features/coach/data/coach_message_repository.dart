@@ -60,6 +60,9 @@ class CoachMessageRepository {
   Stream<List<CoachMessageModel>> watchMessages(String conversationId) =>
       _dao.watchMessages(conversationId).map((rows) => rows.map(toModel).toList());
 
+  /// Removes a question the server refused to answer, so it is not shown or re-sent twice.
+  Future<void> removeMessage(String messageId) => _dao.deleteMessage(messageId);
+
   /// Marks a message's proposed plan change as applied.
   Future<void> markPlanChangeApplied(String messageId) => _dao.markChangeApplied(messageId);
 

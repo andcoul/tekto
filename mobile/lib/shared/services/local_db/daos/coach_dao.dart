@@ -28,6 +28,10 @@ class CoachDao extends DatabaseAccessor<AppDatabase> with _$CoachDaoMixin {
   Future<void> insertMessage(CoachMessagesCompanion msg) =>
       into(coachMessages).insert(msg);
 
+  /// Removes a message that was never answered (e.g. refused with QUOTA_EXCEEDED).
+  Future<void> deleteMessage(String messageId) =>
+      (delete(coachMessages)..where((m) => m.id.equals(messageId))).go();
+
   Future<void> updateMessageRating(String messageId, bool rating) =>
       (update(coachMessages)..where((m) => m.id.equals(messageId)))
           .write(CoachMessagesCompanion(satisfactionRating: Value(rating)));

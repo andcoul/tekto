@@ -115,13 +115,15 @@ void main() {
     expect(state().messages.any((m) => m.id == CoachController.streamingMessageId), isFalse);
   });
 
-  test('QUOTA_EXCEEDED (429) before any event blocks locally for the week', () async {
+  test('QUOTA_EXCEEDED (429) blocks locally for the week and drops the unanswered question', () async {
     api.error = const ApiStatusException(429, 'QUOTA_EXCEEDED');
     await ctrl().sendMessage('One more?');
 
     expect(state().errorMessage, 'QUOTA_EXCEEDED');
+    expect(state().quotaRemaining, 0);
     expect(await usedThisWeek(), CoachQuotaService.freeWeeklyLimit);
-    expect(state().messages.map((m) => m.role), ['user']);
+    expect(state().messages, isEmpty);
+    expect(await CoachDao(db).watchMessages(state().conversationId!).first, isEmpty);
   });
 
   test('AI_UNAVAILABLE (503) before any event consumes no quota', () async {
