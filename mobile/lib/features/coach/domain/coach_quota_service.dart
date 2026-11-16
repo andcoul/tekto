@@ -30,16 +30,27 @@ class CoachQuotaService {
     return (usage?.questionsUsed ?? 0) < freeWeeklyLimit;
   }
 
-  /// Increments the question counter for the current ISO week.
+  /// Mirrors the server's answer to one coach question in the local count. The server is the
+  /// authority (contracts/backend-api.md `coach-message`); this copy only lets the app show
+  /// the remaining questions and the paywall without a round trip.
   ///
-  /// Call this AFTER a message has been accepted and sent.
-  Future<void> incrementUsage(String userId) async {
-    final week = _currentIsoWeek();
-    final existing = await _dao.getQuota(userId, week);
+  /// - 200 with [quotaRemaining]: a reply was returned; store `limit - quotaRemaining`.
+  /// - 200 without it: a Pro user; quota is not tracked.
+  /// - 429 `QUOTA_EXCEEDED`: the limit is reached for this ISO week.
+  /// - anything else, including 503 `AI_UNAVAILABLE`: no reply, nothing is consumed.
+  Future<void> recordReply(String userId, {required int statusCode, int? quotaRemaining}) async {
+    final int used;
+    if (statusCode == 200 && quotaRemaining != null) {
+      used = (freeWeeklyLimit - quotaRemaining).clamp(0, freeWeeklyLimit);
+    } else if (statusCode == 429) {
+      used = freeWeeklyLimit;
+    } else {
+      return;
+    }
     await _dao.upsertQuota(CoachQuotaUsageCompanion.insert(
       userId: userId,
-      isoWeek: week,
-      questionsUsed: Value((existing?.questionsUsed ?? 0) + 1),
+      isoWeek: _currentIsoWeek(),
+      questionsUsed: Value(used),
       updatedAt: Value(_clock()),
     ));
   }

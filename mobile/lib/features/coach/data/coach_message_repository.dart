@@ -21,16 +21,19 @@ class CoachMessageRepository {
   final DateTime Function() _clock;
 
   /// Stores a new message and returns it.
+  /// [id] is the server's message id when known (assistant replies), so ratings and plan
+  /// changes refer to the same row on both sides.
   Future<CoachMessageModel> addMessage({
     required String conversationId,
     required String role,
     required String content,
+    String? id,
     String? screenContext,
     String? exerciseSlug,
     Map<String, dynamic>? planChangeProposed,
   }) async {
     final message = CoachMessageModel(
-      id: _uuid.v4(),
+      id: id ?? _uuid.v4(),
       conversationId: conversationId,
       role: role,
       content: content,

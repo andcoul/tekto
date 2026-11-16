@@ -185,56 +185,50 @@ Sends a user message to the AI coach and returns the assistant reply.
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| `conversation_id` | uuid | Yes | Must belong to the authenticated user |
+| `conversation_id` | uuid | Yes | Created by the app; the server creates the row on first use. Must not belong to another user |
 | `message` | string | Yes | Max 2000 chars |
 | `context.screen` | string | No | Current screen identifier |
 | `context.exercise_slug` | string | No | Exercise being viewed |
 | `context.session_id` | uuid | No | Session being viewed |
 
-**Response `200 OK`**:
+**Response `200 OK`** — streamed as server-sent events (`Content-Type: text/event-stream`), so the app shows the reply as it is written (ai-services.md §2, first text < 3 s):
+
+```
+event: text
+data: {"text":"The Romanian deadlift targets"}
+
+event: text
+data: {"text":" your hamstrings and glutes..."}
+
+event: done
+data: {"message_id":"uuid","plan_change_proposed":null,"quota_remaining":1}
+```
+
+| Event | Data | Notes |
+|---|---|---|
+| `text` | `{"text": string}` | A piece of the reply; append in order. A cache hit arrives as one `text` event |
+| `done` | `{"message_id", "plan_change_proposed", "quota_remaining"}` | Last event of a successful reply. `quota_remaining` is null for Pro users |
+| `error` | `{"error": "AI_UNAVAILABLE"}` | The model failed after text started; discard the partial text and show the "Coach temporarily unavailable" message. No quota is consumed |
+
+`plan_change_proposed`, when present, follows ai-services.md §2, e.g.:
 ```json
 {
-  "message_id": "uuid",
-  "content": "The Romanian deadlift targets your hamstrings and glutes...",
-  "plan_change_proposed": null,
-  "quota_remaining": null
+  "type": "exercise_swap",
+  "plan_exercise_id": "uuid",
+  "old_exercise_slug": "barbell-back-squat",
+  "new_exercise_slug": "leg-press",
+  "reason_en": "Knee-friendly alternative targeting the same muscles.",
+  "reason_fr": "Alternative sans contrainte pour le genou ciblant les mêmes muscles."
 }
 ```
 
-When a plan change is proposed:
-```json
-{
-  "message_id": "uuid",
-  "content": "Sure, I can swap squats for leg press given your knee discomfort. Here's what would change:",
-  "plan_change_proposed": {
-    "type": "exercise_swap",
-    "plan_exercise_id": "uuid",
-    "old_exercise_slug": "barbell-back-squat",
-    "new_exercise_slug": "leg-press",
-    "reason_en": "Knee-friendly alternative targeting the same muscles.",
-    "reason_fr": "Alternative sans contrainte pour le genou ciblant les mêmes muscles."
-  },
-  "quota_remaining": null
-}
-```
-
-For free-tier users (quota tracked):
-```json
-{
-  "message_id": "uuid",
-  "content": "...",
-  "plan_change_proposed": null,
-  "quota_remaining": 1
-}
-```
-
-**Errors**:
+**Errors** (plain JSON `{"error": code}` with the HTTP status, returned before any event is sent):
 | Code | HTTP | Meaning |
 |---|---|---|
-| `QUOTA_EXCEEDED` | 429 | Free user hit 3 questions/week limit |
-| `CONVERSATION_NOT_FOUND` | 404 | |
+| `QUOTA_EXCEEDED` | 429 | Free user hit 3 questions/week limit; checked before any cache lookup or model call |
+| `CONVERSATION_NOT_FOUND` | 404 | `conversation_id` belongs to another user |
 | `MESSAGE_TOO_LONG` | 400 | Message exceeds 2000 chars |
-| `AI_UNAVAILABLE` | 503 | LLM temporarily down or refused; app shows the localized "Coach temporarily unavailable" message (never a spinner). Does **not** consume free quota. |
+| `AI_UNAVAILABLE` | 503 | LLM down or refused before any text was sent; app shows the localized "Coach temporarily unavailable" message (never a spinner). Does **not** consume free quota. After text has started, the same failure arrives as an `error` event |
 
 Replies are in `users.language`. Free quota is consumed only when a reply is returned (including cache hits).
 

@@ -1,9 +1,11 @@
+import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tekto/core/di/providers.dart';
 import 'package:tekto/features/coach/data/coach_conversation_repository.dart';
 import 'package:tekto/features/coach/data/coach_message_repository.dart';
 import 'package:tekto/features/coach/domain/coach_quota_service.dart';
 import 'package:tekto/features/subscription/domain/entitlement_provider.dart';
+import 'package:tekto/shared/services/api/supabase_client.dart' show ApiStatusException;
 import 'package:tekto/shared/models/coach_model.dart';
 
 // ---------------------------------------------------------------------------
@@ -19,6 +21,7 @@ class CoachState {
     this.errorMessage,
     this.conversationId,
     this.rejectedChangeIds = const {},
+    this.quotaRemaining,
   });
 
   final List<CoachMessageModel> messages;
@@ -30,12 +33,16 @@ class CoachState {
   /// a dismissed change is simply never confirmed on the server.
   final Set<String> rejectedChangeIds;
 
+  /// Free questions left this ISO week, from the last reply; null for Pro or before a reply.
+  final int? quotaRemaining;
+
   CoachState copyWith({
     List<CoachMessageModel>? messages,
     CoachStatus? status,
     String? errorMessage,
     String? conversationId,
     Set<String>? rejectedChangeIds,
+    int? quotaRemaining,
   }) =>
       CoachState(
         messages: messages ?? this.messages,
@@ -43,6 +50,7 @@ class CoachState {
         errorMessage: errorMessage,
         conversationId: conversationId ?? this.conversationId,
         rejectedChangeIds: rejectedChangeIds ?? this.rejectedChangeIds,
+        quotaRemaining: quotaRemaining ?? this.quotaRemaining,
       );
 }
 
@@ -92,33 +100,90 @@ class CoachController extends Notifier<CoachState> {
       conversationId: conversationId,
     );
 
+    // The reply is shown while it streams; it is stored only once the server confirms it.
+    final draft = CoachMessageModel(
+      id: streamingMessageId,
+      conversationId: conversationId,
+      role: 'assistant',
+      content: '',
+      planChangeApplied: false,
+      createdAt: DateTime.now(),
+    );
+    state = state.copyWith(messages: [...state.messages, draft]);
+
     try {
-      final response = await ref.read(dioClientProvider).post<Map<String, dynamic>>(
+      // contracts/backend-api.md `POST /coach-message` (server-sent events).
+      final events = await ref.read(dioClientProvider).postEventStream(
         '/functions/v1/coach-message',
         data: {
-          'message': text,
-          'screen_context': screenContext,
           'conversation_id': conversationId,
+          'message': text,
+          if (screenContext != null) 'context': {'screen': screenContext},
         },
       );
 
-      final content = response.data?['content'] as String? ?? '';
-      final planChange = response.data?['plan_change'];
-
-      final assistantMsg = await _messageRepo.addMessage(
-        conversationId: conversationId,
-        role: 'assistant',
-        content: content,
-        planChangeProposed: planChange is Map ? Map<String, dynamic>.from(planChange) : null,
-      );
-
-      await _quotaService.incrementUsage(userId);
-
-      state = state.copyWith(messages: [...state.messages, assistantMsg], status: CoachStatus.idle);
+      final buffer = StringBuffer();
+      var finished = false;
+      await for (final event in events) {
+        switch (event.event) {
+          case 'text':
+            buffer.write(event.data['text'] as String? ?? '');
+            _replaceDraft(draft.copyWith(content: buffer.toString()));
+          case 'done':
+            finished = true;
+            final planChange = event.data['plan_change_proposed'];
+            final quotaRemaining = (event.data['quota_remaining'] as num?)?.toInt();
+            final saved = await _messageRepo.addMessage(
+              id: event.data['message_id'] as String?,
+              conversationId: conversationId,
+              role: 'assistant',
+              content: buffer.toString(),
+              planChangeProposed: planChange is Map ? Map<String, dynamic>.from(planChange) : null,
+            );
+            await _quotaService.recordReply(userId, statusCode: 200, quotaRemaining: quotaRemaining);
+            state = state.copyWith(
+              messages: [for (final m in state.messages) m.id == streamingMessageId ? saved : m],
+              status: CoachStatus.idle,
+              quotaRemaining: quotaRemaining,
+            );
+          case 'error':
+            finished = true;
+            _failStream(event.data['error'] as String? ?? 'AI_UNAVAILABLE');
+        }
+      }
+      // The connection closed before the server finished: same as an unavailable coach.
+      if (!finished) _failStream('AI_UNAVAILABLE');
+    } on ApiStatusException catch (e) {
+      await _quotaService.recordReply(userId, statusCode: e.statusCode);
+      _failStream(e.code ?? _codeForStatus(e.statusCode));
+    } on DioException {
+      _failStream('NETWORK_ERROR');
     } catch (e) {
-      state = state.copyWith(status: CoachStatus.error, errorMessage: e.toString());
+      _failStream(e.toString());
     }
   }
+
+  /// Id of the assistant bubble while its text is streaming in.
+  static const streamingMessageId = 'streaming';
+
+  void _replaceDraft(CoachMessageModel draft) {
+    state = state.copyWith(messages: [for (final m in state.messages) m.id == streamingMessageId ? draft : m]);
+  }
+
+  /// Drops the partial reply (never shown as an answer) and reports [code].
+  void _failStream(String code) {
+    state = state.copyWith(
+      messages: [for (final m in state.messages) if (m.id != streamingMessageId) m],
+      status: CoachStatus.error,
+      errorMessage: code,
+    );
+  }
+
+  static String _codeForStatus(int status) => switch (status) {
+        429 => 'QUOTA_EXCEEDED',
+        503 => 'AI_UNAVAILABLE',
+        _ => 'NETWORK_ERROR',
+      };
 
   /// Applies a coach-proposed plan change.
   Future<void> confirmChange(String messageId) async {

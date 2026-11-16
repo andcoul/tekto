@@ -62,27 +62,67 @@ void main() {
       expect(await service.canSendMessage('user-1', isPro: false), isFalse);
     });
 
-    // ---- incrementUsage ----
+    // ---- recordReply: the local count mirrors the server (T069, contracts/backend-api.md) ----
 
-    test('incrementUsage creates a new quota entry when none exists', () async {
-      when(() => dao.getQuota('user-1', _week)).thenAnswer((_) async => null);
-      when(() => dao.upsertQuota(any())).thenAnswer((_) async {});
+    group('recordReply', () {
+      setUp(() => when(() => dao.upsertQuota(any())).thenAnswer((_) async {}));
 
-      await service.incrementUsage('user-1');
+      CoachQuotaUsageCompanion saved() =>
+          verify(() => dao.upsertQuota(captureAny())).captured.single as CoachQuotaUsageCompanion;
 
-      final saved = verify(() => dao.upsertQuota(captureAny())).captured.single as CoachQuotaUsageCompanion;
-      expect(saved.isoWeek.value, _week);
-      expect(saved.questionsUsed.value, 1);
+      test('an answered question stores the server count for this ISO week', () async {
+        await service.recordReply('user-1', statusCode: 200, quotaRemaining: 2);
+
+        final write = saved();
+        expect(write.isoWeek.value, _week);
+        expect(write.questionsUsed.value, 1);
+      });
+
+      test('quota_remaining 2 → 1 → 0 across three answered questions', () async {
+        for (final remaining in [2, 1, 0]) {
+          await service.recordReply('user-1', statusCode: 200, quotaRemaining: remaining);
+        }
+        final writes = verify(() => dao.upsertQuota(captureAny())).captured.cast<CoachQuotaUsageCompanion>();
+        expect(writes.map((c) => c.questionsUsed.value), [1, 2, 3]);
+      });
+
+      test('AI_UNAVAILABLE (503) does not consume quota', () async {
+        await service.recordReply('user-1', statusCode: 503);
+        verifyNever(() => dao.upsertQuota(any()));
+      });
+
+      test('other failures do not consume quota', () async {
+        for (final code in [400, 404, 500]) {
+          await service.recordReply('user-1', statusCode: code);
+        }
+        verifyNever(() => dao.upsertQuota(any()));
+      });
+
+      test('QUOTA_EXCEEDED (429) blocks locally until the next ISO week', () async {
+        await service.recordReply('user-1', statusCode: 429);
+        expect(saved().questionsUsed.value, CoachQuotaService.freeWeeklyLimit);
+      });
+
+      test('Pro replies (quota_remaining null) store nothing', () async {
+        await service.recordReply('user-1', statusCode: 200);
+        verifyNever(() => dao.upsertQuota(any()));
+      });
     });
 
-    test('incrementUsage increments existing counter', () async {
-      when(() => dao.getQuota('user-1', _week)).thenAnswer((_) async => _quota('user-1', 2));
-      when(() => dao.upsertQuota(any())).thenAnswer((_) async {});
+    test('blocked at 3 questions this week, allowed again on Monday of the next ISO week', () async {
+      when(() => dao.getQuota('user-1', _week)).thenAnswer((_) async => _quota('user-1', 3));
+      when(() => dao.getQuota('user-1', '2026-W47')).thenAnswer((_) async => null);
 
-      await service.incrementUsage('user-1');
+      expect(await service.canSendMessage('user-1', isPro: false), isFalse);
 
-      final saved = verify(() => dao.upsertQuota(captureAny())).captured.single as CoachQuotaUsageCompanion;
-      expect(saved.questionsUsed.value, 3);
+      final nextMonday = CoachQuotaService(dao: dao, clock: () => DateTime(2026, 11, 16, 0, 5));
+      expect(await nextMonday.canSendMessage('user-1', isPro: false), isTrue);
+      expect(await nextMonday.questionsRemaining('user-1', isPro: false), 3);
+    });
+
+    test('Sunday night is still the same ISO week', () async {
+      final sunday = CoachQuotaService(dao: dao, clock: () => DateTime(2026, 11, 15, 23, 59));
+      expect(sunday.currentIsoWeekForTest(), _week);
     });
 
     // ---- ISO week boundary ----
