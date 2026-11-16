@@ -206,7 +206,7 @@ class _MessageBubble extends ConsumerWidget {
             child: Text(message.content.isEmpty && streaming ? '…' : message.content, style: const TextStyle(fontSize: 14)),
           ),
           if (!isUser && !streaming && message.planChangeProposed != null) PlanChangePendingCard(message: message),
-          if (!isUser && !streaming) MessageRatingWidget(messageId: message.id),
+          if (!isUser && !streaming) MessageRatingWidget(messageId: message.id, initialRating: message.satisfactionRating),
         ],
       ),
     );

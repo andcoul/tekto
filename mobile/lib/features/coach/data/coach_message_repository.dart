@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 
 import 'package:tekto/core/di/providers.dart';
+import 'package:tekto/shared/services/sync/sync_queue.dart';
 import 'package:tekto/shared/models/coach_model.dart';
 import 'package:tekto/shared/services/local_db/daos/coach_dao.dart';
 import 'package:tekto/shared/services/local_db/database.dart';
@@ -13,11 +14,13 @@ const _uuid = Uuid();
 
 /// Manages individual coach messages within a conversation (local Drift cache).
 class CoachMessageRepository {
-  const CoachMessageRepository({required CoachDao dao, DateTime Function() clock = DateTime.now})
+  const CoachMessageRepository({required CoachDao dao, SyncQueue? queue, DateTime Function() clock = DateTime.now})
       : _dao = dao,
+        _queue = queue,
         _clock = clock;
 
   final CoachDao _dao;
+  final SyncQueue? _queue;
   final DateTime Function() _clock;
 
   /// Stores a new message and returns it.
@@ -66,9 +69,16 @@ class CoachMessageRepository {
   /// Marks a message's proposed plan change as applied.
   Future<void> markPlanChangeApplied(String messageId) => _dao.markChangeApplied(messageId);
 
-  /// Records a satisfaction rating (thumbs up/down, SC-011).
-  Future<void> rateSatisfaction(String messageId, {required bool thumbsUp}) =>
-      _dao.updateMessageRating(messageId, thumbsUp);
+  /// Records a satisfaction rating (thumbs up/down, SC-011) on the device and queues it for
+  /// the server, where `v_coach_thumbs_up` measures it (works offline; flushed on reconnect).
+  Future<void> rateSatisfaction(String messageId, {required bool thumbsUp}) async {
+    await _dao.updateMessageRating(messageId, thumbsUp);
+    await _queue?.enqueue(
+      operation: 'update',
+      tableName: 'coach_messages',
+      payload: {'id': messageId, 'satisfaction_rating': thumbsUp},
+    );
+  }
 
   static CoachMessageModel toModel(CoachMessage row) => CoachMessageModel(
         id: row.id,
@@ -89,6 +99,7 @@ class CoachMessageRepository {
 final coachMessageRepositoryProvider = Provider<CoachMessageRepository>(
   (ref) => CoachMessageRepository(
     dao: CoachDao(ref.watch(appDatabaseProvider)),
+    queue: ref.watch(syncQueueProvider),
     clock: ref.watch(clockProvider),
   ),
 );

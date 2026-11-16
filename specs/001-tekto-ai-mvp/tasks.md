@@ -278,7 +278,7 @@ Not yet verified: the Pro AI plan path against the real Claude API (needs `ANTHR
 - [X] T134 [US3] Compute the coach quota ISO week in `users.timezone` on both sides (FR-020): `isoWeekOf(date, timeZone)` in `supabase/functions/coach-message/logic.ts` and `mobile/lib/features/coach/domain/coach_quota_service.dart` (both use a fixed zone today — UTC on the server, device-local on the client); add the T069/T070 boundary cases first
 - [X] T078 [P] [US3] Update `mobile/lib/features/coach/ui/plan_change_pending_card.dart` to describe all four change types (swap old → new, shortened session length, deload week, new weight/reps)
 - [ ] T110 [US3] Verify coach access from any screen (FR-016): a global coach entry point in the app shell opens the slide-up `coach_screen.dart` from every primary screen and passes `context.screen` plus `exercise_slug` / `session_id` when applicable; during a live workout it never covers the primary action (Constitution VI)
-- [ ] T111 [P] [US3] Verify `mobile/lib/features/coach/ui/widgets/message_rating_widget.dart` (SC-011): thumbs up/down on each finished assistant message; one rating per message (buttons disable after tap); saves `coach_messages.satisfaction_rating`; never prompted or required
+- [X] T111 [P] [US3] Verify `mobile/lib/features/coach/ui/widgets/message_rating_widget.dart` (SC-011): thumbs up/down on each finished assistant message; one rating per message (buttons disable after tap); saves `coach_messages.satisfaction_rating`; never prompted or required
 
 **Checkpoint**: Quickstart Scenarios 3 and 8 pass.
 

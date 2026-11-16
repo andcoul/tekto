@@ -139,17 +139,80 @@
   "coachApplyChange": "Apply change",
   "coachDeclineChange": "No thanks",
   "coachChangeSwap": "Swap {oldName} → {newName}",
-  "@coachChangeSwap": {"placeholders": {"oldName": {"type": "String"}, "newName": {"type": "String"}}},
+  "@coachChangeSwap": {
+    "placeholders": {
+      "oldName": {
+        "type": "String"
+      },
+      "newName": {
+        "type": "String"
+      }
+    }
+  },
   "coachChangeShorten": "Shorten this session to {minutes} min",
-  "@coachChangeShorten": {"placeholders": {"minutes": {"type": "int"}}},
+  "@coachChangeShorten": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
   "coachChangeDeload": "Deload week {week}: fewer sets and lighter weights",
-  "@coachChangeDeload": {"placeholders": {"week": {"type": "int"}}},
+  "@coachChangeDeload": {
+    "placeholders": {
+      "week": {
+        "type": "int"
+      }
+    }
+  },
   "coachChangeWeight": "{exercise}: {weight} {unit}",
-  "@coachChangeWeight": {"placeholders": {"exercise": {"type": "String"}, "weight": {"type": "String"}, "unit": {"type": "String"}}},
+  "@coachChangeWeight": {
+    "placeholders": {
+      "exercise": {
+        "type": "String"
+      },
+      "weight": {
+        "type": "String"
+      },
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
   "coachChangeReps": "{exercise}: {repsMin}–{repsMax} reps",
-  "@coachChangeReps": {"placeholders": {"exercise": {"type": "String"}, "repsMin": {"type": "int"}, "repsMax": {"type": "int"}}},
+  "@coachChangeReps": {
+    "placeholders": {
+      "exercise": {
+        "type": "String"
+      },
+      "repsMin": {
+        "type": "int"
+      },
+      "repsMax": {
+        "type": "int"
+      }
+    }
+  },
   "coachChangeWeightReps": "{exercise}: {weight} {unit} × {repsMin}–{repsMax} reps",
-  "@coachChangeWeightReps": {"placeholders": {"exercise": {"type": "String"}, "weight": {"type": "String"}, "unit": {"type": "String"}, "repsMin": {"type": "int"}, "repsMax": {"type": "int"}}},
+  "@coachChangeWeightReps": {
+    "placeholders": {
+      "exercise": {
+        "type": "String"
+      },
+      "weight": {
+        "type": "String"
+      },
+      "unit": {
+        "type": "String"
+      },
+      "repsMin": {
+        "type": "int"
+      },
+      "repsMax": {
+        "type": "int"
+      }
+    }
+  },
   "coachChangeApplied": "Change applied",
   "coachChangeDismissed": "Change dismissed",
   "formCheckTitle": "Form Check",
@@ -486,5 +549,13 @@
   "formCheckTechniqueNotes": "Technique notes",
   "formCheckGreatForm": "Great form! Keep it up.",
   "formCheckDone": "Done",
-  "formCheckTryAgain": "Try again"
+  "formCheckTryAgain": "Try again",
+  "coachRateHelpful": "Helpful",
+  "coachRateNotHelpful": "Not helpful",
+  "@coachRateHelpful": {
+    "description": "Tooltip and screen-reader label of the thumbs-up on a coach answer (SC-011)"
+  },
+  "@coachRateNotHelpful": {
+    "description": "Tooltip and screen-reader label of the thumbs-down on a coach answer (SC-011)"
+  }
 }

@@ -242,5 +242,7 @@
   "formCheckTechniqueNotes": "Points techniques",
   "formCheckGreatForm": "Excellente forme ! Continuez comme ça.",
   "formCheckDone": "Terminé",
-  "formCheckTryAgain": "Réessayer"
+  "formCheckTryAgain": "Réessayer",
+  "coachRateHelpful": "Utile",
+  "coachRateNotHelpful": "Pas utile"
 }
