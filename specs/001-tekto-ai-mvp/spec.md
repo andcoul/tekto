@@ -242,7 +242,7 @@ A free user encounters a Pro feature, sees a contextual paywall that communicate
 - **FR-017**: The coach MUST ground all answers in the user's profile, current plan and training history.
 - **FR-018**: The coach MUST support plan modifications on request (exercise swap, session shortening, deload) and require user confirmation before applying any change.
 - **FR-019**: The coach MUST detect injury and pain language and respond with advice to consult a professional; it MUST NOT provide medical diagnoses.
-- **FR-020**: Free users receive a maximum of 3 coach questions per week; Pro users have unlimited access.
+- **FR-020**: Free users receive a maximum of 3 coach questions per ISO week (Monday 00:00 to Sunday 23:59 in the user's time zone, `users.timezone`); Pro users have unlimited access. The server's count is authoritative; the app shows the `quota_remaining` the server last returned.
 
 **Camera Form Check (Pro)**
 
