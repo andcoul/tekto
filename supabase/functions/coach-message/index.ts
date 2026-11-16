@@ -98,7 +98,7 @@ serve(async (req: Request) => {
   };
 
   const deps = buildDeps(db, ctx.coach, history, body.context?.screen ?? null, exerciseName);
-  const resultPromise = handleCoachMessage({ userId: user.id, message, language: ctx.coach.language, onText }, deps)
+  const resultPromise = handleCoachMessage({ userId: user.id, message, language: ctx.coach.language, timeZone: ctx.timeZone, onText }, deps)
     .catch((err): CoachResult => {
       console.error(JSON.stringify({ event: 'coach_message_failed', error: String(err) }));
       return { ok: false, code: 'AI_UNAVAILABLE', status: 503 };
@@ -242,7 +242,10 @@ function buildDeps(
 // ---------------------------------------------------------------------------
 
 // deno-lint-ignore no-explicit-any
-async function loadContext(db: any, userId: string): Promise<{ coach: CoachContext; planId: string | null } | null> {
+async function loadContext(
+  db: any,
+  userId: string,
+): Promise<{ coach: CoachContext; planId: string | null; timeZone: string } | null> {
   const { data: profile } = await db
     .from('users')
     .select('goal, level, language, equipment, limitations, limitations_note, days_per_week, session_length_min, timezone')
@@ -293,6 +296,7 @@ async function loadContext(db: any, userId: string): Promise<{ coach: CoachConte
 
   return {
     planId: plan?.id ?? null,
+    timeZone: profile.timezone ?? 'UTC', // quota week (FR-020)
     coach: {
       language: profile.language as AppLanguage,
       goal: profile.goal,

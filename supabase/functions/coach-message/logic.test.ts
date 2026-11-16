@@ -43,6 +43,9 @@ function fakeDeps(opts: {
   used?: number;
   cached?: string | null;
   model?: ModelOutcome;
+  /** Overrides the clock; quota is then read per week from [usedByWeek]. */
+  now?: Date;
+  usedByWeek?: Record<string, number>;
 } = {}) {
   const calls = {
     embed: [] as string[],
@@ -53,9 +56,10 @@ function fakeDeps(opts: {
   };
   let used = opts.used ?? 0;
   const deps: CoachDeps = {
-    now: () => NOW,
+    now: () => opts.now ?? NOW,
     getSubscription: () => Promise.resolve(opts.sub ?? null),
     getQuotaUsed: (_userId, week) => {
+      if (opts.usedByWeek) return Promise.resolve(opts.usedByWeek[week] ?? 0);
       assertEquals(week, WEEK);
       return Promise.resolve(used);
     },
@@ -299,6 +303,28 @@ Deno.test('a stored cache entry carries the question for its hash', async () => 
   const { deps, calls } = fakeDeps({ model: reply({ cacheable: true }) });
   await handleCoachMessage(ask('  What does RPE mean?  '), deps);
   assertEquals(calls.storeCache[0].question, 'What does RPE mean?');
+});
+
+Deno.test('isoWeekOf uses the user\'s time zone, not UTC (FR-020, T134)', () => {
+  // Monday 00:30 in Paris is still Sunday 23:30 UTC: a new week for the user.
+  assertEquals(isoWeekOf(new Date('2026-11-15T23:30:00Z'), 'Europe/Paris'), '2026-W47');
+  // Monday 09:00 in Auckland (UTC+13) is Sunday 20:00 UTC.
+  assertEquals(isoWeekOf(new Date('2026-11-15T20:00:00Z'), 'Pacific/Auckland'), '2026-W47');
+  // Sunday 23:30 in New York is already Monday 04:30 UTC: still last week for the user.
+  assertEquals(isoWeekOf(new Date('2026-11-16T04:30:00Z'), 'America/New_York'), WEEK);
+  // An unknown zone falls back to UTC.
+  assertEquals(isoWeekOf(new Date('2026-11-15T23:30:00Z'), 'Not/AZone'), WEEK);
+});
+
+Deno.test('the quota week is counted in the user\'s time zone (FR-020, T134)', async () => {
+  // Paris, Monday 00:30 local: last week's 3 questions no longer count.
+  const { deps, calls } = fakeDeps({ usedByWeek: { '2026-W46': 3 }, now: new Date('2026-11-15T23:30:00Z') });
+  const result = await handleCoachMessage({ ...ask('What is a deload?'), timeZone: 'Europe/Paris' }, deps);
+  assertEquals(result.ok, true);
+  assertEquals(calls.quotaIncrements, ['2026-W47']);
+  // The same instant for a UTC user is still the exhausted week.
+  const utc = await handleCoachMessage({ ...ask('What is a deload?'), timeZone: 'UTC' }, deps);
+  assertEquals(utc.ok ? null : utc.code, 'QUOTA_EXCEEDED');
 });
 
 Deno.test('isoWeekOf follows ISO 8601 (UTC)', () => {

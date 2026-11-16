@@ -3,6 +3,7 @@
 // contracts/backend-api.md `POST /coach-message`, contracts/ai-services.md §2.
 import { isPro, type SubscriptionRow } from '../_shared/entitlement.ts';
 import type { AppLanguage, CoachPlanChange } from '../_shared/types.ts';
+import { localDate } from '../_shared/week-boundary.ts';
 
 /** Bumped whenever the system prompt or model changes; old cache rows stop matching. */
 export const PROMPT_VERSION = 'coach-2026-11-16';
@@ -32,9 +33,14 @@ export function detectInjury(message: string): boolean {
   return keywordPattern.test(message.normalize('NFC'));
 }
 
-/** ISO 8601 week `YYYY-Www` of [date] in UTC (week starts Monday; week 1 holds January 4). */
-export function isoWeekOf(date: Date): string {
-  const day = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
+/**
+ * ISO 8601 week `YYYY-Www` of [date] as a calendar date in [timeZone] (week starts Monday;
+ * week 1 holds January 4). The coach quota week is the user's own week (FR-020), so callers
+ * pass `users.timezone`; an unknown zone falls back to UTC.
+ */
+export function isoWeekOf(date: Date, timeZone = 'UTC'): string {
+  const [y, m, d] = localDate(date, timeZone).date.split('-').map(Number);
+  const day = new Date(Date.UTC(y, m - 1, d));
   const weekday = (day.getUTCDay() + 6) % 7; // Monday = 0
   const thursday = new Date(day.getTime() + (3 - weekday) * 86_400_000);
   const year = thursday.getUTCFullYear();
@@ -94,6 +100,8 @@ export interface CoachInput {
   userId: string;
   message: string;
   language: AppLanguage;
+  /** `users.timezone` (IANA); the quota week is counted in it. Defaults to UTC. */
+  timeZone?: string;
   /** Receives the reply text as it becomes available (streamed to the app). */
   onText?: (text: string) => void;
 }
@@ -118,7 +126,7 @@ export async function handleCoachMessage(input: CoachInput, deps: CoachDeps): Pr
   if (input.message.length > MAX_MESSAGE_CHARS) return { ok: false, code: 'MESSAGE_TOO_LONG', status: 400 };
 
   const now = deps.now();
-  const week = isoWeekOf(now);
+  const week = isoWeekOf(now, input.timeZone ?? 'UTC');
 
   // 1. Quota first, from the server's own subscription row (never the client's claim).
   const pro = isPro(await deps.getSubscription(input.userId), now);

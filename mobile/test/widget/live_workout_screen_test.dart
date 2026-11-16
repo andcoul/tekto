@@ -15,6 +15,7 @@ import 'package:tekto/features/library/domain/exercise_provider.dart';
 import 'package:tekto/features/plan/ui/exercise_swap_sheet.dart';
 import 'package:tekto/features/subscription/domain/entitlement_provider.dart';
 import 'package:tekto/shared/models/exercise_model.dart';
+import 'package:tekto/features/workout/domain/workout_controller.dart';
 import 'package:tekto/features/workout/ui/live_workout_screen.dart';
 import 'package:tekto/shared/services/api/supabase_client.dart';
 import 'package:tekto/shared/services/local_db/database.dart';
@@ -94,6 +95,13 @@ void main() {
 
   Finder primaryActions() => find.byType(ElevatedButton);
 
+  /// Sets recorded by the workout controller so far (the screen's own view of the log).
+  int _loggedCount(WidgetTester tester) => ProviderScope.containerOf(tester.element(find.byType(LiveWorkoutScreen)))
+      .read(workoutControllerProvider)
+      .logged
+      .values
+      .fold(0, (sum, sets) => sum + sets.length);
+
   /// Scrolls the exercise list until [finder] is built (the list builds lazily; the logged rows
   /// sit below the rest timer on a 360×780 dp phone).
   Future<void> scrollTo(WidgetTester tester, Finder finder) async {
@@ -126,11 +134,17 @@ void main() {
       await tester.tap(find.text(rpe).last);
       await tester.pumpAndSettle();
     }
+    final before = _loggedCount(tester);
     await tester.tap(find.widgetWithText(ElevatedButton, 'Done'));
     await tester.pump();
-    // Let the local writes finish on the real event loop, then rebuild without
-    // advancing the fake clock (so the rest timer has not ticked yet).
-    await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 50)));
+    // The local writes finish on the real event loop. Wait until the controller has recorded
+    // the set (no fixed sleep — a busy machine can take far longer than any constant, T140),
+    // then rebuild without advancing the fake clock, so the rest timer has not ticked yet.
+    for (var i = 0; i < 500 && _loggedCount(tester) == before; i++) {
+      await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 10)));
+      await tester.pump();
+    }
+    expect(_loggedCount(tester), before + 1, reason: 'the set was not recorded within 5 s of real time');
     for (var i = 0; i < 5; i++) {
       await tester.pump();
     }

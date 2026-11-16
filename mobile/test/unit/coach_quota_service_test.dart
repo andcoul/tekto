@@ -125,6 +125,15 @@ void main() {
       expect(sunday.currentIsoWeekForTest(), _week);
     });
 
+    test('the week is the device-local calendar week, even when the clock returns UTC (FR-020, T134)', () {
+      // 00:30 local on Monday 16 Nov in whatever zone the test machine runs in.
+      final mondayLocal = DateTime(2026, 11, 16, 0, 30);
+      final service = CoachQuotaService(dao: dao, clock: () => mondayLocal.toUtc());
+      expect(service.currentIsoWeekForTest(), '2026-W47');
+      final sundayLocal = DateTime(2026, 11, 15, 23, 30);
+      expect(CoachQuotaService(dao: dao, clock: () => sundayLocal.toUtc()).currentIsoWeekForTest(), _week);
+    });
+
     // ---- ISO week boundary ----
 
     test('currentIsoWeek returns the week of the injected clock in YYYY-Www format', () {

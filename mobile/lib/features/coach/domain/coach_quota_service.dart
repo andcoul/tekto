@@ -71,7 +71,10 @@ class CoachQuotaService {
   // Internal
   // ---------------------------------------------------------------------------
 
-  String _currentIsoWeek() => isoWeekOf(_clock());
+  /// The user's week (FR-020): the server counts it in `users.timezone`, which onboarding and
+  /// settings keep equal to the device zone, so the local calendar date gives the same week.
+  /// `toLocal()` guards against a clock that returns UTC.
+  String _currentIsoWeek() => isoWeekOf(_clock().toLocal());
 
   /// ISO 8601 week of [date] as `YYYY-Www` (week starts Monday; week 1 holds January 4).
   static String isoWeekOf(DateTime date) {
