@@ -64,11 +64,28 @@ class PoseAnalyzer {
   /// Head and upper back folding forward from the hip–shoulder line by more than this.
   static const backRoundingDegrees = 40.0;
 
+  /// Overhead press: elbow angle a press must reach at the top to count as locked out.
+  static const lockoutElbowDegrees = 165.0;
+
+  /// Hip thrust: hip angle a thrust must reach at the top to count as full extension.
+  static const hipExtensionDegrees = 170.0;
+
   /// The angle [RepCounter] counts for [liftKey]; null when the lift is not supported.
   static String? repAngleKey(String liftKey) => switch (liftKey) {
         'squat' || 'lunge' => 'knee_angle',
         'deadlift' || 'hip_thrust' => 'hip_angle',
         'bench_press' || 'overhead_press' || 'row' || 'push_up' => 'elbow_angle',
+        _ => null,
+      };
+
+  /// Faults that only show at the top of a rep (FR-022 live cue for these lifts). A single
+  /// frame cannot tell "still pressing" from "stopped short", so [FormCheckPipeline] judges
+  /// the highest angle of each press when it turns back down.
+  static TopOfRepCheck? topOfRepCheck(String liftKey) => switch (liftKey) {
+        'overhead_press' =>
+          const TopOfRepCheck(angleKey: 'elbow_angle', minDegrees: lockoutElbowDegrees, cueKey: 'incomplete_lockout'),
+        'hip_thrust' =>
+          const TopOfRepCheck(angleKey: 'hip_angle', minDegrees: hipExtensionDegrees, cueKey: 'incomplete_hip_extension'),
         _ => null,
       };
 
@@ -139,6 +156,15 @@ class PoseAnalyzer {
         'bench_press' || 'overhead_press' => _arms,
         _ => [..._arms, ..._legs],
       };
+}
+
+/// A rep-level check: the top of each rep must reach [minDegrees] on [angleKey], else [cueKey].
+class TopOfRepCheck {
+  const TopOfRepCheck({required this.angleKey, required this.minDegrees, required this.cueKey});
+
+  final String angleKey;
+  final double minDegrees;
+  final String cueKey;
 }
 
 // ---------------------------------------------------------------------------

@@ -21,17 +21,28 @@ class FormCheckPipeline {
   FormCheckPipeline({required this.liftKey, CueEngine cueEngine = const CueEngine()})
       : _counter = RepCounter(liftKey: liftKey),
         _angleKey = PoseAnalyzer.repAngleKey(liftKey)!,
+        _topCheck = PoseAnalyzer.topOfRepCheck(liftKey),
         _cueEngine = cueEngine;
 
   final String liftKey;
   final RepCounter _counter;
   final String _angleKey;
+  final TopOfRepCheck? _topCheck;
   final CueEngine _cueEngine;
   final _frames = <FormFrameResult>[];
   final _processingMs = <int>[];
 
   /// Lifts where turning back up before full depth means "go deeper".
   static const _depthLifts = {'squat', 'lunge'};
+
+  /// A press must rise this far above the bottom threshold before its top is judged, so
+  /// jitter at the bottom is never read as a short press.
+  static const minAscentDegrees = 30.0;
+
+  // Top-of-rep tracking (T129): from full depth up to the point where the angle turns down.
+  bool _ascending = false;
+  double _peak = 0;
+  bool _countedThisAscent = false;
 
   int get repCount => _counter.repCount;
 
@@ -50,11 +61,47 @@ class FormCheckPipeline {
     if (_counter.noRepCount > noRepsBefore && _depthLifts.contains(liftKey)) cues.add('depth_too_shallow');
 
     // The frame that finishes a rep belongs to it; frames mid-rep to the next one.
-    final repIndex = completed ? _counter.repCount : (_counter.inRep ? _counter.repCount + 1 : 0);
+    var repIndex = completed ? _counter.repCount : (_counter.inRep ? _counter.repCount + 1 : 0);
+
+    final topFault = angle == null ? null : _judgeTop(angle, completed);
+    if (topFault != null) {
+      cues.add(topFault.cueKey);
+      // A counted rep that stopped short is flagged; a press too short to count is not a rep.
+      repIndex = topFault.counted ? _counter.repCount : 0;
+    }
+
     final tagged = frame.copyWith(activeCues: cues, repDetected: completed, repIndex: repIndex);
     _frames.add(tagged);
 
     return FrameOutcome(cues: _cueEngine.evaluate(tagged), repCount: _counter.repCount, repCompleted: completed);
+  }
+
+  /// Follows each press from full depth to the frame where it turns back down, then judges
+  /// its highest angle against [TopOfRepCheck.minDegrees]. Returns the fault on that frame.
+  ({String cueKey, bool counted})? _judgeTop(double angle, bool completed) {
+    final check = _topCheck;
+    if (check == null) return null;
+
+    if (!_ascending) {
+      if (!_counter.atBottom) return null;
+      _ascending = true;
+      _peak = angle;
+      _countedThisAscent = false;
+      return null;
+    }
+
+    if (completed) _countedThisAscent = true;
+    if (angle > _peak) {
+      _peak = angle;
+      return null;
+    }
+    if (angle > _peak - RepCounter.reversalMargin) return null;
+
+    // Turned back down: this was the top of the press.
+    _ascending = false;
+    final rose = _peak - _counter.thresholds.bottomThreshold >= minAscentDegrees;
+    if (!rose || _peak >= check.minDegrees) return null;
+    return (cueKey: check.cueKey, counted: _countedThisAscent);
   }
 
   /// Post-set summary (FR-024).

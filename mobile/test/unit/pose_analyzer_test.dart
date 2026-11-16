@@ -124,4 +124,45 @@ void main() {
     }, likelihood: 0.3);
     expect(analyzer.analyze(pose, 'squat').jointAngleSnapshot['knee_angle'], isNull);
   });
+
+  // T129 / FR-022: lockout and hip extension are judged at the top of each rep by the
+  // pipeline, from the angle the analyzer reports; never per frame.
+  group('top-of-rep checks', () {
+    test('overhead press: incomplete lockout on the elbow angle', () {
+      final check = PoseAnalyzer.topOfRepCheck('overhead_press')!;
+      expect(check.angleKey, 'elbow_angle');
+      expect(check.cueKey, 'incomplete_lockout');
+      expect(check.minDegrees, PoseAnalyzer.lockoutElbowDegrees);
+    });
+
+    test('hip thrust: incomplete hip extension on the hip angle', () {
+      final check = PoseAnalyzer.topOfRepCheck('hip_thrust')!;
+      expect(check.angleKey, 'hip_angle');
+      expect(check.cueKey, 'incomplete_hip_extension');
+      expect(check.minDegrees, PoseAnalyzer.hipExtensionDegrees);
+    });
+
+    test('the check uses the angle the rep counter counts', () {
+      for (final lift in ['overhead_press', 'hip_thrust']) {
+        expect(PoseAnalyzer.topOfRepCheck(lift)!.angleKey, PoseAnalyzer.repAngleKey(lift));
+      }
+    });
+
+    test('other lifts have no top-of-rep check', () {
+      for (final lift in ['squat', 'deadlift', 'bench_press', 'row', 'lunge', 'push_up']) {
+        expect(PoseAnalyzer.topOfRepCheck(lift), isNull, reason: lift);
+      }
+    });
+
+    test('a single frame never raises a top-of-rep cue', () {
+      final bentArms = _pose({
+        PoseLandmarkType.leftShoulder: (100, 100),
+        PoseLandmarkType.leftElbow: (150, 100),
+        PoseLandmarkType.leftWrist: (150, 50),
+      });
+      final r = analyzer.analyze(bentArms, 'overhead_press');
+      expect(r.jointAngleSnapshot['elbow_angle'], closeTo(90, 0.5));
+      expect(r.activeCues, isEmpty);
+    });
+  });
 }

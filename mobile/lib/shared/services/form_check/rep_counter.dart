@@ -41,6 +41,9 @@ class RepCounter {
   /// `repCount + 1`); false while standing at the top or recovering from a no-rep.
   bool get inRep => _state == _RepState.descending || _state == _RepState.bottom;
 
+  /// True once the current rep has reached full depth and until it is completed.
+  bool get atBottom => _state == _RepState.bottom;
+
   /// Feeds one joint-angle measurement in degrees. Returns true when a rep was just completed.
   bool update(double angle) {
     switch (_state) {

@@ -240,8 +240,8 @@ flutter run -d iPhone-15-Pro
 | row | side, ~2 m | round the back | `back_rounding` |
 | bench_press | side/45°, ~1.5 m | flare the elbows | `elbow_flare` |
 | push_up | side, ~1.5 m | let the hips sag | `hips_sagging` |
-| overhead_press | side, ~2 m | stop short of lockout | lockout cue (T129) |
-| hip_thrust | side, ~1.5 m | stop short of full hip extension | extension cue (T129) |
+| overhead_press | side, ~2 m | stop short of lockout | `incomplete_lockout` (judged when the press turns back down) |
+| hip_thrust | side, ~1.5 m | stop short of full hip extension | `incomplete_hip_extension` (judged when the hips turn back down) |
 
 **Confidence gate test**:
 6. Repeat with the room light off.

@@ -69,6 +69,12 @@ class CueEngine {
       textFr: 'Verrouillez en haut — étendez complètement les bras au-dessus.',
       severity: CueSeverity.warning,
     ),
+    'incomplete_hip_extension': FormCue(
+      key: 'incomplete_hip_extension',
+      textEn: 'Drive your hips all the way up — squeeze your glutes at the top.',
+      textFr: 'Montez les hanches jusqu\'au bout — serrez les fessiers en haut.',
+      severity: CueSeverity.warning,
+    ),
     'hips_sagging': FormCue(
       key: 'hips_sagging',
       textEn: 'Squeeze your glutes — keep your body in a straight plank line.',
