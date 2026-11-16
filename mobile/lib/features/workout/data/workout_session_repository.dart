@@ -43,6 +43,7 @@ class WorkoutSessionRepository {
       for (final d in await (_db.select(_db.exerciseVideoDownloads)..where((d) => d.exerciseSlug.isIn(slugs))).get())
         d.exerciseSlug: d,
     };
+    final previous = await _lastWeights(session.planId, slugs);
 
     return LiveSession(
       sessionId: session.id,
@@ -50,9 +51,48 @@ class WorkoutSessionRepository {
       nameFr: session.nameFr,
       exercises: [
         for (final slot in slots)
-          _liveExercise(slot, exercises[slot.exerciseSlug], downloads[slot.exerciseSlug]),
+          _liveExercise(slot, exercises[slot.exerciseSlug], downloads[slot.exerciseSlug],
+              startWeightKg: previous[slot.exerciseSlug] ?? slot.suggestedWeightKg),
       ],
     );
+  }
+
+  /// Per exercise slug, the weight of the last set logged in a finished workout (FR-009), or
+  /// nothing when the plan was adapted after that workout's week — then the plan's adapted
+  /// value is newer (FR-026). Free plans are never adapted, so they always follow history.
+  Future<Map<String, double>> _lastWeights(String planId, Set<String> slugs) async {
+    if (slugs.isEmpty) return const {};
+    final rows = await (_db.select(_db.setLogs).join([
+      innerJoin(_db.planExercises, _db.planExercises.id.equalsExp(_db.setLogs.planExerciseId)),
+      innerJoin(_db.workoutLogs, _db.workoutLogs.id.equalsExp(_db.setLogs.workoutLogId)),
+      innerJoin(_db.sessions, _db.sessions.id.equalsExp(_db.workoutLogs.sessionId)),
+    ])
+          ..where(_db.planExercises.exerciseSlug.isIn(slugs) & _db.workoutLogs.finishedAt.isNotNull())
+          ..orderBy([OrderingTerm.desc(_db.setLogs.loggedAt)]))
+        .get();
+
+    final plan = await (_db.select(_db.plans)..where((p) => p.id.equals(planId))).getSingleOrNull();
+    final adaptedWeeks = <int>{};
+    if (plan != null) {
+      try {
+        for (final e in jsonDecode(plan.adaptationLog) as List) {
+          if (e is Map && e['week'] is int) adaptedWeeks.add(e['week'] as int);
+        }
+      } on FormatException {
+        // An unreadable log only means we fall back to history.
+      }
+    }
+
+    final out = <String, double>{};
+    final decided = <String>{};
+    for (final r in rows) {
+      final slug = r.readTable(_db.planExercises).exerciseSlug;
+      if (!decided.add(slug)) continue; // newest set per exercise only
+      final sameWeekOrLaterAdapted = r.readTable(_db.sessions).planId == planId &&
+          adaptedWeeks.any((w) => w >= r.readTable(_db.sessions).weekNumber);
+      if (!sameWeekOrLaterAdapted) out[slug] = r.readTable(_db.setLogs).weightKg;
+    }
+    return out;
   }
 
   /// The unfinished workout for [sessionId], if the app closed mid-workout.
@@ -112,7 +152,8 @@ class WorkoutSessionRepository {
     );
   }
 
-  static LiveExercise _liveExercise(PlanExercise slot, Exercise? e, ExerciseVideoDownload? d) => LiveExercise(
+  static LiveExercise _liveExercise(PlanExercise slot, Exercise? e, ExerciseVideoDownload? d, {double? startWeightKg}) =>
+      LiveExercise(
         planExerciseId: slot.id,
         slug: slot.exerciseSlug,
         // Text is cached for every plan exercise; the slug is a last-resort label.
@@ -127,6 +168,7 @@ class WorkoutSessionRepository {
         rpeTarget: slot.rpeTarget,
         rirTarget: slot.rirTarget,
         suggestedWeightKg: slot.suggestedWeightKg,
+        startWeightKg: startWeightKg,
         videoUrl: e?.videoFrontUrl,
         captions: {
           if (e?.captionsEnUrl != null) 'en': e!.captionsEnUrl!,

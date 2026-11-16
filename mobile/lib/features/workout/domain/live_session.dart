@@ -17,6 +17,7 @@ class LiveExercise {
     this.rpeTarget,
     this.rirTarget,
     this.suggestedWeightKg,
+    this.startWeightKg,
     this.videoUrl,
     this.captions = const {},
     this.localVideoPath,
@@ -40,6 +41,10 @@ class LiveExercise {
   /// Reps in reserve target (0–5). Effort is always logged as RPE (FR-007).
   final int? rirTarget;
   final double? suggestedWeightKg;
+
+  /// What the first set is pre-filled with (FR-009, T136): the last weight lifted for this
+  /// exercise in an earlier workout, unless the plan was adapted after it; else the plan value.
+  final double? startWeightKg;
   final String? videoUrl;
   final Map<String, String> captions;
   final String? localVideoPath;

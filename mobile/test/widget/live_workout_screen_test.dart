@@ -164,6 +164,48 @@ void main() {
     await unmount(tester);
   });
 
+  /// An earlier finished workout of the same exercise (goblet squat) on another session.
+  Future<void> seedEarlierSquat({required double kg, int week = 1}) async {
+    await db.batch((b) {
+      b.insert(db.sessions, SessionsCompanion.insert(
+          id: 's-mon', planId: kPlanId, weekNumber: week, dayOfWeek: DateTime.monday,
+          nameEn: 'Mon', nameFr: 'Lun', muscleGroups: '[]'));
+      b.insert(db.planExercises, PlanExercisesCompanion.insert(
+          id: 'pe-squat-mon', sessionId: 's-mon', exerciseSlug: 'goblet-squat', sets: 2, repsMin: 8, repsMax: 10,
+          suggestedWeightKg: const Value(16)));
+      b.insert(db.workoutLogs, WorkoutLogsCompanion.insert(
+          id: 'wl-mon', userId: kUserId, sessionId: 's-mon',
+          startedAt: Value(DateTime(2026, 11, 9, 18)), finishedAt: Value(DateTime(2026, 11, 9, 19))));
+      for (final (i, w) in [(1, kg - 2), (2, kg)]) {
+        b.insert(db.setLogs, SetLogsCompanion.insert(
+            id: 'sl-mon-$i', workoutLogId: 'wl-mon', planExerciseId: 'pe-squat-mon', setNumber: i, weightKg: w,
+            reps: 10, loggedAt: Value(DateTime(2026, 11, 9, 18, 10 * i))));
+      }
+    });
+  }
+
+  testWidgets('the first set starts from the last weight lifted for that exercise, not the plan value (FR-009, T136)',
+      (tester) async {
+    await setUpDb();
+    await seedEarlierSquat(kg: 20);
+    await pumpWorkout(tester);
+    expect(tester.widget<TextField>(find.byKey(const Key('weight-input'))).controller!.text, '20',
+        reason: 'last set of the earlier workout, not the plan\'s 16 kg');
+    await unmount(tester);
+  });
+
+  testWidgets('a plan adapted after that workout wins over the old weight (Pro adaptation is newer)', (tester) async {
+    await setUpDb();
+    await seedEarlierSquat(kg: 20);
+    await (db.update(db.plans)..where((p) => p.id.equals(kPlanId))).write(PlansCompanion(
+        adaptationLog: Value(jsonEncode([
+      {'week': 1, 'adaptations': [], 'sessions_scheduled': 1, 'sessions_completed': 1, 'summary_en': '', 'summary_fr': ''},
+    ]))));
+    await pumpWorkout(tester);
+    expect(tester.widget<TextField>(find.byKey(const Key('weight-input'))).controller!.text, '16');
+    await unmount(tester);
+  });
+
   testWidgets('free user offline: video area shows the inline Pro notice, no dialog, no overlay', (tester) async {
     await setUpDb();
     await pumpWorkout(tester);

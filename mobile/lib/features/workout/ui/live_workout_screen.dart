@@ -174,7 +174,7 @@ class _LiveWorkoutScreenState extends ConsumerState<LiveWorkoutScreen> {
   /// Plate calculator for the current set's weight, in the user's unit (FR-042). A bottom sheet,
   /// never a dialog over the set (Constitution VI).
   void _openPlates(LiveExercise ex, String unit) {
-    final weight = kgToUnit(ex.suggestedWeightKg ?? 0, unit);
+    final weight = kgToUnit(ex.startWeightKg ?? ex.suggestedWeightKg ?? 0, unit);
     showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
@@ -343,8 +343,9 @@ class _LiveWorkoutScreenState extends ConsumerState<LiveWorkoutScreen> {
       unit: unit,
       repsMin: ex.repsMin,
       repsMax: ex.repsMax,
-      // The next set starts from what was just lifted, else the plan's suggestion (FR-009).
-      prefillWeightKg: last?.weightKg ?? ex.suggestedWeightKg,
+      // The next set starts from what was just lifted; the first from the last workout of this
+      // exercise, or the plan's suggestion (FR-009, T136).
+      prefillWeightKg: last?.weightKg ?? ex.startWeightKg ?? ex.suggestedWeightKg,
       prefillReps: last?.reps,
       onDone: isCurrent ? (kg, reps, rpe) => _logSet(session, ex, n, kg, reps, rpe) : null,
     );
