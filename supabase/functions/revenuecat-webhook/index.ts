@@ -22,7 +22,7 @@ serve(async (req: Request) => {
         load: async (userId) => {
           const { data, error } = await db
             .from('subscriptions')
-            .select('user_id, tier, is_trial, trial_ends_at, current_period_ends_at, cancelled_at, revenuecat_customer_id')
+            .select('user_id, tier, is_trial, trial_ends_at, current_period_ends_at, cancelled_at, revenuecat_customer_id, trial_started_at, trial_converted_at')
             .eq('user_id', userId)
             .maybeSingle();
           if (error) throw new Error(error.message);

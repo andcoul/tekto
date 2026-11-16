@@ -125,3 +125,35 @@ Deno.test('malformed bodies are 400', async () => {
   assertEquals((await send(deps, {})).status, 400);
   assertEquals((await send(deps, { event: { type: 'RENEWAL' } })).status, 400);
 });
+
+// ---- T115: history needed by the Gate 2 metrics (trial start rate SC-006, trial-to-paid SC-007) ----
+
+Deno.test('a trial start is recorded once, and kept through conversion and expiry', async () => {
+  const { deps, rows } = store();
+  await send(deps, event('INITIAL_PURCHASE', { period_type: 'TRIAL', expiration_at_ms: T0 + 7 * DAY }));
+  assertEquals(rows.get('u1')!.trial_started_at, iso(T0));
+
+  await send(deps, event('RENEWAL', { is_trial_conversion: true, expiration_at_ms: T0 + 37 * DAY, event_timestamp_ms: T0 + 7 * DAY }));
+  assertEquals(rows.get('u1')!.trial_converted_at, iso(T0 + 7 * DAY));
+
+  await send(deps, event('EXPIRATION', { event_timestamp_ms: T0 + 40 * DAY }));
+  const r = rows.get('u1')!;
+  assertEquals([r.tier, r.trial_started_at, r.trial_converted_at], ['free', iso(T0), iso(T0 + 7 * DAY)]);
+});
+
+Deno.test('replaying a trial start or conversion keeps the first timestamps', async () => {
+  const { deps, rows } = store();
+  await send(deps, event('TRIAL_STARTED', { expiration_at_ms: T0 + 7 * DAY }));
+  await send(deps, event('TRIAL_STARTED', { expiration_at_ms: T0 + 7 * DAY, event_timestamp_ms: T0 + DAY }));
+  assertEquals(rows.get('u1')!.trial_started_at, iso(T0));
+  await send(deps, event('TRIAL_CONVERTED', { expiration_at_ms: T0 + 37 * DAY, event_timestamp_ms: T0 + 7 * DAY }));
+  await send(deps, event('TRIAL_CONVERTED', { expiration_at_ms: T0 + 37 * DAY, event_timestamp_ms: T0 + 8 * DAY }));
+  assertEquals(rows.get('u1')!.trial_converted_at, iso(T0 + 7 * DAY));
+});
+
+Deno.test('a purchase without a trial records neither timestamp', async () => {
+  const { deps, rows } = store();
+  await send(deps, event('INITIAL_PURCHASE'));
+  const r = rows.get('u1')!;
+  assertEquals([r.trial_started_at, r.trial_converted_at], [null, null]);
+});

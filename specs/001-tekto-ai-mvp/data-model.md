@@ -334,7 +334,8 @@ Tracks the user's current subscription state, synced from RevenueCat webhooks.
 | `revenuecat_customer_id` | text | nullable | RevenueCat customer ID |
 | `product_id` | text | nullable | Store product identifier |
 | `is_trial` | bool | NOT NULL, default false | Currently in 7-day trial |
-| `trial_started_at` | timestamptz | nullable | |
+| `trial_started_at` | timestamptz | nullable | First trial start; set once by the webhook and kept after the trial ends (Gate 2 trial start rate; migration 007) |
+| `trial_converted_at` | timestamptz | nullable | First trial conversion to paid; kept (trial-to-paid; migration 007) |
 | `trial_ends_at` | timestamptz | nullable | |
 | `current_period_ends_at` | timestamptz | nullable | Null for free tier |
 | `cancelled_at` | timestamptz | nullable | Set when user cancels; access continues until period end |
