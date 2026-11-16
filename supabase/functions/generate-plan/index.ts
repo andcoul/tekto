@@ -1,5 +1,6 @@
 // POST /generate-plan (contracts/backend-api.md §1). Decision logic lives in flow.ts (tested);
 // this file loads inputs, calls Claude, and persists the result.
+import { persistPlan } from './persist.ts';
 import { z } from 'npm:zod@4.6.7';
 import { errorResponse, jsonResponse, requireAuth } from '../_shared/auth.ts';
 import { CACHE_CONTROL, callStructured, PLAN_MODEL } from '../_shared/claude.ts';
@@ -51,6 +52,7 @@ RULES (non-negotiable):
 8. Write names and rationales in both English and French.`;
 
 Deno.serve(async (req: Request) => {
+  const requestStartedAt = performance.now();
   if (req.method !== 'POST') return errorResponse('Method not allowed', 405);
 
   let userId: string;
@@ -99,51 +101,69 @@ Deno.serve(async (req: Request) => {
   );
   if (!result.ok) return errorResponse(result.message, result.status, result.code);
 
-  if (active && body.force_regenerate) {
-    await db.from('plans').update({ status: 'archived' }).eq('id', active.id);
-  }
-
   const startDate = planStartDate(new Date(), user.timezone ?? 'UTC');
-  const { data: plan, error: planError } = await db.from('plans').insert({
-    user_id: userId,
-    name: result.plan.name_en,
-    weeks_total: result.plan.weeks_total,
-    rationale_en: result.rationale_en,
-    rationale_fr: result.rationale_fr,
-    source: result.source,
-    template_slug: result.template_slug,
-    start_date: startDate,
-    generated_by: result.source === 'ai' ? 'ai' : `template:${result.template_slug}`,
-  }).select('id').single();
-  if (planError || !plan) return errorResponse(`Failed to save plan: ${planError?.message}`, 500, 'SAVE_FAILED');
-
+  let saved: { planId: string; sessions: Awaited<ReturnType<typeof saveSessions>> };
   try {
-    const sessions = await saveSessions(db, plan.id, result.plan, library);
-    if (!user.onboarding_completed_at) {
-      await db.from('users').update({ onboarding_completed_at: new Date().toISOString() }).eq('id', userId);
-    }
-    console.log(JSON.stringify({ event: 'plan_generated', source: result.source, attempts: result.attempts }));
-    return jsonResponse({
-      plan: {
-        id: plan.id,
-        name_en: result.plan.name_en,
-        name_fr: result.plan.name_fr,
-        weeks_total: result.plan.weeks_total,
-        current_week: 1,
-        start_date: startDate,
-        source: result.source,
-        template_slug: result.template_slug,
-        rationale_en: result.rationale_en,
-        rationale_fr: result.rationale_fr,
-        fallback_notice: result.fallback_notice,
-        notices: result.notices,
-        sessions,
+    // T137: the new plan becomes active only once fully saved; activate_plan() archives the
+    // previous one in the same transaction. A failure discards the new plan and keeps the old.
+    saved = await persistPlan({
+      insertStagedPlan: async () => {
+        const { data, error } = await db.from('plans').insert({
+          user_id: userId,
+          status: 'archived',
+          name: result.plan.name_en,
+          weeks_total: result.plan.weeks_total,
+          rationale_en: result.rationale_en,
+          rationale_fr: result.rationale_fr,
+          source: result.source,
+          template_slug: result.template_slug,
+          start_date: startDate,
+          generated_by: result.source === 'ai' ? 'ai' : `template:${result.template_slug}`,
+        }).select('id').single();
+        if (error || !data) throw new Error(error?.message ?? 'no plan row');
+        return data.id as string;
       },
-    }, 201);
+      saveSessions: (planId) => saveSessions(db, planId, result.plan, library),
+      activate: async (planId) => {
+        const { error } = await db.rpc('activate_plan', { p_plan_id: planId });
+        if (error) throw new Error(error.message);
+      },
+      discard: async (planId) => {
+        const { error } = await db.from('plans').delete().eq('id', planId); // cascades
+        if (error) throw new Error(error.message);
+      },
+    });
   } catch (err) {
-    await db.from('plans').delete().eq('id', plan.id); // cascades to sessions + plan_exercises
     return errorResponse(`Failed to save plan: ${(err as Error).message}`, 500, 'SAVE_FAILED');
   }
+
+  if (!user.onboarding_completed_at) {
+    await db.from('users').update({ onboarding_completed_at: new Date().toISOString() }).eq('id', userId);
+  }
+  // SC-002: p95 of total_ms (request received → response, every attempt and the template path).
+  console.log(JSON.stringify({
+    event: 'plan_generated',
+    source: result.source,
+    attempts: result.attempts,
+    total_ms: Math.round(performance.now() - requestStartedAt),
+  }));
+  return jsonResponse({
+    plan: {
+      id: saved.planId,
+      name_en: result.plan.name_en,
+      name_fr: result.plan.name_fr,
+      weeks_total: result.plan.weeks_total,
+      current_week: 1,
+      start_date: startDate,
+      source: result.source,
+      template_slug: result.template_slug,
+      rationale_en: result.rationale_en,
+      rationale_fr: result.rationale_fr,
+      fallback_notice: result.fallback_notice,
+      notices: result.notices,
+      sessions: saved.sessions,
+    },
+  }, 201);
 });
 
 async function generateAiPlan(

@@ -206,7 +206,8 @@ tekto/
 │       ├── 009_rir_target.sql       # plan_exercises.rir_target
 │       ├── 010_coach_rpcs.sql       # increment_coach_quota + coach-message helper RPCs (service role)
 │       ├── 011_coach_change_rejection.sql # coach_messages.plan_change_rejected_at
-│       └── 012_exports_bucket.sql   # private storage bucket for GDPR exports
+│       ├── 012_exports_bucket.sql   # private storage bucket for GDPR exports
+│       └── 013_activate_plan.sql    # activate_plan(): switch the active plan in one transaction
 │
 ├── content/
 │   ├── exercises/
