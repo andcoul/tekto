@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
+import 'package:tekto/features/plan/domain/adaptation_provider.dart';
 import 'package:tekto/core/di/providers.dart';
 import 'package:tekto/core/l10n/gen/app_localizations.dart';
 import 'package:tekto/features/plan/domain/plan_provider.dart';
@@ -41,6 +42,7 @@ void main() {
         currentUserIdProvider.overrideWithValue(kUserId),
         clockProvider.overrideWithValue(() => now),
         activePlanProvider.overrideWith((ref) => Stream.value(noPlan ? null : (plan ?? fixturePlan()))),
+        unseenAdaptationProvider.overrideWith((ref) => Stream.value(null)), // adaptation_card_test covers it
       ],
       child: MaterialApp.router(
         routerConfig: router,

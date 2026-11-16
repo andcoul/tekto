@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
+import 'package:tekto/features/subscription/domain/entitlement_provider.dart';
 import 'package:tekto/core/di/providers.dart';
 import 'package:tekto/core/l10n/gen/app_localizations.dart';
 import 'package:tekto/features/workout/domain/workout_providers.dart';
@@ -71,6 +72,7 @@ void main() {
         syncQueueProvider.overrideWithValue(queue),
         currentUserIdProvider.overrideWithValue(kUserId),
         healthPlatformProvider.overrideWithValue(health),
+        entitlementProvider.overrideWith((ref) => Stream.value(EntitlementState.free)),
       ],
       child: MaterialApp.router(
         routerConfig: router,

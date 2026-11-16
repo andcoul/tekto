@@ -296,16 +296,17 @@
   "freePlanDaysCapped": "Your free plan has 4 sessions a week. Tekto Pro builds programs for 5 or more days.",
   "coachUnavailable": "The coach is temporarily unavailable. Your plan still works — try again in a moment.",
   "proUnavailableInRegion": "Tekto Pro is not yet available in your region.",
-  "adaptationSessionsCompleted": "{completed} of {scheduled} sessions completed",
+  "adaptationSessionsCompleted": "{done} of {total} sessions completed",
   "@adaptationSessionsCompleted": {
     "placeholders": {
-      "completed": {
+      "done": {
         "type": "int"
       },
-      "scheduled": {
+      "total": {
         "type": "int"
       }
-    }
+    },
+    "description": "Weekly adaptation summary (FR-027)"
   },
   "adaptationWhyLabel": "Why",
   "formCheckFreeTryUsed": "You've used your free form check for this lift.",
@@ -557,5 +558,33 @@
   },
   "@coachRateNotHelpful": {
     "description": "Tooltip and screen-reader label of the thumbs-down on a coach answer (SC-011)"
+  },
+  "adaptationWhy": "Why?",
+  "@adaptationWhy": {
+    "description": "Weekly adaptation card / summary (FR-027)"
+  },
+  "adaptationDismiss": "Dismiss",
+  "@adaptationDismiss": {
+    "description": "Weekly adaptation card / summary (FR-027)"
+  },
+  "adaptationTitle": "Week {week} review",
+  "@adaptationTitle": {
+    "placeholders": {
+      "week": {
+        "type": "int"
+      }
+    },
+    "description": "Weekly adaptation summary (FR-027)"
+  },
+  "adaptationNoChanges": "No changes for next week — keep going.",
+  "@adaptationNoChanges": {
+    "description": "Weekly adaptation card / summary (FR-027)"
+  },
+  "@adaptationGotIt": {
+    "description": "Weekly adaptation card / summary (FR-027)"
+  },
+  "adaptationReps": "reps",
+  "@adaptationReps": {
+    "description": "Weekly adaptation card / summary (FR-027)"
   }
 }

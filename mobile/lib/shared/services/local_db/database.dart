@@ -77,6 +77,8 @@ class Plans extends Table {
   TextColumn get rationaleEn => text().nullable()();
   TextColumn get rationaleFr => text().nullable()();
   TextColumn get adaptationLog => text().withDefault(const Constant('[]'))(); // JSON
+  /// Device-only: the newest adaptation week whose card the user dismissed or opened (T086). v3.
+  IntColumn get adaptationSeenWeek => integer().withDefault(const Constant(0))();
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
   DateTimeColumn get updatedAt => dateTime().withDefault(currentDateAndTime)();
 
@@ -303,8 +305,9 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.executor);
 
   /// v2 (2026-11-15): plan_exercises.rir_target, body_weight_entries.
+  /// v3 (2026-11-16): plans.adaptation_seen_week (device-only).
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -313,6 +316,9 @@ class AppDatabase extends _$AppDatabase {
           if (from < 2) {
             await m.addColumn(planExercises, planExercises.rirTarget);
             await m.createTable(bodyWeightEntries);
+          }
+          if (from < 3) {
+            await m.addColumn(plans, plans.adaptationSeenWeek);
           }
         },
       );

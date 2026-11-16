@@ -1,3 +1,6 @@
+import 'package:tekto/features/subscription/domain/entitlement_provider.dart';
+import 'package:tekto/features/plan/domain/adaptation_provider.dart';
+import 'package:tekto/core/di/providers.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -47,6 +50,21 @@ class _WorkoutSummaryScreenState extends ConsumerState<WorkoutSummaryScreen> {
           start: summary.startedAt,
           end: finishedAt,
         ));
+
+    // Fire and forget: if this workout completed the training week, a Pro plan is adapted now
+    // (FR-026 early trigger); its summary shows as a card once the plan refreshes.
+    try {
+      final userId = ref.read(currentUserIdProvider);
+      if (userId != null) {
+        unawaited(ref.read(adaptationServiceProvider).afterWorkoutFinished(
+              sessionId: widget.sessionId,
+              userId: userId,
+              isPro: ref.read(entitlementProvider).value?.isPro ?? false,
+            ));
+      }
+    } on Object {
+      // Never keep the user here: the hourly batch adapts the week anyway.
+    }
 
     ref.read(workoutControllerProvider.notifier).reset();
     if (mounted) context.go('/home');

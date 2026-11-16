@@ -1,3 +1,4 @@
+import 'package:tekto/features/plan/ui/adaptation_card.dart';
 import 'package:tekto/features/coach/ui/coach_launcher.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -55,6 +56,8 @@ class PlanOverviewScreen extends ConsumerWidget {
                         const SizedBox(height: AppSpacing.xs),
                         Text(rationale, style: Theme.of(context).textTheme.bodyMedium),
                       ],
+                      // What changed this week and why (FR-027).
+                      const AdaptationCard(),
                       const SizedBox(height: 4),
                       Text(
                         'Week ${plan.currentWeek} of ${plan.weeksTotal}',

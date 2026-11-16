@@ -76,6 +76,8 @@ class PlanRepository {
       templateSlug: Value(row['template_slug'] as String?),
       rationaleEn: Value(row['rationale_en'] as String?),
       rationaleFr: Value(row['rationale_fr'] as String?),
+      // Weekly summaries from adapt-plan (both triggers), shown as a card until seen (T086).
+      adaptationLog: Value(jsonEncode(row['adaptation_log'] ?? const [])),
     ));
   }
 

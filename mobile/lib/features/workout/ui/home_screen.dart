@@ -1,3 +1,4 @@
+import 'package:tekto/features/plan/ui/adaptation_card.dart';
 import 'package:tekto/features/coach/ui/coach_launcher.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -54,6 +55,7 @@ class HomeScreen extends ConsumerWidget {
               AsyncError(:final error) => Text('$error'),
               _ => const _SessionCardSkeleton(),
             },
+            const AdaptationCard(),
             const SizedBox(height: AppSpacing.base),
             const _QuickAccessRow(),
           ],

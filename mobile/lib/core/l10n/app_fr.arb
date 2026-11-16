@@ -145,7 +145,7 @@
   "freePlanDaysCapped": "Votre programme gratuit comprend 4 séances par semaine. Tekto Pro crée des programmes de 5 jours ou plus.",
   "coachUnavailable": "Le coach est momentanément indisponible. Votre programme fonctionne toujours — réessayez dans un instant.",
   "proUnavailableInRegion": "Tekto Pro n'est pas encore disponible dans votre région.",
-  "adaptationSessionsCompleted": "{completed} séances sur {scheduled} effectuées",
+  "adaptationSessionsCompleted": "{done} séances faites sur {total}",
   "adaptationWhyLabel": "Pourquoi",
   "formCheckFreeTryUsed": "Vous avez utilisé votre analyse de forme gratuite pour cet exercice.",
   "libraryVideoUnavailable": "Vidéo indisponible",
@@ -244,5 +244,10 @@
   "formCheckDone": "Terminé",
   "formCheckTryAgain": "Réessayer",
   "coachRateHelpful": "Utile",
-  "coachRateNotHelpful": "Pas utile"
+  "coachRateNotHelpful": "Pas utile",
+  "adaptationWhy": "Pourquoi ?",
+  "adaptationDismiss": "Fermer",
+  "adaptationTitle": "Bilan de la semaine {week}",
+  "adaptationNoChanges": "Aucun changement la semaine prochaine — continuez.",
+  "adaptationReps": "reps"
 }
