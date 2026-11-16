@@ -272,10 +272,11 @@ A single turn in a coach conversation.
 | `context_session_id` | uuid | FK → sessions.id, nullable | Session in view when asked |
 | `plan_change_proposed` | jsonb | nullable | Proposed change awaiting confirmation |
 | `plan_change_applied` | bool | default false | Whether the change was confirmed and applied |
+| `plan_change_rejected_at` | timestamptz | nullable | Set when the user taps "No thanks" (`confirmed: false`); migration 011 |
 | `satisfaction_rating` | bool | nullable | Thumbs up/down; null if not rated |
 | `created_at` | timestamptz | NOT NULL | |
 
-**Validation rule**: `plan_change_applied` can only be `true` if `plan_change_proposed` is non-null.
+**Validation rule**: `plan_change_applied` can only be `true` if `plan_change_proposed` is non-null; `plan_change_applied` and `plan_change_rejected_at` are never both set. A change is pending while neither is.
 
 ---
 

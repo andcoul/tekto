@@ -274,9 +274,12 @@ Confirms or rejects a proposed plan modification from the coach.
 | `NO_PENDING_CHANGE` | 400 | Message has no `plan_change_proposed`, or it was already applied |
 | `EXERCISE_NO_VIDEO` | 400 | Swap target has no video (Constitution IV) |
 | `EXERCISE_NOT_ALLOWED` | 400 | Swap target needs unavailable equipment or is contraindicated |
-| `MESSAGE_NOT_FOUND` | 404 | |
+| `EXERCISE_NOT_EQUIVALENT` | 400 | Swap target does not train the same primary muscle (same rule as §4) |
+| `INVALID_CHANGE` | 400 | The proposal is missing fields for its type, or sets an invalid weight / rep range |
+| `PLAN_TARGET_NOT_FOUND` | 404 | The plan exercise, session or week is not in the user's active plan |
+| `MESSAGE_NOT_FOUND` | 404 | Unknown message, or one from another user's conversation |
 
-`confirmed: false` records the rejection and returns `{ "applied": false }`.
+`confirmed: false` records the rejection and returns `{ "applied": false }`. The rejection is stored in `coach_messages.plan_change_rejected_at` (migration 011); an applied or rejected change returns `NO_PENDING_CHANGE` afterwards. `session_shorten` also returns `removed_plan_exercise_ids`.
 
 ---
 

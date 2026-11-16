@@ -4,6 +4,7 @@ import 'package:tekto/core/di/providers.dart';
 import 'package:tekto/features/coach/data/coach_conversation_repository.dart';
 import 'package:tekto/features/coach/data/coach_message_repository.dart';
 import 'package:tekto/features/coach/domain/coach_quota_service.dart';
+import 'package:tekto/features/plan/domain/plan_provider.dart';
 import 'package:tekto/features/subscription/domain/entitlement_provider.dart';
 import 'package:tekto/shared/services/api/supabase_client.dart' show ApiStatusException;
 import 'package:tekto/shared/models/coach_model.dart';
@@ -202,12 +203,13 @@ class CoachController extends Notifier<CoachState> {
         _ => 'NETWORK_ERROR',
       };
 
-  /// Applies a coach-proposed plan change.
+  /// Applies a coach-proposed plan change once the user taps "Apply change" (FR-018), then
+  /// refreshes the cached plan so the workout and plan screens show the change.
   Future<void> confirmChange(String messageId) async {
     try {
       await ref.read(dioClientProvider).post<void>(
         '/functions/v1/coach-confirm-change',
-        data: {'message_id': messageId},
+        data: {'message_id': messageId, 'confirmed': true},
       );
       await _messageRepo.markPlanChangeApplied(messageId);
       state = state.copyWith(
@@ -217,12 +219,30 @@ class CoachController extends Notifier<CoachState> {
       );
     } catch (e) {
       state = state.copyWith(status: CoachStatus.error, errorMessage: e.toString());
+      return;
+    }
+    final userId = ref.read(currentUserIdProvider);
+    if (userId != null) {
+      try {
+        await ref.read(planRepositoryProvider).refreshActivePlan(userId);
+      } on Object {
+        // Applied on the server; the cache catches up on the next refresh.
+      }
     }
   }
 
-  /// Dismisses a proposed plan change without a server call.
-  void rejectChange(String messageId) {
+  /// Dismisses a proposed plan change. The card goes away at once; the rejection is recorded on
+  /// the server (contract: `confirmed: false`) when online, and simply stays unapplied otherwise.
+  Future<void> rejectChange(String messageId) async {
     state = state.copyWith(rejectedChangeIds: {...state.rejectedChangeIds, messageId});
+    try {
+      await ref.read(dioClientProvider).post<void>(
+        '/functions/v1/coach-confirm-change',
+        data: {'message_id': messageId, 'confirmed': false},
+      );
+    } on Object {
+      // Offline or already handled: nothing was applied, so there is nothing to undo.
+    }
   }
 }
 

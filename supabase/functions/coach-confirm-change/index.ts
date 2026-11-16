@@ -1,104 +1,100 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
-import { getAuthUser, errorResponse, jsonResponse } from '../_shared/auth.ts';
+import { errorResponse, getAuthUser, jsonResponse } from '../_shared/auth.ts';
 import { getDb } from '../_shared/db.ts';
+import { buildSwapDeps } from '../swap-exercise/deps.ts';
+import { type ConfirmDeps, type ConfirmRequest, handleConfirm, type PlanExerciseRow } from './apply.ts';
 
-// ---------------------------------------------------------------------------
-// Apply a coach-proposed plan change.
-// ---------------------------------------------------------------------------
-// Validates:
-//   1. The message has a non-null plan_change_proposed
-//   2. The replacement exercise has a video_front_url (Video Gate, Principle IV)
-//   3. The plan_exercise belongs to the authenticated user's active plan
-// Then applies the change and marks plan_change_applied = true.
-
+// POST /coach-confirm-change — contracts/backend-api.md §3 (FR-018). Rules live in apply.ts:
+// all four change types, checked against the user's active plan; swaps follow the user-swap
+// rules (Video Gate, equipment, limitations — Constitution IV); `confirmed: false` records
+// the rejection. plan_exercises reference exercises by `exercise_slug` (001_initial_schema.sql).
 serve(async (req: Request) => {
   if (req.method !== 'POST') return errorResponse('Method not allowed', 405);
 
   const user = await getAuthUser(req);
-  if (!user) return errorResponse('Unauthorized', 401);
+  if (!user) return errorResponse('Unauthorized', 401, 'UNAUTHORIZED');
 
-  let body: { message_id: string };
+  let body: ConfirmRequest;
   try {
     body = await req.json();
   } catch {
-    return errorResponse('Invalid JSON', 400);
+    return errorResponse('Invalid JSON', 400, 'INVALID_REQUEST');
   }
-
-  if (!body.message_id) return errorResponse('message_id is required', 400);
 
   const db = getDb();
-
-  // ---- Fetch the message ----
-  const { data: message, error: msgErr } = await db
-    .from('coach_messages')
-    .select('id, plan_change_proposed, plan_change_applied, conversation_id')
-    .eq('id', body.message_id)
-    .single();
-
-  if (msgErr || !message) return errorResponse('Message not found', 404);
-  if (!message.plan_change_proposed) {
-    return errorResponse('No plan_change_proposed on this message', 400);
-  }
-  if (message.plan_change_applied) {
-    return errorResponse('Plan change already applied', 409);
-  }
-
-  const change = message.plan_change_proposed as {
-    type: string;
-    plan_exercise_id: string;
-    new_exercise_slug: string;
+  const throwOn = (error: { message: string } | null) => {
+    if (error) throw new Error(error.message);
   };
 
-  if (change.type !== 'swap_exercise') {
-    return errorResponse(`Unsupported change type: ${change.type}`, 400);
+  const deps: ConfirmDeps = {
+    now: () => new Date(),
+    loadMessage: async (id) => {
+      const { data } = await db
+        .from('coach_messages')
+        .select('id, plan_change_proposed, plan_change_applied, plan_change_rejected_at, coach_conversations!inner(user_id)')
+        .eq('id', id)
+        .maybeSingle();
+      if (!data) return null;
+      return {
+        id: data.id,
+        // deno-lint-ignore no-explicit-any -- nested select shape
+        user_id: (data as any).coach_conversations?.user_id,
+        plan_change_proposed: data.plan_change_proposed,
+        plan_change_applied: data.plan_change_applied,
+        plan_change_rejected_at: data.plan_change_rejected_at,
+      };
+    },
+    loadActivePlanExercises: async (userId) => {
+      const { data, error } = await db
+        .from('plan_exercises')
+        .select(
+          'id, session_id, exercise_slug, sort_order, sets, reps_min, reps_max, rest_sec, suggested_weight_kg, ' +
+            'sessions!inner(week_number, plans!inner(user_id, status))',
+        )
+        .eq('sessions.plans.user_id', userId)
+        .eq('sessions.plans.status', 'active');
+      throwOn(error);
+      // deno-lint-ignore no-explicit-any -- nested select shape
+      return (data ?? []).map((r: any): PlanExerciseRow => ({
+        id: r.id,
+        session_id: r.session_id,
+        week_number: r.sessions.week_number,
+        exercise_slug: r.exercise_slug,
+        sort_order: r.sort_order,
+        sets: r.sets,
+        reps_min: r.reps_min,
+        reps_max: r.reps_max,
+        rest_sec: r.rest_sec,
+        suggested_weight_kg: r.suggested_weight_kg === null ? null : Number(r.suggested_weight_kg),
+      }));
+    },
+    updatePlanExercise: async (id, patch) => {
+      const { error } = await db.from('plan_exercises').update(patch).eq('id', id);
+      throwOn(error);
+    },
+    deletePlanExercises: async (ids) => {
+      const { error } = await db.from('plan_exercises').delete().in('id', ids);
+      throwOn(error);
+    },
+    updateSessionEstimate: async (sessionId, minutes) => {
+      const { error } = await db.from('sessions').update({ estimated_min: minutes }).eq('id', sessionId);
+      throwOn(error);
+    },
+    markApplied: async (messageId) => {
+      const { error } = await db.from('coach_messages').update({ plan_change_applied: true }).eq('id', messageId);
+      throwOn(error);
+    },
+    markRejected: async (messageId, at) => {
+      const { error } = await db.from('coach_messages').update({ plan_change_rejected_at: at.toISOString() }).eq('id', messageId);
+      throwOn(error);
+    },
+    swap: buildSwapDeps(db),
+  };
+
+  try {
+    const result = await handleConfirm(user.id, body, deps);
+    return jsonResponse(result.body, result.status);
+  } catch (err) {
+    return errorResponse(`Failed to apply the change: ${(err as Error).message}`, 500, 'APPLY_FAILED');
   }
-
-  // ---- Video Gate: new exercise must have video_front_url ----
-  const { data: exercise } = await db
-    .from('exercises')
-    .select('id, video_front_url')
-    .eq('slug', change.new_exercise_slug)
-    .single();
-
-  if (!exercise) {
-    return errorResponse('New exercise not found', 404);
-  }
-  if (!exercise.video_front_url) {
-    return errorResponse('EXERCISE_NO_VIDEO: replacement exercise has no video', 400);
-  }
-
-  // ---- Verify ownership: plan_exercise must belong to user's active plan ----
-  const { data: planExercise } = await db
-    .from('plan_exercises')
-    .select(`
-      id,
-      sessions!inner(plans!inner(user_id, status))
-    `)
-    .eq('id', change.plan_exercise_id)
-    .single();
-
-  if (!planExercise) return errorResponse('Plan exercise not found', 404);
-
-  // deno-lint-ignore no-explicit-any
-  const plan = (planExercise as any).sessions?.plans;
-  if (plan?.user_id !== user.id) return errorResponse('Forbidden', 403);
-  if (plan?.status !== 'active') return errorResponse('Plan is not active', 400);
-
-  // ---- Apply the swap ----
-  await db
-    .from('plan_exercises')
-    .update({ exercise_id: exercise.id })
-    .eq('id', change.plan_exercise_id);
-
-  // ---- Mark message as applied ----
-  await db
-    .from('coach_messages')
-    .update({ plan_change_applied: true })
-    .eq('id', body.message_id);
-
-  return jsonResponse({
-    applied: true,
-    plan_exercise_id: change.plan_exercise_id,
-    new_exercise_id: exercise.id,
-  });
 });
