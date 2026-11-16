@@ -1,7 +1,10 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:tekto/features/settings/domain/settings_service.dart';
 
 import '../../../core/di/providers.dart';
 import '../../../core/l10n/gen/app_localizations.dart';
@@ -13,24 +16,96 @@ import '../domain/onboarding_controller.dart';
 ///
 /// TODO(T094): step labels below use an inline EN/FR helper; move them to the ARB files.
 class OnboardingQuizScreen extends ConsumerStatefulWidget {
-  const OnboardingQuizScreen({super.key});
+  const OnboardingQuizScreen({super.key, this.editProfile = false});
+
+  /// Settings → "Edit my training profile" (FR-046, T131): starts prefilled from the saved
+  /// profile, skips the language step (it has its own setting), saves instead of building a
+  /// plan, then offers "Regenerate my plan". The active plan is untouched until confirmed.
+  final bool editProfile;
 
   @override
   ConsumerState<OnboardingQuizScreen> createState() => _OnboardingQuizScreenState();
 }
 
 class _OnboardingQuizScreenState extends ConsumerState<OnboardingQuizScreen> {
-  int _step = 0;
+  late int _step = _firstStep;
+  bool _saving = false;
+
+  int get _firstStep => widget.editProfile ? 1 : 0;
 
   @override
   void initState() {
     super.initState();
+    if (widget.editProfile) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => _prefill());
+      return;
+    }
     // Pre-select the device language (en/fr) the first time the quiz opens.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted || ref.read(onboardingControllerProvider).language != null) return;
       final device = Localizations.localeOf(context).languageCode;
       _setLanguage(device == 'fr' ? 'fr' : 'en');
     });
+  }
+
+  Future<void> _prefill() async {
+    final userId = ref.read(currentUserIdProvider);
+    if (userId == null) return;
+    final db = ref.read(appDatabaseProvider);
+    final user = await (db.select(db.users)..where((u) => u.id.equals(userId))).getSingleOrNull();
+    if (user == null || !mounted) return;
+    List<String> list(String? json) => json == null ? const [] : (jsonDecode(json) as List).cast<String>();
+    final strength = <String, ({double weightKg, int reps})>{};
+    if (user.strengthEstimates case final raw?) {
+      for (final MapEntry(:key, :value) in (jsonDecode(raw) as Map<String, dynamic>).entries) {
+        final m = value as Map<String, dynamic>;
+        strength[key] = (weightKg: (m['weight_kg'] as num).toDouble(), reps: (m['reps'] as num).toInt());
+      }
+    }
+    ref.read(onboardingControllerProvider.notifier).prefill(
+          goal: user.goal,
+          level: user.level,
+          daysPerWeek: user.daysPerWeek,
+          sessionLengthMin: user.sessionLengthMin,
+          equipment: list(user.equipment),
+          limitations: list(user.limitations),
+          limitationsNote: user.limitationsNote,
+          strength: strength,
+        );
+  }
+
+  /// Edit mode: save the answers, then offer to regenerate the plan (never automatically).
+  Future<void> _saveEdits() async {
+    final settings = ref.read(settingsServiceProvider);
+    if (settings == null) return;
+    final l = AppLocalizations.of(context);
+    setState(() => _saving = true);
+    try {
+      await settings.saveProfile(ref.read(onboardingControllerProvider.notifier).editableProfileRow());
+    } finally {
+      if (mounted) setState(() => _saving = false);
+    }
+    if (!mounted) return;
+    final regenerate = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(l.settingsRegeneratePlan),
+        content: Text(l.profileEditRegenerateBody),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(l.profileEditNotNow)),
+          TextButton(onPressed: () => Navigator.pop(ctx, true), child: Text(l.settingsRegenerateConfirm)),
+        ],
+      ),
+    );
+    if (regenerate == true) {
+      try {
+        await settings.regeneratePlan();
+        if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l.settingsRegenerateDone)));
+      } on Object {
+        if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l.settingsRegenerateFailed)));
+      }
+    }
+    if (mounted) context.canPop() ? context.pop() : context.go('/settings');
   }
 
   void _setLanguage(String code) {
@@ -113,11 +188,11 @@ class _OnboardingQuizScreenState extends ConsumerState<OnboardingQuizScreen> {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        leading: _step > 0
+        leading: _step > _firstStep
             ? IconButton(icon: const Icon(Icons.arrow_back), onPressed: () => setState(() => _step--))
-            : null,
+            : (widget.editProfile ? const CloseButton() : null),
         title: LinearProgressIndicator(
-          value: (_step + 1) / OnboardingState.stepCount,
+          value: (_step + 1 - _firstStep) / (OnboardingState.stepCount - _firstStep),
           backgroundColor: AppColors.charcoalElevated,
           valueColor: const AlwaysStoppedAnimation<Color>(AppColors.accent),
         ),
@@ -131,9 +206,11 @@ class _OnboardingQuizScreenState extends ConsumerState<OnboardingQuizScreen> {
               Expanded(child: step),
               const SizedBox(height: AppSpacing.lg),
               ElevatedButton(
-                onPressed: state.canProceed(_step)
+                onPressed: state.canProceed(_step) && !_saving
                     ? () {
-                        if (isLast) {
+                        if (isLast && widget.editProfile) {
+                          _saveEdits();
+                        } else if (isLast) {
                           ctrl.submit();
                           context.go('/onboarding/generating');
                         } else {
@@ -141,7 +218,11 @@ class _OnboardingQuizScreenState extends ConsumerState<OnboardingQuizScreen> {
                         }
                       }
                     : null,
-                child: Text(isLast ? _t(context, 'Build my plan', 'Créer mon programme') : _t(context, 'Next', 'Suivant')),
+                child: Text(isLast
+                    ? (widget.editProfile
+                        ? AppLocalizations.of(context).profileEditSave
+                        : _t(context, 'Build my plan', 'Créer mon programme'))
+                    : _t(context, 'Next', 'Suivant')),
               ),
             ],
           ),

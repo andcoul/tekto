@@ -203,6 +203,40 @@ class OnboardingController extends _$OnboardingController {
     state = state.copyWith(strength: next);
   }
 
+  /// Loads the saved answers for editing from Settings (FR-046, T131).
+  void prefill({
+    required String goal,
+    required String level,
+    required int daysPerWeek,
+    required int sessionLengthMin,
+    required List<String> equipment,
+    required List<String> limitations,
+    String? limitationsNote,
+    Map<String, ({double weightKg, int reps})> strength = const {},
+  }) {
+    state = state.copyWith(
+      goal: goal,
+      level: level,
+      daysPerWeek: daysPerWeek.clamp(1, 7),
+      sessionLengthMin: sessionLengthMin.clamp(15, 120),
+      equipment: equipment,
+      limitations: limitations.where(kLimitationTags.contains).toList(),
+      limitationsNote: limitationsNote ?? '',
+      strength: strength,
+    );
+  }
+
+  /// The answers a user can edit later (FR-046): no language (its own setting), no consent or
+  /// time zone (editing limitations needs no new consent — only a new consent version does).
+  Map<String, dynamic> editableProfileRow() {
+    final row = profileRow(timezone: '')
+      ..remove('language')
+      ..remove('timezone')
+      ..remove('consent_at')
+      ..remove('consent_version');
+    return row;
+  }
+
   /// The `users` row for this profile (snake_case columns; weights already in kg).
   Map<String, dynamic> profileRow({required String timezone}) => {
         'goal': state.goal,

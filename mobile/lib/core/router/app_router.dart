@@ -198,6 +198,11 @@ GoRouter appRouter(Ref ref) {
             path: 'subscription',
             builder: (context, state) => const SubscriptionSettingsScreen(),
           ),
+          // Edit onboarding answers (FR-046, T131): the quiz without its language step.
+          GoRoute(
+            path: 'profile',
+            builder: (context, state) => const OnboardingQuizScreen(editProfile: true),
+          ),
         ],
       ),
 

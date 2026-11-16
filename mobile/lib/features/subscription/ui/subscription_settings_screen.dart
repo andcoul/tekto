@@ -1,3 +1,4 @@
+import 'package:tekto/features/settings/domain/settings_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tekto/core/di/providers.dart';
@@ -67,7 +68,7 @@ class _Body extends ConsumerWidget {
         _SectionHeader('Legal'),
         ListTile(
           title: const Text('Privacy Policy'),
-          onTap: () => _launchUrl('https://tekto.app/privacy'),
+          onTap: () => _launchUrl(kPrivacyPolicyUrl),
         ),
         ListTile(
           title: const Text('Terms of Service'),

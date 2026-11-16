@@ -1,3 +1,5 @@
+import 'package:url_launcher/url_launcher.dart';
+import 'package:tekto/features/settings/domain/settings_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -34,7 +36,12 @@ class ConsentScreen extends ConsumerWidget {
                 Text(l10n.consentTitle, style: Theme.of(context).textTheme.displayMedium, textAlign: TextAlign.center),
                 const SizedBox(height: AppSpacing.base),
                 Expanded(child: SingleChildScrollView(child: Text(l10n.consentBody))),
-                const SizedBox(height: AppSpacing.lg),
+                // FR-038: the privacy policy is linked from onboarding.
+                TextButton(
+                  onPressed: () => launchUrl(Uri.parse(kPrivacyPolicyUrl), mode: LaunchMode.externalApplication),
+                  child: Text(l10n.settingsPrivacyPolicy),
+                ),
+                const SizedBox(height: AppSpacing.base),
                 ElevatedButton(
                   onPressed: () async {
                     final now = DateTime.now().toUtc();

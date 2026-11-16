@@ -240,11 +240,11 @@
   "settingsUnits": "Weight units",
   "settingsUnitKg": "Kilograms (kg)",
   "settingsUnitLb": "Pounds (lb)",
-  "settingsHealthSync": "Sync to Apple Health",
+  "settingsHealthSync": "Sync workouts to Apple Health / Health Connect",
   "settingsSubscription": "Subscription",
   "settingsAccount": "Account",
   "settingsExportData": "Export my data",
-  "settingsExportDataConfirm": "Your data will be prepared and a download link emailed to you.",
+  "settingsExportDataConfirm": "We prepare one file with all your data. The download link works for 1 hour.",
   "settingsDeleteAccount": "Delete account",
   "settingsDeleteAccountConfirm": "This will permanently delete all your data and cannot be undone. Are you sure?",
   "settingsDeleteAccountConfirmSecond": "Delete my account permanently",
@@ -586,5 +586,83 @@
   "adaptationReps": "reps",
   "@adaptationReps": {
     "description": "Weekly adaptation card / summary (FR-027)"
+  },
+  "@settingsHealthSync": {
+    "description": "Settings (T091)"
+  },
+  "@settingsExportDataConfirm": {
+    "description": "Settings (T091)"
+  },
+  "settingsExportReady": "Your export is ready",
+  "@settingsExportReady": {
+    "description": "Settings (T091)"
+  },
+  "settingsExportOpen": "Open",
+  "@settingsExportOpen": {
+    "description": "Settings (T091)"
+  },
+  "settingsExportFailed": "Export failed. Check your connection and try again.",
+  "@settingsExportFailed": {
+    "description": "Settings (T091)"
+  },
+  "settingsRegeneratePlan": "Regenerate my plan",
+  "@settingsRegeneratePlan": {
+    "description": "Settings (T091)"
+  },
+  "settingsRegeneratePlanBody": "Build a new plan from your current answers? Your current plan is replaced; your workout history stays.",
+  "@settingsRegeneratePlanBody": {
+    "description": "Settings (T091)"
+  },
+  "settingsRegenerateConfirm": "Regenerate",
+  "@settingsRegenerateConfirm": {
+    "description": "Settings (T091)"
+  },
+  "settingsRegenerateDone": "Your new plan is ready.",
+  "@settingsRegenerateDone": {
+    "description": "Settings (T091)"
+  },
+  "settingsRegenerateFailed": "Could not build a new plan. Check your connection and try again.",
+  "@settingsRegenerateFailed": {
+    "description": "Settings (T091)"
+  },
+  "settingsDeleteAccountFinalTitle": "Last step",
+  "@settingsDeleteAccountFinalTitle": {
+    "description": "Settings (T091)"
+  },
+  "settingsDeleteAccountFinalBody": "Your account, workouts, plans and coach messages will be deleted from our servers and this phone.",
+  "@settingsDeleteAccountFinalBody": {
+    "description": "Settings (T091)"
+  },
+  "settingsDeleteFailed": "Your account could not be deleted. Nothing was removed. Try again when you are online.",
+  "@settingsDeleteFailed": {
+    "description": "Settings (T091)"
+  },
+  "settingsPrivacyPolicy": "Privacy policy",
+  "@settingsPrivacyPolicy": {
+    "description": "Settings (T091)"
+  },
+  "settingsManageSubscription": "Manage subscription",
+  "@settingsManageSubscription": {
+    "description": "Settings (T091)"
+  },
+  "settingsEditProfile": "Edit my training profile",
+  "@settingsEditProfile": {
+    "description": "Settings (T091)"
+  },
+  "settingsNeedsConnection": "Connect to the internet to do this.",
+  "@settingsNeedsConnection": {
+    "description": "Settings (T091)"
+  },
+  "profileEditSave": "Save",
+  "@profileEditSave": {
+    "description": "Edit training profile from Settings (FR-046, T131)"
+  },
+  "profileEditRegenerateBody": "Your answers are saved. Build a new plan from them now? Your current plan stays until you do.",
+  "@profileEditRegenerateBody": {
+    "description": "Edit training profile from Settings (FR-046, T131)"
+  },
+  "profileEditNotNow": "Not now",
+  "@profileEditNotNow": {
+    "description": "Edit training profile from Settings (FR-046, T131)"
   }
 }

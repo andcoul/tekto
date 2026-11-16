@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'features/settings/domain/settings_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -28,6 +29,13 @@ class TektoApp extends ConsumerWidget {
         // the UI; offline it does nothing and runs again on the next sign-in or launch.
         unawaited(HistoryBackfillService(db: ref.read(appDatabaseProvider), api: ref.read(dioClientProvider))
             .run(user.id));
+        // The saved language survives restarts (FR-033); the training week follows the device
+        // zone (FR-026). Both read and write the device profile; neither blocks the UI.
+        final settings = ref.read(settingsServiceProvider);
+        if (settings != null) {
+          unawaited(settings.applySavedLanguage().catchError((Object _) {}));
+          unawaited(settings.syncTimezone().then((_) {}, onError: (Object _) {}));
+        }
       } else if (next.hasValue) {
         revenueCat.reset();
       }
