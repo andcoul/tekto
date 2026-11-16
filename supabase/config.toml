@@ -93,3 +93,11 @@ enabled = false
 [functions]
 # Sets the base URL for Deno modules imported from npm specifiers.
 # npm_registry = "https://npm.pkg.github.com"
+
+# GET /health is polled by the external uptime monitor without a user token (T088, SC-013).
+[functions.health]
+verify_jwt = false
+
+# RevenueCat authenticates with its own shared secret, not a Supabase JWT (contracts §6).
+[functions.revenuecat-webhook]
+verify_jwt = false
