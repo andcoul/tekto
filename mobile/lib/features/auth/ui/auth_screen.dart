@@ -1,3 +1,4 @@
+import 'package:tekto/core/l10n/gen/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -113,13 +114,13 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
               if (!_showEmail) ...[
                 _SocialButton(
                   icon: Icons.apple,
-                  label: 'Continue with Apple',
+                  label: AppLocalizations.of(context).authApple,
                   onPressed: _loading ? null : _signInApple,
                 ),
                 const SizedBox(height: 12),
                 _SocialButton(
                   icon: Icons.g_mobiledata_rounded,
-                  label: 'Continue with Google',
+                  label: AppLocalizations.of(context).authGoogle,
                   onPressed: _loading ? null : _signInGoogle,
                 ),
                 const SizedBox(height: 12),
@@ -127,7 +128,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                   onPressed: _loading
                       ? null
                       : () => setState(() => _showEmail = true),
-                  child: const Text('Sign in with email'),
+                  child: Text(AppLocalizations.of(context).authEmail),
                 ),
               ] else ...[
                 TextField(

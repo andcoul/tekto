@@ -1,3 +1,4 @@
+import 'package:tekto/core/l10n/gen/app_localizations.dart';
 import 'package:tekto/features/coach/ui/coach_launcher.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -40,7 +41,7 @@ class _ExerciseListScreenState extends ConsumerState<ExerciseListScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Exercise Library'),
+        title: Text(AppLocalizations.of(context).libraryTitle),
         actions: const [CoachButton(screen: 'library')],
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(60),
@@ -54,6 +55,7 @@ class _ExerciseListScreenState extends ConsumerState<ExerciseListScreen> {
                 suffixIcon: _query.isNotEmpty
                     ? IconButton(
                         icon: const Icon(Icons.clear),
+                        tooltip: AppLocalizations.of(context).libraryClearSearch,
                         onPressed: () => setState(() => _query = ''),
                       )
                     : null,
@@ -78,9 +80,9 @@ class _ExerciseListScreenState extends ConsumerState<ExerciseListScreen> {
             child: exercisesAsync.when(
               loading: () =>
                   const Center(child: CircularProgressIndicator()),
-              error: (e, _) => Center(child: Text('Error: $e')),
+              error: (e, _) => Center(child: Text(AppLocalizations.of(context).commonLoadError)),
               data: (exercises) => exercises.isEmpty
-                  ? const Center(child: Text('No exercises found.'))
+                  ? Center(child: Text(AppLocalizations.of(context).libraryEmpty))
                   : ListView.builder(
                       itemCount: exercises.length,
                       itemBuilder: (context, index) =>

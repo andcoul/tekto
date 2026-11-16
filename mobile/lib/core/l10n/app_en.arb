@@ -108,7 +108,7 @@
       }
     }
   },
-  "libraryTitle": "Exercise Library",
+  "libraryTitle": "Exercise library",
   "librarySearchHint": "Search exercises…",
   "libraryFilterMuscle": "Muscle",
   "libraryFilterEquipment": "Equipment",
@@ -664,5 +664,271 @@
   "profileEditNotNow": "Not now",
   "@profileEditNotNow": {
     "description": "Edit training profile from Settings (FR-046, T131)"
+  },
+  "quizGoalTitle": "What is your main goal?",
+  "@quizGoalTitle": {
+    "description": "T094 localization audit"
+  },
+  "quizGoalMuscle": "Build muscle",
+  "@quizGoalMuscle": {
+    "description": "T094 localization audit"
+  },
+  "quizGoalStrength": "Get stronger",
+  "@quizGoalStrength": {
+    "description": "T094 localization audit"
+  },
+  "quizGoalFatLoss": "Lose fat",
+  "@quizGoalFatLoss": {
+    "description": "T094 localization audit"
+  },
+  "quizGoalGeneral": "General fitness",
+  "@quizGoalGeneral": {
+    "description": "T094 localization audit"
+  },
+  "quizLevelTitle": "Your training level",
+  "@quizLevelTitle": {
+    "description": "T094 localization audit"
+  },
+  "quizLevelBeginner": "Beginner",
+  "@quizLevelBeginner": {
+    "description": "T094 localization audit"
+  },
+  "quizLevelIntermediate": "Intermediate",
+  "@quizLevelIntermediate": {
+    "description": "T094 localization audit"
+  },
+  "quizLevelAdvanced": "Advanced",
+  "@quizLevelAdvanced": {
+    "description": "T094 localization audit"
+  },
+  "quizDaysTitle": "Days per week",
+  "@quizDaysTitle": {
+    "description": "T094 localization audit"
+  },
+  "quizSessionTitle": "Session length",
+  "@quizSessionTitle": {
+    "description": "T094 localization audit"
+  },
+  "quizEquipmentTitle": "Your equipment",
+  "@quizEquipmentTitle": {
+    "description": "T094 localization audit"
+  },
+  "quizEquipmentBarbell": "Barbell",
+  "@quizEquipmentBarbell": {
+    "description": "T094 localization audit"
+  },
+  "quizEquipmentDumbbell": "Dumbbells",
+  "@quizEquipmentDumbbell": {
+    "description": "T094 localization audit"
+  },
+  "quizEquipmentCable": "Cable / machines",
+  "@quizEquipmentCable": {
+    "description": "T094 localization audit"
+  },
+  "quizEquipmentBodyweight": "Bodyweight",
+  "@quizEquipmentBodyweight": {
+    "description": "T094 localization audit"
+  },
+  "quizEquipmentBands": "Resistance bands",
+  "@quizEquipmentBands": {
+    "description": "T094 localization audit"
+  },
+  "quizLimitationsTitle": "Any injuries or limitations?",
+  "@quizLimitationsTitle": {
+    "description": "T094 localization audit"
+  },
+  "quizLimitationsNote": "Anything else? (optional)",
+  "@quizLimitationsNote": {
+    "description": "T094 localization audit"
+  },
+  "quizStrengthTitle": "Strength check (optional)",
+  "@quizStrengthTitle": {
+    "description": "T094 localization audit"
+  },
+  "quizNext": "Next",
+  "@quizNext": {
+    "description": "T094 localization audit"
+  },
+  "quizBuildPlan": "Build my plan",
+  "@quizBuildPlan": {
+    "description": "T094 localization audit"
+  },
+  "quizReps": "reps",
+  "@quizReps": {
+    "description": "T094 localization audit"
+  },
+  "quizLimitationsBody": "Optional. We will avoid exercises that stress these areas.",
+  "@quizLimitationsBody": {
+    "description": "T094 localization audit"
+  },
+  "quizStrengthBody": "A recent weight (kg) you lifted and for how many reps. Leave empty if you don't know — we start conservatively.",
+  "@quizStrengthBody": {
+    "description": "T094 localization audit"
+  },
+  "limitationKnee": "Knee",
+  "@limitationKnee": {
+    "description": "T094 localization audit"
+  },
+  "limitationLowerBack": "Lower back",
+  "@limitationLowerBack": {
+    "description": "T094 localization audit"
+  },
+  "limitationShoulder": "Shoulder",
+  "@limitationShoulder": {
+    "description": "T094 localization audit"
+  },
+  "limitationWrist": "Wrist",
+  "@limitationWrist": {
+    "description": "T094 localization audit"
+  },
+  "limitationElbow": "Elbow",
+  "@limitationElbow": {
+    "description": "T094 localization audit"
+  },
+  "limitationHip": "Hip",
+  "@limitationHip": {
+    "description": "T094 localization audit"
+  },
+  "limitationAnkle": "Ankle",
+  "@limitationAnkle": {
+    "description": "T094 localization audit"
+  },
+  "limitationNeck": "Neck",
+  "@limitationNeck": {
+    "description": "T094 localization audit"
+  },
+  "liftSquat": "Squat",
+  "@liftSquat": {
+    "description": "T094 localization audit"
+  },
+  "liftBenchPress": "Bench press",
+  "@liftBenchPress": {
+    "description": "T094 localization audit"
+  },
+  "liftDeadlift": "Deadlift",
+  "@liftDeadlift": {
+    "description": "T094 localization audit"
+  },
+  "@planTitle": {
+    "description": "T094 localization audit"
+  },
+  "commonLoadError": "Something went wrong. Pull to retry or try again later.",
+  "@commonLoadError": {
+    "description": "T094 localization audit"
+  },
+  "planNone": "No active plan.",
+  "@planNone": {
+    "description": "T094 localization audit"
+  },
+  "planGenerate": "Generate a plan",
+  "@planGenerate": {
+    "description": "T094 localization audit"
+  },
+  "planRestDay": "Rest day",
+  "@planRestDay": {
+    "description": "T094 localization audit"
+  },
+  "planRestDayBody": "Recovery is part of the plan.",
+  "@planRestDayBody": {
+    "description": "T094 localization audit"
+  },
+  "@libraryTitle": {
+    "description": "T094 localization audit"
+  },
+  "libraryEmpty": "No exercises found.",
+  "@libraryEmpty": {
+    "description": "T094 localization audit"
+  },
+  "libraryFront": "Front",
+  "@libraryFront": {
+    "description": "T094 localization audit"
+  },
+  "librarySide": "Side",
+  "@librarySide": {
+    "description": "T094 localization audit"
+  },
+  "libraryCues": "Technique cues",
+  "@libraryCues": {
+    "description": "T094 localization audit"
+  },
+  "libraryMistakes": "Common mistakes",
+  "@libraryMistakes": {
+    "description": "T094 localization audit"
+  },
+  "libraryVariations": "Variations",
+  "@libraryVariations": {
+    "description": "T094 localization audit"
+  },
+  "subscriptionManageHint": "Opens App Store or Google Play",
+  "@subscriptionManageHint": {
+    "description": "T094 localization audit"
+  },
+  "subscriptionRestore": "Restore purchases",
+  "@subscriptionRestore": {
+    "description": "T094 localization audit"
+  },
+  "subscriptionTerms": "Terms of Service",
+  "@subscriptionTerms": {
+    "description": "T094 localization audit"
+  },
+  "subscriptionRestored": "Purchases restored.",
+  "@subscriptionRestored": {
+    "description": "T094 localization audit"
+  },
+  "subscriptionRestoreFailed": "Restore failed. Try again.",
+  "@subscriptionRestoreFailed": {
+    "description": "T094 localization audit"
+  },
+  "planGenSlow": "This is taking longer than expected.",
+  "@planGenSlow": {
+    "description": "T094 localization audit"
+  },
+  "planGenCheckConnection": "Please check your connection and try again.",
+  "@planGenCheckConnection": {
+    "description": "T094 localization audit"
+  },
+  "planGenAiDown": "AI is temporarily unavailable.",
+  "@planGenAiDown": {
+    "description": "T094 localization audit"
+  },
+  "planGenTryLater": "Please try again in a moment.",
+  "@planGenTryLater": {
+    "description": "T094 localization audit"
+  },
+  "commonTryAgain": "Try again",
+  "@commonTryAgain": {
+    "description": "T094 localization audit"
+  },
+  "authApple": "Continue with Apple",
+  "@authApple": {
+    "description": "T094 localization audit"
+  },
+  "authGoogle": "Continue with Google",
+  "@authGoogle": {
+    "description": "T094 localization audit"
+  },
+  "authEmail": "Sign in with email",
+  "@authEmail": {
+    "description": "T094 localization audit"
+  },
+  "commonNotFound": "Page not found.",
+  "@commonNotFound": {
+    "description": "T094 localization audit"
+  },
+  "libraryEasier": "Easier",
+  "@libraryEasier": {
+    "description": "T094 localization audit"
+  },
+  "libraryHarder": "Harder",
+  "@libraryHarder": {
+    "description": "T094 localization audit"
+  },
+  "coachSend": "Send",
+  "@coachSend": {
+    "description": "Screen-reader label (T093, FR-035)"
+  },
+  "libraryClearSearch": "Clear search",
+  "@libraryClearSearch": {
+    "description": "Screen-reader label (T093, FR-035)"
   }
 }

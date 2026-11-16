@@ -250,6 +250,7 @@ class _InputRow extends StatelessWidget {
                 // Disabled while a reply is streaming in; no spinner (the bubble shows progress).
                 child: IconButton(
                   icon: const Icon(Icons.send),
+                  tooltip: AppLocalizations.of(context).coachSend,
                   color: AppColors.accent,
                   onPressed: sending ? null : onSend,
                 ),

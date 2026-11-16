@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:tekto/shared/services/sync/sync_queue.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:drift/native.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -44,6 +46,10 @@ void main() {
     c = ProviderContainer(overrides: [
       appDatabaseProvider.overrideWithValue(db),
       dioClientProvider.overrideWithValue(api),
+      // No connectivity plugin in unit tests: a queue that never sees a network change.
+      syncQueueProvider.overrideWith(
+        (ref) => SyncQueue(db: db, dio: api, connectivityChanges: const Stream<List<ConnectivityResult>>.empty()),
+      ),
       currentUserIdProvider.overrideWithValue('user-1'),
       clockProvider.overrideWithValue(() => _now),
       entitlementProvider.overrideWith((ref) => Stream.value(EntitlementState.free)),

@@ -27,21 +27,21 @@ class PlanOverviewScreen extends ConsumerWidget {
     final planAsync = ref.watch(activePlanProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('My Plan'), actions: const [CoachButton(screen: 'plan_overview')]),
+      appBar: AppBar(title: Text(AppLocalizations.of(context).planTitle), actions: const [CoachButton(screen: 'plan_overview')]),
       body: planAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text('Error: $e')),
+        error: (e, _) => Center(child: Text(AppLocalizations.of(context).commonLoadError)),
         data: (plan) {
           if (plan == null) {
             return Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Text('No active plan.'),
+                  Text(AppLocalizations.of(context).planNone),
                   const SizedBox(height: 16),
                   ElevatedButton(
                     onPressed: () => context.go('/onboarding/disclaimer'),
-                    child: const Text('Generate a plan'),
+                    child: Text(AppLocalizations.of(context).planGenerate),
                   ),
                 ],
               ),
@@ -68,7 +68,7 @@ class PlanOverviewScreen extends ConsumerWidget {
                       const AdaptationCard(),
                       const SizedBox(height: 4),
                       Text(
-                        'Week ${plan.currentWeek} of ${plan.weeksTotal}',
+                        AppLocalizations.of(context).planWeekOf(plan.currentWeek, plan.weeksTotal),
                         style: Theme.of(context).textTheme.bodyMedium,
                       ),
                       _PlanNotices(planId: plan.id),
@@ -132,8 +132,8 @@ class _DayCard extends ConsumerWidget {
           child: ListTile(
             contentPadding: const EdgeInsets.all(AppSpacing.base),
             leading: badge,
-            title: Text(fr ? 'Repos' : 'Rest day'),
-            subtitle: Text(fr ? 'La récupération fait partie du programme.' : 'Recovery is part of the plan.'),
+            title: Text(AppLocalizations.of(context).planRestDay),
+            subtitle: Text(AppLocalizations.of(context).planRestDayBody),
           ),
         ),
       );

@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:tekto/core/l10n/gen/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -132,15 +133,15 @@ class _TimeoutView extends StatelessWidget {
         children: [
           const Icon(Icons.wifi_off, size: 48, color: AppColors.onDarkSecondary),
           const SizedBox(height: AppSpacing.lg),
-          Text('This is taking longer than expected.',
+          Text(AppLocalizations.of(context).planGenSlow,
               style: Theme.of(context).textTheme.titleLarge,
               textAlign: TextAlign.center),
           const SizedBox(height: AppSpacing.sm),
-          Text('Please check your connection and try again.',
+          Text(AppLocalizations.of(context).planGenCheckConnection,
               style: Theme.of(context).textTheme.bodyMedium,
               textAlign: TextAlign.center),
           const SizedBox(height: AppSpacing.lg),
-          ElevatedButton(onPressed: onRetry, child: const Text('Try again')),
+          ElevatedButton(onPressed: onRetry, child: Text(AppLocalizations.of(context).commonTryAgain)),
         ],
       );
 }
@@ -156,15 +157,15 @@ class _ErrorView extends StatelessWidget {
         children: [
           const Icon(Icons.error_outline, size: 48, color: AppColors.error),
           const SizedBox(height: AppSpacing.lg),
-          Text('AI is temporarily unavailable.',
+          Text(AppLocalizations.of(context).planGenAiDown,
               style: Theme.of(context).textTheme.titleLarge,
               textAlign: TextAlign.center),
           const SizedBox(height: AppSpacing.sm),
-          Text('Please try again in a moment.',
+          Text(AppLocalizations.of(context).planGenTryLater,
               style: Theme.of(context).textTheme.bodyMedium,
               textAlign: TextAlign.center),
           const SizedBox(height: AppSpacing.lg),
-          ElevatedButton(onPressed: onRetry, child: const Text('Try again')),
+          ElevatedButton(onPressed: onRetry, child: Text(AppLocalizations.of(context).commonTryAgain)),
         ],
       );
 }

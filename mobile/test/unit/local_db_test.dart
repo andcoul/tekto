@@ -20,11 +20,12 @@ void main() {
     addTearDown(() => dir.delete(recursive: true));
     final file = File('${dir.path}/db.sqlite');
 
-    // Build a v2 file, then roll it back to the v1 shape.
+    // Build a current file, then roll it back to the v1 shape (v3's column removed too).
     final v2 = AppDatabase.forTesting(NativeDatabase(file));
     await v2.customStatement("INSERT INTO plan_exercises (id, session_id, exercise_slug, sets, reps_min, reps_max) VALUES ('pe1', 's1', 'goblet-squat', 3, 8, 12)");
     await v2.customStatement('DROP TABLE body_weight_entries');
     await v2.customStatement('ALTER TABLE plan_exercises DROP COLUMN rir_target');
+    await v2.customStatement('ALTER TABLE plans DROP COLUMN adaptation_seen_week');
     await v2.customStatement('PRAGMA user_version = 1');
     await v2.close();
 
@@ -37,6 +38,23 @@ void main() {
     await upgraded.into(upgraded.bodyWeightEntries).insert(BodyWeightEntriesCompanion.insert(
           id: 'bw1', userId: 'u1', weightKg: 80, measuredOn: DateTime(2026, 11, 15)));
     expect(await upgraded.select(upgraded.bodyWeightEntries).get(), hasLength(1));
+  });
+
+  test('schema v2 → v3 adds plans.adaptation_seen_week (0), keeping plans', () async {
+    final dir = await Directory.systemTemp.createTemp('tekto_migration_v3');
+    addTearDown(() => dir.delete(recursive: true));
+    final file = File('${dir.path}/db.sqlite');
+
+    final v2 = AppDatabase.forTesting(NativeDatabase(file));
+    await v2.customStatement("INSERT INTO plans (id, user_id, name, weeks_total) VALUES ('p1', 'u1', 'Plan', 4)");
+    await v2.customStatement('ALTER TABLE plans DROP COLUMN adaptation_seen_week');
+    await v2.customStatement('PRAGMA user_version = 2');
+    await v2.close();
+
+    final upgraded = AppDatabase.forTesting(NativeDatabase(file));
+    addTearDown(upgraded.close);
+    final plan = await upgraded.select(upgraded.plans).getSingle();
+    expect([plan.id, plan.adaptationSeenWeek], ['p1', 0]);
   });
 
   test('the bundled SQLite is SQLCipher (Constitution II)', () async {

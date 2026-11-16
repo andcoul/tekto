@@ -17,14 +17,15 @@ description: "Task list for Tekto AI MVP (regenerated after spec clarifications 
 
 **Organization**: Tasks are grouped by user story; story labels match spec.md (US1–US7). Phases follow spec priority: P1 = US6, US1, US2, US7, US4; P2 = US3, US5. Priority is build order only; every story is required at launch (spec **Launch scope** lines).
 
-## Progress (2026-11-16)
+## Progress (2026-11-16, after `/speckit-implement`)
 
-**101 done / 34 open** of 135. Phases 1–7 are done except two external tasks (below). Phase 8 (US3 coach): T069, T070, T073, T076, T077, T078, T116 done; T071, T072, T074, T075, T110, T111, T134 open. The app compiles (`flutter analyze`: 0 errors; T128); the iOS/Android device build is T135.
+**126 done / 14 open** of 140. Every code task is done; the 14 open tasks need accounts, devices, content or people:
 
-- **T114** — staging Supabase project + Vault secrets (needs account access; blocks T075, T095)
-- **T022** — ≥ 150 filmed exercises (content workstream; 15 today)
+- **Accounts / infrastructure**: T114 staging project + secrets (blocks T075 guardrail run, T095 staging timings), T092 uptime monitor on the deployed `/health`, T133 `supabase db reset` with Docker (001–013 already applied on a local Postgres with Supabase schemas stubbed — only 006 pg_cron and pgvector could not run there)
+- **Devices**: T135 iOS/Android build, T130 form-check threshold tuning, T095 performance run, T096 privacy audit, T097 Scenarios 1–9; T093 VoiceOver/TalkBack + tablet walkthrough (code part done)
+- **Content / people**: T022 ≥ 150 filmed exercises (15 today), T132 welcome + paywall clips, T094 native-speaker review of the French (code part done), T098 store listings
 
-Not yet verified: the Pro AI plan path against the real Claude API (needs `ANTHROPIC_API_KEY`), quickstart Scenarios 1, 2, 4 and 7 on a device (Scenario 4 also tunes the form-check thresholds), and the Health write on a real phone. Next: T072 (guardrail eval), T134 (quota week), then T071 → T074, T110, T111.
+Not yet verified: the Pro AI plan path and the coach against the real Claude API (needs `ANTHROPIC_API_KEY`, staging), and the Health write on a real phone. Next: T114 (unblocks T075, T095), then T135 on devices.
 
 ---
 
@@ -317,8 +318,8 @@ Not yet verified: the Pro AI plan path against the real Claude API (needs `ANTHR
 - [X] T090 [P] Update `supabase/functions/delete-account/index.ts` to the `DELETE /delete-account` contract (§8): require `{ "confirm": true }`, delete the RevenueCat customer, delete export files, delete `auth.users` (cascade)
 - [X] T091 Update `mobile/lib/features/settings/ui/settings_screen.dart`: language toggle EN/FR saved to `users.language` and applied immediately (FR-033); unit toggle kg/lb saved to `users.unit` and used by every weight display and input (FR-034); health sync toggle saved to `users.health_sync_enabled`; "Regenerate my plan" (`force_regenerate: true`, confirm dialog); refresh `users.timezone` when the device zone changes; export shows the download link; delete account uses a two-step confirmation, then calls `AppDatabase.wipe()` and returns to the welcome screen; a privacy policy link (also on the consent screen, FR-038)
 - [ ] T092 Configure an external uptime monitor on `GET /health` every 60 s with alerts; record the monitor URL in `specs/001-tekto-ai-mvp/checklists/gate1.md`
-- [ ] T093 [P] Accessibility pass on all primary screens: `Semantics` labels, Dynamic Type up to the largest size without clipping, tap targets ≥ 48×48 dp, VoiceOver and TalkBack walkthrough (FR-035, Constitution VI); run every primary screen on an iPad and an Android tablet and fix any clipping or broken layout (spec Assumptions)
-- [ ] T094 [P] Localization audit of `app_en.arb` / `app_fr.arb`: no hard-coded user-facing strings in `mobile/lib/`; French copy reviewed by a native speaker
+- [ ] T093 [P] Accessibility pass on all primary screens: `Semantics` labels, Dynamic Type up to the largest size without clipping, tap targets ≥ 48×48 dp, VoiceOver and TalkBack walkthrough (FR-035, Constitution VI); run every primary screen on an iPad and an Android tablet and fix any clipping or broken layout (spec Assumptions). Code part done 2026-11-16: every icon button has a localized tooltip / screen-reader label, coach, rating and plan buttons are ≥ 48 dp, no text-scaling clamp; remaining: the device walkthrough
+- [ ] T094 [P] Localization audit of `app_en.arb` / `app_fr.arb`: no hard-coded user-facing strings in `mobile/lib/`; French copy reviewed by a native speaker. Code part done 2026-11-16: ~70 strings moved to ARB (quiz, plan, library, subscription, plan generation, auth, router); only brand names and the EN/FR and kg/lb toggle labels stay literal; remaining: the native-speaker review
 - [ ] T095 Performance run on iPhone 12 and Pixel 6 — cold start < 2 s, video first frame < 1 s (LTE profile), form-check median < 150 ms, coach first token < 3 s p95 (≥ 50 staging messages, SC-015), plan generation < 30 s p95 (≥ 20 runs, SC-002) — and record results in `specs/001-tekto-ai-mvp/checklists/gate1.md`
 - [ ] T096 Privacy audit per quickstart Scenario 9 steps 1–2 (encrypted local DB, zero network bytes during form check); record results in `checklists/gate1.md`
 - [ ] T097 Add rows for quickstart Scenarios 8 and 9 to `specs/001-tekto-ai-mvp/checklists/gate1.md`, then run Scenarios 1–9 on iOS 16 and Android 10 and record pass/fail for each, including the Scenario 1–2 steps for FR-039–FR-045; time Scenario 1 from account creation to plan and record it (SC-016); Scenario 4 is recorded after the T130 tuning

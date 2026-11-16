@@ -69,7 +69,7 @@ class _ExerciseDetailScreenState extends ConsumerState<ExerciseDetailScreen> {
                   if (exercise.videoSideUrl != null)
                     TextButton(
                       onPressed: () => setState(() => _showSideView = !_showSideView),
-                      child: Text(_showSideView ? 'Front' : 'Side', style: const TextStyle(color: AppColors.accent)),
+                      child: Text(_showSideView ? AppLocalizations.of(context).libraryFront : AppLocalizations.of(context).librarySide, style: const TextStyle(color: AppColors.accent)),
                     ),
                   // Offline downloads are a Pro entitlement (FR-015); hidden for free users.
                   if (isPro)
@@ -88,18 +88,18 @@ class _ExerciseDetailScreenState extends ConsumerState<ExerciseDetailScreen> {
                     const SizedBox(height: 4),
                     Text(exercise.musclePrimary.join(' · '), style: Theme.of(context).textTheme.bodyMedium),
                     const SizedBox(height: AppSpacing.lg),
-                    _SectionHeader(fr ? 'Consignes techniques' : 'Technique cues'),
+                    _SectionHeader(AppLocalizations.of(context).libraryCues),
                     ...cues.asMap().entries.map((e) => _CueRow(number: e.key + 1, text: e.value)),
                     const SizedBox(height: AppSpacing.lg),
-                    _SectionHeader(fr ? 'Erreurs fréquentes' : 'Common mistakes'),
+                    _SectionHeader(AppLocalizations.of(context).libraryMistakes),
                     ...mistakes.map((m) => _MistakeRow(text: m)),
                     if (exercise.variationEasierSlug != null || exercise.variationHarderSlug != null) ...[
                       const SizedBox(height: AppSpacing.lg),
-                      _SectionHeader(fr ? 'Variantes' : 'Variations'),
+                      _SectionHeader(AppLocalizations.of(context).libraryVariations),
                       if (exercise.variationEasierSlug != null)
-                        _VariationTile(slug: exercise.variationEasierSlug!, label: fr ? 'Plus facile' : 'Easier', icon: Icons.arrow_downward),
+                        _VariationTile(slug: exercise.variationEasierSlug!, label: AppLocalizations.of(context).libraryEasier, icon: Icons.arrow_downward),
                       if (exercise.variationHarderSlug != null)
-                        _VariationTile(slug: exercise.variationHarderSlug!, label: fr ? 'Plus difficile' : 'Harder', icon: Icons.arrow_upward),
+                        _VariationTile(slug: exercise.variationHarderSlug!, label: AppLocalizations.of(context).libraryHarder, icon: Icons.arrow_upward),
                     ],
                     const SizedBox(height: 80),
                   ]),

@@ -1,3 +1,4 @@
+import 'package:tekto/core/l10n/gen/app_localizations.dart';
 import 'package:tekto/features/settings/domain/settings_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -18,10 +19,10 @@ class SubscriptionSettingsScreen extends ConsumerWidget {
     final entitlement = ref.watch(entitlementProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Subscription')),
+      appBar: AppBar(title: Text(AppLocalizations.of(context).settingsSubscription)),
       body: entitlement.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text('Error: $e')),
+        error: (e, _) => Center(child: Text(AppLocalizations.of(context).commonLoadError)),
         data: (state) => _Body(state: state),
       ),
     );
@@ -45,7 +46,7 @@ class _Body extends ConsumerWidget {
             color: state.isPro ? AppColors.accent : null,
           ),
           title: Text(state.isPro ? 'Tekto Pro' : 'Free'),
-          subtitle: _buildSubtitle(state),
+          subtitle: _buildSubtitle(context, state),
         ),
         const Divider(),
 
@@ -53,13 +54,13 @@ class _Body extends ConsumerWidget {
         _SectionHeader('Manage'),
         ListTile(
           leading: const Icon(Icons.open_in_new),
-          title: const Text('Manage subscription'),
-          subtitle: const Text('Opens App Store or Google Play'),
+          title: Text(AppLocalizations.of(context).settingsManageSubscription),
+          subtitle: Text(AppLocalizations.of(context).subscriptionManageHint),
           onTap: () => _openManageSubscription(Theme.of(context).platform),
         ),
         ListTile(
           leading: const Icon(Icons.restore),
-          title: const Text('Restore purchases'),
+          title: Text(AppLocalizations.of(context).subscriptionRestore),
           onTap: () => _restorePurchases(context, ref),
         ),
         const Divider(),
@@ -67,25 +68,25 @@ class _Body extends ConsumerWidget {
         // ---- Legal ----
         _SectionHeader('Legal'),
         ListTile(
-          title: const Text('Privacy Policy'),
+          title: Text(AppLocalizations.of(context).settingsPrivacyPolicy),
           onTap: () => _launchUrl(kPrivacyPolicyUrl),
         ),
         ListTile(
-          title: const Text('Terms of Service'),
+          title: Text(AppLocalizations.of(context).subscriptionTerms),
           onTap: () => _launchUrl('https://tekto.app/terms'),
         ),
       ],
     );
   }
 
-  Text? _buildSubtitle(EntitlementState state) {
+  Text? _buildSubtitle(BuildContext context, EntitlementState state) {
     if (!state.isPro) return null;
+    final l = AppLocalizations.of(context);
     if (state.isTrial && state.periodEndsAt != null) {
-      return Text(
-          'Trial ends ${_formatDate(state.periodEndsAt!)}');
+      return Text(l.subscriptionTrialEnds(_formatDate(state.periodEndsAt!)));
     }
     if (state.periodEndsAt != null) {
-      return Text('Renews ${_formatDate(state.periodEndsAt!)}');
+      return Text(l.subscriptionRenews(_formatDate(state.periodEndsAt!)));
     }
     return null;
   }
@@ -109,11 +110,11 @@ class _Body extends ConsumerWidget {
     try {
       await service.restorePurchases();
       messenger.showSnackBar(
-        const SnackBar(content: Text('Purchases restored.')),
+        SnackBar(content: Text(AppLocalizations.of(context).subscriptionRestored)),
       );
     } on Object {
       messenger.showSnackBar(
-        const SnackBar(content: Text('Restore failed. Try again.')),
+        SnackBar(content: Text(AppLocalizations.of(context).subscriptionRestoreFailed)),
       );
     }
   }

@@ -1,3 +1,4 @@
+import 'package:tekto/core/l10n/gen/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -221,7 +222,7 @@ GoRouter appRouter(Ref ref) {
       ),
     ],
     errorBuilder: (context, state) => Scaffold(
-      body: Center(child: Text('Page not found: ${state.error}')),
+      body: Center(child: Text(AppLocalizations.of(context).commonNotFound)),
     ),
   );
 }
