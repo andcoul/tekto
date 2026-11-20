@@ -26,7 +26,7 @@ class AdaptationCard extends ConsumerWidget {
         padding: const EdgeInsets.fromLTRB(AppSpacing.base, AppSpacing.sm, 0, AppSpacing.sm),
         child: Row(
           children: [
-            const Icon(Icons.trending_up, color: AppColors.accent),
+            const Icon(Icons.trending_up, color: AppColors.glacier),
             const SizedBox(width: AppSpacing.sm),
             Expanded(
               child: Column(

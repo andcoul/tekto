@@ -58,8 +58,18 @@ Future<List<ProOffer>?> proOffers(Ref ref) async {
   final current = offerings?.current;
   if (current == null) return null;
   final offers = [
-    if (current.annual case final annual?) ProOffer(isAnnual: true, priceString: annual.storeProduct.priceString, price: annual.storeProduct.price, package: annual),
-    if (current.monthly case final monthly?) ProOffer(isAnnual: false, priceString: monthly.storeProduct.priceString, price: monthly.storeProduct.price, package: monthly),
+    if (current.annual case final annual?)
+      ProOffer(
+          isAnnual: true,
+          priceString: annual.storeProduct.priceString,
+          price: annual.storeProduct.price,
+          package: annual),
+    if (current.monthly case final monthly?)
+      ProOffer(
+          isAnnual: false,
+          priceString: monthly.storeProduct.priceString,
+          price: monthly.storeProduct.price,
+          package: monthly),
   ];
   return offers.isEmpty ? null : offers;
 }

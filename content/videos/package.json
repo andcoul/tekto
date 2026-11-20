@@ -1,0 +1,11 @@
+{
+  "name": "tekto-video-ingest",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Checks and converts the exercise and screen video loops (design/video-prompts.md)",
+  "scripts": {
+    "ingest": "node ingest.js",
+    "test": "node --test"
+  }
+}

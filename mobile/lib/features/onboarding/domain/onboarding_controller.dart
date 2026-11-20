@@ -40,6 +40,7 @@ class GeneratedPlanInfo {
 abstract class OnboardingApi {
   /// Upserts the `users` row for the signed-in user.
   Future<void> saveProfile(Map<String, dynamic> profile);
+
   /// `forceRegenerate` replaces the active plan (used after a trial starts — FR-004).
   Future<GeneratedPlanInfo> generatePlan({bool forceRegenerate = false});
   Future<String> deviceTimezone();
@@ -60,9 +61,9 @@ class SupabaseOnboardingApi implements OnboardingApi {
   @override
   Future<GeneratedPlanInfo> generatePlan({bool forceRegenerate = false}) async {
     final response = await _ref.read(dioClientProvider).post<Map<String, dynamic>>(
-          '/functions/v1/generate-plan',
-          data: <String, dynamic>{if (forceRegenerate) 'force_regenerate': true},
-        );
+      '/functions/v1/generate-plan',
+      data: <String, dynamic>{if (forceRegenerate) 'force_regenerate': true},
+    );
     final plan = response.data!['plan'] as Map<String, dynamic>;
     return GeneratedPlanInfo(
       planId: plan['id'] as String,
@@ -252,7 +253,9 @@ class OnboardingController extends _$OnboardingController {
         'consent_version': kConsentVersion,
         'strength_estimates': state.strength.isEmpty
             ? null
-            : {for (final e in state.strength.entries) e.key: {'weight_kg': e.value.weightKg, 'reps': e.value.reps}},
+            : {
+                for (final e in state.strength.entries) e.key: {'weight_kg': e.value.weightKg, 'reps': e.value.reps}
+              },
       };
 
   /// Saves the profile, then generates the plan. The server always returns a plan (FR-003b);

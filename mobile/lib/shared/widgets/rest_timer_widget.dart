@@ -30,13 +30,12 @@ class RestTimerWidget extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.base),
       decoration: BoxDecoration(
-        color: AppColors.charcoalElevated,
+        color: AppColors.deep,
         borderRadius: BorderRadius.circular(AppSizes.borderRadius),
       ),
       child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.stretch, children: [
         Text(l.workoutRestTimerLabel,
-            textAlign: TextAlign.center,
-            style: theme.textTheme.titleMedium?.copyWith(color: AppColors.onDarkSecondary)),
+            textAlign: TextAlign.center, style: theme.textTheme.titleMedium?.copyWith(color: AppColors.mist)),
         Row(mainAxisAlignment: MainAxisAlignment.center, children: [
           _AdjustButton(label: '−15', tooltip: l.workoutRestRemove15, onTap: () => onAdjust(-15)),
           Expanded(

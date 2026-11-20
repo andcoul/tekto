@@ -61,25 +61,6 @@ class HomeScreen extends ConsumerWidget {
           ],
         ),
       ),
-      bottomNavigationBar: NavigationBar(
-        destinations: [
-          NavigationDestination(icon: const Icon(Icons.home_outlined), label: l.navHome),
-          NavigationDestination(icon: const Icon(Icons.fitness_center), label: l.navPlan),
-          NavigationDestination(icon: const Icon(Icons.library_books_outlined), label: l.navLibrary),
-          NavigationDestination(icon: const Icon(Icons.bar_chart_outlined), label: l.navProgress),
-        ],
-        onDestinationSelected: (index) {
-          switch (index) {
-            case 1:
-              context.go('/plan');
-            case 2:
-              context.go('/library');
-            case 3:
-              context.go('/progress');
-          }
-        },
-        selectedIndex: 0,
-      ),
     );
   }
 }
@@ -117,7 +98,7 @@ class _TodaySessionCard extends StatelessWidget {
               ),
               if (estimatedMin != null)
                 Row(children: [
-                  const Icon(Icons.timer_outlined, size: 16, color: AppColors.onDarkSecondary),
+                  const Icon(Icons.timer_outlined, size: 16, color: AppColors.mist),
                   const SizedBox(width: 4),
                   Text(l.homeEstimatedMin(estimatedMin!), style: theme.textTheme.bodyMedium),
                 ]),
@@ -149,7 +130,7 @@ class _RestDayCard extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.lg),
         child: Column(children: [
-          const Icon(Icons.self_improvement, size: 48, color: AppColors.onDarkSecondary),
+          const Icon(Icons.self_improvement, size: 48, color: AppColors.mist),
           const SizedBox(height: AppSpacing.sm),
           Text(l.homeRestDay, style: theme.textTheme.titleLarge),
           const SizedBox(height: 4),
@@ -172,7 +153,7 @@ class _NoPlanCard extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.lg),
         child: Column(children: [
-          const Icon(Icons.fitness_center, size: 48, color: AppColors.onDarkSecondary),
+          const Icon(Icons.fitness_center, size: 48, color: AppColors.mist),
           const SizedBox(height: AppSpacing.sm),
           Text(l.homeNoPlanTitle, style: theme.textTheme.titleLarge),
           const SizedBox(height: 4),
@@ -195,7 +176,7 @@ class _SessionCardSkeleton extends StatelessWidget {
   Widget build(BuildContext context) => Container(
         height: 140,
         decoration: BoxDecoration(
-          color: AppColors.charcoalSurface,
+          color: AppColors.mid,
           borderRadius: BorderRadius.circular(AppSizes.borderRadius),
         ),
         child: const Center(child: CircularProgressIndicator()),
@@ -210,13 +191,17 @@ class _QuickAccessRow extends StatelessWidget {
     final l = AppLocalizations.of(context);
     return Row(children: [
       Expanded(
-        child: _QuickButton(icon: Icons.library_books_outlined, label: l.homeExercises, onTap: () => context.push('/library')),
+        child: _QuickButton(
+            icon: Icons.library_books_outlined, label: l.homeExercises, onTap: () => context.push('/library')),
       ),
       const SizedBox(width: 8),
-      Expanded(child: _QuickButton(icon: Icons.chat_bubble_outline, label: l.homeCoach, onTap: () => openCoach(context, screen: 'home'))),
+      Expanded(
+          child: _QuickButton(
+              icon: Icons.chat_bubble_outline, label: l.homeCoach, onTap: () => openCoach(context, screen: 'home'))),
       const SizedBox(width: 8),
       Expanded(
-        child: _QuickButton(icon: Icons.bar_chart_outlined, label: l.homeProgress, onTap: () => context.push('/progress')),
+        child:
+            _QuickButton(icon: Icons.bar_chart_outlined, label: l.homeProgress, onTap: () => context.push('/progress')),
       ),
     ]);
   }
@@ -236,11 +221,11 @@ class _QuickButton extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: AppSpacing.base),
           decoration: BoxDecoration(
-            color: AppColors.charcoalSurface,
+            color: AppColors.mid,
             borderRadius: BorderRadius.circular(AppSizes.borderRadius),
           ),
           child: Column(children: [
-            Icon(icon, color: AppColors.accent),
+            Icon(icon, color: AppColors.glacier),
             const SizedBox(height: 4),
             Text(label, style: Theme.of(context).textTheme.labelSmall),
           ]),

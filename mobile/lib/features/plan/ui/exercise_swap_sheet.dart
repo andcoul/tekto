@@ -112,17 +112,17 @@ class _AlternativeRow extends StatelessWidget {
         width: 56,
         height: 56,
         decoration: BoxDecoration(
-          color: AppColors.charcoalElevated,
+          color: AppColors.deep,
           borderRadius: BorderRadius.circular(AppSizes.borderRadius),
         ),
-        child: const Icon(Icons.play_circle_outline, color: AppColors.onDarkSecondary),
+        child: const Icon(Icons.play_circle_outline, color: AppColors.mist),
       ),
       title: Text(fr ? exercise.nameFr : exercise.nameEn),
       subtitle: Text(exercise.musclePrimary.join(', ')),
       onTap: onTap,
       trailing: onTap == null
           ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2))
-          : const Icon(Icons.swap_horiz, color: AppColors.accent),
+          : const Icon(Icons.swap_horiz, color: AppColors.glacier),
     );
   }
 }

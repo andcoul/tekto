@@ -12,7 +12,8 @@ import '../../../shared/services/local_db/database.dart';
 typedef DownloadUrlsFetcher = Future<List<Map<String, dynamic>>> Function(String planId);
 
 /// Downloads [url] to [path] and resolves when the file is complete.
-typedef FileDownloader = Future<void> Function(String url, String path, void Function(int received, int total) onProgress);
+typedef FileDownloader = Future<void> Function(
+    String url, String path, void Function(int received, int total) onProgress);
 
 class ProRequiredException implements Exception {
   const ProRequiredException();
@@ -38,7 +39,8 @@ class VideoDownloadService {
   factory VideoDownloadService.live({required AppDatabase db, required TektoDioClient dio}) => VideoDownloadService(
         db: db,
         fetchUrls: (planId) async {
-          final response = await dio.post<Map<String, dynamic>>('/functions/v1/video-download-urls', data: {'plan_id': planId});
+          final response =
+              await dio.post<Map<String, dynamic>>('/functions/v1/video-download-urls', data: {'plan_id': planId});
           return (response.data?['downloads'] as List? ?? const []).cast<Map<String, dynamic>>();
         },
         download: (url, path, onProgress) => dio.dio.download(url, path, onReceiveProgress: onProgress),
@@ -70,7 +72,8 @@ class VideoDownloadService {
       final slug = item['exercise_slug'] as String;
       final videoUrl = item['download_url_front'] as String;
       final captions = (item['captions'] as Map? ?? const {}).cast<String, String>();
-      yield DownloadProgress(exerciseSlug: slug, completed: completed, total: downloads.length, status: DownloadStatus.downloading);
+      yield DownloadProgress(
+          exerciseSlug: slug, completed: completed, total: downloads.length, status: DownloadStatus.downloading);
 
       try {
         final videoPath = '${dir.path}/$slug.mp4';
@@ -96,9 +99,11 @@ class VideoDownloadService {
               ),
             );
         completed++;
-        yield DownloadProgress(exerciseSlug: slug, completed: completed, total: downloads.length, status: DownloadStatus.done);
+        yield DownloadProgress(
+            exerciseSlug: slug, completed: completed, total: downloads.length, status: DownloadStatus.done);
       } on Exception {
-        yield DownloadProgress(exerciseSlug: slug, completed: completed, total: downloads.length, status: DownloadStatus.error);
+        yield DownloadProgress(
+            exerciseSlug: slug, completed: completed, total: downloads.length, status: DownloadStatus.error);
       }
     }
   }

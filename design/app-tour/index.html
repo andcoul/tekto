@@ -1,0 +1,595 @@
+<title>Tekto App Tour</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@500&display=swap">
+<style>
+/* Layout: a dark studio wall; each flow stage is a horizontal rail of phones, id + name above, design note below. Tekto is dark-only, so this page commits to one dark look. */
+:root{
+  --night:#0F1014;--mid:#16171D;--deep:#1F2129;--steel:#2A2D37;--line:#3A3E4B;
+  --frost:#EEF0F5;--mist:#A2A7B6;--glacier:#9DB8FF;--mint:#7EE0B8;--ink:#0B0D12;--wall:#0A0B0E;
+  --display:"Bricolage Grotesque","Arial Narrow",system-ui,sans-serif;
+  --ui:"Geist",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"Geist Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  --s:.74;
+  color-scheme:dark;
+}
+body{background:var(--wall);color:var(--frost);font-family:var(--ui);-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--wall)}
+.wrap{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 64px;max-width:1600px;margin:0 auto}
+header.top{display:flex;flex-wrap:wrap;align-items:center;gap:14px 28px;padding-bottom:22px;border-bottom:1px solid var(--steel)}
+.brand{display:flex;align-items:center;gap:10px;font-family:var(--display);font-weight:700;font-size:26px;letter-spacing:-.01em}
+.brand svg{width:34px;height:34px}
+.intro{color:var(--mist);font-size:14px;line-height:1.5;max-width:62ch;margin:0}
+nav.jump{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--wall);display:flex;gap:8px;overflow-x:auto;padding-block:14px;scrollbar-width:none}
+nav.jump a{flex:none;color:var(--mist);text-decoration:none;font-size:13px;font-weight:500;padding:8px 14px;border:1px solid var(--steel);border-radius:99px;white-space:nowrap}
+nav.jump a:hover,nav.jump a:focus-visible{color:var(--frost);border-color:var(--glacier);outline:none}
+nav.jump a.on{background:var(--glacier);color:var(--ink);border-color:var(--glacier)}
+section.stage{padding-top:34px;scroll-margin-top:70px}
+.stage>.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--glacier)}
+.stage>h2{font-family:var(--display);font-weight:700;font-size:clamp(22px,3vw,30px);margin:6px 0 4px;text-wrap:balance}
+.stage>p{color:var(--mist);margin:0 0 18px;font-size:14px;line-height:1.5;max-width:70ch}
+.rail{display:flex;gap:28px;overflow-x:auto;padding-bottom:18px;scroll-snap-type:x proximity}
+.rail::-webkit-scrollbar{height:8px}.rail::-webkit-scrollbar-thumb{background:var(--steel);border-radius:8px}
+.col{flex:none;width:calc(393px*var(--s));scroll-snap-align:start;display:flex;flex-direction:column;gap:6px}
+.col .id{font-family:var(--mono);font-size:11px;color:var(--glacier)}
+.col .nm{font-family:var(--display);font-weight:600;font-size:16px;margin-bottom:6px}
+.col .note{color:var(--mist);font-size:12.5px;line-height:1.45;margin-top:8px}
+.frame{width:calc(393px*var(--s));overflow:hidden;border-radius:calc(44px*var(--s));box-shadow:0 0 0 1px var(--steel),0 20px 50px rgba(0,0,0,.45);cursor:zoom-in;background:var(--night)}
+.frame:focus-visible{outline:2px solid var(--glacier);outline-offset:4px}
+.frame>img{display:block;width:100%}
+.frame>.scr{transform:scale(var(--s));transform-origin:0 0}
+#lb[hidden]{display:none}
+.brandgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:20px;align-items:start}
+.brandgrid figure.wide{grid-column:1/-1}
+.brandgrid figure{margin:0;background:var(--mid);border:1px solid var(--steel);border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.brandgrid figure img{border-radius:10px;display:block;width:100%}
+.brandgrid figcaption{color:var(--mist);font-size:13px;line-height:1.45}
+.photos{display:grid;grid-template-columns:repeat(auto-fill,minmax(86px,1fr));gap:8px}
+.photos img{aspect-ratio:3/4;object-fit:cover;border-radius:8px;width:100%}
+.banner{margin-top:18px;background:var(--mid);border:1px solid var(--steel);border-radius:14px;padding:12px 16px;color:var(--mist);font-size:13px;line-height:1.5}
+.banner b{color:var(--frost);font-weight:600}
+/* lightbox */
+#lb{position:fixed;inset:0;z-index:20;background:rgba(5,6,8,.92);display:flex;align-items:center;justify-content:center;padding:calc(16px + env(safe-area-inset-top,0px)) 16px calc(16px + env(safe-area-inset-bottom,0px));overflow:auto}
+#lb .holder{position:relative}
+#lb .x{position:fixed;top:calc(14px + env(safe-area-inset-top,0px));right:calc(14px + env(safe-area-inset-right,0px));background:var(--steel);color:var(--frost);border:0;border-radius:99px;font:600 14px var(--ui);padding:10px 16px;cursor:pointer}
+
+/* ===== phone screen kit (393 wide, native px) ===== */
+.scr{width:393px;height:852px;position:relative;overflow:hidden;background:var(--night);color:var(--frost);font-family:var(--ui);font-size:15px;line-height:1.35;border-radius:44px}
+.scr *{box-sizing:border-box}
+.sb{position:absolute;inset:0 0 auto;height:54px;display:flex;align-items:center;justify-content:space-between;padding:6px 32px 0 48px;font-weight:600;font-size:16px;z-index:4}
+.sb i{display:flex;gap:6px;align-items:center}
+.hi{position:absolute;left:50%;bottom:8px;width:134px;height:5px;border-radius:5px;background:var(--frost);transform:translateX(-50%);z-index:6}
+.pad{position:absolute;inset:54px 0 0;padding:0 24px;display:flex;flex-direction:column;gap:16px}
+.bar{height:48px;display:flex;align-items:center;justify-content:space-between}
+.bar .t{font-weight:600;font-size:16px}
+.ic{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.H{font-family:var(--display);font-weight:800;text-transform:uppercase;font-size:40px;line-height:.95;letter-spacing:-.01em;margin:0}
+.H2{font-family:var(--display);font-weight:700;font-size:24px;line-height:1.1;margin:0}
+.lbl{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--mist)}
+.mist{color:var(--mist)}.gl{color:var(--glacier)}.mi{color:var(--mint)}
+.btn{height:56px;border-radius:28px;display:flex;align-items:center;justify-content:center;gap:8px;font-weight:600;font-size:17px;background:var(--glacier);color:var(--ink);border:0;width:100%}
+.btn.sec{background:var(--steel);color:var(--frost)}
+.btn.ghost{background:transparent;color:var(--frost);border:1px solid var(--line)}
+.card{background:var(--mid);border:1px solid var(--steel);border-radius:20px;padding:16px}
+.chip{display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 14px;border-radius:17px;border:1px solid var(--line);font-size:14px;font-weight:500;white-space:nowrap}
+.chip.on{background:var(--glacier);color:var(--ink);border-color:var(--glacier)}
+.row{display:flex;align-items:center;gap:12px}
+.sp{flex:1}
+.glass{width:48px;height:48px;border-radius:24px;background:rgba(22,23,29,.6);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);display:flex;align-items:center;justify-content:center;border:1px solid rgba(238,240,245,.12)}
+.img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.scrim{position:absolute;inset:0;background:linear-gradient(180deg,rgba(15,16,20,0) 30%,rgba(15,16,20,.85) 70%,var(--night) 100%)}
+.tabs{position:absolute;left:16px;right:16px;bottom:30px;height:64px;display:flex;align-items:center;gap:12px;z-index:5}
+.tabs .pill{flex:1;height:64px;border-radius:32px;background:rgba(31,33,41,.86);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid var(--steel);display:flex;align-items:center;justify-content:space-around;padding:0 8px}
+.tabs .tb{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10.5px;color:var(--mist);width:64px}
+.tabs .tb.on{color:var(--frost)}
+.tabs .tb.on .dot{background:var(--glacier)}
+.tabs .dot{width:4px;height:4px;border-radius:2px;background:transparent}
+.tabs .plus{width:64px;height:64px;border-radius:32px;background:var(--glacier);color:var(--ink);display:flex;align-items:center;justify-content:center}
+.av{border-radius:50%;object-fit:cover;flex:none}
+.coach{width:36px;height:36px;border-radius:18px;background:var(--deep);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;flex:none}
+.coach svg{width:20px;height:20px}
+.sheet{position:absolute;left:0;right:0;bottom:0;background:var(--mid);border-top-left-radius:32px;border-top-right-radius:32px;border-top:1px solid var(--steel);padding:12px 24px 44px;display:flex;flex-direction:column;gap:16px;z-index:5}
+.grab{width:40px;height:5px;border-radius:3px;background:var(--line);margin:0 auto 4px}
+.dim{position:absolute;inset:0;background:rgba(5,6,8,.62);z-index:4}
+.tile{position:relative;border-radius:16px;overflow:hidden;background:var(--deep)}
+.tile img,.tile video{width:100%;height:100%;object-fit:cover;display:block}
+.tile .cap{position:absolute;left:0;right:0;bottom:0;padding:24px 10px 8px;background:linear-gradient(transparent,rgba(15,16,20,.92));font-size:12.5px;font-weight:600}
+.tag{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:3px 7px;border-radius:6px;background:var(--steel);color:var(--mist)}
+.tag.gl{background:rgba(157,184,255,.16);color:var(--glacier)}
+.tag.mi{background:rgba(126,224,184,.14);color:var(--mint)}
+.list{display:flex;flex-direction:column}
+.li{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--steel)}
+.li:last-child{border-bottom:0}
+.thumb{width:60px;height:60px;border-radius:14px;object-fit:cover;flex:none}
+.num{font-variant-numeric:tabular-nums}
+.tog{width:51px;height:31px;border-radius:16px;background:var(--steel);position:relative;flex:none}
+.tog::after{content:"";position:absolute;top:3px;left:3px;width:25px;height:25px;border-radius:50%;background:var(--frost)}
+.tog.on{background:var(--glacier)}.tog.on::after{left:23px;background:var(--ink)}
+.seg{display:flex;background:var(--deep);border-radius:12px;padding:3px}
+.seg span{flex:1;text-align:center;padding:8px 0;font-size:13.5px;border-radius:10px;color:var(--mist);font-weight:500}
+.seg span.on{background:var(--steel);color:var(--frost)}
+.field{display:flex;flex-direction:column;gap:6px}
+.field .in{height:50px;border-radius:14px;background:var(--deep);border:1px solid var(--steel);display:flex;align-items:center;padding:0 14px;gap:8px}
+.grp{background:var(--mid);border:1px solid var(--steel);border-radius:18px;padding:0 16px}
+.grp .li{padding:14px 0}
+.pro{font-family:var(--mono);font-size:10px;letter-spacing:.12em;padding:3px 7px;border-radius:6px;background:var(--glacier);color:var(--ink);font-weight:500}
+.mm{display:flex;justify-content:center;gap:18px}
+.mm figure{margin:0;display:flex;flex-direction:column;align-items:center;gap:4px}
+.legend{display:flex;justify-content:center;gap:12px;font-size:11.5px;color:var(--mist);flex-wrap:wrap}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+.mbar{display:flex;flex-direction:column;gap:6px}
+.mbar .tr{height:8px;border-radius:4px;background:var(--steel);overflow:hidden}
+.mbar .tr b{display:block;height:100%;border-radius:4px;background:var(--glacier)}
+/* ===== clickable prototype ===== */
+.trybtn{margin-left:auto;display:inline-flex;align-items:center;gap:8px;height:44px;padding:0 20px;border-radius:22px;background:var(--glacier);color:var(--ink);font:600 15px var(--ui);border:0;cursor:pointer;text-decoration:none}
+.trybtn:focus-visible{outline:2px solid var(--frost);outline-offset:3px}
+#pv{position:fixed;inset:0;z-index:30;background:radial-gradient(90% 70% at 50% 20%,#161A26,var(--wall) 70%);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:calc(12px + env(safe-area-inset-top,0px)) 16px calc(12px + env(safe-area-inset-bottom,0px))}
+#pv[hidden]{display:none}
+#pv .pvbar{display:flex;align-items:center;gap:10px;width:min(100%,520px);justify-content:space-between}
+#pv .pvbar button{background:var(--steel);color:var(--frost);border:0;border-radius:99px;font:600 13px var(--ui);padding:9px 14px;cursor:pointer}
+#pv .pvbar button:focus-visible{outline:2px solid var(--glacier)}
+#pv .where{font:500 12px var(--mono);color:var(--mist);letter-spacing:.06em;text-align:center;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#pvphone{position:relative;overflow:hidden;box-shadow:0 0 0 10px #050608,0 0 0 11px #2A2D37,0 30px 80px rgba(0,0,0,.6);flex:none}
+#pvframe{width:393px;height:852px;transform-origin:0 0;position:absolute;left:0;top:0;border-radius:44px;overflow:hidden}
+#pvscroll{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;scrollbar-width:none}
+#pvscroll::-webkit-scrollbar{display:none}
+#pvscroll .scr{border-radius:0}
+#pvscroll .tabs,#pvscroll .hi,#pvscroll .sb,#pvscroll .dock{position:fixed}
+#pvscroll .sb{background:linear-gradient(var(--night) 40%,transparent)}
+#pvscroll .hot{cursor:pointer}
+#pvscroll .hot:hover{filter:brightness(1.08)}
+#pv .hint{color:var(--mist);font-size:12.5px;text-align:center}
+@media (prefers-reduced-motion:no-preference){#pvframe.in{animation:pvin .22s ease-out}@keyframes pvin{from{opacity:.4;transform-origin:0 0}to{opacity:1}}}
+@media (max-width:520px){:root{--s:.66}.rail{gap:18px}}
+@media (prefers-reduced-motion:no-preference){nav.jump a{transition:background .15s,color .15s,border-color .15s}}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div class="brand"><svg viewBox="0 0 64 64" aria-hidden="true"><path d="M8 18L56 10V23L8 27Z" fill="#9DB8FF" stroke="#9DB8FF" stroke-width="4" stroke-linejoin="round"/><rect x="25" y="32" width="14" height="24" rx="3" fill="#9DB8FF"/></svg>tekto <span class="mist" style="font-family:var(--ui);font-weight:500;font-size:16px;margin-left:4px">App tour</span></div>
+    <p class="intro">Every stage of the app, from first open to Pro. Section 1 is the onboarding exactly as built in Figma. Sections 2 to 6 are the next screens in the same style; they move into Figma once the plan limit allows. Tap any screen to see it larger, or try the app as a clickable prototype.</p>
+    <a class="trybtn" href="#try" id="trybtn"><svg width="16" height="16" viewBox="0 0 24 24"><path d="M8 5.5v13l11-6.5z" fill="currentColor"/></svg>Try the app</a>
+  </header>
+  <nav class="jump" id="jump" aria-label="Sections"></nav>
+  <main id="main"></main>
+  <div class="banner"><b>About the photos:</b> these are the current Figma photos. They are being recast so that 15 of 24 show Black men and women (prompts in <code>design/video-prompts.md</code>). Once you drop the edited files into <code>design/images/</code>, this tour and Figma pick them up.</div>
+</div>
+<div id="pv" hidden role="dialog" aria-modal="true" aria-label="Tekto prototype">
+  <div class="pvbar"><button type="button" id="pvback">← Back</button><span class="where" id="pvwhere"></span><span style="display:flex;gap:8px"><button type="button" id="pvrestart">Restart</button><button type="button" id="pvclose">Close</button></span></div>
+  <div id="pvphone"><div id="pvframe"><div id="pvscroll"></div></div></div>
+  <div class="hint" id="pvhint">Tap buttons, tabs, rows and photos like on a phone.</div>
+</div>
+<div id="lb" hidden role="dialog" aria-modal="true" aria-label="Screen preview"><button class="x" id="lbx" type="button">Close</button><div class="holder" id="lbh"></div></div>
+
+<script>
+const IMG=p=>`img/${p}.jpg`;
+const P={
+ back:'<path d="M15 5l-7 7 7 7"/>',x:'<path d="M6 6l12 12M18 6L6 18"/>',bell:'<path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20.5a2 2 0 0 0 4 0"/>',
+ play:'<path d="M8 5.5v13l11-6.5z" fill="currentColor" stroke="none"/>',cam:'<path d="M4 8h3l2-2.5h6L17 8h3v11H4z"/><circle cx="12" cy="13.5" r="3.5"/>',
+ swap:'<path d="M7 4L4 7l3 3M4 7h13M17 20l3-3-3-3M20 17H7"/>',mic:'<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"/>',
+ send:'<path d="M5 12l15-7-5 15-3-6z"/>',search:'<circle cx="11" cy="11" r="6.5"/><path d="M16 16l4 4"/>',check:'<path d="M5 12.5l4.5 4.5L19 7"/>',
+ plus:'<path d="M12 5v14M5 12h14"/>',cog:'<circle cx="12" cy="12" r="3"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"/>',
+ chev:'<path d="M9 5l7 7-7 7"/>',lock:'<rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>',edit:'<path d="M4 20h4L19 9l-4-4L4 16z"/>',
+ dumb:'<path d="M3 9v6M6 7v10M18 7v10M21 9v6M6 12h12"/>',chat:'<path d="M4 5h16v11H9l-5 4z"/>',grid:'<rect x="4" y="4" width="7" height="7" rx="2"/><rect x="13" y="4" width="7" height="7" rx="2"/><rect x="4" y="13" width="7" height="7" rx="2"/><rect x="13" y="13" width="7" height="7" rx="2"/>',
+ chart:'<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',spark:'<path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/>',plan:'<rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/>',
+ eye:'<path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="3"/>',down:'<path d="M12 4v11M7 10.5l5 5 5-5M5 20h14"/>',
+ timer:'<circle cx="12" cy="13" r="7.5"/><path d="M12 9v4l2.5 2M9.5 2.5h5"/>',flame:'<path d="M12 21a6 6 0 0 0 6-6c0-4-3-6-4-10-2 2-3 4-3 6-1-1-1.5-2-1.5-3C7 9.5 6 12 6 15a6 6 0 0 0 6 6z"/>',
+ cc:'<rect x="3" y="6" width="18" height="12" rx="2"/><path d="M10 10.5a2 2 0 1 0 0 3M16 10.5a2 2 0 1 0 0 3"/>',info:'<circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 7.5v.5"/>',
+ globe:'<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/>',ruler:'<path d="M3 16L16 3l5 5L8 21z"/><path d="M7 12l2 2M10 9l2 2M13 6l2 2"/>',
+ logout:'<path d="M14 4h5v16h-5M10 8l-4 4 4 4M6 12h10"/>',trash:'<path d="M5 7h14M10 7V4h4v3M7 7l1 13h8l1-13"/>',shield:'<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/>'
+};
+const ic=(n,s=24,c='currentColor',w=1.8)=>`<svg class="ic" viewBox="0 0 24 24" style="width:${s}px;height:${s}px;color:${c};stroke-width:${w}">${P[n]}</svg>`;
+const MARK=(c='#9DB8FF')=>`<svg viewBox="0 0 64 64"><path d="M8 18L56 10V23L8 27Z" fill="${c}" stroke="${c}" stroke-width="4" stroke-linejoin="round"/><rect x="25" y="32" width="14" height="24" rx="3" fill="${c}"/></svg>`;
+const SB=`<div class="sb"><span>9:41</span><i><svg width="18" height="12" viewBox="0 0 18 12"><rect x="0" y="8" width="3" height="4" rx="1" fill="#EEF0F5"/><rect x="5" y="5.5" width="3" height="6.5" rx="1" fill="#EEF0F5"/><rect x="10" y="3" width="3" height="9" rx="1" fill="#EEF0F5"/><rect x="15" y="0" width="3" height="12" rx="1" fill="#EEF0F5"/></svg><svg width="16" height="12" viewBox="0 0 16 12"><path d="M8 11.5l2.2-2.6a3.3 3.3 0 0 0-4.4 0zM3.6 6.6a6.6 6.6 0 0 1 8.8 0l1.4-1.6a8.8 8.8 0 0 0-11.6 0zM.8 3.3a11 11 0 0 1 14.4 0L16 2.2a12.5 12.5 0 0 0-16 0z" fill="#EEF0F5"/></svg><svg width="27" height="13" viewBox="0 0 27 13"><rect x=".5" y=".5" width="23" height="12" rx="3.5" fill="none" stroke="#EEF0F5" opacity=".4"/><rect x="2" y="2" width="20" height="9" rx="2" fill="#EEF0F5"/><rect x="24.5" y="4.5" width="1.6" height="4" rx=".8" fill="#EEF0F5" opacity=".4"/></svg></i></div>`;
+const HI='<div class="hi"></div>';
+const TABS=a=>`<div class="tabs"><div class="pill">${[['Workout','dumb'],['Coach','chat'],['Library','grid'],['Progress','chart']].map(([n,i])=>`<div class="tb ${a===n?'on':''}">${ic(i,22)}<span>${n}</span><span class="dot"></span></div>`).join('')}</div><div class="plus">${ic('plus',26,'#0B0D12',2.2)}</div></div>`;
+const COACH=(s=36)=>`<div class="coach" style="width:${s}px;height:${s}px">${MARK()}</div>`;
+const scr=(inner,h=852,bg)=>`<div class="scr" style="height:${h}px;${bg?'background:'+bg:''}">${SB}${inner}${HI}</div>`;
+
+/* ---- muscle map ---- */
+const MUS={front:{delts:['E36,46,9,8','E84,46,9,8'],chest:['M59 40 L44 40 Q37 46 40 60 Q49 67 59 63 Z','M61 40 L76 40 Q83 46 80 60 Q71 67 61 63 Z'],biceps:['E31,68,6,12','E89,68,6,12'],forearms:['E26,100,5,15','E94,100,5,15'],abs:['R50,66,20,44,6'],obliques:['M48 68 Q42 88 45 108 L49 108 L49 68 Z','M72 68 Q78 88 75 108 L71 108 L71 68 Z'],quads:['M46 126 Q40 150 44 175 L57 175 Q60 150 59 128 Z','M74 126 Q80 150 76 175 L63 175 Q60 150 61 128 Z'],shins:['E49,208,5.5,19','E71,208,5.5,19']},
+ back:{traps:['M60 30 L45 42 L60 56 L75 42 Z'],rdelts:['E36,46,9,8','E84,46,9,8'],lats:['M46 52 Q38 70 47 94 L58 90 L58 58 Z','M74 52 Q82 70 73 94 L62 90 L62 58 Z'],triceps:['E31,68,6,12','E89,68,6,12'],forearms:['E26,100,5,15','E94,100,5,15'],lowerback:['R51,92,18,18,4'],glutes:['E51,122,9.5,11','E69,122,9.5,11'],hamstrings:['M44 136 Q40 156 45 178 L57 178 Q59 156 58 136 Z','M76 136 Q80 156 75 178 L63 178 Q61 156 62 136 Z'],calves:['E49,204,7,17','E71,204,7,17']}};
+function shp(d,fill,stroke,sw){
+  if(d[0]==='E'){const[a,b,c,e]=d.slice(1).split(',');return `<ellipse cx="${a}" cy="${b}" rx="${c}" ry="${e}" fill="${fill}" stroke="${stroke}" stroke-width="${sw}"/>`}
+  if(d[0]==='R'){const[a,b,c,e,r]=d.slice(1).split(',');return `<rect x="${a}" y="${b}" width="${c}" height="${e}" rx="${r}" fill="${fill}" stroke="${stroke}" stroke-width="${sw}"/>`}
+  return `<path d="${d}" fill="${fill}" stroke="${stroke}" stroke-width="${sw}"/>`;
+}
+function body(view,lv={},pr=[],h=220){
+  const neu='fill="#1F2129" stroke="#3A3E4B" stroke-width="1"';
+  let s=`<svg viewBox="0 0 120 250" style="height:${h}px;width:${h*120/250}px" role="img" aria-label="${view} muscle map"><circle cx="60" cy="16" r="10" ${neu}/><rect x="55" y="25" width="10" height="9" rx="3" ${neu}/><path d="M40 36 Q60 30 80 36 L80 112 Q60 118 40 112 Z" ${neu}/><rect x="44" y="110" width="32" height="18" rx="7" ${neu}/><circle cx="24" cy="121" r="5" ${neu}/><circle cx="96" cy="121" r="5" ${neu}/><ellipse cx="50.5" cy="182" rx="6" ry="6" ${neu}/><ellipse cx="69.5" cy="182" rx="6" ry="6" ${neu}/><ellipse cx="48" cy="236" rx="6.5" ry="4" ${neu}/><ellipse cx="72" cy="236" rx="6.5" ry="4" ${neu}/>`;
+  for(const [m,ds] of Object.entries(MUS[view])){
+    const l=lv[m]||0;const fill=l?`rgba(157,184,255,${[0,.32,.62,1][l]})`:'#2A2D37';
+    const isPr=pr.includes(m);
+    ds.forEach(d=>s+=shp(d,fill,isPr?'#7EE0B8':'#0F1014',isPr?1.6:.8));
+  }
+  return s+'</svg>';
+}
+const LEG=`<div class="legend"><span><i style="background:#9DB8FF"></i>High</span><span><i style="background:rgba(157,184,255,.62)"></i>Medium</span><span><i style="background:rgba(157,184,255,.32)"></i>Light</span><span><i style="background:transparent;border:1.6px solid #7EE0B8"></i>Record</span></div>`;
+const mbar=(n,v,f,d)=>`<div class="mbar"><div class="row" style="font-size:14px"><span style="font-weight:600">${n}</span><span class="sp"></span><span class="num">${v}</span>${d?`<span class="mi num" style="font-size:12.5px;width:46px;text-align:right">${d}</span>`:'<span style="width:46px"></span>'}</div><div class="tr"><b style="width:${f}%"></b></div></div>`;
+const MAPSESSION=[{quads:3,abs:1,obliques:1,shins:1},{glutes:3,hamstrings:2,lowerback:2,calves:1},['quads']];
+const MAP30=[{chest:2,delts:2,biceps:2,quads:3,abs:2,obliques:1,forearms:1,shins:1},{traps:2,rdelts:1,lats:2,triceps:2,lowerback:2,glutes:3,hamstrings:2,calves:1},['quads','chest','glutes']];
+
+/* ================= screens ================= */
+const S={};
+S['2.01']=()=>scr(`<div class="pad" style="gap:18px">
+ <div class="bar" style="margin-top:4px"><div class="row"><img class="av" src="${IMG('avatar-user')}" width="40" height="40" alt=""><div><div class="mist" style="font-size:13px">Wednesday 19 Nov</div><div style="font-weight:600">Hi Sam</div></div></div><div class="row" style="gap:10px"><span class="tag gl">Pro trial · 6 days</span>${ic('bell')}</div></div>
+ <div class="row" style="justify-content:space-between">${['M','T','W','T','F','S','S'].map((d,i)=>`<div style="display:flex;flex-direction:column;align-items:center;gap:6px;width:40px"><span class="mist" style="font-size:12px">${d}</span><div style="width:36px;height:36px;border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;${i===0?'background:var(--glacier);color:var(--ink)':i===2?'border:2px solid var(--glacier)':i===4?'border:1px dashed var(--line);color:var(--mist)':'color:var(--line)'}">${i===0?ic('check',18,'#0B0D12',2.4):17+i}</div></div>`).join('')}</div>
+ <div class="tile" data-arg="lower" style="height:400px;border-radius:28px"><img src="${IMG('ex-legs-back-squat')}" alt=""><div class="scrim"></div>
+  <div style="position:absolute;left:20px;right:20px;bottom:20px;display:flex;flex-direction:column;gap:10px"><span class="lbl" style="color:var(--glacier)">Today · Session 2 of 3</span><h3 class="H" style="font-size:48px">Lower A</h3><div class="mist" style="font-size:14px">5 exercises · 45 min · squat focus</div><div class="btn" style="margin-top:6px">${ic('play',18,'#0B0D12')}Start session</div></div></div>
+ <div class="row card" data-arg="upper" style="padding:12px 14px;gap:12px"><img class="thumb" style="width:48px;height:48px" src="${IMG('ex-chest-bench-press')}" alt=""><div><div class="lbl">Friday</div><div style="font-weight:600">Upper A · bench focus</div></div><span class="sp"></span>${ic('chev',20,'#A2A7B6')}</div>
+</div>${TABS('Workout')}`);
+S['2.02']=(k)=>{const q=SESS[k]||SESS.lower;return scr(`<div style="position:absolute;inset:0 0 auto;height:380px"><img class="img" src="${IMG(q.hero)}" alt=""><div class="scrim"></div></div>
+ <div style="position:absolute;top:58px;left:20px;right:20px;display:flex;justify-content:space-between;z-index:3"><div class="glass">${ic('back')}</div><div class="glass">${ic('dots'in P?'dots':'info')}</div></div>
+ <div class="pad" style="top:250px;gap:16px"><span class="lbl gl">${q.day}</span><h2 class="H" style="font-size:52px">${q.t}</h2>
+ <div class="row" style="gap:8px;flex-wrap:wrap"><span class="chip">${ic('timer',16)}${q.chips[0]}</span><span class="chip">${ic('dumb',16)}${q.chips[1]}</span><span class="chip">${q.chips[2]}</span></div>
+ <div class="card row" style="align-items:flex-start;gap:12px">${COACH()}<div style="font-size:14px;line-height:1.45"><b style="font-weight:600">From your coach</b><br><span class="mist">${q.coach}</span></div></div>
+ <div class="lbl" style="margin-top:4px">5 exercises</div>
+ <div class="list">${q.list.map(([i,n,m])=>`<div class="li" data-arg="${i}"><img class="thumb" src="${IMG(i)}" alt=""><div style="min-width:0"><div style="font-weight:600">${n}</div><div class="mist num" style="font-size:13.5px">${m}</div></div><span class="sp"></span>${ic('swap',20,'#A2A7B6')}</div>`).join('')}</div>
+ </div>
+ <div class="dock" style="position:absolute;left:0;right:0;bottom:0;padding:24px 24px 40px;background:linear-gradient(transparent,var(--night) 30%);z-index:4"><div class="btn" data-arg="${q.list[0][0]}">${ic('play',18,'#0B0D12')}Start session</div></div>`,1180)};
+S['2.03']=(k)=>{const e=EX[k];const w=e?e.w:EX['ex-legs-back-squat'].w;return scr(`<img class="img" src="${IMG(e&&e.vid!==false&&k!=='ex-legs-back-squat'?k:'hero-live')}" alt=""><div class="scrim" style="background:linear-gradient(180deg,rgba(15,16,20,.55),rgba(15,16,20,0) 22%,rgba(15,16,20,0) 42%,rgba(15,16,20,.9) 66%,var(--night))"></div>
+ <div style="position:absolute;top:58px;left:20px;right:20px;display:flex;flex-direction:column;gap:12px;z-index:3"><div class="row"><div class="glass">${ic('x')}</div><span class="sp"></span><div style="text-align:center"><div class="lbl" style="color:var(--frost)">1 of 5</div><div style="font-weight:600">${e?e.n:'Back squat'}</div></div><span class="sp"></span><div class="glass">${ic('cc')}</div></div>
+ <div class="row" style="gap:4px">${[1,.4,0,0,0].map(f=>`<div style="flex:1;height:4px;border-radius:2px;background:var(--steel);overflow:hidden"><div style="width:${f*100}%;height:100%;background:var(--glacier)"></div></div>`).join('')}</div></div>
+ <div style="position:absolute;left:24px;right:24px;bottom:150px;z-index:3;display:flex;flex-direction:column;gap:6px"><span class="lbl gl">Set 2 of 4 · 2 reps in reserve</span>
+ <div class="row" style="align-items:baseline;gap:10px"><span class="num" style="font-family:var(--display);font-weight:800;font-size:96px;line-height:.9">${w[0]}</span><span style="font-size:22px;font-weight:600" class="mist">${w[1]}</span><span class="sp"></span><span class="num" style="font-family:var(--display);font-weight:800;font-size:56px">${w[2]}</span></div>
+ <div class="mist" style="font-size:13.5px">${!e||k==='ex-legs-back-squat'?'Each side: 20 + 1.25 kg · last time 60 kg × 8':inPlan(k)?'Last time: same weight, 2 reps in reserve':'Swapped in for today · start light'}</div></div>
+ <div style="position:absolute;left:24px;right:24px;bottom:70px;z-index:3" class="row"><div class="glass" style="width:56px;height:56px;border-radius:28px">${ic('cam')}</div><div class="btn" style="flex:1">${ic('check',20,'#0B0D12',2.4)}Log set</div><div class="glass" style="width:56px;height:56px;border-radius:28px">${ic('swap')}</div></div>
+ <div style="position:absolute;left:0;right:0;bottom:22px;z-index:3;display:flex;flex-direction:column;align-items:center;gap:2px"><div class="grab" style="margin:0"></div><span class="mist" style="font-size:12px">Results</span></div>`)};
+S['2.04']=()=>scr(`<img class="img" src="${IMG('hero-live')}" alt=""><div class="dim"></div>
+ <div class="sheet" style="gap:14px"><div class="grab"></div><div class="row"><div><div class="lbl">Set 2 of 4</div><div class="H2">Back squat</div></div><span class="sp"></span><span class="tag">Plates ${ic('info',12)}</span></div>
+ <div style="display:grid;grid-template-columns:40px 1fr 1fr 44px;gap:8px 10px;align-items:center;font-size:15px" class="num">
+  <span class="lbl">Set</span><span class="lbl">kg</span><span class="lbl">Reps</span><span></span>
+  ${[[1,'62.5','8','done'],[2,'62.5','8','on'],[3,'62.5','6',''],[4,'62.5','6','']].map(([n,k,r,st])=>`<span class="${st?'':'mist'}">${n}</span><div class="field"><div class="in" style="height:44px;${st==='on'?'border-color:var(--glacier)':''}">${k}</div></div><div class="field"><div class="in" style="height:44px;${st==='on'?'border-color:var(--glacier);color:var(--glacier);font-weight:600':''}">${r}</div></div><div style="width:44px;height:44px;border-radius:22px;display:flex;align-items:center;justify-content:center;${st==='done'?'background:var(--glacier)':'border:1px solid var(--line)'}">${st==='done'?ic('check',20,'#0B0D12',2.4):''}</div>`).join('')}
+ </div>
+ <div><div style="font-weight:600;margin-bottom:8px">How many more reps could you do?</div><div class="row" style="gap:8px">${['0','1','2','3','4+'].map(v=>`<span class="chip ${v==='2'?'on':''}" style="flex:1;justify-content:center">${v}</span>`).join('')}</div></div>
+ <div class="row mist" style="font-size:13px;gap:8px">${ic('info',16)}Two left is the target. Your coach adjusts the next set.</div>
+ <div class="btn">Save set · rest 2:00</div></div>`);
+S['2.05']=()=>{const r=118,c=2*Math.PI*r,f=84/120;return scr(`<div class="pad" style="align-items:center;gap:22px"><div class="bar" style="width:100%"><div class="glass" style="width:40px;height:40px">${ic('back',20)}</div><span class="t">Back squat</span><span style="width:40px"></span></div>
+ <span class="lbl" style="margin-top:20px">Rest</span>
+ <div style="position:relative;width:280px;height:280px"><svg width="280" height="280" viewBox="0 0 280 280"><circle cx="140" cy="140" r="${r}" fill="none" stroke="#2A2D37" stroke-width="12"/><circle cx="140" cy="140" r="${r}" fill="none" stroke="#9DB8FF" stroke-width="12" stroke-linecap="round" stroke-dasharray="${c*f} ${c}" transform="rotate(-90 140 140)"/></svg>
+ <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center"><span class="num" style="font-family:var(--display);font-weight:800;font-size:76px">1:24</span><span class="mist" style="font-size:14px">of 2:00</span></div></div>
+ <div class="row" style="gap:12px"><span class="chip" style="height:44px;padding:0 20px">−15 s</span><span class="chip" style="height:44px;padding:0 20px">+15 s</span></div>
+ <div class="card" style="width:100%"><div class="lbl">Up next</div><div class="row" style="margin-top:8px"><img class="thumb" style="width:52px;height:52px" src="${IMG('ex-legs-back-squat')}" alt=""><div><div style="font-weight:600">Set 3 · 62.5 kg × 6</div><div class="mist" style="font-size:13.5px">Breathe in at the top, brace, then sit back</div></div></div></div>
+ <div class="btn sec" style="margin-top:auto;margin-bottom:48px">Skip rest</div></div>`)};
+S['2.06']=()=>scr(`<img class="img" src="${IMG('hero-formcheck')}" alt=""><div class="scrim" style="background:linear-gradient(180deg,rgba(15,16,20,.6),transparent 25%,transparent 60%,rgba(15,16,20,.92) 85%)"></div>
+ <svg style="position:absolute;inset:0;z-index:2" viewBox="0 0 393 852"><g stroke="#9DB8FF" stroke-width="3" fill="none" stroke-linecap="round" opacity=".95"><path d="M196 300 L196 330 M168 345 L224 345 M168 345 L150 420 M224 345 L242 420 M178 445 L214 445 M178 445 L160 520 L176 600 M214 445 L232 520 L218 600 M196 330 L196 445"/></g><g fill="#0F1014" stroke="#9DB8FF" stroke-width="3">${[[196,300],[168,345],[224,345],[150,420],[242,420],[178,445],[214,445],[160,520],[232,520],[176,600],[218,600]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r="6"/>`).join('')}</g><g fill="#7EE0B8"><circle cx="160" cy="520" r="4"/><circle cx="232" cy="520" r="4"/></g></svg>
+ <div style="position:absolute;top:58px;left:20px;right:20px;z-index:3" class="row"><div class="glass">${ic('x')}</div><span class="sp"></span><span style="font-weight:600">Form check</span><span class="tag gl" style="margin-left:6px">Beta</span><span class="sp"></span><div class="glass" style="font-weight:700;font-size:15px">4</div></div>
+ <div style="position:absolute;left:20px;right:20px;bottom:44px;z-index:3;display:flex;flex-direction:column;gap:12px">
+  <div class="card row" style="background:rgba(22,23,29,.82);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);gap:14px"><div style="position:relative;width:64px;height:64px;flex:none"><svg width="64" height="64"><circle cx="32" cy="32" r="27" fill="none" stroke="#2A2D37" stroke-width="6"/><circle cx="32" cy="32" r="27" fill="none" stroke="#7EE0B8" stroke-width="6" stroke-linecap="round" stroke-dasharray="${2*Math.PI*27*.86} 999" transform="rotate(-90 32 32)"/></svg><span class="num" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:19px">86</span></div>
+  <div style="font-size:14px;line-height:1.45"><b style="font-weight:600" class="mi">Depth good</b> · knees track over toes<br><span class="mist">Keep your chest up a little more at the bottom.</span></div></div>
+  <div class="row mist" style="font-size:12.5px;justify-content:center;gap:6px">${ic('lock',14)}Video stays on your phone. Nothing is uploaded.</div></div>`);
+S['2.07']=(k)=>{const e=EX[k]||EX['ex-legs-back-squat'];const alt=(SWAPS[k]||SWAPS['ex-legs-back-squat']);return scr(`<img class="img" src="${IMG(e.vid!==false&&EX[k]?k:'hero-live')}" alt=""><div class="dim"></div>
+ <div class="sheet"><div class="grab"></div><div><div class="lbl">Swap</div><div class="H2">Replace ${e.n.toLowerCase()}</div></div>
+ <div class="row" style="gap:8px;flex-wrap:wrap">${['Rack is busy','Pain or discomfort','Too hard','Just prefer another'].map((t,i)=>`<span class="chip ${i===0?'on':''}">${t}</span>`).join('')}</div>
+ <div class="lbl">Same movement, same muscles</div>
+ <div class="list">${alt.map(([i,n,e,t,b])=>`<div class="li" data-arg="${i}"><img class="thumb" src="${IMG(i)}" alt=""><div style="min-width:0;display:flex;flex-direction:column;gap:4px"><div class="row" style="gap:8px"><span style="font-weight:600">${n}</span>${b?`<span class="tag gl">${b}</span>`:''}</div><div class="mist" style="font-size:13px">${e}</div><div class="row" style="gap:5px">${t.map(x=>`<span class="tag">${x}</span>`).join('')}</div></div><span class="sp"></span>${ic('chev',20,'#A2A7B6')}</div>`).join('')}</div>
+ <div class="mist" style="font-size:12.5px">Only exercises with a video are offered. Your plan keeps the swap for today only.</div></div>`)};
+S['2.08']=()=>scr(`<div class="pad" style="gap:18px">
+ <div class="bar"><div class="glass" style="width:40px;height:40px">${ic('x',20)}</div><span class="sp"></span><span class="chip">Share</span></div>
+ <div><span class="lbl gl">Lower A · 47 min</span><h2 class="H" style="font-size:50px;margin-top:8px">Session done</h2></div>
+ <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">${[['8,080','kg moved'],['17','sets'],['47:12','time']].map(([v,l])=>`<div class="card" style="padding:14px"><div class="num" style="font-family:var(--display);font-weight:800;font-size:26px">${v}</div><div class="mist" style="font-size:12.5px">${l}</div></div>`).join('')}</div>
+ <div class="card row" style="border-color:rgba(126,224,184,.5);background:rgba(126,224,184,.07);gap:14px"><div style="width:44px;height:44px;border-radius:22px;background:rgba(126,224,184,.16);display:flex;align-items:center;justify-content:center">${ic('flame',22,'#7EE0B8')}</div><div><div class="lbl mi">New record</div><div style="font-weight:600">Back squat 62.5 kg × 8</div><div class="mist" style="font-size:13px">Estimated max 77 kg, up 3 kg</div></div></div>
+ <div class="card" style="display:flex;flex-direction:column;gap:14px"><div class="row"><div><div class="lbl">Muscles you trained</div><div style="font-weight:600;font-size:17px;margin-top:4px">Legs did the heavy lifting</div></div></div>
+  <div class="mm"><figure>${body('front',MAPSESSION[0],MAPSESSION[2],230)}<span class="lbl">Front</span></figure><figure>${body('back',MAPSESSION[1],MAPSESSION[2],230)}<span class="lbl">Back</span></figure></div>${LEG}</div>
+ <div class="card" style="display:flex;flex-direction:column;gap:14px"><div class="row"><div class="lbl">Load per muscle</div><span class="sp"></span><span class="lbl">vs last week</span></div>
+  ${mbar('Quads','3,240 kg',100,'+8%')}${mbar('Glutes','2,610 kg',81,'+12%')}${mbar('Hamstrings','1,450 kg',45,'+5%')}${mbar('Lower back','780 kg',24,'')}${mbar('Core','3 × 40 s',18,'')}</div>
+ <div class="card row" style="align-items:flex-start;gap:12px">${COACH()}<div style="font-size:14.5px;line-height:1.5">Your legs carried <b>8 tonnes</b> today and your quads are <b class="mi">8% stronger</b> than last week. Give them 48 hours. Friday is upper body.</div></div>
+ <div class="btn">Done</div></div>`,1500);
+S['3.01']=()=>scr(`<div class="pad" style="gap:14px"><div class="bar" style="border-bottom:1px solid var(--steel);margin:0 -24px;padding:0 24px 10px;height:62px"><div class="row">${COACH(40)}<div><div style="font-weight:600">Tekto Coach</div><div class="mist" style="font-size:12.5px">AI coach · knows your plan</div></div></div><span class="tag">Voice ${ic('mic',12)}</span></div>
+ <div style="align-self:flex-end;max-width:80%;background:var(--glacier);color:var(--ink);padding:12px 14px;border-radius:20px 20px 6px 20px;font-size:14.5px">My left knee feels tight on lunges. Can we change Friday?</div>
+ <div class="row" style="align-items:flex-end;gap:8px">${COACH(28)}<div style="max-width:84%;background:var(--deep);padding:12px 14px;border-radius:20px 20px 20px 6px;font-size:14.5px;line-height:1.45">Thanks for telling me. If it turns into sharp pain, stop and see a physio. For tightness, here is a knee-friendlier Friday:</div></div>
+ <div class="card" style="margin-left:36px;display:flex;flex-direction:column;gap:10px;padding:14px"><div class="row"><span class="lbl">Plan change · Fri Lower B</span></div>
+  <div class="row" style="gap:10px;font-size:14px"><span class="mist" style="width:16px;text-align:center">−</span><span class="mist" style="text-decoration:line-through">Walking lunge 3 × 10</span></div>
+  <div class="row" style="gap:10px;font-size:14px"><span class="gl" style="width:16px;text-align:center;font-weight:700">+</span><span>Hip thrust 3 × 10 · 60 kg</span><span class="tag gl">Glutes</span></div>
+  <div class="row" style="gap:10px;font-size:14px"><span class="mist" style="width:16px;text-align:center">=</span><span class="mist">Romanian deadlift, no change</span></div>
+  <div class="row" style="gap:8px;margin-top:4px"><div class="btn" style="height:42px;font-size:15px">Apply</div><div class="btn sec" style="height:42px;font-size:15px">Keep plan</div></div></div>
+ <div class="row" style="gap:8px;margin-left:36px;flex-wrap:wrap"><span class="chip">Why hip thrust?</span><span class="chip">Show my week</span></div>
+ </div>
+ <div style="position:absolute;left:16px;right:16px;bottom:110px;z-index:5" class="row"><div class="field" style="flex:1"><div class="in" style="height:52px;border-radius:26px;background:var(--mid)"><span class="mist">Ask your coach…</span><span class="sp"></span>${ic('mic',20,'#A2A7B6')}</div></div><div style="width:52px;height:52px;border-radius:26px;background:var(--glacier);display:flex;align-items:center;justify-content:center">${ic('send',22,'#0B0D12')}</div></div>
+ ${TABS('Coach')}`);
+const CATS=[['Chest','ex-chest-bench-press',[['ex-chest-bench-press','Bench press'],['ex-chest-incline-db-press','Incline DB press'],['ex-chest-push-up','Push-up'],['ex-chest-db-bench-press','DB bench press'],['ex-chest-cable-fly','Cable fly'],['ex-chest-dip','Chest dip'],['ex-chest-incline-push-up','Incline push-up'],['ex-chest-band-chest-press','Band chest press'],['ex-chest-incline-bench-press','Incline bench press'],['ex-chest-close-grip-bench-press','Close-grip bench press'],['ex-chest-db-fly','DB fly'],['ex-chest-pec-deck','Pec deck']]],['Back','ex-back-pull-up',[['ex-back-barbell-row','Barbell row'],['ex-back-lat-pulldown','Lat pulldown'],['ex-back-pull-up','Pull-up'],['ex-back-db-row','DB row'],['ex-back-seated-cable-row','Seated cable row'],['ex-back-face-pull','Face pull'],['ex-back-band-pull-apart','Band pull-apart'],['ex-back-band-row','Seated band row'],['ex-back-pendlay-row','Pendlay row'],['ex-back-straight-arm-pulldown','Straight-arm pulldown'],['ex-back-inverted-row','Inverted row']]],['Legs','ex-legs-back-squat',[['ex-legs-back-squat','Back squat'],['ex-legs-romanian-deadlift','Romanian deadlift'],['ex-legs-walking-lunge','Walking lunge'],['ex-legs-goblet-squat','Goblet squat'],['ex-legs-front-squat','Front squat'],['ex-legs-deadlift','Deadlift'],['ex-legs-bulgarian-split-squat','Bulgarian split squat'],['ex-legs-leg-press','Leg press'],['ex-legs-bodyweight-squat','Bodyweight squat'],['ex-legs-calf-raise','Calf raise'],['ex-legs-lying-leg-curl','Lying leg curl'],['ex-legs-sumo-deadlift','Sumo deadlift'],['ex-legs-dumbbell-rdl','DB RDL'],['ex-legs-dumbbell-step-up','DB step-up'],['ex-legs-kettlebell-sumo-squat','Kettlebell sumo squat'],['ex-legs-leg-extension','Leg extension'],['ex-legs-bodyweight-lunge','Reverse lunge']]],['Shoulders','ex-shoulders-overhead-press',[['ex-shoulders-overhead-press','Overhead press'],['ex-shoulders-lateral-raise','Lateral raise'],['ex-shoulders-db-shoulder-press','DB shoulder press'],['ex-shoulders-rear-delt-fly','Rear delt fly'],['ex-shoulders-band-overhead-press','Band overhead press'],['ex-shoulders-push-press','Push press'],['ex-shoulders-front-raise','Front raise'],['ex-shoulders-cable-lateral-raise','Cable lateral raise'],['ex-shoulders-reverse-pec-deck','Reverse pec deck']]],['Arms','ex-arms-db-curl',[['ex-arms-db-curl','DB curl'],['ex-arms-rope-pushdown','Rope pushdown'],['ex-arms-overhead-triceps-extension','Overhead triceps extension'],['ex-arms-hammer-curl','Hammer curl'],['ex-arms-band-curl','Band curl'],['ex-arms-band-triceps-pushdown','Band triceps pushdown'],['ex-arms-db-skull-crusher','DB skull crusher'],['ex-arms-cable-curl','Cable curl']]],['Core','ex-core-plank',[['ex-core-plank','Plank'],['ex-core-hanging-leg-raise','Hanging leg raise'],['ex-core-pallof-press','Pallof press'],['ex-core-reverse-crunch','Reverse crunch'],['ex-core-cable-crunch','Cable crunch'],['ex-core-side-plank','Side plank'],['ex-core-ab-wheel-rollout','Ab wheel rollout']]],['Glutes','ex-glutes-hip-thrust',[['ex-glutes-hip-thrust','Hip thrust'],['ex-glutes-kettlebell-swing','Kettlebell swing'],['ex-glutes-glute-bridge','Glute bridge'],['ex-glutes-band-lateral-walk','Band lateral walk'],['ex-glutes-cable-kickback','Cable glute kickback'],['ex-glutes-single-leg-hip-thrust','Single-leg hip thrust']]]];
+const COUNTS={Chest:24,Back:26,Legs:38,Shoulders:18,Arms:20,Core:14,Glutes:12};
+/* Exercise data for the detail, category, live and swap screens: name, equipment, level, main/also muscles,
+   muscle map (front, back), cues, and the live-session numbers [big, unit, reps]. off:true = not downloaded for offline (3.03 shows it greyed). */
+const EX={
+'ex-chest-bench-press':{n:'Bench press',eq:['Barbell','Bench'],lv:'Intermediate',main:'chest',also:'triceps, front shoulders',f:{chest:3,delts:2},b:{triceps:2},w:['55','kg','×8'],c:['Eyes under the bar, feet flat, shoulder blades pulled back.','Lower the bar to your lower chest, elbows about 45°.','Touch lightly, then press back up over your shoulders.','Keep your hips on the bench the whole time.']},
+'ex-chest-incline-db-press':{n:'Incline DB press',eq:['Dumbbells','Bench'],lv:'Beginner',main:'upper chest',also:'front shoulders, triceps',f:{chest:3,delts:2},b:{triceps:1},w:['18','kg','×10'],c:['Set the bench to about 30° and plant your feet.','Start with the dumbbells at the sides of your upper chest.','Press up and slightly in until your arms are straight.','Lower slowly to the start.']},
+'ex-chest-push-up':{n:'Push-up',eq:['Bodyweight'],lv:'Beginner',main:'chest',also:'triceps, front shoulders, core',f:{chest:3,delts:1,abs:1},b:{triceps:2},w:['12','reps',''],c:['Hands under your shoulders, body in one straight line.','Lower your chest to just above the floor.','Keep your elbows about 45° from your body.','Push back up to straight arms.']},
+'ex-back-barbell-row':{n:'Barbell row',eq:['Barbell'],lv:'Intermediate',main:'lats, upper back',also:'biceps, rear shoulders, lower back',f:{biceps:1},b:{lats:3,traps:2,rdelts:2,lowerback:1},w:['50','kg','×8'],c:['Hinge to about 45° with a flat back, knees soft.','Pull the bar to your lower ribs, leading with your elbows.','Squeeze your shoulder blades together at the top.','Lower to straight arms without rounding.']},
+'ex-back-lat-pulldown':{n:'Lat pulldown',eq:['Cable machine'],lv:'Beginner',main:'lats',also:'biceps, rear shoulders',f:{biceps:2},b:{lats:3,rdelts:1},w:['45','kg','×10'],c:['Grip the bar a little wider than your shoulders.','Pull it down to your upper chest, elbows driving down.','Keep your chest up; do not lean far back.','Let the bar rise under control to straight arms.']},
+'ex-back-pull-up':{n:'Pull-up',eq:['Pull-up bar'],lv:'Advanced',main:'lats',also:'biceps, core',f:{biceps:2,abs:1},b:{lats:3,traps:1},w:['6','reps',''],c:['Hang with straight arms, overhand grip.','Pull your chest toward the bar until your chin clears it.','No swinging or kicking.','Lower all the way to a full hang.']},
+'ex-legs-back-squat':{n:'Back squat',eq:['Barbell','Squat rack'],lv:'Intermediate',main:'quads, glutes',also:'hamstrings, lower back, core',f:{quads:3,abs:1},b:{glutes:3,hamstrings:2,lowerback:1},w:['62.5','kg','×8'],c:['Set the bar across your upper back, hands just outside shoulders.','Brace your core, then sit down and back between your hips.','Go until thighs pass parallel, knees tracking over toes.','Drive up through the whole foot, chest leading.']},
+'ex-legs-romanian-deadlift':{n:'Romanian deadlift',eq:['Barbell'],lv:'Intermediate',main:'hamstrings, glutes',also:'lower back, grip',f:{forearms:1},b:{hamstrings:3,glutes:2,lowerback:2},w:['50','kg','×8'],c:['Hold the bar at your thighs, knees slightly bent.','Push your hips back and slide the bar down your legs.','Stop at mid-shin with a flat back.','Drive your hips forward to stand tall.']},
+'ex-legs-walking-lunge':{n:'Walking lunge',eq:['Dumbbells'],lv:'Beginner',main:'quads, glutes',also:'hamstrings, calves, balance',f:{quads:3},b:{glutes:2,hamstrings:1,calves:1},w:['14','kg','×10'],c:['Hold a dumbbell in each hand, stand tall.','Step forward and lower until both knees reach about 90°.','Keep your front knee over your toes.','Push through the front heel and step through.']},
+'ex-legs-goblet-squat':{n:'Goblet squat',eq:['Kettlebell'],lv:'Beginner',main:'quads, glutes',also:'core, upper back',f:{quads:3,abs:1},b:{glutes:2},w:['24','kg','×12'],c:['Hold the kettlebell at your chest with both hands.','Keep your elbows inside your knees at the bottom.','Sit deep with your chest up.','Drive up through your heels.']},
+'ex-legs-front-squat':{n:'Front squat',eq:['Barbell','Squat rack'],lv:'Advanced',main:'quads',also:'glutes, upper back, core',f:{quads:3,abs:2},b:{glutes:2,traps:1},w:['50','kg','×6'],c:['Rest the bar on the front of your shoulders, elbows high.','Keep your torso upright as you sit straight down.','Go until thighs pass parallel.','Drive up, keeping your elbows pointing forward.']},
+'ex-legs-deadlift':{n:'Deadlift',eq:['Barbell'],lv:'Intermediate',main:'hamstrings, glutes, lower back',also:'quads, upper back, grip',f:{quads:1,forearms:1},b:{hamstrings:3,glutes:3,lowerback:2,traps:1},w:['90','kg','×5'],c:['Bar over your mid-foot, hips higher than your knees.','Brace and pull the slack out of the bar.','Push the floor away, keeping the bar against your legs.','Stand tall, then lower it the same way.']},
+'ex-legs-bulgarian-split-squat':{n:'Bulgarian split squat',eq:['Dumbbells','Bench'],lv:'Intermediate',main:'quads, glutes',also:'hamstrings, balance',f:{quads:3},b:{glutes:3,hamstrings:1},w:['12','kg','×8'],c:['Rest your back foot on the bench, dumbbells at your sides.','Lower straight down until your front thigh is level.','Keep your front knee over your toes.','Push through the front heel to stand.']},
+'ex-legs-leg-press':{n:'Leg press',eq:['Machine'],lv:'Beginner',main:'quads, glutes',also:'hamstrings',f:{quads:3},b:{glutes:2,hamstrings:1},w:['120','kg','×10'],c:['Feet shoulder-width on the platform.','Keep your back flat on the pad.','Lower until your knees reach about 90°.','Press up without locking your knees.']},
+'ex-legs-calf-raise':{n:'Calf raise',eq:['Bodyweight','Step'],lv:'Beginner',main:'calves',also:'ankles',f:{},b:{calves:3},w:['15','reps',''],c:['Stand on the balls of your feet on a step.','Hold a support for balance.','Rise as high as you can onto your toes.','Lower slowly until your heels drop below the step.']},
+'ex-legs-lying-leg-curl':{n:'Lying leg curl',eq:['Machine'],lv:'Beginner',main:'hamstrings',also:'calves',f:{},b:{hamstrings:3,calves:1},w:['30','kg','×12'],off:true,c:['Lie face down, the pad just above your heels.','Curl your heels toward your glutes.','Keep your hips on the bench.','Lower slowly to straight legs.']},
+'ex-legs-bodyweight-squat':{n:'Bodyweight squat',eq:['Bodyweight'],lv:'Beginner',main:'quads, glutes',also:'core',f:{quads:3,abs:1},b:{glutes:2},w:['15','reps',''],c:['Feet shoulder-width apart, arms forward for balance.','Sit back and down, knees over your toes.','Keep your heels on the floor.','Stand tall and squeeze your glutes.']},
+'ex-chest-db-bench-press':{n:'DB bench press',eq:['Dumbbells','Bench'],lv:'Beginner',main:'chest',also:'triceps, front shoulders',f:{chest:3,delts:2},b:{triceps:2},w:['22','kg','×10'],c:['Lie back with the dumbbells over your chest.','Lower them to the sides of your chest, elbows about 45°.','Press up until your arms are straight.','Keep your feet flat and hips down.']},
+'ex-chest-cable-fly':{n:'Cable fly',eq:['Cable machine'],lv:'Beginner',main:'chest',also:'front shoulders',f:{chest:3,delts:1},b:{},w:['12','kg','×12'],c:['Stand between the cables, a soft bend in your elbows.','Bring your hands together in front of your chest.','Keep the same elbow angle all the way.','Open slowly until you feel a stretch.']},
+'ex-chest-dip':{n:'Chest dip',eq:['Dip bars'],lv:'Intermediate',main:'chest, triceps',also:'front shoulders',f:{chest:3,delts:2},b:{triceps:3},w:['8','reps',''],c:['Grip the bars, arms straight.','Lean your torso slightly forward.','Lower until your shoulders are just below your elbows.','Press back up to straight arms.']},
+'ex-chest-incline-push-up':{n:'Incline push-up',eq:['Bodyweight','Bench'],lv:'Beginner',main:'chest',also:'triceps, front shoulders, core',f:{chest:3,delts:1,abs:1},b:{triceps:2},w:['12','reps',''],c:['Hands on the bench, body in one straight line.','Lower your chest to the edge of the bench.','Keep your elbows about 45° from your body.','Push back up to straight arms.']},
+'ex-back-db-row':{n:'DB row',eq:['Dumbbell','Bench'],lv:'Beginner',main:'lats, upper back',also:'biceps, rear shoulders',f:{biceps:1},b:{lats:3,traps:2,rdelts:1},w:['24','kg','×10'],c:['One hand and knee on the bench, back flat.','Pull the dumbbell to your hip.','Lead with your elbow; do not twist.','Lower to a straight arm.']},
+'ex-back-seated-cable-row':{n:'Seated cable row',eq:['Cable machine'],lv:'Beginner',main:'lats, upper back',also:'biceps, rear shoulders',f:{biceps:1},b:{lats:3,traps:2,rdelts:1},w:['50','kg','×10'],c:['Sit tall, knees soft, arms straight.','Pull the handle to your lower ribs.','Squeeze your shoulder blades together.','Return slowly without rocking.']},
+'ex-back-face-pull':{n:'Face pull',eq:['Cable machine','Rope'],lv:'Beginner',main:'rear shoulders',also:'upper back, traps',f:{},b:{rdelts:3,traps:2},w:['20','kg','×15'],c:['Set the rope at head height.','Pull it toward your face, hands apart.','Finish with your elbows high.','Return slowly to straight arms.']},
+'ex-shoulders-db-shoulder-press':{n:'DB shoulder press',eq:['Dumbbells','Bench'],lv:'Beginner',main:'shoulders',also:'triceps, upper chest',f:{delts:3,chest:1},b:{triceps:2},w:['16','kg','×10'],c:['Sit tall, dumbbells at shoulder height.','Press straight up until your arms are straight.','Keep your ribs down; do not arch.','Lower to your shoulders under control.']},
+'ex-arms-overhead-triceps-extension':{n:'Overhead triceps extension',eq:['Dumbbell','Bench'],lv:'Beginner',main:'triceps',also:'core',f:{},b:{triceps:3},w:['14','kg','×12'],c:['Sit tall, one dumbbell overhead in both hands.','Lower it behind your head.','Keep your elbows pointing up.','Straighten your arms to lift it back.']},
+'ex-core-pallof-press':{n:'Pallof press',eq:['Cable machine'],lv:'Beginner',main:'core',also:'obliques, shoulders',f:{abs:3,obliques:3},b:{},w:['10','each side',''],c:['Stand side-on to the cable, handle at your chest.','Press it straight out.','Do not let your body turn.','Hold, then bring it back.']},
+'ex-glutes-kettlebell-swing':{n:'Kettlebell swing',eq:['Kettlebell'],lv:'Intermediate',main:'glutes, hamstrings',also:'core, lower back',f:{abs:1},b:{glutes:3,hamstrings:3,lowerback:1},w:['20','kg','×15'],c:['Hinge at the hips with a flat back.','Snap your hips forward to swing the bell to chest height.','Let your arms follow; do not lift with them.','Let it fall back between your legs and hinge again.']},
+'ex-shoulders-rear-delt-fly':{n:'Rear delt fly',eq:['Dumbbells'],lv:'Beginner',main:'rear shoulders',also:'upper back, traps',f:{},b:{rdelts:3,traps:2},w:['6','kg','×15'],c:['Hinge forward with a flat back, dumbbells under your shoulders.','Open your arms out to the sides like wings.','Stop at shoulder height; elbows keep the same slight bend.','Lower slowly.']},
+'ex-arms-hammer-curl':{n:'Hammer curl',eq:['Dumbbells'],lv:'Beginner',main:'biceps',also:'forearms',f:{biceps:3,forearms:2},b:{},w:['12','kg','×10'],c:['Hold the dumbbells at your sides, palms facing in.','Curl them up, keeping the dumbbells vertical.','Keep your elbows by your sides.','Lower slowly to straight arms.']},
+'ex-glutes-glute-bridge':{n:'Glute bridge',eq:['Bodyweight','Mat'],lv:'Beginner',main:'glutes',also:'hamstrings, core',f:{abs:1},b:{glutes:3,hamstrings:2},w:['15','reps',''],c:['Lie on your back, knees bent, feet flat.','Push through your heels to lift your hips.','Stop when knees, hips and shoulders form a line.','Squeeze, then lower to the mat.']},
+'ex-core-reverse-crunch':{n:'Reverse crunch',eq:['Bodyweight'],lv:'Beginner',main:'core',also:'hip flexors',f:{abs:3},b:{},w:['12','reps',''],c:['Lie on your back, knees bent at 90 degrees above your hips.','Curl your hips off the mat, bringing your knees toward your chest.','Lower your hips slowly, knees staying above your hips.']},
+'ex-back-band-pull-apart':{n:'Band pull-apart',eq:['Band'],lv:'Beginner',main:'rear shoulders',also:'upper back, traps',f:{},b:{rdelts:3,traps:1},w:['12','reps',''],c:['Hold the band in front of your chest, arms straight.','Pull your hands apart until your arms form a T.','Bring your hands back together slowly, arms still straight.']},
+'ex-glutes-band-lateral-walk':{n:'Band lateral walk',eq:['Band'],lv:'Beginner',main:'glutes',also:'quads',f:{quads:1},b:{glutes:3},w:['12','reps',''],c:['Loop the band above your knees and sit into a half squat.','Step to the side, keeping the band tight and your knees out.','Stay low and step back the same way.']},
+'ex-arms-band-curl':{n:'Band curl',eq:['Band'],lv:'Beginner',main:'biceps',also:'forearms',f:{biceps:3,forearms:1},b:{},w:['12','reps',''],c:['Stand on the band, one end in each hand, arms straight.','Elbows pinned to your sides, curl your hands to your shoulders.','Lower slowly to straight arms.']},
+'ex-arms-band-triceps-pushdown':{n:'Band triceps pushdown',eq:['Band'],lv:'Beginner',main:'triceps',also:'stability',f:{},b:{triceps:3},w:['12','reps',''],c:['Loop the band over a high bar, hands at chest height.','Upper arms still, push your hands down until your arms are straight.','Let your hands rise back to chest height with control.']},
+'ex-chest-band-chest-press':{n:'Band chest press',eq:['Band'],lv:'Beginner',main:'chest',also:'triceps, front shoulders',f:{chest:3,delts:1},b:{triceps:1},w:['12','reps',''],c:['Band around your upper back, hands beside your chest, one foot forward.','Press both hands straight forward until your arms are straight.','Bring your hands back slowly beside your chest.']},
+'ex-back-band-row':{n:'Seated band row',eq:['Band'],lv:'Beginner',main:'lats',also:'upper back, biceps',f:{biceps:1},b:{lats:3,traps:1},w:['12','reps',''],c:['Sit tall, legs straight, band looped around your feet.','Row your hands to your lower ribs, squeezing your shoulder blades.','Let your arms straighten without leaning back.']},
+'ex-shoulders-band-overhead-press':{n:'Band overhead press',eq:['Band'],lv:'Beginner',main:'shoulders',also:'triceps, core',f:{delts:3,abs:1},b:{triceps:1},w:['12','reps',''],c:['Stand on the band, handles at your shoulders, palms forward.','Press both hands straight overhead until your arms are straight.','Lower slowly back to your shoulders.']},
+'ex-legs-sumo-deadlift':{n:'Sumo deadlift',eq:['Barbell'],lv:'Intermediate',main:'glutes, quads',also:'hamstrings, lower back',f:{quads:3},b:{glutes:3,hamstrings:1,lowerback:1},w:['40','kg','×10'],c:['Wide stance, toes out, grip the bar inside your knees.','Push your knees out and stand up, bar close to your legs.','Finish tall with hips through, then lower with a flat back.']},
+'ex-chest-incline-bench-press':{n:'Incline bench press',eq:['Barbell'],lv:'Intermediate',main:'upper chest',also:'front shoulders, triceps',f:{chest:3,delts:1},b:{triceps:1},w:['40','kg','×10'],c:['Lie on an incline bench, feet flat, bar over your shoulders.','Lower the bar to your upper chest, elbows slightly tucked.','Press back up to straight arms.']},
+'ex-back-pendlay-row':{n:'Pendlay row',eq:['Barbell'],lv:'Intermediate',main:'lats',also:'upper back, lower back, biceps',f:{biceps:1},b:{lats:3,traps:1,lowerback:1},w:['40','kg','×10'],c:['Hinge until your back is flat and nearly level with the floor.','Pull the bar from the floor to your lower chest.','Lower it back to the floor and reset each rep.']},
+'ex-chest-close-grip-bench-press':{n:'Close-grip bench press',eq:['Barbell'],lv:'Intermediate',main:'triceps',also:'chest, front shoulders',f:{chest:1,delts:1},b:{triceps:3},w:['40','kg','×10'],c:['Grip the bar about shoulder-width apart, elbows tucked.','Lower the bar to your lower chest.','Press back up to straight arms.']},
+'ex-shoulders-push-press':{n:'Push press',eq:['Barbell'],lv:'Intermediate',main:'shoulders',also:'triceps, quads, core',f:{delts:3,quads:1,abs:1},b:{triceps:1},w:['40','kg','×10'],c:['Bar on your front shoulders, elbows slightly forward.','Dip a few centimetres, then drive up hard with your legs.','Press to locked arms overhead, head through, then lower to your shoulders.']},
+'ex-legs-dumbbell-rdl':{n:'DB RDL',eq:['Dumbbells'],lv:'Beginner',main:'hamstrings',also:'glutes, lower back',f:{},b:{hamstrings:3,glutes:1,lowerback:1},w:['14','kg','×10'],c:['Stand tall, dumbbells in front of your thighs, knees soft.','Push your hips back until your torso is parallel to the floor.','Keep your back flat and drive your hips forward to stand fully upright.']},
+'ex-legs-dumbbell-step-up':{n:'DB step-up',eq:['Dumbbells'],lv:'Beginner',main:'quads, glutes',also:'hamstrings',f:{quads:3},b:{glutes:3,hamstrings:1},w:['14','kg','×10'],c:['Stand behind a knee-height box, dumbbells at your sides.','Step one whole foot onto the box and drive up to stand tall on top.','Step down, then lead with the other leg on the next rep.']},
+'ex-shoulders-front-raise':{n:'Front raise',eq:['Dumbbells'],lv:'Beginner',main:'front shoulders',also:'shoulders',f:{delts:3},b:{},w:['14','kg','×10'],c:['Stand tall, dumbbells in front of your thighs.','Raise both arms in front of you to shoulder height.','Lower slowly without swinging.']},
+'ex-arms-db-skull-crusher':{n:'DB skull crusher',eq:['Dumbbells'],lv:'Beginner',main:'triceps',also:'stability',f:{},b:{triceps:3},w:['14','kg','×10'],c:['Lie on the bench, upper arms pointing at the ceiling.','Bend only your elbows to lower the dumbbells beside your ears.','Straighten your arms fully, upper arms staying still.']},
+'ex-chest-db-fly':{n:'DB fly',eq:['Dumbbells'],lv:'Beginner',main:'chest',also:'front shoulders',f:{chest:3,delts:1},b:{},w:['14','kg','×10'],c:['Lie on a flat bench, dumbbells above your chest, elbows soft.','Open your arms wide until you feel a stretch in your chest.','Bring the dumbbells back together over your chest.']},
+'ex-legs-kettlebell-sumo-squat':{n:'Kettlebell sumo squat',eq:['Kettlebell'],lv:'Beginner',main:'quads, glutes',also:'hamstrings, core',f:{quads:3,abs:1},b:{glutes:3,hamstrings:1},w:['14','kg','×10'],c:['Wide stance, toes out, kettlebell hanging in both hands.','Chest up, sit down until your thighs are level with the floor.','Stand all the way up and squeeze your glutes at the top.']},
+'ex-legs-leg-extension':{n:'Leg extension',eq:['Cable machine'],lv:'Beginner',main:'quads',also:'stability',f:{quads:3},b:{},w:['14','kg','×10'],c:['Sit back against the pad, roller on the front of your ankles, shins vertical.','Lift your lower legs until both legs are fully straight.','Lower slowly all the way until your knees are bent at 90 degrees.']},
+'ex-back-straight-arm-pulldown':{n:'Straight-arm pulldown',eq:['Cable machine'],lv:'Beginner',main:'lats',also:'triceps, core',f:{abs:1},b:{lats:3,triceps:1},w:['14','kg','×10'],c:['Face the high pulley, arms straight at shoulder height.','Sweep the bar down to your thighs, arms staying straight.','Let it rise back to shoulder height with control.']},
+'ex-arms-cable-curl':{n:'Cable curl',eq:['Cable machine'],lv:'Beginner',main:'biceps',also:'forearms',f:{biceps:3,forearms:1},b:{},w:['14','kg','×10'],c:['Face the low pulley, straight bar in your hands, arms straight.','Elbows pinned, curl the bar to your shoulders.','Lower slowly to straight arms.']},
+'ex-core-cable-crunch':{n:'Cable crunch',eq:['Cable machine'],lv:'Beginner',main:'core',also:'stability',f:{abs:3},b:{},w:['14','kg','×10'],c:['Kneel an arm’s length from the cable, rope held at your forehead.','Keep your hips still and round your spine until your head is near the floor.','Uncurl slowly until your torso is upright.']},
+'ex-glutes-cable-kickback':{n:'Cable glute kickback',eq:['Cable machine'],lv:'Beginner',main:'glutes',also:'hamstrings',f:{},b:{glutes:3,hamstrings:1},w:['14','kg','×10'],c:['Strap the cable to your ankle and hold the frame.','Kick your straight leg back and up, squeezing your glute.','Bring the foot back beside the other one slowly, hips square.']},
+'ex-chest-pec-deck':{n:'Pec deck',eq:['Cable machine'],lv:'Beginner',main:'chest',also:'front shoulders',f:{chest:3,delts:1},b:{},w:['14','kg','×10'],c:['Sit tall, back on the pad, arms out wide with elbows almost straight.','Sweep your straight arms forward until your hands meet in front of you.','Open your arms slowly back out to a full chest stretch.']},
+'ex-shoulders-cable-lateral-raise':{n:'Cable lateral raise',eq:['Cable machine'],lv:'Beginner',main:'shoulders',also:'traps',f:{delts:3},b:{traps:1},w:['14','kg','×10'],c:['Stand side-on to the low pulley, handle in your far hand.','With a slight elbow bend, raise your arm out to shoulder height.','Lower slowly against the cable.']},
+'ex-legs-bodyweight-lunge':{n:'Reverse lunge',eq:['Bodyweight'],lv:'Beginner',main:'quads, glutes',also:'hamstrings',f:{quads:3},b:{glutes:3,hamstrings:1},w:['12','reps',''],c:['Stand tall, hands on your hips.','Step one foot back and lower until both knees reach about 90 degrees.','Push through your front foot to stand back up.']},
+'ex-core-side-plank':{n:'Side plank',eq:['Bodyweight'],lv:'Beginner',main:'core',also:'glutes, shoulders',f:{abs:3,delts:1},b:{glutes:1},w:['30','s',''],c:['Support yourself on one hand, feet stacked, body in a straight line.','Lower your hips a few centimetres toward the floor.','Lift them back up into a straight line and hold.']},
+'ex-back-inverted-row':{n:'Inverted row',eq:['Bodyweight'],lv:'Beginner',main:'lats, upper back',also:'biceps, rear shoulders',f:{biceps:1},b:{lats:3,traps:3,rdelts:1},w:['12','reps',''],c:['Set a bar in squat stands at hip height and hang under it, arms straight, heels down.','Keep your body straight and pull your chest up to touch the bar.','Lower slowly until your arms are straight again.']},
+'ex-glutes-single-leg-hip-thrust':{n:'Single-leg hip thrust',eq:['Bodyweight'],lv:'Intermediate',main:'glutes',also:'hamstrings, core',f:{abs:1},b:{glutes:3,hamstrings:1},w:['12','reps',''],c:['Upper back on the bench, one foot flat, other knee pulled in.','Drive through your heel to lift your hips into a straight line.','Lower your hips slowly and lift again.']},
+'ex-core-ab-wheel-rollout':{n:'Ab wheel rollout',eq:['Bodyweight'],lv:'Intermediate',main:'core',also:'lats, shoulders',f:{abs:3,delts:1},b:{lats:1},w:['12','reps',''],c:['Kneel with the wheel under your shoulders, arms straight.','Roll forward slowly, keeping your back flat.','Pull the wheel back under your shoulders.']},
+'ex-shoulders-reverse-pec-deck':{n:'Reverse pec deck',eq:['Cable machine'],lv:'Beginner',main:'rear shoulders',also:'upper back, traps',f:{},b:{rdelts:3,traps:1},w:['14','kg','×10'],c:['Sit facing the machine, chest on the pad, handles together in front.','Keep your arms almost straight and open them until they line up with your shoulders.','Squeeze your shoulder blades, then bring the handles back slowly.']},
+'ex-shoulders-overhead-press':{n:'Overhead press',eq:['Barbell'],lv:'Intermediate',main:'shoulders',also:'triceps, upper chest, core',f:{delts:3,chest:1,abs:1},b:{triceps:2,traps:1},w:['35','kg','×8'],c:['Start with the bar on your front shoulders, grip just outside them.','Squeeze your glutes and brace.','Press straight up, moving your head back then through.','Lock out over your mid-foot, then lower under control.']},
+'ex-shoulders-lateral-raise':{n:'Lateral raise',eq:['Dumbbells'],lv:'Beginner',main:'side shoulders',also:'upper traps',f:{delts:3},b:{traps:1},w:['8','kg','×12'],c:['Stand tall with a slight bend in the elbows.','Raise the dumbbells out to the sides.','Stop at shoulder height.','Lower slowly; do not swing.']},
+'ex-arms-db-curl':{n:'DB curl',eq:['Dumbbells'],lv:'Beginner',main:'biceps',also:'forearms',f:{biceps:3,forearms:1},b:{},w:['12','kg','×10'],c:['Keep your elbows pinned to your sides.','Curl the dumbbell up, turning your palm toward you.','Squeeze at the top.','Lower all the way until your arm is straight.']},
+'ex-arms-rope-pushdown':{n:'Rope pushdown',eq:['Cable machine'],lv:'Beginner',main:'triceps',also:'forearms',f:{forearms:1},b:{triceps:3},w:['20','kg','×12'],c:['Stand close to the cable, elbows at your sides.','Push the rope down until your arms are straight.','Spread the rope ends apart at the bottom.','Let it rise slowly without moving your elbows.']},
+'ex-core-plank':{n:'Plank',eq:['Bodyweight'],lv:'Beginner',main:'core',also:'shoulders, glutes',f:{abs:3,obliques:2,delts:1},b:{glutes:1},w:['40','s',''],c:['Elbows under your shoulders, forearms on the floor.','Squeeze your glutes and brace your core.','Keep a straight line from head to heels.','Breathe steadily and hold.']},
+'ex-core-hanging-leg-raise':{n:'Hanging leg raise',eq:['Pull-up bar'],lv:'Advanced',main:'abs, hip flexors',also:'grip, lats',f:{abs:3,obliques:1,forearms:1},b:{lats:1},w:['10','reps',''],c:['Hang from the bar with your shoulders engaged.','Raise your legs to hip height.','Do not swing.','Lower them under control.']},
+'ex-glutes-hip-thrust':{n:'Hip thrust',eq:['Barbell','Bench'],lv:'Intermediate',main:'glutes',also:'hamstrings, core',f:{abs:1},b:{glutes:3,hamstrings:2},w:['80','kg','×10'],c:['Upper back on the bench, bar padded across your hips.','Feet flat, shins vertical at the top.','Drive your hips up until body and thighs form a line.','Pause, then lower under control.']}
+};
+const CATDESC={Chest:'chest, triceps, front shoulders',Back:'lats, upper back, biceps',Legs:'quads, hamstrings, calves',Shoulders:'front, side and rear delts',Arms:'biceps, triceps, forearms',Core:'abs, obliques, lower back',Glutes:'glutes, hamstrings'};
+const cap=t=>t.charAt(0).toUpperCase()+t.slice(1);
+/* Session previews: the home card is Lower A (today), the Friday card is Upper A. */
+/* Swap offers per exercise: same movement pattern, only exercises with a video. */
+const SWAPS={
+ 'ex-legs-back-squat':[['ex-legs-goblet-squat','Goblet squat','Kettlebell',['Quads','Glutes'],'Best match'],['ex-legs-walking-lunge','Walking lunge','Dumbbells',['Quads','Glutes','Balance']],['ex-legs-front-squat','Front squat','Barbell, rack',['Quads','Glutes']],['ex-legs-bulgarian-split-squat','Bulgarian split squat','Dumbbells, bench',['Quads','Glutes']],['ex-legs-leg-press','Leg press','Machine',['Quads','Glutes']],['ex-glutes-glute-bridge','Glute bridge','Bodyweight',['Glutes','Hamstrings']]],
+ 'ex-chest-bench-press':[['ex-chest-incline-db-press','Incline DB press','Dumbbells, bench',['Chest','Shoulders'],'Best match'],['ex-chest-db-bench-press','DB bench press','Dumbbells, bench',['Chest','Triceps']],['ex-chest-incline-bench-press','Incline bench press','Barbell, bench',['Upper chest','Triceps']],['ex-chest-push-up','Push-up','Bodyweight',['Chest','Triceps']],['ex-chest-band-chest-press','Band chest press','Band',['Chest','Triceps']]],
+ 'ex-back-barbell-row':[['ex-back-lat-pulldown','Lat pulldown','Cable machine',['Lats','Biceps'],'Best match'],['ex-back-db-row','DB row','Dumbbell, bench',['Lats','Upper back']],['ex-back-seated-cable-row','Seated cable row','Cable machine',['Lats','Upper back']],['ex-back-pull-up','Pull-up','Pull-up bar',['Lats','Biceps']],['ex-back-pendlay-row','Pendlay row','Barbell',['Lats','Upper back']],['ex-back-inverted-row','Inverted row','Bodyweight',['Lats','Upper back']],['ex-back-band-row','Seated band row','Band',['Lats','Upper back']]],
+ 'ex-shoulders-overhead-press':[['ex-shoulders-db-shoulder-press','DB shoulder press','Dumbbells, bench',['Shoulders','Triceps'],'Best match'],['ex-shoulders-push-press','Push press','Barbell',['Shoulders','Legs']],['ex-shoulders-band-overhead-press','Band overhead press','Band',['Shoulders','Triceps']],['ex-shoulders-lateral-raise','Lateral raise','Dumbbells',['Shoulders']],['ex-chest-incline-db-press','Incline DB press','Dumbbells, bench',['Chest','Shoulders']]]
+};
+const inPlan=k=>Object.values(SESS).some(q=>q.list.some(x=>x[0]===k));
+const SESS={
+ lower:{day:'Wednesday · week 1',t:'Lower A',hero:'hero-session',chips:['45 min','Barbell, dumbbells','Quads · glutes'],coach:'Squat is up 2.5 kg from Monday. Keep two reps in the tank on every set.',list:[['ex-legs-back-squat','Back squat','4 × 6 · 62.5 kg'],['ex-legs-romanian-deadlift','Romanian deadlift','3 × 8 · 50 kg'],['ex-legs-walking-lunge','Walking lunge','3 × 10 each leg · 2 × 14 kg'],['ex-legs-goblet-squat','Goblet squat','2 × 12 · 24 kg'],['ex-core-plank','Plank','3 × 40 s']]},
+ upper:{day:'Friday · week 1',t:'Upper A',hero:'ex-chest-bench-press',chips:['50 min','Barbell, cable','Chest · back'],coach:'Bench moved well on Monday. Add 2.5 kg if the first set feels easy.',list:[['ex-chest-bench-press','Bench press','4 × 6 · 55 kg'],['ex-back-barbell-row','Barbell row','4 × 8 · 50 kg'],['ex-shoulders-overhead-press','Overhead press','3 × 8 · 35 kg'],['ex-back-lat-pulldown','Lat pulldown','3 × 10 · 45 kg'],['ex-arms-rope-pushdown','Rope pushdown','2 × 12 · 20 kg']]}
+};
+S['3.02']=()=>scr(`<div class="pad" style="gap:18px"><div class="bar"><h2 class="H" style="font-size:36px">Library</h2><span class="mist num" style="font-size:13px">152 exercises</span></div>
+ <div class="field"><div class="in" style="border-radius:16px">${ic('search',20,'#A2A7B6')}<span class="mist">Search exercises</span></div></div>
+ <div class="row" style="gap:14px;overflow:hidden;margin-right:-24px">${CATS.map(([n,i],k)=>`<div style="display:flex;flex-direction:column;align-items:center;gap:6px;flex:none"><img class="av" data-arg="${n}" src="${IMG(i)}" width="64" height="64" style="${k===0?'outline:2px solid var(--glacier);outline-offset:2px':''}" alt=""><span style="font-size:12.5px;${k===0?'':'color:var(--mist)'}">${n}</span></div>`).join('')}</div>
+ ${CATS.map(([n,_,ex])=>`<div style="display:flex;flex-direction:column;gap:10px"><div class="row"><span style="font-weight:600;font-size:17px">${n}</span><span class="mist num" style="font-size:13px">${COUNTS[n]}</span><span class="sp"></span><span class="gl" data-arg="${n}" style="font-size:13.5px">See all</span></div><div class="row" style="gap:10px;overflow:hidden;margin-right:-24px">${ex.map(([i,t])=>`<div class="tile" data-arg="${i}" style="width:118px;height:148px;flex:none"><img src="${IMG(i)}" alt=""><div class="cap">${t}</div></div>`).join('')}</div></div>`).join('')}
+ </div>${TABS('Library')}`,1700);
+S['3.03']=(c)=>{const cat=CATS.find(x=>x[0]===c)||CATS.find(x=>x[0]==='Legs');const list=cat[2].map(x=>x[0]);return scr(`<div class="pad" style="gap:16px"><div class="bar"><div class="glass" style="width:40px;height:40px">${ic('back',20)}</div><span class="sp"></span>${ic('search',22)}</div>
+ <div class="row" style="gap:14px"><img class="av" src="${IMG(cat[1])}" width="56" height="56" alt=""><div><h2 class="H" style="font-size:38px">${cat[0]}</h2><div class="mist" style="font-size:13.5px">${COUNTS[cat[0]]} exercises · ${CATDESC[cat[0]]}</div></div></div>
+ <div class="row" style="gap:8px;overflow:hidden;margin-right:-24px">${['All','Barbell','Dumbbell','Kettlebell','Bodyweight','Machine'].map((t,i)=>`<span class="chip ${i===0?'on':''}">${t}</span>`).join('')}</div>
+ <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">${list.map(k=>{const e=EX[k];return `<div style="display:flex;flex-direction:column;gap:6px"><div class="tile" data-arg="${k}" style="height:190px">${e.vid===false?`<div style="position:absolute;inset:0;display:flex;flex-direction:column;gap:8px;align-items:center;justify-content:center;background:var(--deep);border:1px dashed var(--line);border-radius:16px" class="mist">${ic('down',22)}<span style="font-size:12px">Not downloaded</span></div>`:`<img src="${IMG(k)}" alt=""${e.off?' style="opacity:.35"':''}>${e.off?`<div style="position:absolute;left:8px;bottom:8px;display:flex;gap:5px;align-items:center;padding:4px 8px;border-radius:10px;background:rgba(15,16,20,.75);font-size:11.5px" class="mist">${ic('down',14)}Not downloaded</div>`:''}`}</div><div style="font-weight:600;font-size:14.5px">${e.n}</div><div class="row" style="gap:5px"><span class="tag">${e.eq[0]}</span><span class="tag gl">${cap(e.main.split(',')[0])}</span></div></div>`}).join('')}</div>
+ </div>${TABS('Library')}`,Math.max(852,330+Math.ceil(list.length/2)*262))};
+S['3.04']=(k)=>{const e=EX[k]||EX[k='ex-legs-back-squat'];const has=e.vid!==false;return scr(`<div style="position:absolute;inset:0 0 auto;height:470px">${has?`<img class="img" src="${IMG(k)}" alt="">`:`<div class="img" style="background:var(--deep)"></div>`}<div class="scrim" style="background:linear-gradient(180deg,rgba(15,16,20,.5),transparent 25%,transparent 70%,var(--night))"></div>
+ <div style="position:absolute;inset:0;display:flex;flex-direction:column;gap:10px;align-items:center;justify-content:center">${has?`<div class="glass" style="width:72px;height:72px;border-radius:36px">${ic('play',30)}</div>`:`<div class="glass" style="width:72px;height:72px;border-radius:36px">${ic('down',30)}</div><span class="mist" style="font-size:13px">Video not downloaded</span>`}</div>
+ <div style="position:absolute;top:58px;left:20px;right:20px" class="row"><div class="glass">${ic('back')}</div><span class="sp"></span><div class="glass">${ic('cc')}</div></div>
+ <div style="position:absolute;bottom:20px;left:24px" class="seg"><span class="on" style="padding:6px 14px">Front</span><span style="padding:6px 14px">Side</span></div></div>
+ <div class="pad" style="top:480px;gap:16px"><div><h2 class="H2" style="font-size:30px">${e.n}</h2><div class="row" style="gap:6px;margin-top:8px">${e.eq.map(x=>`<span class="tag">${x}</span>`).join('')}<span class="tag gl">${e.lv}</span></div></div>
+ <div class="row" style="gap:22px;border-bottom:1px solid var(--steel);font-weight:600;font-size:15px"><span style="padding-bottom:10px;border-bottom:2px solid var(--glacier)">Instructions</span><span class="mist" style="padding-bottom:10px">Muscles</span><span class="mist" style="padding-bottom:10px">Equipment</span></div>
+ <ol style="margin:0;padding-left:20px;display:flex;flex-direction:column;gap:10px;font-size:14.5px;line-height:1.5">${e.c.map(x=>`<li>${x}</li>`).join('')}</ol>
+ <div class="card row" style="gap:16px"><div class="row" style="gap:4px">${body('front',e.f,[],120)}${body('back',e.b,[],120)}</div><div style="font-size:13.5px;line-height:1.6"><div><b class="gl">Main</b> ${e.main}</div><div class="mist">Also ${e.also}</div></div></div>
+ <div class="row card" style="gap:10px;padding:12px 14px">${ic('down',20,'#9DB8FF')}<div style="font-size:14px">${has&&!e.off?`<b style="font-weight:600">Saved for offline</b><div class="mist" style="font-size:12.5px">Front and side video · 18 MB</div>`:`<b style="font-weight:600">Download for offline</b><div class="mist" style="font-size:12.5px">Front and side video · 16 MB</div>`}</div></div>
+ </div>`,1240)};
+S['3.05']=()=>scr(`<div class="pad" style="gap:18px"><div class="bar"><h2 class="H" style="font-size:36px">Progress</h2>${ic('plan',22,'#A2A7B6')}</div>
+ <div class="seg"><span>7 days</span><span class="on">30 days</span><span>90 days</span></div>
+ <div><div class="mist" style="font-size:14px">This month you moved</div><div class="row" style="align-items:baseline;gap:10px"><span class="num" style="font-family:var(--display);font-weight:800;font-size:56px;line-height:1">18,420</span><span class="mist" style="font-size:18px;font-weight:600">kg</span><span class="tag mi" style="margin-left:auto">+14% vs Oct</span></div><div class="mist" style="font-size:13.5px;margin-top:6px">About the weight of three elephants.</div></div>
+ <div class="card" style="display:flex;flex-direction:column;gap:12px"><div class="lbl">Your strength map · 30 days</div><div class="mm"><figure>${body('front',MAP30[0],MAP30[2],230)}<span class="lbl">Front</span></figure><figure>${body('back',MAP30[1],MAP30[2],230)}<span class="lbl">Back</span></figure></div>${LEG}</div>
+ <div class="card" style="display:flex;flex-direction:column;gap:14px"><div class="row"><div class="lbl">Strongest gains</div><span class="sp"></span><span class="lbl">change</span></div>${mbar('Quads','11,900 kg',100,'+11%')}${mbar('Glutes','9,450 kg',79,'+9%')}${mbar('Chest','6,200 kg',52,'+7%')}${mbar('Back','5,980 kg',50,'+4%')}${mbar('Shoulders','2,300 kg',19,'+2%')}</div>
+ <div class="card" style="display:flex;flex-direction:column;gap:10px"><div class="row"><div><div class="lbl">Estimated max · back squat</div><div class="num" style="font-weight:700;font-size:22px;margin-top:4px">77 kg <span class="mi" style="font-size:14px">+7 kg</span></div></div></div>
+  <svg viewBox="0 0 330 120" style="width:100%;height:120px"><g stroke="#2A2D37" stroke-width="1">${[20,50,80].map(y=>`<line x1="30" x2="330" y1="${y}" y2="${y}"/>`).join('')}</g><g fill="#A2A7B6" font-size="10" font-family="Geist,system-ui"><text x="0" y="23">80</text><text x="0" y="53">75</text><text x="0" y="83">70</text><text x="30" y="112">20 Oct</text><text x="150" y="112">3 Nov</text><text x="280" y="112">17 Nov</text></g><path d="M34 80 L80 74 L126 68 L172 62 L218 50 L264 44 L318 38 L318 98 L34 98Z" fill="rgba(157,184,255,.12)"/><path d="M34 80 L80 74 L126 68 L172 62 L218 50 L264 44 L318 38" fill="none" stroke="#9DB8FF" stroke-width="2.5" stroke-linejoin="round"/><circle cx="318" cy="38" r="5" fill="#7EE0B8"/></svg></div>
+ <div class="card"><div class="lbl">Records this month</div><div class="list" style="margin-top:4px">${[['Back squat','62.5 kg × 8','17 Nov'],['Bench press','55 kg × 8','14 Nov'],['Hip thrust','80 kg × 10','12 Nov']].map(([n,v,d])=>`<div class="li"><span style="width:8px;height:8px;border-radius:4px;background:var(--mint)"></span><span style="font-weight:600">${n}</span><span class="sp"></span><span class="num">${v}</span><span class="mist" style="font-size:12.5px;width:48px;text-align:right">${d}</span></div>`).join('')}</div></div>
+ <div class="card row" style="align-items:flex-start;gap:12px">${COACH()}<div style="font-size:14px;line-height:1.5"><b>Push and pull are balanced</b> (52 / 48). Shoulders lag a little; I added one lateral raise set to Friday.</div></div>
+ </div>${TABS('Progress')}`,1660);
+S['4.01']=()=>scr(`<div class="pad" style="gap:18px"><div class="bar"><div class="glass" style="width:40px;height:40px">${ic('back',20)}</div><span class="t">Profile</span><div class="glass" style="width:40px;height:40px">${ic('cog',20)}</div></div>
+ <div style="display:flex;flex-direction:column;align-items:center;gap:10px"><div style="position:relative"><img class="av" src="${IMG('avatar-user')}" width="104" height="104" alt=""><div style="position:absolute;right:-2px;bottom:-2px;width:34px;height:34px;border-radius:17px;background:var(--glacier);display:flex;align-items:center;justify-content:center;border:3px solid var(--night)">${ic('edit',16,'#0B0D12',2)}</div></div><div class="H2">Sam Okafor</div><div class="row" style="gap:8px"><span class="pro">PRO</span><span class="mist" style="font-size:13.5px">Trial until 24 Nov · member since Nov 2026</span></div></div>
+ <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">${[['12','sessions'],['3 wk','streak'],['5','records']].map(([v,l])=>`<div class="card" style="padding:12px;text-align:center"><div class="num" style="font-family:var(--display);font-weight:800;font-size:24px">${v}</div><div class="mist" style="font-size:12.5px">${l}</div></div>`).join('')}</div>
+ <div class="grp"><div class="li"><span class="lbl">Body</span><span class="sp"></span><span class="gl" style="font-size:14px">Edit</span></div>${[['Height','182 cm'],['Weight','81.4 kg'],['Age','31']].map(([k,v])=>`<div class="li"><span class="mist">${k}</span><span class="sp"></span><span class="num">${v}</span></div>`).join('')}</div>
+ <div class="grp"><div class="li"><span class="lbl">Training</span><span class="sp"></span><span class="gl" style="font-size:14px">Edit</span></div>${[['Goal','Build muscle'],['Level','Some experience'],['Days','Mon · Wed · Fri'],['Session','45 min'],['Equipment','Full gym'],['Limitations','Left knee']].map(([k,v])=>`<div class="li"><span class="mist">${k}</span><span class="sp"></span><span>${v}</span></div>`).join('')}</div>
+ </div>`,1060);
+S['4.02']=()=>scr(`<div class="pad" style="gap:16px"><div class="bar"><span class="mist">Cancel</span><span class="t">Edit profile</span><span class="gl" style="font-weight:600">Save</span></div>
+ <div style="display:flex;flex-direction:column;align-items:center;gap:8px"><img class="av" src="${IMG('avatar-user')}" width="88" height="88" alt=""><span class="gl" style="font-size:14px;font-weight:600">Change photo</span></div>
+ <div class="row" style="gap:12px">${[['First name','Sam'],['Last name','Okafor']].map(([l,v])=>`<div class="field" style="flex:1"><span class="lbl">${l}</span><div class="in">${v}</div></div>`).join('')}</div>
+ <div class="field"><span class="lbl">Email</span><div class="in">sam.okafor@example.com</div></div>
+ <div class="field"><span class="lbl">Date of birth</span><div class="in num">14 March 1995<span class="sp"></span>${ic('plan',18,'#A2A7B6')}</div></div>
+ <div class="field"><span class="lbl">Sex · optional</span><div class="seg"><span>Female</span><span class="on">Male</span><span>Prefer not to say</span></div><span class="mist" style="font-size:12px">Only used to tune starting weights.</span></div>
+ <div class="row" style="gap:12px"><div class="field" style="flex:1"><span class="lbl">Height</span><div class="in num">182<span class="sp"></span><span class="mist">cm</span></div></div><div class="field" style="flex:1"><span class="lbl">Weight</span><div class="in num">81.4<span class="sp"></span><span class="mist">kg</span></div></div></div>
+ <div class="seg" style="width:150px"><span class="on">Metric</span><span>Imperial</span></div>
+ <div class="btn" style="margin-top:auto;margin-bottom:44px">Save changes</div></div>`);
+S['4.03']=()=>scr(`<div class="pad" style="gap:18px"><div class="bar"><div class="glass" style="width:40px;height:40px">${ic('back',20)}</div><span class="t">Training preferences</span><span style="width:40px"></span></div>
+ ${[['Goal',['Build muscle','Get stronger','Lose fat, keep muscle','Stay fit'],0],['Level',['New','Some experience','Advanced'],1],['Session length',['30 min','45 min','60 min'],1],['Equipment',['Full gym','Home: dumbbells','Bodyweight only'],0]].map(([t,o,s])=>`<div style="display:flex;flex-direction:column;gap:10px"><span style="font-weight:600;font-size:17px">${t}</span><div class="row" style="gap:8px;flex-wrap:wrap">${o.map((x,i)=>`<span class="chip ${i===s?'on':''}">${x}</span>`).join('')}</div></div>`).join('')}
+ <div style="display:flex;flex-direction:column;gap:10px"><span style="font-weight:600;font-size:17px">Training days</span><div class="row" style="justify-content:space-between">${['M','T','W','T','F','S','S'].map((d,i)=>`<div style="width:42px;height:46px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-weight:600;${[0,2,4].includes(i)?'background:var(--glacier);color:var(--ink)':'border:1px solid var(--line)'}">${d}</div>`).join('')}</div></div>
+ <div style="display:flex;flex-direction:column;gap:10px"><span style="font-weight:600;font-size:17px">Limitations</span><div class="row" style="gap:8px;flex-wrap:wrap"><span class="chip">None</span><span class="chip on">Knees</span><span class="chip">Lower back</span><span class="chip">Shoulders</span></div></div>
+ <div class="card row" style="align-items:flex-start;gap:12px">${COACH()}<div class="mist" style="font-size:13.5px;line-height:1.5">Saving rebuilds the rest of this week. Sessions you already logged stay as they are.</div></div>
+ <div class="btn" style="margin-top:auto;margin-bottom:44px">Save and update plan</div></div>`,1000);
+S['4.04']=()=>{const g=(t,rows)=>`<div style="display:flex;flex-direction:column;gap:8px"><span class="lbl">${t}</span><div class="grp">${rows.join('')}</div></div>`;const r=(i,n,right)=>`<div class="li">${ic(i,20,'#A2A7B6')}<span>${n}</span><span class="sp"></span>${right}</div>`;const ch=v=>`<span class="mist" style="font-size:14px">${v}</span>${ic('chev',18,'#A2A7B6')}`;return scr(`<div class="pad" style="gap:18px"><div class="bar"><div class="glass" style="width:40px;height:40px">${ic('back',20)}</div><span class="t">Settings</span><span style="width:40px"></span></div>
+ ${g('Subscription',[`<div class="li"><span class="pro">PRO</span><div><div style="font-weight:600">Pro trial</div><div class="mist" style="font-size:12.5px">Ends 24 Nov, then $79.99 / year</div></div><span class="sp"></span><span class="gl" style="font-size:14px">Manage</span></div>`,r('down','Restore purchases','')])}
+ ${g('Preferences',[r('ruler','Units','<div class="seg" style="width:120px"><span class="on" style="padding:5px 0">kg</span><span style="padding:5px 0">lb</span></div>'),r('globe','Language',ch('English')),r('mic','Coach voice','<div class="tog"></div>')])}
+ ${g('Notifications',[r('bell','Training day reminders','<div class="tog on"></div>'),r('spark','Plan updates from coach','<div class="tog on"></div>'),r('plan','Trial reminder','<div class="tog on"></div>')])}
+ ${g('Privacy',[r('shield','Consents',ch('2 of 4')),r('down','Export my data',ch('')),r('eye','Health disclaimer',ch(''))])}
+ ${g('Account',[r('logout','Log out',''),`<div class="li">${ic('trash',20,'#A2A7B6')}<span>Delete account</span><span class="sp"></span><span class="mist" style="font-size:12.5px">Removes all data</span></div>`])}
+ <div class="mist" style="text-align:center;font-size:12px">Tekto 1.0 (1)</div></div>`,1260)};
+const FEAT=[['spark','A plan that updates every week','Your coach adjusts weights and sets from what you log'],['chat','Unlimited coach chat','Ask anything, change your plan in one tap'],['cam','Camera form check','Rep counting and depth feedback, on your phone'],['chart','Strength map and advanced stats','See every muscle you trained and how much stronger it got'],['down','Offline video library','Download front and side videos for every exercise']];
+const PLANS=(compact)=>`<div style="display:flex;flex-direction:column;gap:10px">
+ <div style="position:relative;border:2px solid var(--glacier);background:rgba(157,184,255,.08);border-radius:20px;padding:${compact?'12px':'16px'} 16px" class="row"><span style="position:absolute;top:-11px;right:16px;background:var(--mint);color:var(--ink);font-size:11.5px;font-weight:700;padding:3px 9px;border-radius:8px">Save 49%</span><div style="width:24px;height:24px;border-radius:12px;background:var(--glacier);display:flex;align-items:center;justify-content:center">${ic('check',14,'#0B0D12',3)}</div><div><div style="font-weight:600">Annual</div><div class="mist" style="font-size:13px">7 days free, then $79.99 / year</div></div><span class="sp"></span><div style="text-align:right"><div class="num" style="font-weight:700">$6.67</div><div class="mist" style="font-size:12px">per month</div></div></div>
+ <div style="border:1px solid var(--line);border-radius:20px;padding:${compact?'12px':'16px'} 16px" class="row"><div style="width:24px;height:24px;border-radius:12px;border:1.5px solid var(--line)"></div><div><div style="font-weight:600">Monthly</div><div class="mist" style="font-size:13px">7 days free, then $12.99 / month</div></div><span class="sp"></span><div style="text-align:right"><div class="num" style="font-weight:700">$12.99</div><div class="mist" style="font-size:12px">per month</div></div></div></div>`;
+S['5.01']=()=>scr(`<div style="position:absolute;inset:0;background:radial-gradient(120% 60% at 50% 0%,rgba(157,184,255,.18),transparent 60%)"></div><div class="pad" style="gap:18px"><div class="bar"><div class="glass" style="width:40px;height:40px">${ic('x',20)}</div><span class="gl" style="font-size:14px">Restore</span></div>
+ <div class="row" style="gap:10px"><div style="width:30px;height:30px">${MARK()}</div><span style="font-family:var(--display);font-weight:700;font-size:24px">tekto</span><span class="pro">PRO</span></div>
+ <h2 class="H" style="font-size:44px">Train with a coach that learns you</h2>
+ <div style="display:flex;flex-direction:column;gap:12px">${FEAT.map(([i,t,d])=>`<div class="row" style="gap:14px;align-items:flex-start"><div style="width:42px;height:42px;border-radius:12px;background:var(--deep);border:1px solid var(--steel);display:flex;align-items:center;justify-content:center;flex:none">${ic(i,20,'#9DB8FF')}</div><div><div style="font-weight:600;font-size:15px">${t}</div><div class="mist" style="font-size:13px">${d}</div></div></div>`).join('')}</div>
+ ${PLANS(false)}
+ <div class="btn">Start 7-day free trial</div>
+ <div class="mist" style="text-align:center;font-size:12.5px;line-height:1.5">Reminder 2 days before it ends. Cancel anytime in Settings.<br><span style="color:var(--frost)">All plans</span> · Restore purchases · Terms · Privacy</div></div>`,1080);
+S['5.02']=()=>scr(`<div style="position:absolute;inset:0;filter:blur(7px);opacity:.75"><div class="pad" style="gap:16px"><div style="height:40px"></div><h2 class="H" style="font-size:50px">Session done</h2><div class="card" style="display:flex;flex-direction:column;gap:10px"><div class="lbl">Muscles you trained</div><div class="mm">${body('front',MAPSESSION[0],MAPSESSION[2],230)}${body('back',MAPSESSION[1],MAPSESSION[2],230)}</div></div></div></div><div class="dim" style="background:rgba(5,6,8,.35)"></div>
+ <div style="position:absolute;left:0;right:0;top:250px;z-index:5;display:flex;justify-content:center"><div class="glass" style="width:56px;height:56px;border-radius:28px">${ic('lock',24,'#9DB8FF')}</div></div>
+ <div class="sheet" style="gap:14px"><div class="grab"></div><div class="row" style="gap:8px"><span class="pro">PRO</span><span class="lbl">Strength map</span></div><div class="H2" style="font-size:26px">See every muscle you trained today</div><div class="mist" style="font-size:14px;line-height:1.45">Your quads took 3,240 kg and set a record. Pro shows each muscle, how much load it took and how much stronger it is getting.</div>
+ ${PLANS(true)}<div class="btn">Start 7-day free trial</div><div class="mist" style="text-align:center;font-size:14px">Not now</div></div>`);
+S['5.03']=()=>scr(`<div class="pad" style="gap:18px"><div class="bar"><div class="glass" style="width:40px;height:40px">${ic('x',20)}</div><span class="lbl">Sunday check-in</span><span style="width:40px"></span></div>
+ <div class="row" style="gap:18px"><div style="position:relative;width:96px;height:96px;flex:none"><svg width="96" height="96"><circle cx="48" cy="48" r="40" fill="none" stroke="#2A2D37" stroke-width="8"/><circle cx="48" cy="48" r="40" fill="none" stroke="#9DB8FF" stroke-width="8" stroke-linecap="round" stroke-dasharray="${2*Math.PI*40} 999" transform="rotate(-90 48 48)"/></svg><span class="num" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:22px">3/3</span></div><div><h2 class="H" style="font-size:40px">Week 1 done</h2><div class="mist" style="font-size:14px;margin-top:6px">All three sessions logged. Two records.</div></div></div>
+ ${[['How did the week feel?',['Too easy','Just right','Too hard'],1],['Any pain or discomfort?',['None','A little','Yes, it hurt'],1],['How did you sleep?',['Badly','OK','Well'],2]].map(([q,o,s])=>`<div class="card" style="display:flex;flex-direction:column;gap:12px"><span style="font-weight:600">${q}</span><div class="row" style="gap:8px">${o.map((x,i)=>`<span class="chip ${i===s?'on':''}" style="flex:1;justify-content:center">${x}</span>`).join('')}</div></div>`).join('')}
+ <div class="field"><span class="lbl">Where? · optional</span><div class="in">Left knee, on lunges</div></div>
+ <div class="btn" style="margin-top:auto;margin-bottom:44px">Send to coach</div></div>`);
+S['5.04']=()=>scr(`<div class="pad" style="gap:16px"><div class="bar"><div class="glass" style="width:40px;height:40px">${ic('back',20)}</div><span class="sp"></span></div>
+ <div><span class="lbl gl">Week 2</span><h2 class="H" style="font-size:44px;margin-top:8px">Your plan, updated</h2></div>
+ <div class="card row" style="align-items:flex-start;gap:12px">${COACH()}<div style="font-size:14px;line-height:1.5">You hit every set with reps to spare, so loads go up. Lunges are out until the knee settles.</div></div>
+ ${[['Mon · Lower A',[['up','Back squat','62.5 → 65 kg'],['up','Romanian deadlift','50 → 52.5 kg']]],['Wed · Upper A',[['up','Bench press','3 × 8 → 4 × 8'],['same','Barbell row','no change']]],['Fri · Lower B',[['swap','Walking lunge → hip thrust','knee'],['add','Lateral raise','+1 set']]]].map(([d,ch])=>`<div class="card" style="display:flex;flex-direction:column;gap:10px;padding:14px 16px"><span class="lbl">${d}</span>${ch.map(([k,n,v])=>`<div class="row" style="gap:10px;font-size:14px"><span style="width:22px;height:22px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;${k==='same'?'background:var(--steel);color:var(--mist)':'background:rgba(157,184,255,.16);color:var(--glacier)'}">${{up:'↑',same:'=',swap:'⇄',add:'+'}[k]}</span><span style="${k==='same'?'color:var(--mist)':''}">${n}</span><span class="sp"></span><span class="num ${k==='same'?'mist':'gl'}" style="font-size:13.5px">${v}</span></div>`).join('')}</div>`).join('')}
+ <div class="mist row" style="font-size:12.5px;gap:6px">${ic('shield',14)}Every change passed the safety check.</div>
+ <div class="row" style="gap:10px;margin-top:auto;margin-bottom:44px"><div class="btn sec" style="flex:1">Keep last week</div><div class="btn" style="flex:1.3">Approve</div></div></div>`);
+
+/* ================= page ================= */
+const OB=[['1.01','Splash','Logo with a soft cold glow; fades into sign-in.'],['1.02','Sign in','Apple or Google first, email under it. Footage behind.'],['1.03','Value story 1','Story-style pages; the coach explains how the plan is built.'],['1.04','Value story 2','Last story ends on one button.'],['1.05','Health disclaimer','One screen, plain words, must be accepted.'],['1.06','Consent','Required items are on and labelled; optional ones are off.'],['1.07','Meet your coach','The AI coach introduces itself. Voice is optional.'],['1.08','Goal & level','Topics on one screen, live summary above the button.'],['1.09','Days & length','Days per week or specific days.'],['1.10','Equipment','Presets, then fine-tune by category.'],['1.11','Limitations','The coach says how it will adapt the plan.'],['1.12','Strength check','Each lift with its own photo; optional.'],['1.13','Building your plan','Honest progress while the AI works.'],['1.14','Your plan match','The plan as a card on your own footage.'],['1.15','How your trial works','Clear timeline; dismissing keeps the free plan.'],['1.16','Trial started','Reminder opt-in on the Pro badge.']];
+const STAGES=[
+ {id:'brand',eb:'0 · Brand',h:'Logo, icons and photos',p:'The Tekto mark is a T made of two slabs: the rising top bar stands for progress. Glacier blue on midnight; mint is kept for records.'},
+ {id:'onboarding',eb:'1 · Onboarding',h:'From first open to a plan in under 3 minutes',p:'Built in Figma. The AI coach guides every step.',ob:true},
+ {id:'workout',eb:'2 · Daily workout',h:'Train, log, rest, and see what you built',p:'One primary action per screen. The session ends with a muscle map: each muscle lights up by load, records get a mint outline.',ids:[['2.01','Home','Week strip, today as a big card, next session peeking.'],['2.02','Session preview','Photo for every exercise, swap on each row. Scrolls.'],['2.03','Live session','Load shown huge. Camera and swap at thumb height.'],['2.04','Log set','Set table plus “reps left”, which drives the next set.'],['2.05','Rest timer','Ring, ±15 s, and the next set with a cue.'],['2.06','Form check','Pro, Beta. Pose lines, depth score, video stays on the phone.'],['2.07','Swap','Reason first, then matching exercises with photos.'],['2.08','Session complete','Muscle map front and back, load per muscle, coach line. Scrolls.']]},
+ {id:'coach',eb:'3 · Coach & library',h:'Ask the coach, browse by body part',p:'Library categories are round photo icons; every exercise has its own photo.',ids:[['3.01','Coach chat','Plan changes come as a diff card with Apply or Keep.'],['3.02','Library','Category icons, then a row per category. Scrolls.'],['3.03','Category: Legs','Filter by equipment. Greyed tile is not downloaded.'],['3.04','Exercise detail','Front and side video, captions, small muscle map.']]},
+ {id:'progress',eb:'4 · Progress',h:'Show people what they built',p:'A 30-day strength map, the total moved in plain words, the biggest gains and records.',ids:[['3.05','Progress','Strength map, gains per muscle, estimated max, records, balance tip. Scrolls.']]},
+ {id:'profile',eb:'5 · Profile & settings',h:'Your details, editable any time',p:'Reached from the photo on Home. Training changes rebuild the plan.',ids:[['4.01','Profile','Photo, stats, body and training details, each editable.'],['4.02','Edit profile','Names, email, birth date, optional sex, height, weight, units.'],['4.03','Training preferences','Same choices as onboarding; saving updates the plan.'],['4.04','Settings','Subscription, units, language, notifications, privacy, account.']]},
+ {id:'pro',eb:'6 · Pro & weekly update',h:'Paywall and the weekly loop',p:'Paywall modelled on your reference: feature tiles, Annual vs Monthly with a saving badge, one trial button. Prices from the PRD.',ids:[['5.01','Paywall','Annual preselected. Restore always visible.'],['5.02','Paywall in context','After a session, over the blurred muscle map.'],['5.03','Weekly check-in','Three taps, optional note.'],['5.04','Plan update','Every change shown; approve or keep last week.']]}
+];
+const main=document.getElementById('main'),jump=document.getElementById('jump');
+const col=(id,nm,note,inner,h)=>`<div class="col"><span class="id">${id}</span><span class="nm">${nm}</span><div class="frame" tabindex="0" role="button" aria-label="Open ${id} ${nm}" data-h="${h}" style="height:calc(${h}px*var(--s))">${inner}</div><span class="note">${note}</span></div>`;
+let html='';
+for(const st of STAGES){
+  jump.insertAdjacentHTML('beforeend',`<a href="#${st.id}">${st.eb}</a>`);
+  let body='';
+  if(st.id==='brand'){
+    body=`<div class="brandgrid"><figure><img src="img/logo-sheet.png" alt="Tekto logo sheet"><figcaption>Mark, lockup, sizes and app icons from Figma.</figcaption></figure><figure style="align-items:flex-start"><div class="row" style="gap:16px;display:flex;align-items:center"><img src="img/app-icon.png" alt="Tekto app icon" style="width:96px;border-radius:22px"><img src="img/app-icon.png" alt="" style="width:60px;border-radius:14px"><img src="img/app-icon.png" alt="" style="width:40px;border-radius:9px"></div><figcaption>App icon, now in the iOS and Android projects.</figcaption></figure><figure><img src="img/components-sheet.png" alt="Components"><figcaption>Status bar, buttons and the floating tab bar.</figcaption></figure><figure class="wide"><div class="photos">${['hero-signin','hero-story-1','hero-story-2','hero-session','hero-live','hero-formcheck','avatar-user',...CATS.flatMap(c=>c[2].map(e=>e[0]))].filter((v,i,a)=>a.indexOf(v)===i).map(i=>`<img src="${IMG(i)}" alt="">`).join('')}</div><figcaption>24 photos: 6 screen photos, the profile photo and 17 exercises.</figcaption></figure></div>`;
+  } else if(st.ob){
+    body=`<div class="rail">${OB.map(([id,nm,n])=>col(id,nm,n,`<img src="ob/${id.replace('.','')}.jpg" alt="${nm}" loading="lazy">`,852)).join('')}</div>`;
+  } else {
+    body=`<div class="rail">${st.ids.map(([id,nm,n])=>{const h=S[id]();const m=h.match(/height:(\d+)px/);return col(id,nm,n,h,m?+m[1]:852)}).join('')}</div>`;
+  }
+  html+=`<section class="stage" id="${st.id}"><div class="eyebrow">${st.eb}</div><h2>${st.h}</h2><p>${st.p}</p>${body}</section>`;
+}
+/* Photos that have a video loop play it (clips from design/videos, re-encoded into vid/). */
+const VID=/img\/((?:hero|ex)-[a-z0-9-]+)\.jpg$/;
+const still=matchMedia('(prefers-reduced-motion: reduce)');
+const vio=new IntersectionObserver(es=>es.forEach(e=>{const v=e.target;if(e.isIntersecting&&!still.matches)v.play().catch(()=>{});else v.pause()}),{threshold:.2});
+function liven(root){
+  root.querySelectorAll('img').forEach(im=>{
+    const m=(im.getAttribute('src')||'').match(VID);
+    if(!m||im.classList.contains('thumb')||!(im.classList.contains('img')||im.parentElement.classList.contains('tile')))return;
+    const v=document.createElement('video');
+    for(const a of im.attributes)if(a.name!=='src'&&a.name!=='alt')v.setAttribute(a.name,a.value);
+    for(const a of ['muted','loop','playsinline','data-live'])v.setAttribute(a,'');
+    v.setAttribute('preload','metadata');v.setAttribute('aria-hidden','true');
+    v.poster=im.getAttribute('src');v.src=`vid/${m[1]}.mp4`;im.replaceWith(v);
+  });
+  root.querySelectorAll('video[data-live]').forEach(v=>{v.muted=true;vio.observe(v)});
+}
+main.innerHTML=html;
+liven(main);
+/* active chip */
+const links=[...jump.querySelectorAll('a')];
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){links.forEach(a=>a.classList.toggle('on',a.getAttribute('href')==='#'+e.target.id))}}),{rootMargin:'-30% 0px -60% 0px'});
+document.querySelectorAll('section.stage').forEach(s=>io.observe(s));
+/* lightbox */
+const lb=document.getElementById('lb'),lbh=document.getElementById('lbh');
+function openLB(f){
+  const h=+f.dataset.h,vh=window.innerHeight-48,vw=window.innerWidth-32;
+  const k=Math.min(1.15,vw/393,h>1000?1.15:vh/h);
+  const isImg=f.firstElementChild.tagName==='IMG';
+  const inner=isImg?`<img src="${f.firstElementChild.getAttribute('src')}" alt="" style="display:block;width:100%">`:`<div style="transform:scale(${k});transform-origin:0 0;width:393px">${f.innerHTML}</div>`;
+  lbh.innerHTML=`<div style="width:${393*k}px;height:${h*k}px;border-radius:${44*k}px;overflow:hidden;box-shadow:0 0 0 1px #2A2D37;background:#0F1014">${inner}</div>`;
+  liven(lbh);
+  lb.hidden=false;lb.scrollTop=0;document.getElementById('lbx').focus();
+}
+main.addEventListener('click',e=>{const f=e.target.closest('.frame');if(f)openLB(f)});
+main.addEventListener('keydown',e=>{const f=e.target.closest('.frame');if(f&&(e.key==='Enter'||e.key===' ')){e.preventDefault();openLB(f)}});
+const closeLB=()=>{lb.hidden=true;lbh.innerHTML=''};
+document.getElementById('lbx').onclick=closeLB;lb.addEventListener('click',e=>{if(e.target===lb)closeLB()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!lb.hidden)closeLB()});
+
+/* ================= clickable prototype ================= */
+const NAMES={};OB.forEach(([i,n])=>NAMES[i]=n);STAGES.forEach(s=>(s.ids||[]).forEach(([i,n])=>NAMES[i]=n));
+const TAB=[['.tabs .tb','2.01',0],['.tabs .tb','3.01',1],['.tabs .tb','3.02',2],['.tabs .tb','3.05',3],['.tabs .plus','3.01']];
+// [selector, target screen or 'back', optional index among matches]
+const RULES={
+ '2.01':[...TAB,['img.av','4.01'],['.bar .tag','5.01'],['.bar .ic','5.03',0],['.tile','2.02'],['.card.row','2.02']],
+ '2.02':[['.btn','2.03'],['.glass','back',0],['.li','3.04']],
+ '2.03':[['.glass','2.01',0],['.glass','2.06',2],['.glass','2.07',3],['.btn','2.04']],
+ '2.04':[['.btn','2.05'],['.dim','back']],
+ '2.05':[['.btn','2.08'],['.glass','back']],
+ '2.06':[['.glass','back',0]],
+ '2.07':[['.li','2.03'],['.dim','back']],
+ '2.08':[['.btn','2.01'],['.glass','2.01']],
+ '3.01':[...TAB,['.btn','2.01'],['.chip','2.01','Show my week'],['.chip','3.04','Why hip thrust?']],
+ '3.02':[...TAB,['.tile','3.04'],['img.av','3.03'],['.gl','3.03']],
+ '3.03':[...TAB,['.glass','back'],['.tile','3.04']],
+ '3.04':[['.glass','back',0]],
+ '3.05':[...TAB,['.li','3.04']],
+ '4.01':[['.glass','back',0],['.glass','4.04',1],['.grp .gl','4.02',0],['.grp .gl','4.03',1],['.av','4.02'],['.pro','5.01'],...['Height','Weight','Age'].map(t=>['.li','4.02',t]),...['Goal','Level','Days','Session','Equipment','Limitations'].map(t=>['.li','4.03',t])],
+ '4.02':[['.btn','4.01'],['.bar>span','4.01']],
+ '4.03':[['.btn','4.01'],['.glass','back']],
+ '4.04':[['.glass','back'],['.grp .gl','5.01'],['.pro','5.01'],['.li','1.02','Log out']],
+ '5.01':[['.btn','1.16'],['.glass','back']],
+ '5.02':[['.btn','1.16'],['.sheet>.mist','2.01',1]],
+ '5.03':[['.btn','5.04'],['.glass','back']],
+ '5.04':[['.btn','2.01'],['.glass','back']]
+};
+const pv=document.getElementById('pv'),pvs=document.getElementById('pvscroll'),pvf=document.getElementById('pvframe'),pvp=document.getElementById('pvphone');
+let cur=null,curArg,hist=[];
+const isOB=id=>id.startsWith('1.');
+function fit(){const vh=window.innerHeight-150,vw=window.innerWidth-48;const k=Math.max(.4,Math.min(1,vh/852,vw/393));pvp.style.width=393*k+'px';pvp.style.height=852*k+'px';pvp.style.borderRadius=44*k+'px';pvf.style.transform=`scale(${k})`}
+function show(id,push=true,arg){
+  if(push&&cur)hist.push([cur,curArg]);cur=id;curArg=arg;
+  if(isOB(id)){pvs.innerHTML=`<div class="scr hot" data-next style="height:852px"><img src="ob/${id.replace('.','')}.jpg" alt="${NAMES[id]}" style="display:block;width:100%;height:100%;object-fit:cover"></div>`}
+  else{pvs.innerHTML=S[id](arg);(RULES[id]||[]).forEach(([sel,to,idx])=>{const els=[...pvs.querySelectorAll(sel)];(idx===undefined?els:typeof idx==='string'?els.filter(e=>e.textContent.includes(idx)):[els[idx]]).forEach(el=>{if(el&&!el.dataset.to){el.dataset.to=to;el.classList.add('hot')}})});liven(pvs)}
+  pvs.scrollTop=0;pvf.classList.remove('in');void pvf.offsetWidth;pvf.classList.add('in');
+  const what=arg&&(EX[arg]?EX[arg].n:SESS[arg]?SESS[arg].t:arg);
+  document.getElementById('pvwhere').textContent=`${id} · ${(NAMES[id]||'').replace(/: Legs$/,'')}${what?' · '+what:''}`;
+  document.getElementById('pvback').disabled=!hist.length;
+  try{history.replaceState(null,'','#try-'+id.replace('.',''))}catch(e){}
+}
+function nextOB(id){const i=OB.findIndex(o=>o[0]===id);return i<OB.length-1?OB[i+1][0]:'2.01'}
+pvs.addEventListener('click',e=>{
+  const t=e.target.closest('[data-to],[data-next]');if(!t)return;
+  if('next' in t.dataset){show(nextOB(cur));return}
+  const to=t.dataset.to;if(to==='back'){goBack();return}
+  // The tapped element names what to open (data-arg); a swap keeps the exercise being replaced.
+  const own=t.dataset.arg||(t.querySelector('[data-arg]')||{dataset:{}}).dataset.arg||exByText(t.textContent);
+  show(to,true,own||(to==='2.07'?curArg:undefined));
+});
+/* Exercise named in the tapped text (Progress records, coach chips); the longest name wins. */
+function exByText(text){const l=text.toLowerCase();let best;for(const [k,e] of Object.entries(EX))if(l.includes(e.n.toLowerCase())&&(!best||e.n.length>EX[best].n.length))best=k;return best}
+function goBack(){if(hist.length){const [id,a]=hist.pop();show(id,false,a)}}
+function openPV(start){fit();hist=[];cur=null;curArg=undefined;pv.hidden=false;show(start||'1.01');document.getElementById('pvclose').focus()}
+function closePV(){pv.hidden=true;pvs.innerHTML='';try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}}
+document.getElementById('pvback').onclick=goBack;
+document.getElementById('pvrestart').onclick=()=>{hist=[];cur=null;curArg=undefined;show('1.01')};
+document.getElementById('pvclose').onclick=closePV;
+document.getElementById('trybtn').addEventListener('click',e=>{e.preventDefault();openPV('1.01')});
+window.addEventListener('resize',()=>{if(!pv.hidden)fit()});
+document.addEventListener('keydown',e=>{if(pv.hidden)return;if(e.key==='Escape')closePV();if(e.key==='ArrowLeft')goBack();if(e.key==='ArrowRight'&&isOB(cur))show(nextOB(cur))});
+function fromHash(){const m=/^#try(?:-(\d)(\d\d))?$/.exec(location.hash);if(!m)return;const id=m[1]?`${m[1]}.${m[2]}`:'1.01';if(NAMES[id]){if(pv.hidden)openPV(id);else show(id)}}
+window.addEventListener('hashchange',fromHash);fromHash();
+</script>

@@ -27,7 +27,8 @@ class PlanOverviewScreen extends ConsumerWidget {
     final planAsync = ref.watch(activePlanProvider);
 
     return Scaffold(
-      appBar: AppBar(title: Text(AppLocalizations.of(context).planTitle), actions: const [CoachButton(screen: 'plan_overview')]),
+      appBar: AppBar(
+          title: Text(AppLocalizations.of(context).planTitle), actions: const [CoachButton(screen: 'plan_overview')]),
       body: planAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(child: Text(AppLocalizations.of(context).commonLoadError)),
@@ -56,8 +57,7 @@ class PlanOverviewScreen extends ConsumerWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(plan.name,
-                          style: Theme.of(context).textTheme.headlineMedium),
+                      Text(plan.name, style: Theme.of(context).textTheme.headlineMedium),
                       // Why this plan fits (FR-044).
                       if ((Localizations.localeOf(context).languageCode == 'fr' ? plan.rationaleFr : plan.rationaleEn)
                           case final rationale? when rationale.isNotEmpty) ...[
@@ -120,7 +120,7 @@ class _DayCard extends ConsumerWidget {
     final badge = Container(
       width: 40,
       height: 40,
-      decoration: BoxDecoration(color: AppColors.charcoalElevated, borderRadius: BorderRadius.circular(8)),
+      decoration: BoxDecoration(color: AppColors.deep, borderRadius: BorderRadius.circular(8)),
       child: Center(child: Text(dayLabel, style: const TextStyle(fontWeight: FontWeight.w600))),
     );
 
@@ -155,7 +155,8 @@ class _DayCard extends ConsumerWidget {
                 Expanded(
                   child: Text(fr ? d.session.nameFr : d.session.nameEn, style: Theme.of(context).textTheme.titleMedium),
                 ),
-                if (d.session.estimatedMin case final min?) Text('$min min', style: Theme.of(context).textTheme.bodySmall),
+                if (d.session.estimatedMin case final min?)
+                  Text('$min min', style: Theme.of(context).textTheme.bodySmall),
               ]),
               const SizedBox(height: AppSpacing.sm),
               for (final x in d.exercises)
@@ -243,7 +244,7 @@ class _PlanNoticesState extends ConsumerState<_PlanNotices> {
           Card(
             margin: const EdgeInsets.only(top: AppSpacing.base),
             child: ListTile(
-              leading: const Icon(Icons.info_outline, color: AppColors.accent),
+              leading: const Icon(Icons.info_outline, color: AppColors.glacier),
               title: Text(value),
               trailing: IconButton(
                 icon: const Icon(Icons.close),

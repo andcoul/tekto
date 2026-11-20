@@ -29,7 +29,10 @@ final formCheckGateProvider = FutureProvider.autoDispose.family<FormCheckGate, S
   final exercises = await ref.watch(exercisesProvider.future);
   final exercise = exercises.where((e) => e.slug == slug).firstOrNull;
   final liftKey = exercise?.formCheckLiftKey;
-  if (exercise == null || !exercise.formCheckSupported || liftKey == null || !RepCounter.launchLifts.contains(liftKey)) {
+  if (exercise == null ||
+      !exercise.formCheckSupported ||
+      liftKey == null ||
+      !RepCounter.launchLifts.contains(liftKey)) {
     return const FormCheckGate.unsupported();
   }
   final userId = ref.watch(currentUserIdProvider);

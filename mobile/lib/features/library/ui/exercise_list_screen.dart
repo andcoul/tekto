@@ -21,12 +21,25 @@ class _ExerciseListScreenState extends ConsumerState<ExerciseListScreen> {
   String _query = '';
 
   static const _muscleGroups = [
-    'quadriceps', 'glutes', 'hamstrings', 'chest', 'shoulders',
-    'lats', 'traps', 'biceps', 'triceps', 'core', 'erectors',
+    'quadriceps',
+    'glutes',
+    'hamstrings',
+    'chest',
+    'shoulders',
+    'lats',
+    'traps',
+    'biceps',
+    'triceps',
+    'core',
+    'erectors',
   ];
 
   static const _equipment = [
-    'barbell', 'dumbbell', 'cable', 'bodyweight', 'bands',
+    'barbell',
+    'dumbbell',
+    'cable',
+    'bodyweight',
+    'bands',
   ];
 
   @override
@@ -71,22 +84,18 @@ class _ExerciseListScreenState extends ConsumerState<ExerciseListScreen> {
             equipment: _equipment,
             selectedMuscle: _selectedMuscle,
             selectedEquipment: _selectedEquipment,
-            onMuscleSelected: (m) => setState(() =>
-                _selectedMuscle = _selectedMuscle == m ? null : m),
-            onEquipmentSelected: (e) => setState(() =>
-                _selectedEquipment = _selectedEquipment == e ? null : e),
+            onMuscleSelected: (m) => setState(() => _selectedMuscle = _selectedMuscle == m ? null : m),
+            onEquipmentSelected: (e) => setState(() => _selectedEquipment = _selectedEquipment == e ? null : e),
           ),
           Expanded(
             child: exercisesAsync.when(
-              loading: () =>
-                  const Center(child: CircularProgressIndicator()),
+              loading: () => const Center(child: CircularProgressIndicator()),
               error: (e, _) => Center(child: Text(AppLocalizations.of(context).commonLoadError)),
               data: (exercises) => exercises.isEmpty
                   ? Center(child: Text(AppLocalizations.of(context).libraryEmpty))
                   : ListView.builder(
                       itemCount: exercises.length,
-                      itemBuilder: (context, index) =>
-                          _ExerciseRow(exercise: exercises[index]),
+                      itemBuilder: (context, index) => _ExerciseRow(exercise: exercises[index]),
                     ),
             ),
           ),
@@ -147,8 +156,7 @@ class _FilterChips extends StatelessWidget {
     );
   }
 
-  static String _capitalize(String s) =>
-      s.isEmpty ? s : s[0].toUpperCase() + s.substring(1);
+  static String _capitalize(String s) => s.isEmpty ? s : s[0].toUpperCase() + s.substring(1);
 }
 
 class _ExerciseRow extends StatelessWidget {
@@ -166,10 +174,10 @@ class _ExerciseRow extends StatelessWidget {
         width: 56,
         height: 56,
         decoration: BoxDecoration(
-          color: AppColors.charcoalElevated,
+          color: AppColors.deep,
           borderRadius: BorderRadius.circular(8),
         ),
-        child: const Icon(Icons.fitness_center, color: AppColors.accent),
+        child: const Icon(Icons.fitness_center, color: AppColors.glacier),
       ),
       title: Text(exercise.nameEn),
       subtitle: Text(

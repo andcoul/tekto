@@ -11,8 +11,7 @@ typedef PlanDay = ({Session session, List<PlanSlot> exercises});
 
 /// The sessions of [week] of a plan, from the device cache (works offline, Constitution I);
 /// updates when the plan cache is refreshed, e.g. after a swap (T138).
-final planWeekProvider =
-    StreamProvider.autoDispose.family<List<PlanDay>, ({String planId, int week})>((ref, key) {
+final planWeekProvider = StreamProvider.autoDispose.family<List<PlanDay>, ({String planId, int week})>((ref, key) {
   final db = ref.watch(appDatabaseProvider);
   final query = db.select(db.sessions).join([
     leftOuterJoin(db.planExercises, db.planExercises.sessionId.equalsExp(db.sessions.id)),

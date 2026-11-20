@@ -34,7 +34,7 @@ class _MessageRatingWidgetState extends ConsumerState<MessageRatingWidget> {
         label: _rated! ? l.coachRateHelpful : l.coachRateNotHelpful,
         child: Padding(
           padding: const EdgeInsets.only(top: 4),
-          child: Icon(_rated! ? Icons.thumb_up : Icons.thumb_down, size: 16, color: AppColors.onDarkSecondary),
+          child: Icon(_rated! ? Icons.thumb_up : Icons.thumb_down, size: 16, color: AppColors.mist),
         ),
       );
     }
@@ -76,7 +76,7 @@ class _RateButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) => IconButton(
         icon: Icon(icon, size: 18),
-        color: AppColors.onDarkSecondary,
+        color: AppColors.mist,
         tooltip: tooltip,
         constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
         onPressed: onPressed,

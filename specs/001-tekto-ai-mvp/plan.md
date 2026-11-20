@@ -38,6 +38,7 @@ Tekto is a premium, AI-first strength training app for iOS 16+ and Android 10+ p
 | Coach cache limited to generic answers (never personalized ones) | Constitution II (cross-user leak risk) |
 | Model IDs moved to the current generation | research.md §2 |
 | Analyze runs 5–6 (2026-11-15): progress, plate calculator, welcome, rationale, consent FRs (FR-039–045); volume max on all plans; push:pull check for AI plans; swap for all tiers; onboarding order welcome → auth → disclaimer → consent → quiz → plan → trial | spec Clarifications 2026-11-15 |
+| Imagery and casting (2026-11-17): mixed cast with Black men and women in lead roles across photos, thumbnails and filmed content; dark-UI lighting brief | User design request; Constitution VI; research §16 |
 
 ---
 
@@ -102,7 +103,7 @@ Tekto is a premium, AI-first strength training app for iOS 16+ and Android 10+ p
 
 **Gate result**: PASS. No unjustified violations. The one open risk (exercise content volume: 15 of 150) is a dependency, not a design violation; it is tracked in Complexity Tracking and must be closed before Gate 1.
 
-**Post-design re-check (after Phase 1)**: re-evaluated against the updated [data-model.md](./data-model.md), [contracts/](./contracts/) and [quickstart.md](./quickstart.md). No new violations introduced. Status unchanged.
+**Post-design re-check (after Phase 1)**: re-evaluated against the updated [data-model.md](./data-model.md), [contracts/](./contracts/) and [quickstart.md](./quickstart.md). No new violations introduced. Status unchanged. Re-checked 2026-11-17 after research §16 (imagery and casting): content and design only, so no new violations, and VI (Premium UX) is strengthened.
 
 ---
 

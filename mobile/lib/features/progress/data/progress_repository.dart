@@ -16,8 +16,12 @@ const _push = {'chest', 'shoulders', 'front_deltoid', 'triceps', 'upper_chest'};
 const _pull = {'lats', 'rhomboids', 'rear_deltoid', 'biceps', 'traps'};
 
 class HistoryEntry {
-  const HistoryEntry({required this.workoutLogId, required this.finishedAt, required this.sessionNameEn,
-      required this.sessionNameFr, required this.totalVolumeKg});
+  const HistoryEntry(
+      {required this.workoutLogId,
+      required this.finishedAt,
+      required this.sessionNameEn,
+      required this.sessionNameFr,
+      required this.totalVolumeKg});
   final String workoutLogId;
   final DateTime finishedAt;
   final String sessionNameEn;
@@ -26,8 +30,14 @@ class HistoryEntry {
 }
 
 class RecordEntry {
-  const RecordEntry({required this.exerciseSlug, required this.exerciseNameEn, required this.exerciseNameFr,
-      required this.bestWeightKg, required this.bestReps, required this.bestE1rmKg, required this.achievedAt});
+  const RecordEntry(
+      {required this.exerciseSlug,
+      required this.exerciseNameEn,
+      required this.exerciseNameFr,
+      required this.bestWeightKg,
+      required this.bestReps,
+      required this.bestE1rmKg,
+      required this.achievedAt});
   final String exerciseSlug;
   final String exerciseNameEn;
   final String exerciseNameFr;
@@ -64,8 +74,15 @@ class BodyWeightPoint {
 }
 
 class ProgressData {
-  const ProgressData({required this.limited, required this.history, required this.records, required this.e1rmTrend,
-      required this.weeklySets, required this.balance, required this.bodyWeight, required this.exerciseNames});
+  const ProgressData(
+      {required this.limited,
+      required this.history,
+      required this.records,
+      required this.e1rmTrend,
+      required this.weeklySets,
+      required this.balance,
+      required this.bodyWeight,
+      required this.exerciseNames});
 
   /// True for free users: history and trends are limited to [kFreeProgressDays].
   final bool limited;
@@ -134,8 +151,8 @@ class ProgressRepository {
           finishedAt: l.finishedAt!,
           sessionNameEn: sessions[l.sessionId]?.nameEn ?? '',
           sessionNameFr: sessions[l.sessionId]?.nameFr ?? '',
-          totalVolumeKg: l.totalVolumeKg ??
-              (setsByLog[l.id] ?? const []).fold(0.0, (sum, s) => sum + s.weightKg * s.reps),
+          totalVolumeKg:
+              l.totalVolumeKg ?? (setsByLog[l.id] ?? const []).fold(0.0, (sum, s) => sum + s.weightKg * s.reps),
         ),
     ];
 

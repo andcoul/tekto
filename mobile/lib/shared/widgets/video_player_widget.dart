@@ -207,21 +207,24 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
     final l10n = AppLocalizations.of(context);
     switch (_source.kind) {
       case VideoSourceKind.proRequired:
-        return _Placeholder(aspectRatio: widget.aspectRatio, icon: Icons.lock_outline, text: l10n.libraryOfflineProRequired);
+        return _Placeholder(
+            aspectRatio: widget.aspectRatio, icon: Icons.lock_outline, text: l10n.libraryOfflineProRequired);
       case VideoSourceKind.unavailable:
-        return _Placeholder(aspectRatio: widget.aspectRatio, icon: Icons.play_circle_outline, text: l10n.libraryVideoUnavailable);
+        return _Placeholder(
+            aspectRatio: widget.aspectRatio, icon: Icons.play_circle_outline, text: l10n.libraryVideoUnavailable);
       case VideoSourceKind.local:
       case VideoSourceKind.remote:
         break;
     }
 
     if (_error) {
-      return _Placeholder(aspectRatio: widget.aspectRatio, icon: Icons.play_circle_outline, text: l10n.libraryVideoUnavailable);
+      return _Placeholder(
+          aspectRatio: widget.aspectRatio, icon: Icons.play_circle_outline, text: l10n.libraryVideoUnavailable);
     }
     if (_chewieController == null) {
       return AspectRatio(
         aspectRatio: widget.aspectRatio,
-        child: const Center(child: CircularProgressIndicator(color: AppColors.accent)),
+        child: const Center(child: CircularProgressIndicator(color: AppColors.glacier)),
       );
     }
     return AspectRatio(aspectRatio: widget.aspectRatio, child: Chewie(controller: _chewieController!));
@@ -240,13 +243,13 @@ class _Placeholder extends StatelessWidget {
     return AspectRatio(
       aspectRatio: aspectRatio,
       child: Container(
-        color: AppColors.charcoalElevated,
+        color: AppColors.deep,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, color: AppColors.onDarkSecondary, size: 32),
+            Icon(icon, color: AppColors.mist, size: 32),
             const SizedBox(height: 8),
-            Text(text, style: const TextStyle(color: AppColors.onDarkSecondary, fontSize: 14), textAlign: TextAlign.center),
+            Text(text, style: const TextStyle(color: AppColors.mist, fontSize: 14), textAlign: TextAlign.center),
           ],
         ),
       ),

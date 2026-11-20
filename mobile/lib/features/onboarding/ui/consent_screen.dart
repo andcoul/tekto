@@ -31,7 +31,7 @@ class ConsentScreen extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 const SizedBox(height: AppSpacing.xl),
-                const Icon(Icons.lock_outline, size: 56, color: AppColors.accent),
+                const Icon(Icons.lock_outline, size: 56, color: AppColors.glacier),
                 const SizedBox(height: AppSpacing.lg),
                 Text(l10n.consentTitle, style: Theme.of(context).textTheme.displayMedium, textAlign: TextAlign.center),
                 const SizedBox(height: AppSpacing.base),

@@ -197,8 +197,8 @@ class _OnboardingQuizScreenState extends ConsumerState<OnboardingQuizScreen> {
             : (widget.editProfile ? const CloseButton() : null),
         title: LinearProgressIndicator(
           value: (_step + 1 - _firstStep) / (OnboardingState.stepCount - _firstStep),
-          backgroundColor: AppColors.charcoalElevated,
-          valueColor: const AlwaysStoppedAnimation<Color>(AppColors.accent),
+          backgroundColor: AppColors.deep,
+          valueColor: const AlwaysStoppedAnimation<Color>(AppColors.glacier),
         ),
       ),
       body: SafeArea(
@@ -235,7 +235,6 @@ class _OnboardingQuizScreenState extends ConsumerState<OnboardingQuizScreen> {
     );
   }
 }
-
 
 class _ChoiceStep extends StatelessWidget {
   const _ChoiceStep({required this.title, required this.options, required this.selected, required this.onSelect});
@@ -331,8 +330,7 @@ class _LimitationsStep extends StatelessWidget {
   @override
   Widget build(BuildContext context) => ListView(
         children: [
-          Text(AppLocalizations.of(context).quizLimitationsTitle,
-              style: Theme.of(context).textTheme.headlineMedium),
+          Text(AppLocalizations.of(context).quizLimitationsTitle, style: Theme.of(context).textTheme.headlineMedium),
           const SizedBox(height: AppSpacing.sm),
           Text(AppLocalizations.of(context).quizLimitationsBody),
           const SizedBox(height: AppSpacing.lg),
@@ -378,11 +376,12 @@ class _StrengthStep extends StatelessWidget {
           const SizedBox(height: AppSpacing.sm),
           Text(AppLocalizations.of(context).quizStrengthBody),
           const SizedBox(height: AppSpacing.lg),
-          for (final lift in kStrengthLifts) _LiftRow(
-            label: _labels[lift]!(AppLocalizations.of(context)),
-            value: values[lift],
-            onChanged: (v) => onChanged(lift, v),
-          ),
+          for (final lift in kStrengthLifts)
+            _LiftRow(
+              label: _labels[lift]!(AppLocalizations.of(context)),
+              value: values[lift],
+              onChanged: (v) => onChanged(lift, v),
+            ),
         ],
       );
 }
@@ -453,7 +452,7 @@ class _OptionCard extends StatelessWidget {
   Widget build(BuildContext context) => Padding(
         padding: const EdgeInsets.only(bottom: AppSpacing.sm),
         child: Material(
-          color: selected ? AppColors.accent.withValues(alpha: 0.15) : AppColors.charcoalElevated,
+          color: selected ? AppColors.glacier.withValues(alpha: 0.15) : AppColors.deep,
           borderRadius: BorderRadius.circular(AppSizes.borderRadius),
           child: InkWell(
             borderRadius: BorderRadius.circular(AppSizes.borderRadius),
@@ -464,11 +463,11 @@ class _OptionCard extends StatelessWidget {
               alignment: Alignment.centerLeft,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(AppSizes.borderRadius),
-                border: Border.all(color: selected ? AppColors.accent : Colors.transparent, width: 2),
+                border: Border.all(color: selected ? AppColors.glacier : Colors.transparent, width: 2),
               ),
               child: Row(children: [
                 Expanded(child: Text(label, style: Theme.of(context).textTheme.titleMedium)),
-                if (selected) const Icon(Icons.check_circle, color: AppColors.accent),
+                if (selected) const Icon(Icons.check_circle, color: AppColors.glacier),
               ]),
             ),
           ),

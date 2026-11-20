@@ -65,9 +65,9 @@ class SettingsService {
   static const languages = {'en', 'fr'};
   static const units = {'kg', 'lb'};
 
-  Stream<UserSettings?> watch() => (_db.select(_db.users)..where((u) => u.id.equals(_userId)))
-      .watchSingleOrNull()
-      .map((u) => u == null ? null : UserSettings(language: u.language, unit: u.unit, healthSyncEnabled: u.healthSyncEnabled));
+  Stream<UserSettings?> watch() =>
+      (_db.select(_db.users)..where((u) => u.id.equals(_userId))).watchSingleOrNull().map((u) =>
+          u == null ? null : UserSettings(language: u.language, unit: u.unit, healthSyncEnabled: u.healthSyncEnabled));
 
   /// FR-033: the app switches language immediately.
   Future<void> setLanguage(String languageCode) async {

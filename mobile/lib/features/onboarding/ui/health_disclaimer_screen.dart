@@ -24,9 +24,10 @@ class HealthDisclaimerScreen extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 const SizedBox(height: AppSpacing.xl),
-                const Icon(Icons.health_and_safety_outlined, size: 56, color: AppColors.accent),
+                const Icon(Icons.health_and_safety_outlined, size: 56, color: AppColors.glacier),
                 const SizedBox(height: AppSpacing.lg),
-                Text(l10n.healthDisclaimerTitle, style: Theme.of(context).textTheme.displayMedium, textAlign: TextAlign.center),
+                Text(l10n.healthDisclaimerTitle,
+                    style: Theme.of(context).textTheme.displayMedium, textAlign: TextAlign.center),
                 const SizedBox(height: AppSpacing.base),
                 Expanded(
                   child: SingleChildScrollView(child: Text(l10n.healthDisclaimerBody, textAlign: TextAlign.center)),

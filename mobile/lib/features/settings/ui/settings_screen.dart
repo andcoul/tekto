@@ -71,7 +71,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             title: Text(l.settingsHealthSync),
             value: settings?.healthSyncEnabled ?? false,
             onChanged: service == null ? null : service.setHealthSync,
-            activeThumbColor: AppColors.accent,
+            activeThumbColor: AppColors.glacier,
           ),
           ListTile(
             leading: const Icon(Icons.tune),
@@ -122,8 +122,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             onTap: () => launchUrl(Uri.parse(kPrivacyPolicyUrl), mode: LaunchMode.externalApplication),
           ),
           ListTile(
-            leading: const Icon(Icons.delete_forever, color: Colors.red),
-            title: Text(l.settingsDeleteAccount, style: const TextStyle(color: Colors.red)),
+            leading: const Icon(Icons.delete_forever, color: AppColors.danger),
+            title: Text(l.settingsDeleteAccount, style: const TextStyle(color: AppColors.danger)),
             enabled: !_busy && service != null,
             onTap: _deleteAccount,
           ),
@@ -203,7 +203,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     });
   }
 
-  Future<bool?> _confirm({required String title, required String body, required String action, bool destructive = false}) {
+  Future<bool?> _confirm(
+      {required String title, required String body, required String action, bool destructive = false}) {
     return showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -216,7 +217,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
-            style: destructive ? TextButton.styleFrom(foregroundColor: Colors.red) : null,
+            style: destructive ? TextButton.styleFrom(foregroundColor: AppColors.danger) : null,
             child: Text(action),
           ),
         ],
@@ -236,7 +237,7 @@ class _SectionHeader extends StatelessWidget {
         padding: const EdgeInsets.only(left: 16, top: 16, bottom: 4),
         child: Text(
           text,
-          style: Theme.of(context).textTheme.labelMedium?.copyWith(color: AppColors.onDarkSecondary),
+          style: Theme.of(context).textTheme.labelMedium?.copyWith(color: AppColors.mist),
         ),
       );
 }

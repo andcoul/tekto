@@ -152,7 +152,8 @@ class WorkoutSessionRepository {
     );
   }
 
-  static LiveExercise _liveExercise(PlanExercise slot, Exercise? e, ExerciseVideoDownload? d, {double? startWeightKg}) =>
+  static LiveExercise _liveExercise(PlanExercise slot, Exercise? e, ExerciseVideoDownload? d,
+          {double? startWeightKg}) =>
       LiveExercise(
         planExerciseId: slot.id,
         slug: slot.exerciseSlug,

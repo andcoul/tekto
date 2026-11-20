@@ -74,7 +74,8 @@ class CoachController extends Notifier<CoachState> {
     final userId = ref.read(currentUserIdProvider);
     if (userId == null || _isPro) return;
     final remaining = await _quotaService.questionsRemaining(userId, isPro: false);
-    if (remaining != null) state = state.copyWith(status: state.status, errorMessage: state.errorMessage, quotaRemaining: remaining);
+    if (remaining != null)
+      state = state.copyWith(status: state.status, errorMessage: state.errorMessage, quotaRemaining: remaining);
   }
 
   /// Sends a message to the AI coach.
@@ -175,7 +176,10 @@ class CoachController extends Notifier<CoachState> {
         // Not answered: drop the question (the screen keeps it in the input to re-send later).
         await _messageRepo.removeMessage(userMsg.id);
         state = state.copyWith(
-          messages: [for (final m in state.messages) if (m.id != userMsg.id) m],
+          messages: [
+            for (final m in state.messages)
+              if (m.id != userMsg.id) m
+          ],
           quotaRemaining: 0,
         );
       }
@@ -197,7 +201,10 @@ class CoachController extends Notifier<CoachState> {
   /// Drops the partial reply (never shown as an answer) and reports [code].
   void _failStream(String code) {
     state = state.copyWith(
-      messages: [for (final m in state.messages) if (m.id != streamingMessageId) m],
+      messages: [
+        for (final m in state.messages)
+          if (m.id != streamingMessageId) m
+      ],
       status: CoachStatus.error,
       errorMessage: code,
     );

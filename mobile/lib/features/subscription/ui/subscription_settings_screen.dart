@@ -43,7 +43,7 @@ class _Body extends ConsumerWidget {
         ListTile(
           leading: Icon(
             state.isPro ? Icons.star : Icons.star_border,
-            color: state.isPro ? AppColors.accent : null,
+            color: state.isPro ? AppColors.glacier : null,
           ),
           title: Text(state.isPro ? 'Tekto Pro' : 'Free'),
           subtitle: _buildSubtitle(context, state),
@@ -94,12 +94,9 @@ class _Body extends ConsumerWidget {
   Future<void> _openManageSubscription(TargetPlatform platform) async {
     // Platform-specific subscription management URL
     const iosUrl = 'https://apps.apple.com/account/subscriptions';
-    const androidUrl =
-        'https://play.google.com/store/account/subscriptions';
+    const androidUrl = 'https://play.google.com/store/account/subscriptions';
     final uri = Uri.parse(
-      platform == TargetPlatform.iOS
-          ? iosUrl
-          : androidUrl,
+      platform == TargetPlatform.iOS ? iosUrl : androidUrl,
     );
     if (await canLaunchUrl(uri)) await launchUrl(uri);
   }
@@ -134,12 +131,11 @@ class _SectionHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Padding(
-        padding: const EdgeInsets.only(
-            left: 16, top: AppSpacing.base, bottom: AppSpacing.sm),
+        padding: const EdgeInsets.only(left: 16, top: AppSpacing.base, bottom: AppSpacing.sm),
         child: Text(
           text,
           style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                color: AppColors.onDarkSecondary,
+                color: AppColors.mist,
               ),
         ),
       );

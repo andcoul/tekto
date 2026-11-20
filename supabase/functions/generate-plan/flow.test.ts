@@ -76,9 +76,11 @@ Deno.test('Pro: exercises the user cannot do are substituted without another AI 
   assert(r.ok, JSON.stringify(r));
   assertEquals([r.source, calls.length], ['ai', 1]);
   const slugs = new Set(r.plan.sessions.flatMap((s) => s.exercises.map((e) => e.exercise_slug)));
-  // Squat → lunge: same primary muscles and equipment class; ties break alphabetically
-  // (substitution does not rank by movement pattern).
-  assertEquals([...slugs].sort(), ['dumbbell-bench-press', 'dumbbell-lunge', 'dumbbell-row', 'dumbbell-shoulder-press']);
+  // Squat → Bulgarian split squat: same primary muscles and equipment class; ties break
+  // alphabetically (substitution does not rank by movement pattern).
+  assertEquals([...slugs].sort(), [
+    'bulgarian-split-squat', 'dumbbell-bench-press', 'dumbbell-row', 'dumbbell-shoulder-press',
+  ]);
 });
 
 Deno.test('Pro: an unknown exercise with no substitute is a validation error that triggers a retry', async () => {

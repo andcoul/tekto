@@ -63,7 +63,7 @@ class _ProCard extends StatelessWidget {
     final l = AppLocalizations.of(context);
     return Card(
       child: ListTile(
-        leading: const Icon(Icons.auto_awesome, color: AppColors.accent),
+        leading: const Icon(Icons.auto_awesome, color: AppColors.glacier),
         title: Text(l.progressProCard),
         trailing: TextButton(onPressed: () => context.push('/paywall'), child: Text(l.progressProCardAction)),
       ),
@@ -112,7 +112,7 @@ class _RecordsTab extends StatelessWidget {
       for (final r in p.records)
         ListTile(
           contentPadding: EdgeInsets.zero,
-          leading: const Icon(Icons.emoji_events_outlined, color: AppColors.pr),
+          leading: const Icon(Icons.emoji_events_outlined, color: AppColors.mint),
           title: Text(lang == 'fr' ? r.exerciseNameFr : r.exerciseNameEn),
           subtitle: Text(l.progressE1rm(_weight(r.bestE1rmKg, unit))),
           trailing: Text(l.progressRecord(_weight(r.bestWeightKg, unit), r.bestReps)),
@@ -135,7 +135,8 @@ class _VolumeTab extends StatelessWidget {
     return ListView(padding: const EdgeInsets.all(AppSpacing.base), children: [
       if (p.balance case final b?)
         Card(
-          child: ListTile(title: Text(l.progressBalanceTitle), subtitle: Text(l.progressBalance(b.pushSets, b.pullSets))),
+          child:
+              ListTile(title: Text(l.progressBalanceTitle), subtitle: Text(l.progressBalance(b.pushSets, b.pullSets))),
         )
       else
         const _ProCard(),
@@ -189,7 +190,7 @@ class _TrendRow extends StatelessWidget {
                 lineBarsData: [
                   LineChartBarData(
                     spots: [for (var i = 0; i < points.length; i++) FlSpot(i.toDouble(), points[i].e1rmKg)],
-                    color: AppColors.accent,
+                    color: AppColors.glacier,
                     dotData: const FlDotData(show: false),
                   ),
                 ],
@@ -219,7 +220,10 @@ class _BodyWeightTab extends ConsumerWidget {
       const SizedBox(height: AppSpacing.base),
       if (p.bodyWeight.isEmpty) Text(l.progressNoBodyWeight),
       for (final b in p.bodyWeight.reversed)
-        ListTile(contentPadding: EdgeInsets.zero, title: Text(_weight(b.weightKg, unit)), subtitle: Text(date.format(b.day))),
+        ListTile(
+            contentPadding: EdgeInsets.zero,
+            title: Text(_weight(b.weightKg, unit)),
+            subtitle: Text(date.format(b.day))),
     ]);
   }
 
@@ -231,7 +235,9 @@ class _BodyWeightTab extends ConsumerWidget {
     );
     final userId = ref.read(currentUserIdProvider);
     if (value == null || userId == null) return;
-    await ref.read(progressRepositoryProvider).logBodyWeight(userId, unitToKg(value, unit), day: ref.read(clockProvider)());
+    await ref
+        .read(progressRepositoryProvider)
+        .logBodyWeight(userId, unitToKg(value, unit), day: ref.read(clockProvider)());
     ref.invalidate(progressDataProvider);
   }
 }

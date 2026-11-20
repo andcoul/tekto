@@ -145,7 +145,8 @@ class WorkoutSummary {
 
 /// The profile settings the workout screens need, with safe defaults offline.
 class UserPrefs {
-  const UserPrefs({this.unit = 'kg', this.healthSyncEnabled = false, this.equipment = const [], this.limitations = const []});
+  const UserPrefs(
+      {this.unit = 'kg', this.healthSyncEnabled = false, this.equipment = const [], this.limitations = const []});
 
   /// 'kg' | 'lb' (FR-034).
   final String unit;

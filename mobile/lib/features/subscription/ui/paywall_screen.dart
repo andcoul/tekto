@@ -99,58 +99,68 @@ class _PaywallViewState extends ConsumerState<PaywallView> {
 
     return Padding(
       padding: const EdgeInsets.all(AppSpacing.lg),
-      child: Column(mainAxisSize: widget.inSheet ? MainAxisSize.min : MainAxisSize.max, crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-        Flexible(
-          child: SingleChildScrollView(child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(AppSizes.borderRadius),
-              child: SizedBox(height: widget.inSheet ? 120 : 200, child: PaywallValueVideo(feature: widget.feature)),
+      child: Column(
+          mainAxisSize: widget.inSheet ? MainAxisSize.min : MainAxisSize.max,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Flexible(
+              child: SingleChildScrollView(
+                  child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(AppSizes.borderRadius),
+                  child:
+                      SizedBox(height: widget.inSheet ? 120 : 200, child: PaywallValueVideo(feature: widget.feature)),
+                ),
+                const SizedBox(height: AppSpacing.base),
+                Text(l.paywallTitle, style: text.headlineSmall, textAlign: TextAlign.center),
+                const SizedBox(height: AppSpacing.xs),
+                Text(_featureLine(l, widget.feature), textAlign: TextAlign.center),
+                const SizedBox(height: AppSpacing.base),
+                if (!online)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+                    child: Text(l.paywallOffline,
+                        textAlign: TextAlign.center, style: const TextStyle(color: AppColors.glacier)),
+                  ),
+                ...offers.when(
+                  loading: () => [const Center(child: CircularProgressIndicator())],
+                  error: (_, __) => [Text(l.proUnavailableInRegion, textAlign: TextAlign.center)],
+                  data: (list) {
+                    if (list == null || list.isEmpty)
+                      return [Text(l.proUnavailableInRegion, textAlign: TextAlign.center)];
+                    final selected = list.firstWhere((o) => o.isAnnual == _annual, orElse: () => list.first);
+                    final savings = annualSavingsPercent(list);
+                    return [
+                      for (final o in list)
+                        RadioListTile<bool>(
+                          value: o.isAnnual,
+                          groupValue: selected.isAnnual,
+                          onChanged: enabled ? (v) => setState(() => _annual = v ?? true) : null,
+                          title: Text(o.isAnnual ? l.paywallAnnual : l.paywallMonthly),
+                          subtitle: o.isAnnual && savings != null ? Text(l.paywallSave(savings)) : null,
+                          secondary: Text(o.priceString, style: text.titleMedium),
+                        ),
+                      if (_message != null)
+                        Text(_message!, style: const TextStyle(color: AppColors.danger), textAlign: TextAlign.center),
+                      const SizedBox(height: AppSpacing.sm),
+                      ElevatedButton(
+                          onPressed: enabled ? () => _purchase(selected) : null, child: Text(l.paywallTrialCta)),
+                    ];
+                  },
+                ),
+              ])),
             ),
-            const SizedBox(height: AppSpacing.base),
-            Text(l.paywallTitle, style: text.headlineSmall, textAlign: TextAlign.center),
-            const SizedBox(height: AppSpacing.xs),
-            Text(_featureLine(l, widget.feature), textAlign: TextAlign.center),
-            const SizedBox(height: AppSpacing.base),
-            if (!online)
-              Padding(
-                padding: const EdgeInsets.only(bottom: AppSpacing.sm),
-                child: Text(l.paywallOffline, textAlign: TextAlign.center, style: const TextStyle(color: AppColors.accent)),
-              ),
-            ...offers.when(
-              loading: () => [const Center(child: CircularProgressIndicator())],
-              error: (_, __) => [Text(l.proUnavailableInRegion, textAlign: TextAlign.center)],
-              data: (list) {
-                if (list == null || list.isEmpty) return [Text(l.proUnavailableInRegion, textAlign: TextAlign.center)];
-                final selected = list.firstWhere((o) => o.isAnnual == _annual, orElse: () => list.first);
-                final savings = annualSavingsPercent(list);
-                return [
-                  for (final o in list)
-                    RadioListTile<bool>(
-                      value: o.isAnnual,
-                      groupValue: selected.isAnnual,
-                      onChanged: enabled ? (v) => setState(() => _annual = v ?? true) : null,
-                      title: Text(o.isAnnual ? l.paywallAnnual : l.paywallMonthly),
-                      subtitle: o.isAnnual && savings != null ? Text(l.paywallSave(savings)) : null,
-                      secondary: Text(o.priceString, style: text.titleMedium),
-                    ),
-                  if (_message != null)
-                    Text(_message!, style: const TextStyle(color: AppColors.error), textAlign: TextAlign.center),
-                  const SizedBox(height: AppSpacing.sm),
-                  ElevatedButton(onPressed: enabled ? () => _purchase(selected) : null, child: Text(l.paywallTrialCta)),
-                ];
-              },
-            ),
-          ])),
-        ),
-        // Pinned outside the scroll area so they are always visible (FR-031).
-        const SizedBox(height: AppSpacing.sm),
-        Text(l.paywallCancelAnytime, textAlign: TextAlign.center, style: text.bodySmall),
-        TextButton(onPressed: enabled ? _restore : null, child: Text(l.paywallRestore)),
-        if (widget.inSheet)
-          TextButton(onPressed: () => Navigator.of(context).pop(), child: Text(l.paywallContinueWorkout))
-        else
-          TextButton(onPressed: () => context.canPop() ? context.pop() : context.go('/home'), child: Text(l.paywallNotNow)),
-      ]),
+            // Pinned outside the scroll area so they are always visible (FR-031).
+            const SizedBox(height: AppSpacing.sm),
+            Text(l.paywallCancelAnytime, textAlign: TextAlign.center, style: text.bodySmall),
+            TextButton(onPressed: enabled ? _restore : null, child: Text(l.paywallRestore)),
+            if (widget.inSheet)
+              TextButton(onPressed: () => Navigator.of(context).pop(), child: Text(l.paywallContinueWorkout))
+            else
+              TextButton(
+                  onPressed: () => context.canPop() ? context.pop() : context.go('/home'),
+                  child: Text(l.paywallNotNow)),
+          ]),
     );
   }
 
@@ -172,8 +182,8 @@ class PaywallValueVideo extends StatelessWidget {
         asset: feature.clipAsset,
         captionsAsset: feature.captionsAsset,
         placeholder: const ColoredBox(
-          color: AppColors.charcoalElevated,
-          child: Center(child: Icon(Icons.auto_awesome, size: 48, color: AppColors.accent)),
+          color: AppColors.deep,
+          child: Center(child: Icon(Icons.auto_awesome, size: 48, color: AppColors.glacier)),
         ),
       );
 }

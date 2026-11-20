@@ -26,10 +26,10 @@ class PlanChangePendingCard extends ConsumerWidget {
     final rejected = ref.watch(coachControllerProvider.select((s) => s.rejectedChangeIds.contains(message.id)));
 
     if (message.planChangeApplied) {
-      return _StatusChip(icon: Icons.check_circle, label: l.coachChangeApplied, color: AppColors.accent);
+      return _StatusChip(icon: Icons.check_circle, label: l.coachChangeApplied, color: AppColors.glacier);
     }
     if (rejected) {
-      return _StatusChip(icon: Icons.cancel, label: l.coachChangeDismissed, color: AppColors.onDarkSecondary);
+      return _StatusChip(icon: Icons.cancel, label: l.coachChangeDismissed, color: AppColors.mist);
     }
 
     final language = Localizations.localeOf(context).languageCode;
@@ -42,7 +42,7 @@ class PlanChangePendingCard extends ConsumerWidget {
       margin: const EdgeInsets.only(top: AppSpacing.sm),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppSizes.borderRadius),
-        side: const BorderSide(color: AppColors.accent, width: 1),
+        side: const BorderSide(color: AppColors.glacier, width: 1),
       ),
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.sm),
@@ -51,7 +51,7 @@ class PlanChangePendingCard extends ConsumerWidget {
           children: [
             Text(
               l.coachPlanChangePending,
-              style: Theme.of(context).textTheme.labelMedium?.copyWith(color: AppColors.accent),
+              style: Theme.of(context).textTheme.labelMedium?.copyWith(color: AppColors.glacier),
             ),
             const SizedBox(height: 4),
             Text(
@@ -60,7 +60,7 @@ class PlanChangePendingCard extends ConsumerWidget {
             ),
             if (reason.isNotEmpty) ...[
               const SizedBox(height: 4),
-              Text(reason, style: Theme.of(context).textTheme.bodySmall?.copyWith(color: AppColors.onDarkSecondary)),
+              Text(reason, style: Theme.of(context).textTheme.bodySmall?.copyWith(color: AppColors.mist)),
             ],
             const SizedBox(height: AppSpacing.sm),
             Row(
@@ -126,8 +126,8 @@ String describePlanChange(
 }
 
 /// Localized names for a comma-separated list of slugs, from the device's exercise library.
-final _exerciseNamesProvider = FutureProvider.autoDispose
-    .family<Map<String, String>, ({String slugs, String language})>((ref, key) async {
+final _exerciseNamesProvider =
+    FutureProvider.autoDispose.family<Map<String, String>, ({String slugs, String language})>((ref, key) async {
   if (key.slugs.isEmpty) return const {};
   final rows = await ExerciseDao(ref.watch(appDatabaseProvider)).getBySlugs(key.slugs.split(','));
   return {for (final e in rows) e.slug: key.language == 'fr' ? e.nameFr : e.nameEn};

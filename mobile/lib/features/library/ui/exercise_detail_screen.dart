@@ -16,8 +16,7 @@ class ExerciseDetailScreen extends ConsumerStatefulWidget {
   final String exerciseSlug;
 
   @override
-  ConsumerState<ExerciseDetailScreen> createState() =>
-      _ExerciseDetailScreenState();
+  ConsumerState<ExerciseDetailScreen> createState() => _ExerciseDetailScreenState();
 }
 
 class _ExerciseDetailScreenState extends ConsumerState<ExerciseDetailScreen> {
@@ -69,14 +68,18 @@ class _ExerciseDetailScreenState extends ConsumerState<ExerciseDetailScreen> {
                   if (exercise.videoSideUrl != null)
                     TextButton(
                       onPressed: () => setState(() => _showSideView = !_showSideView),
-                      child: Text(_showSideView ? AppLocalizations.of(context).libraryFront : AppLocalizations.of(context).librarySide, style: const TextStyle(color: AppColors.accent)),
+                      child: Text(
+                          _showSideView
+                              ? AppLocalizations.of(context).libraryFront
+                              : AppLocalizations.of(context).librarySide,
+                          style: const TextStyle(color: AppColors.glacier)),
                     ),
                   // Offline downloads are a Pro entitlement (FR-015); hidden for free users.
                   if (isPro)
                     IconButton(
                       tooltip: l10n.libraryDownloadForOffline,
                       onPressed: download != null || _downloading || !isOnline ? null : _downloadActivePlan,
-                      icon: Icon(download != null ? Icons.download_done : Icons.download, color: AppColors.accent),
+                      icon: Icon(download != null ? Icons.download_done : Icons.download, color: AppColors.glacier),
                     ),
                 ],
               ),
@@ -97,9 +100,15 @@ class _ExerciseDetailScreenState extends ConsumerState<ExerciseDetailScreen> {
                       const SizedBox(height: AppSpacing.lg),
                       _SectionHeader(AppLocalizations.of(context).libraryVariations),
                       if (exercise.variationEasierSlug != null)
-                        _VariationTile(slug: exercise.variationEasierSlug!, label: AppLocalizations.of(context).libraryEasier, icon: Icons.arrow_downward),
+                        _VariationTile(
+                            slug: exercise.variationEasierSlug!,
+                            label: AppLocalizations.of(context).libraryEasier,
+                            icon: Icons.arrow_downward),
                       if (exercise.variationHarderSlug != null)
-                        _VariationTile(slug: exercise.variationHarderSlug!, label: AppLocalizations.of(context).libraryHarder, icon: Icons.arrow_upward),
+                        _VariationTile(
+                            slug: exercise.variationHarderSlug!,
+                            label: AppLocalizations.of(context).libraryHarder,
+                            icon: Icons.arrow_upward),
                     ],
                     const SizedBox(height: 80),
                   ]),
@@ -158,14 +167,14 @@ class _CueRow extends StatelessWidget {
               height: 24,
               margin: const EdgeInsets.only(right: 12, top: 2),
               decoration: const BoxDecoration(
-                color: AppColors.accent,
+                color: AppColors.glacier,
                 shape: BoxShape.circle,
               ),
               child: Center(
                 child: Text(
                   '$number',
                   style: const TextStyle(
-                    color: AppColors.onDark,
+                    color: AppColors.ink,
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
                   ),
@@ -188,7 +197,7 @@ class _MistakeRow extends StatelessWidget {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Icon(Icons.close, color: AppColors.error, size: 18),
+            const Icon(Icons.close, color: AppColors.danger, size: 18),
             const SizedBox(width: 8),
             Expanded(child: Text(text)),
           ],
@@ -210,7 +219,7 @@ class _VariationTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) => ListTile(
         contentPadding: EdgeInsets.zero,
-        leading: Icon(icon, color: AppColors.accent),
+        leading: Icon(icon, color: AppColors.glacier),
         title: Text(label),
         subtitle: Text(slug, style: Theme.of(context).textTheme.bodyMedium),
         onTap: () => context.push('/library/$slug'),

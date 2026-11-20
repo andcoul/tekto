@@ -19,17 +19,6 @@ class WelcomeScreen extends StatelessWidget {
         fit: StackFit.expand,
         children: [
           const WelcomeVideo(),
-          // Fades the bottom into the background so the copy stays readable over any frame.
-          DecoratedBox(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [Colors.transparent, Theme.of(context).scaffoldBackgroundColor],
-                stops: [0.35, 0.85],
-              ),
-            ),
-          ),
           SafeArea(
             child: Padding(
               padding: const EdgeInsets.all(AppSpacing.lg),
@@ -57,7 +46,7 @@ class WelcomeScreen extends StatelessWidget {
 }
 
 /// Muted, looping welcome clip bundled with the app, with captions in the app language.
-/// Plain background until the content workstream delivers `assets/video/welcome.mp4`.
+/// The fade is drawn under the caption, so the caption can sit just above the title, clear of the face.
 class WelcomeVideo extends StatelessWidget {
   const WelcomeVideo({super.key});
 
@@ -69,5 +58,17 @@ class WelcomeVideo extends StatelessWidget {
         asset: asset,
         captionsAsset: captionsAsset,
         placeholder: ColoredBox(color: Theme.of(context).scaffoldBackgroundColor),
+        captionAlignment: const Alignment(0, 0.3),
+        // Fades the bottom into the background so the copy stays readable over any frame.
+        scrim: DecoratedBox(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [Colors.transparent, Theme.of(context).scaffoldBackgroundColor],
+              stops: const [0.35, 0.85],
+            ),
+          ),
+        ),
       );
 }

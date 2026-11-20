@@ -110,9 +110,9 @@ class _SetLogRowState extends State<SetLogRow> {
       margin: const EdgeInsets.only(bottom: AppSpacing.sm),
       padding: const EdgeInsets.all(AppSpacing.sm),
       decoration: BoxDecoration(
-        color: widget.mode == SetRowMode.done ? AppColors.accent.withValues(alpha: 0.12) : AppColors.charcoalSurface,
+        color: widget.mode == SetRowMode.done ? AppColors.glacier.withValues(alpha: 0.12) : AppColors.mid,
         borderRadius: BorderRadius.circular(AppSizes.borderRadius),
-        border: widget.isPr ? Border.all(color: AppColors.pr, width: 1.5) : null,
+        border: widget.isPr ? Border.all(color: AppColors.mint, width: 1.5) : null,
       ),
       child: switch (widget.mode) {
         SetRowMode.done => _doneRow(l, theme, unitLabel),
@@ -127,7 +127,7 @@ class _SetLogRowState extends State<SetLogRow> {
         child: Text(
           '${widget.setNumber}',
           textAlign: TextAlign.center,
-          style: theme.textTheme.titleMedium?.copyWith(color: highlight ? AppColors.accent : AppColors.onDarkSecondary),
+          style: theme.textTheme.titleMedium?.copyWith(color: highlight ? AppColors.glacier : AppColors.mist),
         ),
       );
 
@@ -151,12 +151,12 @@ class _SetLogRowState extends State<SetLogRow> {
           ),
         if (widget.isPr)
           Row(mainAxisSize: MainAxisSize.min, children: [
-            const Icon(Icons.emoji_events, color: AppColors.pr, size: 20),
+            const Icon(Icons.emoji_events, color: AppColors.mint, size: 20),
             const SizedBox(width: 4),
-            Text(l.workoutNewPR, style: theme.textTheme.labelLarge?.copyWith(color: AppColors.pr)),
+            Text(l.workoutNewPR, style: theme.textTheme.labelLarge?.copyWith(color: AppColors.mint)),
           ])
         else
-          const Icon(Icons.check_circle, color: AppColors.accent),
+          const Icon(Icons.check_circle, color: AppColors.glacier),
       ]),
     );
   }
@@ -167,7 +167,7 @@ class _SetLogRowState extends State<SetLogRow> {
           _number(theme, highlight: false),
           const SizedBox(width: AppSpacing.sm),
           Text(l.workoutTargetReps(widget.repsMin, widget.repsMax),
-              style: theme.textTheme.bodyMedium?.copyWith(color: AppColors.onDarkSecondary)),
+              style: theme.textTheme.bodyMedium?.copyWith(color: AppColors.mist)),
         ]),
       );
 

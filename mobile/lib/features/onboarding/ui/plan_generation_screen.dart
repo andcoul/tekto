@@ -18,8 +18,7 @@ class PlanGenerationScreen extends ConsumerStatefulWidget {
   final bool upgrade;
 
   @override
-  ConsumerState<PlanGenerationScreen> createState() =>
-      _PlanGenerationScreenState();
+  ConsumerState<PlanGenerationScreen> createState() => _PlanGenerationScreenState();
 }
 
 class _PlanGenerationScreenState extends ConsumerState<PlanGenerationScreen> {
@@ -101,7 +100,7 @@ class _LoadingView extends StatelessWidget {
             width: 80,
             height: 80,
             child: CircularProgressIndicator(
-              color: AppColors.accent,
+              color: AppColors.glacier,
               strokeWidth: 3,
             ),
           ),
@@ -116,10 +115,7 @@ class _LoadingView extends StatelessWidget {
             style: Theme.of(context).textTheme.bodyMedium,
             textAlign: TextAlign.center,
           ),
-        ]
-            .animate(interval: 200.ms)
-            .fadeIn(duration: 400.ms)
-            .slideY(begin: 0.1, end: 0),
+        ].animate(interval: 200.ms).fadeIn(duration: 400.ms).slideY(begin: 0.1, end: 0),
       );
 }
 
@@ -131,15 +127,13 @@ class _TimeoutView extends StatelessWidget {
   Widget build(BuildContext context) => Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(Icons.wifi_off, size: 48, color: AppColors.onDarkSecondary),
+          const Icon(Icons.wifi_off, size: 48, color: AppColors.mist),
           const SizedBox(height: AppSpacing.lg),
           Text(AppLocalizations.of(context).planGenSlow,
-              style: Theme.of(context).textTheme.titleLarge,
-              textAlign: TextAlign.center),
+              style: Theme.of(context).textTheme.titleLarge, textAlign: TextAlign.center),
           const SizedBox(height: AppSpacing.sm),
           Text(AppLocalizations.of(context).planGenCheckConnection,
-              style: Theme.of(context).textTheme.bodyMedium,
-              textAlign: TextAlign.center),
+              style: Theme.of(context).textTheme.bodyMedium, textAlign: TextAlign.center),
           const SizedBox(height: AppSpacing.lg),
           ElevatedButton(onPressed: onRetry, child: Text(AppLocalizations.of(context).commonTryAgain)),
         ],
@@ -155,15 +149,13 @@ class _ErrorView extends StatelessWidget {
   Widget build(BuildContext context) => Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(Icons.error_outline, size: 48, color: AppColors.error),
+          const Icon(Icons.error_outline, size: 48, color: AppColors.danger),
           const SizedBox(height: AppSpacing.lg),
           Text(AppLocalizations.of(context).planGenAiDown,
-              style: Theme.of(context).textTheme.titleLarge,
-              textAlign: TextAlign.center),
+              style: Theme.of(context).textTheme.titleLarge, textAlign: TextAlign.center),
           const SizedBox(height: AppSpacing.sm),
           Text(AppLocalizations.of(context).planGenTryLater,
-              style: Theme.of(context).textTheme.bodyMedium,
-              textAlign: TextAlign.center),
+              style: Theme.of(context).textTheme.bodyMedium, textAlign: TextAlign.center),
           const SizedBox(height: AppSpacing.lg),
           ElevatedButton(onPressed: onRetry, child: Text(AppLocalizations.of(context).commonTryAgain)),
         ],

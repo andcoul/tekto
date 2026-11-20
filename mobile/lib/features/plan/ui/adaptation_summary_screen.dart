@@ -20,10 +20,8 @@ class AdaptationSummaryScreen extends ConsumerWidget {
     final l = AppLocalizations.of(context);
     final lang = Localizations.localeOf(context).languageCode;
     final unit = ref.watch(userPrefsProvider).value?.unit ?? 'kg';
-    final names = ref
-            .watch(planExerciseNamesProvider(summary.changes.map((c) => c.planExerciseId).join(',')))
-            .value ??
-        const {};
+    final names =
+        ref.watch(planExerciseNamesProvider(summary.changes.map((c) => c.planExerciseId).join(','))).value ?? const {};
 
     return Scaffold(
       appBar: AppBar(title: Text(l.adaptationTitle(summary.week))),
@@ -115,7 +113,7 @@ class _ChangeCard extends StatelessWidget {
             const SizedBox(height: 4),
             Row(
               children: [
-                Icon(up ? Icons.arrow_upward : Icons.arrow_downward, size: 18, color: AppColors.accent),
+                Icon(up ? Icons.arrow_upward : Icons.arrow_downward, size: 18, color: AppColors.glacier),
                 const SizedBox(width: 4),
                 Text(values, style: Theme.of(context).textTheme.titleMedium),
               ],

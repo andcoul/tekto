@@ -58,7 +58,9 @@ class FormCheckScreen extends ConsumerWidget {
       appBar: AppBar(
         backgroundColor: Colors.black,
         foregroundColor: Colors.white,
-        title: Row(mainAxisSize: MainAxisSize.min, children: [Text(l.formCheckTitle), const SizedBox(width: 8), const BetaBadge()]),
+        title: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [Text(l.formCheckTitle), const SizedBox(width: 8), const BetaBadge()]),
       ),
       body: SafeArea(
         child: gate.when(
@@ -101,7 +103,8 @@ class _BlockedView extends StatelessWidget {
             children: [
               const Icon(Icons.lock_outline, size: 64, color: Colors.white54),
               const SizedBox(height: AppSpacing.base),
-              Text(l.formCheckFreeTryUsed, textAlign: TextAlign.center, style: const TextStyle(color: Colors.white, fontSize: 16)),
+              Text(l.formCheckFreeTryUsed,
+                  textAlign: TextAlign.center, style: const TextStyle(color: Colors.white, fontSize: 16)),
               const SizedBox(height: AppSpacing.lg),
               // Free users only reach this view; the gate opens the paywall on tap.
               ProGateWidget(
@@ -227,7 +230,7 @@ class _LiveFormCheckState extends ConsumerState<_LiveFormCheck> {
                 onPressed: _starting || _stopping ? null : _stop,
                 icon: const Icon(Icons.stop_circle),
                 label: Text(l.formCheckStop),
-                style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                style: ElevatedButton.styleFrom(backgroundColor: AppColors.frost, foregroundColor: AppColors.ink),
               ),
             ),
           ),
@@ -252,7 +255,8 @@ class _PlacementGuide extends StatelessWidget {
         children: [
           const Icon(Icons.accessibility_new, size: 96, color: Colors.white54),
           const SizedBox(height: AppSpacing.base),
-          Text(l.formCheckPlacementTitle, textAlign: TextAlign.center, style: const TextStyle(color: Colors.white, fontSize: 18)),
+          Text(l.formCheckPlacementTitle,
+              textAlign: TextAlign.center, style: const TextStyle(color: Colors.white, fontSize: 18)),
           const SizedBox(height: AppSpacing.sm),
           Text(l.formCheckPlacementInstructions, textAlign: TextAlign.center, style: body),
           const SizedBox(height: AppSpacing.base),
@@ -261,7 +265,7 @@ class _PlacementGuide extends StatelessWidget {
           Text(l.formCheckBetaNote, textAlign: TextAlign.center, style: body),
           if (freeTry) ...[
             const SizedBox(height: AppSpacing.sm),
-            Text(l.formCheckFreeTryNote, textAlign: TextAlign.center, style: const TextStyle(color: AppColors.accent)),
+            Text(l.formCheckFreeTryNote, textAlign: TextAlign.center, style: const TextStyle(color: AppColors.glacier)),
           ],
           const SizedBox(height: AppSpacing.lg),
           SizedBox(
@@ -290,13 +294,17 @@ class _CueChips extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
                 color: cue.key == 'adjust_lighting'
-                    ? Colors.amber.withValues(alpha: 0.9)
-                    : (cue.severity == CueSeverity.error ? Colors.red : Colors.orange).withValues(alpha: 0.9),
+                    ? AppColors.steel.withValues(alpha: 0.92)
+                    : (cue.severity == CueSeverity.error ? AppColors.frost : AppColors.glacier).withValues(alpha: 0.94),
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Text(
                 cue.key == 'adjust_lighting' ? adjustLighting : (language == 'fr' ? cue.textFr : cue.textEn),
-                style: const TextStyle(color: Colors.white, fontSize: 14),
+                style: TextStyle(
+                  color: cue.key == 'adjust_lighting' ? AppColors.frost : AppColors.ink,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
             ),
         ],
@@ -310,7 +318,8 @@ class _RepBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        decoration: BoxDecoration(color: AppColors.accent.withValues(alpha: 0.9), borderRadius: BorderRadius.circular(24)),
+        decoration:
+            BoxDecoration(color: AppColors.glacier.withValues(alpha: 0.9), borderRadius: BorderRadius.circular(24)),
         child: Text(text, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
       );
 }

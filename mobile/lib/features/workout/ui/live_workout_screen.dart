@@ -43,7 +43,9 @@ class _LiveWorkoutScreenState extends ConsumerState<LiveWorkoutScreen> {
   /// Resumes the unfinished workout for this session, or starts a new one.
   Future<void> _ensureStarted() async {
     final current = ref.read(workoutControllerProvider);
-    if (current.sessionId == widget.sessionId && current.workoutLogId != null && current.phase != WorkoutPhase.complete) {
+    if (current.sessionId == widget.sessionId &&
+        current.workoutLogId != null &&
+        current.phase != WorkoutPhase.complete) {
       return;
     }
     final userId = ref.read(currentUserIdProvider);
@@ -51,7 +53,8 @@ class _LiveWorkoutScreenState extends ConsumerState<LiveWorkoutScreen> {
     if (userId == null || logs == null) return;
 
     final session = await ref.read(liveSessionProvider(widget.sessionId).future);
-    final open = await ref.read(workoutSessionRepositoryProvider).findOpenLog(userId: userId, sessionId: widget.sessionId);
+    final open =
+        await ref.read(workoutSessionRepositoryProvider).findOpenLog(userId: userId, sessionId: widget.sessionId);
     if (!mounted) return;
 
     final controller = ref.read(workoutControllerProvider.notifier);
@@ -245,7 +248,7 @@ class _LiveWorkoutScreenState extends ConsumerState<LiveWorkoutScreen> {
                 child: Column(children: [
                   Text(ex.name(lang), textAlign: TextAlign.center, style: Theme.of(context).textTheme.titleLarge),
                   Text(l.workoutExerciseOf(index + 1, session.exercises.length),
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(color: AppColors.onDarkSecondary)),
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(color: AppColors.mist)),
                 ]),
               ),
               IconButton(
@@ -291,8 +294,7 @@ class _LiveWorkoutScreenState extends ConsumerState<LiveWorkoutScreen> {
             const SizedBox(height: AppSpacing.sm),
             for (final cue in ex.keyCues(lang)) _CueBubble(text: cue),
             const SizedBox(height: AppSpacing.sm),
-            for (var n = 1; n <= ex.sets; n++)
-              _row(session, ex, n, logged, unit, resting, last),
+            for (var n = 1; n <= ex.sets; n++) _row(session, ex, n, logged, unit, resting, last),
           ],
         ),
       ),
@@ -318,7 +320,8 @@ class _LiveWorkoutScreenState extends ConsumerState<LiveWorkoutScreen> {
     ]);
   }
 
-  Widget _row(LiveSession session, LiveExercise ex, int n, List<LoggedSet> logged, String unit, bool resting, LoggedSet? last) {
+  Widget _row(
+      LiveSession session, LiveExercise ex, int n, List<LoggedSet> logged, String unit, bool resting, LoggedSet? last) {
     final key = ValueKey('set-${ex.planExerciseId}-$n');
     if (n <= logged.length) {
       final s = logged[n - 1];
@@ -360,7 +363,7 @@ class _CueBubble extends StatelessWidget {
   Widget build(BuildContext context) => Container(
         margin: const EdgeInsets.only(bottom: 4),
         padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
-        decoration: BoxDecoration(color: AppColors.charcoalElevated, borderRadius: BorderRadius.circular(8)),
+        decoration: BoxDecoration(color: AppColors.deep, borderRadius: BorderRadius.circular(8)),
         child: Text(text, style: Theme.of(context).textTheme.bodyMedium),
       );
 }

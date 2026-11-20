@@ -93,7 +93,10 @@ class WorkoutController extends _$WorkoutController {
 
   /// Records a saved set; starts the rest timer when [restSec] is given.
   void recordSet(LoggedSet set, {int? restSec}) {
-    final logged = {...state.logged, set.planExerciseId: [...state.setsFor(set.planExerciseId), set]};
+    final logged = {
+      ...state.logged,
+      set.planExerciseId: [...state.setsFor(set.planExerciseId), set]
+    };
     _restTimer?.cancel();
     if (restSec == null || restSec <= 0) {
       state = state.copyWith(logged: logged, phase: WorkoutPhase.active, restSecondsRemaining: 0);

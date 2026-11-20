@@ -16,12 +16,13 @@ class BetaBadge extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
         decoration: BoxDecoration(
-          border: Border.all(color: AppColors.accent),
+          border: Border.all(color: AppColors.glacier),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Text(
           l.formCheckBeta,
-          style: Theme.of(context).textTheme.labelSmall?.copyWith(color: AppColors.accent, fontWeight: FontWeight.bold),
+          style:
+              Theme.of(context).textTheme.labelSmall?.copyWith(color: AppColors.glacier, fontWeight: FontWeight.bold),
         ),
       ),
     );

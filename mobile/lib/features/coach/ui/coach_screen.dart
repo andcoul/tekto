@@ -77,7 +77,7 @@ class _CoachScreenState extends ConsumerState<CoachScreen> {
             width: 40,
             height: 4,
             decoration: BoxDecoration(
-              color: AppColors.onDarkSecondary,
+              color: AppColors.mist,
               borderRadius: BorderRadius.circular(2),
             ),
           ),
@@ -150,12 +150,12 @@ class _QuotaBadge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: AppColors.charcoalElevated,
+        color: AppColors.deep,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Text(
         remaining > 0 ? l.coachQuotaRemaining(remaining) : l.coachQuotaExhausted,
-        style: const TextStyle(fontSize: 12, color: AppColors.onDarkSecondary),
+        style: const TextStyle(fontSize: 12, color: AppColors.mist),
       ),
     );
   }
@@ -172,13 +172,13 @@ class _InlineNotice extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.all(AppSpacing.sm),
           decoration: BoxDecoration(
-            color: AppColors.charcoalElevated,
+            color: AppColors.deep,
             borderRadius: BorderRadius.circular(AppSizes.borderRadius),
-            border: Border.all(color: AppColors.onDarkSecondary.withValues(alpha: 0.4)),
+            border: Border.all(color: AppColors.mist.withValues(alpha: 0.4)),
           ),
           child: Row(
             children: [
-              const Icon(Icons.info_outline, size: 18, color: AppColors.onDarkSecondary),
+              const Icon(Icons.info_outline, size: 18, color: AppColors.mist),
               const SizedBox(width: 8),
               Expanded(child: Text(text, style: const TextStyle(fontSize: 14))),
             ],
@@ -206,16 +206,23 @@ class _MessageBubble extends ConsumerWidget {
         crossAxisAlignment: isUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
         children: [
           Container(
-            padding: const EdgeInsets.all(AppSpacing.sm),
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
             decoration: BoxDecoration(
-              color: isUser ? AppColors.accent : AppColors.charcoalElevated,
-              borderRadius: BorderRadius.circular(AppSizes.borderRadius),
+              color: isUser ? AppColors.glacier : AppColors.deep,
+              borderRadius: BorderRadius.only(
+                topLeft: const Radius.circular(20),
+                topRight: const Radius.circular(20),
+                bottomLeft: Radius.circular(isUser ? 20 : 6),
+                bottomRight: Radius.circular(isUser ? 6 : 20),
+              ),
             ),
             // While the first words are on their way, a plain ellipsis — never a spinner.
-            child: Text(message.content.isEmpty && streaming ? '…' : message.content, style: const TextStyle(fontSize: 14)),
+            child: Text(message.content.isEmpty && streaming ? '…' : message.content,
+                style: TextStyle(fontSize: 14.5, height: 1.45, color: isUser ? AppColors.ink : AppColors.frost)),
           ),
           if (!isUser && !streaming && message.planChangeProposed != null) PlanChangePendingCard(message: message),
-          if (!isUser && !streaming) MessageRatingWidget(messageId: message.id, initialRating: message.satisfactionRating),
+          if (!isUser && !streaming)
+            MessageRatingWidget(messageId: message.id, initialRating: message.satisfactionRating),
         ],
       ),
     );
@@ -251,7 +258,7 @@ class _InputRow extends StatelessWidget {
                 child: IconButton(
                   icon: const Icon(Icons.send),
                   tooltip: AppLocalizations.of(context).coachSend,
-                  color: AppColors.accent,
+                  color: AppColors.glacier,
                   onPressed: sending ? null : onSend,
                 ),
               ),

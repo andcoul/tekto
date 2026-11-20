@@ -435,7 +435,8 @@
       "dumbbell"
     ],
     "muscle_primary": [
-      "lats"
+      "lats",
+      "rhomboids"
     ],
     "muscle_secondary": [
       "biceps",
@@ -710,5 +711,3089 @@
     "variation_harder_slug": "diamond-push-up",
     "form_check_supported": true,
     "form_check_lift_key": "push_up"
+  },
+  {
+    "slug": "incline-dumbbell-press",
+    "name_en": "Incline Dumbbell Press",
+    "name_fr": "Développé incliné aux haltères",
+    "equipment": [
+      "dumbbell"
+    ],
+    "muscle_primary": [
+      "upper_chest"
+    ],
+    "muscle_secondary": [
+      "front_deltoid",
+      "triceps"
+    ],
+    "cues_en": [
+      "Set the bench to about 30° and plant your feet.",
+      "Lower the dumbbells to the sides of your upper chest.",
+      "Press up and slightly in until your arms are straight."
+    ],
+    "cues_fr": [
+      "Réglez le banc à environ 30° et ancrez vos pieds.",
+      "Descendez les haltères sur les côtés du haut de la poitrine.",
+      "Poussez vers le haut et légèrement vers l'intérieur, bras tendus."
+    ],
+    "common_mistakes_en": [
+      "Bench set too steep",
+      "Elbows flared straight out to the sides"
+    ],
+    "common_mistakes_fr": [
+      "Banc trop incliné",
+      "Coudes écartés à angle droit du corps"
+    ],
+    "video_front_url": "https://customer-tekto.cloudflarestream.com/incline-dumbbell-press-front/manifest/video.m3u8",
+    "video_side_url": null,
+    "video_duration_sec": 5,
+    "captions_en_url": "captions/incline-dumbbell-press_en.vtt",
+    "captions_fr_url": "captions/incline-dumbbell-press_fr.vtt",
+    "contraindications": [
+      "shoulder"
+    ],
+    "variation_easier_slug": "push-up",
+    "variation_harder_slug": null,
+    "form_check_supported": false,
+    "form_check_lift_key": null
+  },
+  {
+    "slug": "lateral-raise",
+    "name_en": "Lateral Raise",
+    "name_fr": "Élévations latérales",
+    "equipment": [
+      "dumbbell"
+    ],
+    "muscle_primary": [
+      "shoulders"
+    ],
+    "muscle_secondary": [
+      "traps"
+    ],
+    "cues_en": [
+      "Stand tall with a slight bend in the elbows.",
+      "Raise the dumbbells out to the sides up to shoulder height.",
+      "Lower slowly; do not swing."
+    ],
+    "cues_fr": [
+      "Tenez-vous droit, coudes légèrement fléchis.",
+      "Montez les haltères sur les côtés jusqu'à hauteur d'épaules.",
+      "Redescendez lentement, sans élan."
+    ],
+    "common_mistakes_en": [
+      "Swinging the weight up",
+      "Shrugging the shoulders"
+    ],
+    "common_mistakes_fr": [
+      "Monter la charge avec de l'élan",
+      "Hausser les épaules"
+    ],
+    "video_front_url": "https://customer-tekto.cloudflarestream.com/lateral-raise-front/manifest/video.m3u8",
+    "video_side_url": null,
+    "video_duration_sec": 5,
+    "captions_en_url": "captions/lateral-raise_en.vtt",
+    "captions_fr_url": "captions/lateral-raise_fr.vtt",
+    "contraindications": [
+      "shoulder"
+    ],
+    "variation_easier_slug": null,
+    "variation_harder_slug": null,
+    "form_check_supported": false,
+    "form_check_lift_key": null
+  },
+  {
+    "slug": "dumbbell-curl",
+    "name_en": "Dumbbell Curl",
+    "name_fr": "Curl aux haltères",
+    "equipment": [
+      "dumbbell"
+    ],
+    "muscle_primary": [
+      "biceps"
+    ],
+    "muscle_secondary": [
+      "forearms"
+    ],
+    "cues_en": [
+      "Keep your elbows pinned to your sides.",
+      "Curl the dumbbell up, turning the palm toward you.",
+      "Lower all the way until the arm is straight."
+    ],
+    "cues_fr": [
+      "Gardez les coudes collés au corps.",
+      "Montez l'haltère en tournant la paume vers vous.",
+      "Redescendez jusqu'à tendre complètement le bras."
+    ],
+    "common_mistakes_en": [
+      "Elbows drifting forward",
+      "Leaning back to lift the weight"
+    ],
+    "common_mistakes_fr": [
+      "Coudes qui avancent",
+      "Se pencher en arrière pour monter la charge"
+    ],
+    "video_front_url": "https://customer-tekto.cloudflarestream.com/dumbbell-curl-front/manifest/video.m3u8",
+    "video_side_url": null,
+    "video_duration_sec": 5,
+    "captions_en_url": "captions/dumbbell-curl_en.vtt",
+    "captions_fr_url": "captions/dumbbell-curl_fr.vtt",
+    "contraindications": [
+      "elbow",
+      "wrist"
+    ],
+    "variation_easier_slug": null,
+    "variation_harder_slug": null,
+    "form_check_supported": false,
+    "form_check_lift_key": null
+  },
+  {
+    "slug": "rope-pushdown",
+    "name_en": "Rope Pushdown",
+    "name_fr": "Extension à la poulie haute (corde)",
+    "equipment": [
+      "cable"
+    ],
+    "muscle_primary": [
+      "triceps"
+    ],
+    "muscle_secondary": [],
+    "cues_en": [
+      "Stand close to the cable, elbows at your sides.",
+      "Push the rope down and spread the ends at the bottom.",
+      "Let the rope rise slowly without moving your elbows."
+    ],
+    "cues_fr": [
+      "Placez-vous près de la poulie, coudes le long du corps.",
+      "Poussez la corde vers le bas et écartez les extrémités en bas.",
+      "Laissez remonter lentement sans bouger les coudes."
+    ],
+    "common_mistakes_en": [
+      "Elbows moving forward and back",
+      "Leaning over the rope to push with body weight"
+    ],
+    "common_mistakes_fr": [
+      "Coudes qui avancent et reculent",
+      "Se pencher sur la corde pour pousser avec le poids du corps"
+    ],
+    "video_front_url": "https://customer-tekto.cloudflarestream.com/rope-pushdown-front/manifest/video.m3u8",
+    "video_side_url": null,
+    "video_duration_sec": 5,
+    "captions_en_url": "captions/rope-pushdown_en.vtt",
+    "captions_fr_url": "captions/rope-pushdown_fr.vtt",
+    "contraindications": [
+      "elbow"
+    ],
+    "variation_easier_slug": null,
+    "variation_harder_slug": null,
+    "form_check_supported": false,
+    "form_check_lift_key": null
+  },
+  {
+    "slug": "plank",
+    "name_en": "Plank",
+    "name_fr": "Gainage (planche)",
+    "equipment": [
+      "bodyweight"
+    ],
+    "muscle_primary": [
+      "core"
+    ],
+    "muscle_secondary": [
+      "shoulders",
+      "glutes"
+    ],
+    "cues_en": [
+      "Elbows under your shoulders, forearms on the floor.",
+      "Squeeze your glutes and keep a straight line from head to heels.",
+      "Breathe steadily and hold."
+    ],
+    "cues_fr": [
+      "Coudes sous les épaules, avant-bras au sol.",
+      "Serrez les fessiers et gardez une ligne droite de la tête aux talons.",
+      "Respirez calmement et tenez la position."
+    ],
+    "common_mistakes_en": [
+      "Hips sagging toward the floor",
+      "Hips piked too high"
+    ],
+    "common_mistakes_fr": [
+      "Bassin qui s'affaisse",
+      "Fessiers trop hauts"
+    ],
+    "video_front_url": "https://customer-tekto.cloudflarestream.com/plank-front/manifest/video.m3u8",
+    "video_side_url": null,
+    "video_duration_sec": 5,
+    "captions_en_url": "captions/plank_en.vtt",
+    "captions_fr_url": "captions/plank_fr.vtt",
+    "contraindications": [
+      "shoulder",
+      "lower_back"
+    ],
+    "variation_easier_slug": null,
+    "variation_harder_slug": "hanging-leg-raise",
+    "form_check_supported": false,
+    "form_check_lift_key": null
+  },
+  {
+    "slug": "hanging-leg-raise",
+    "name_en": "Hanging Leg Raise",
+    "name_fr": "Relevé de jambes suspendu",
+    "equipment": [
+      "bodyweight"
+    ],
+    "muscle_primary": [
+      "core"
+    ],
+    "muscle_secondary": [
+      "hip_flexors",
+      "forearms"
+    ],
+    "cues_en": [
+      "Hang from the bar with your shoulders engaged.",
+      "Raise your legs to hip height without swinging.",
+      "Lower them under control."
+    ],
+    "cues_fr": [
+      "Suspendez-vous à la barre, épaules engagées.",
+      "Montez les jambes à hauteur de hanches sans balancer.",
+      "Redescendez-les en contrôlant."
+    ],
+    "common_mistakes_en": [
+      "Swinging to lift the legs",
+      "Dropping the legs quickly"
+    ],
+    "common_mistakes_fr": [
+      "Balancer pour monter les jambes",
+      "Laisser retomber les jambes"
+    ],
+    "video_front_url": "https://customer-tekto.cloudflarestream.com/hanging-leg-raise-front/manifest/video.m3u8",
+    "video_side_url": null,
+    "video_duration_sec": 5,
+    "captions_en_url": "captions/hanging-leg-raise_en.vtt",
+    "captions_fr_url": "captions/hanging-leg-raise_fr.vtt",
+    "contraindications": [
+      "shoulder",
+      "lower_back"
+    ],
+    "variation_easier_slug": "plank",
+    "variation_harder_slug": null,
+    "form_check_supported": false,
+    "form_check_lift_key": null
+  },
+  {
+    "slug": "front-squat",
+    "name_en": "Barbell Front Squat",
+    "name_fr": "Squat avant à la barre",
+    "equipment": [
+      "barbell"
+    ],
+    "muscle_primary": [
+      "quadriceps",
+      "glutes"
+    ],
+    "muscle_secondary": [
+      "core",
+      "erectors"
+    ],
+    "cues_en": [
+      "Rest the bar on your front shoulders, elbows high.",
+      "Sit straight down, keeping your chest up.",
+      "Drive up through the whole foot."
+    ],
+    "cues_fr": [
+      "Posez la barre sur l'avant des épaules, coudes hauts.",
+      "Descendez droit, poitrine haute.",
+      "Remontez en poussant sur tout le pied."
+    ],
+    "common_mistakes_en": [
+      "Elbows dropping",
+      "Rounding the upper back"
+    ],
+    "common_mistakes_fr": [
+      "Coudes qui tombent",
+      "Haut du dos qui s'arrondit"
+    ],
+    "video_front_url": "https://customer-tekto.cloudflarestream.com/front-squat-front/manifest/video.m3u8",
+    "video_side_url": null,
+    "video_duration_sec": 5,
+    "captions_en_url": "captions/front-squat_en.vtt",
+    "captions_fr_url": "captions/front-squat_fr.vtt",
+    "contraindications": [
+      "knee",
+      "lower_back",
+      "wrist"
+    ],
+    "variation_easier_slug": "goblet-squat",
+    "variation_harder_slug": "barbell-squat",
+    "form_check_supported": false,
+    "form_check_lift_key": null
+  },
+  {
+    "slug": "bulgarian-split-squat",
+    "name_en": "Bulgarian Split Squat",
+    "name_fr": "Squat bulgare",
+    "equipment": [
+      "dumbbell"
+    ],
+    "muscle_primary": [
+      "quadriceps",
+      "glutes"
+    ],
+    "muscle_secondary": [
+      "hamstrings",
+      "core"
+    ],
+    "cues_en": [
+      "Rest your back foot on a bench, dumbbells at your sides.",
+      "Lower straight down until the front thigh is level.",
+      "Push through the front heel to stand."
+    ],
+    "cues_fr": [
+      "Posez le pied arrière sur un banc, haltères le long du corps.",
+      "Descendez droit jusqu'à la cuisse avant à l'horizontale.",
+      "Poussez sur le talon avant pour remonter."
+    ],
+    "common_mistakes_en": [
+      "Front knee caving inward",
+      "Pushing off the back foot"
+    ],
+    "common_mistakes_fr": [
+      "Genou avant qui rentre",
+      "Pousser avec le pied arrière"
+    ],
+    "video_front_url": "https://customer-tekto.cloudflarestream.com/bulgarian-split-squat-front/manifest/video.m3u8",
+    "video_side_url": null,
+    "video_duration_sec": 5,
+    "captions_en_url": "captions/bulgarian-split-squat_en.vtt",
+    "captions_fr_url": "captions/bulgarian-split-squat_fr.vtt",
+    "contraindications": [
+      "knee",
+      "hip"
+    ],
+    "variation_easier_slug": "dumbbell-lunge",
+    "variation_harder_slug": null,
+    "form_check_supported": false,
+    "form_check_lift_key": null
+  },
+  {
+    "slug": "leg-press",
+    "name_en": "Leg Press",
+    "name_fr": "Presse à cuisses",
+    "equipment": [
+      "cable"
+    ],
+    "muscle_primary": [
+      "quadriceps",
+      "glutes"
+    ],
+    "muscle_secondary": [
+      "hamstrings"
+    ],
+    "cues_en": [
+      "Back and hips flat on the pad, feet shoulder-width on the platform.",
+      "Lower the platform until your knees bend to 90 degrees.",
+      "Push through your whole foot until your legs are straight, knees soft."
+    ],
+    "cues_fr": [
+      "Dos et hanches à plat sur le dossier, pieds écartés à largeur d'épaules.",
+      "Descendez la plateforme jusqu'aux genoux fléchis à 90 degrés.",
+      "Poussez avec tout le pied jusqu'aux jambes tendues, genoux souples."
+    ],
+    "common_mistakes_en": [
+      "Lifting the hips off the pad",
+      "Locking the knees hard at the top"
+    ],
+    "common_mistakes_fr": [
+      "Décoller les hanches du dossier",
+      "Verrouiller brutalement les genoux en haut"
+    ],
+    "video_front_url": "https://customer-tekto.cloudflarestream.com/leg-press-front/manifest/video.m3u8",
+    "video_side_url": null,
+    "video_duration_sec": 7,
+    "captions_en_url": "captions/leg-press_en.vtt",
+    "captions_fr_url": "captions/leg-press_fr.vtt",
+    "contraindications": [
+      "knee",
+      "lower_back"
+    ],
+    "variation_easier_slug": null,
+    "variation_harder_slug": "barbell-squat",
+    "form_check_supported": false,
+    "form_check_lift_key": null
+  },
+  {
+    "slug": "calf-raise",
+    "name_en": "Standing Calf Raise",
+    "name_fr": "Extensions des mollets debout",
+    "equipment": [
+      "bodyweight"
+    ],
+    "muscle_primary": [
+      "calves"
+    ],
+    "muscle_secondary": [],
+    "cues_en": [
+      "Stand on the balls of your feet, holding a support.",
+      "Rise as high as you can onto your toes.",
+      "Lower slowly until the heels drop below the step."
+    ],
+    "cues_fr": [
+      "Debout sur l'avant des pieds, tenez un appui.",
+      "Montez le plus haut possible sur la pointe des pieds.",
+      "Redescendez lentement, talons sous la marche."
+    ],
+    "common_mistakes_en": [
+      "Bouncing at the bottom",
+      "Bending the knees"
+    ],
+    "common_mistakes_fr": [
+      "Rebondir en bas",
+      "Plier les genoux"
+    ],
+    "video_front_url": "https://customer-tekto.cloudflarestream.com/calf-raise-front/manifest/video.m3u8",
+    "video_side_url": null,
+    "video_duration_sec": 5,
+    "captions_en_url": "captions/calf-raise_en.vtt",
+    "captions_fr_url": "captions/calf-raise_fr.vtt",
+    "contraindications": [
+      "ankle"
+    ],
+    "variation_easier_slug": null,
+    "variation_harder_slug": null,
+    "form_check_supported": false,
+    "form_check_lift_key": null
+  },
+  {
+    "slug": "lying-leg-curl",
+    "name_en": "Lying Leg Curl",
+    "name_fr": "Leg curl allongé",
+    "equipment": [
+      "cable"
+    ],
+    "muscle_primary": [
+      "hamstrings"
+    ],
+    "muscle_secondary": [
+      "calves"
+    ],
+    "cues_en": [
+      "Lie face down, pad just above your heels.",
+      "Curl your heels toward your glutes.",
+      "Lower slowly; keep your hips on the bench."
+    ],
+    "cues_fr": [
+      "Allongé sur le ventre, boudin juste au-dessus des talons.",
+      "Ramenez les talons vers les fessiers.",
+      "Redescendez lentement, bassin collé au banc."
+    ],
+    "common_mistakes_en": [
+      "Hips lifting off the bench",
+      "Dropping the weight"
+    ],
+    "common_mistakes_fr": [
+      "Bassin qui se soulève",
+      "Laisser retomber la charge"
+    ],
+    "video_front_url": "https://customer-tekto.cloudflarestream.com/lying-leg-curl-front/manifest/video.m3u8",
+    "video_side_url": null,
+    "video_duration_sec": 5,
+    "captions_en_url": "captions/lying-leg-curl_en.vtt",
+    "captions_fr_url": "captions/lying-leg-curl_fr.vtt",
+    "contraindications": [
+      "knee"
+    ],
+    "variation_easier_slug": null,
+    "variation_harder_slug": null,
+    "form_check_supported": false,
+    "form_check_lift_key": null
+  },
+  {
+    "slug": "bodyweight-squat",
+    "name_en": "Bodyweight Squat",
+    "name_fr": "Squat au poids du corps",
+    "equipment": [
+      "bodyweight"
+    ],
+    "muscle_primary": [
+      "quadriceps",
+      "glutes"
+    ],
+    "muscle_secondary": [
+      "core"
+    ],
+    "cues_en": [
+      "Feet shoulder-width apart, arms forward for balance.",
+      "Sit back and down, knees over your toes.",
+      "Stand tall and squeeze your glutes at the top."
+    ],
+    "cues_fr": [
+      "Pieds largeur d'épaules, bras devant pour l'équilibre.",
+      "Descendez en arrière, genoux dans l'axe des pieds.",
+      "Redressez-vous et serrez les fessiers en haut."
+    ],
+    "common_mistakes_en": [
+      "Heels lifting",
+      "Knees caving inward"
+    ],
+    "common_mistakes_fr": [
+      "Talons qui décollent",
+      "Genoux qui rentrent"
+    ],
+    "video_front_url": "https://customer-tekto.cloudflarestream.com/bodyweight-squat-front/manifest/video.m3u8",
+    "video_side_url": null,
+    "video_duration_sec": 5,
+    "captions_en_url": "captions/bodyweight-squat_en.vtt",
+    "captions_fr_url": "captions/bodyweight-squat_fr.vtt",
+    "contraindications": [
+      "knee"
+    ],
+    "variation_easier_slug": null,
+    "variation_harder_slug": "goblet-squat",
+    "form_check_supported": false,
+    "form_check_lift_key": null
+  },
+  {
+    "slug": "cable-fly",
+    "name_en": "Cable Fly",
+    "name_fr": "Écarté à la poulie",
+    "equipment": [
+      "cable"
+    ],
+    "muscle_primary": [
+      "chest"
+    ],
+    "muscle_secondary": [
+      "front_deltoid"
+    ],
+    "cues_en": [
+      "Stand between the cables, a soft bend in the elbows.",
+      "Bring your hands together in front of your chest.",
+      "Open slowly until you feel a stretch across the chest."
+    ],
+    "cues_fr": [
+      "Placez-vous entre les poulies, coudes légèrement fléchis.",
+      "Ramenez les mains devant la poitrine.",
+      "Ouvrez lentement jusqu'à sentir l'étirement des pectoraux."
+    ],
+    "common_mistakes_en": [
+      "Bending the elbows into a press",
+      "Letting the shoulders roll forward"
+    ],
+    "common_mistakes_fr": [
+      "Plier les coudes comme un développé",
+      "Épaules qui partent vers l'avant"
+    ],
+    "video_front_url": "https://customer-tekto.cloudflarestream.com/cable-fly-front/manifest/video.m3u8",
+    "video_side_url": null,
+    "video_duration_sec": 5,
+    "captions_en_url": "captions/cable-fly_en.vtt",
+    "captions_fr_url": "captions/cable-fly_fr.vtt",
+    "contraindications": [
+      "shoulder"
+    ],
+    "variation_easier_slug": null,
+    "variation_harder_slug": null,
+    "form_check_supported": false,
+    "form_check_lift_key": null
+  },
+  {
+    "slug": "chest-dip",
+    "name_en": "Chest Dip",
+    "name_fr": "Dips pectoraux",
+    "equipment": [
+      "bodyweight"
+    ],
+    "muscle_primary": [
+      "chest",
+      "triceps"
+    ],
+    "muscle_secondary": [
+      "front_deltoid"
+    ],
+    "cues_en": [
+      "Grip the bars, lean your torso slightly forward.",
+      "Lower until your upper arms are parallel to the floor.",
+      "Press back up to straight arms, shoulders down."
+    ],
+    "cues_fr": [
+      "Saisissez les barres, buste légèrement penché en avant.",
+      "Descendez jusqu'à ce que le haut des bras soit parallèle au sol.",
+      "Remontez bras tendus, épaules basses."
+    ],
+    "common_mistakes_en": [
+      "Stopping halfway down",
+      "Shrugging the shoulders up to the ears"
+    ],
+    "common_mistakes_fr": [
+      "S'arrêter à mi-descente",
+      "Hausser les épaules vers les oreilles"
+    ],
+    "video_front_url": "https://customer-tekto.cloudflarestream.com/chest-dip-front/manifest/video.m3u8",
+    "video_side_url": null,
+    "video_duration_sec": 5,
+    "captions_en_url": "captions/chest-dip_en.vtt",
+    "captions_fr_url": "captions/chest-dip_fr.vtt",
+    "contraindications": [
+      "shoulder",
+      "elbow"
+    ],
+    "variation_easier_slug": "incline-push-up",
+    "variation_harder_slug": null,
+    "form_check_supported": false,
+    "form_check_lift_key": null
+  },
+  {
+    "slug": "incline-push-up",
+    "name_en": "Incline Push-Up",
+    "name_fr": "Pompes inclinées",
+    "equipment": [
+      "bodyweight"
+    ],
+    "muscle_primary": [
+      "chest"
+    ],
+    "muscle_secondary": [
+      "triceps",
+      "front_deltoid",
+      "core"
+    ],
+    "cues_en": [
+      "Hands on a bench, body in one straight line.",
+      "Lower your chest to the edge of the bench.",
+      "Push the bench away to straight arms."
+    ],
+    "cues_fr": [
+      "Mains sur un banc, corps bien aligné.",
+      "Descendez la poitrine jusqu'au bord du banc.",
+      "Repoussez le banc jusqu'aux bras tendus."
+    ],
+    "common_mistakes_en": [
+      "Hips sagging",
+      "Elbows flaring wide"
+    ],
+    "common_mistakes_fr": [
+      "Bassin qui s'affaisse",
+      "Coudes trop écartés"
+    ],
+    "video_front_url": "https://customer-tekto.cloudflarestream.com/incline-push-up-front/manifest/video.m3u8",
+    "video_side_url": null,
+    "video_duration_sec": 5,
+    "captions_en_url": "captions/incline-push-up_en.vtt",
+    "captions_fr_url": "captions/incline-push-up_fr.vtt",
+    "contraindications": [
+      "wrist",
+      "shoulder"
+    ],
+    "variation_easier_slug": null,
+    "variation_harder_slug": "push-up",
+    "form_check_supported": false,
+    "form_check_lift_key": null
+  },
+  {
+    "slug": "seated-cable-row",
+    "name_en": "Seated Cable Row",
+    "name_fr": "Tirage horizontal assis",
+    "equipment": [
+      "cable"
+    ],
+    "muscle_primary": [
+      "lats",
+      "rhomboids"
+    ],
+    "muscle_secondary": [
+      "biceps",
+      "rear_deltoid"
+    ],
+    "cues_en": [
+      "Sit tall, knees soft, arms straight.",
+      "Pull the handle to your lower ribs.",
+      "Squeeze the shoulder blades, then return slowly."
+    ],
+    "cues_fr": [
+      "Asseyez-vous droit, genoux souples, bras tendus.",
+      "Tirez la poignée vers le bas des côtes.",
+      "Serrez les omoplates, puis revenez lentement."
+    ],
+    "common_mistakes_en": [
+      "Rocking the torso",
+      "Shrugging the shoulders"
+    ],
+    "common_mistakes_fr": [
+      "Balancer le buste",
+      "Hausser les épaules"
+    ],
+    "video_front_url": "https://customer-tekto.cloudflarestream.com/seated-cable-row-front/manifest/video.m3u8",
+    "video_side_url": null,
+    "video_duration_sec": 5,
+    "captions_en_url": "captions/seated-cable-row_en.vtt",
+    "captions_fr_url": "captions/seated-cable-row_fr.vtt",
+    "contraindications": [
+      "lower_back"
+    ],
+    "variation_easier_slug": null,
+    "variation_harder_slug": "barbell-row",
+    "form_check_supported": false,
+    "form_check_lift_key": null
+  },
+  {
+    "slug": "face-pull",
+    "name_en": "Face Pull",
+    "name_fr": "Face pull",
+    "equipment": [
+      "cable"
+    ],
+    "muscle_primary": [
+      "rear_deltoid"
+    ],
+    "muscle_secondary": [
+      "rhomboids",
+      "traps"
+    ],
+    "cues_en": [
+      "Rope at eye height; step back until your arms are straight and the cable is taut.",
+      "Pull the rope to your forehead, hands apart, elbows high.",
+      "Straighten your arms slowly without stepping forward."
+    ],
+    "cues_fr": [
+      "Corde à hauteur des yeux ; reculez jusqu'à avoir les bras tendus et le câble tendu.",
+      "Tirez la corde vers le front, mains écartées, coudes hauts.",
+      "Tendez lentement les bras sans avancer."
+    ],
+    "common_mistakes_en": [
+      "Standing too close to the cable",
+      "Leaning back to pull the weight"
+    ],
+    "common_mistakes_fr": [
+      "Se tenir trop près de la poulie",
+      "Se pencher en arrière pour tirer la charge"
+    ],
+    "video_front_url": "https://customer-tekto.cloudflarestream.com/face-pull-front/manifest/video.m3u8",
+    "video_side_url": null,
+    "video_duration_sec": 5,
+    "captions_en_url": "captions/face-pull_en.vtt",
+    "captions_fr_url": "captions/face-pull_fr.vtt",
+    "contraindications": [
+      "shoulder"
+    ],
+    "variation_easier_slug": null,
+    "variation_harder_slug": null,
+    "form_check_supported": false,
+    "form_check_lift_key": null
+  },
+  {
+    "slug": "overhead-triceps-extension",
+    "name_en": "Overhead Triceps Extension",
+    "name_fr": "Extension triceps au-dessus de la tête",
+    "equipment": [
+      "dumbbell"
+    ],
+    "muscle_primary": [
+      "triceps"
+    ],
+    "muscle_secondary": [],
+    "cues_en": [
+      "Sit tall, one dumbbell held overhead with both hands.",
+      "Lower it behind your head, elbows pointing up.",
+      "Straighten your arms to lift it back up."
+    ],
+    "cues_fr": [
+      "Assis droit, un haltère tenu à deux mains au-dessus de la tête.",
+      "Descendez-le derrière la tête, coudes vers le haut.",
+      "Tendez les bras pour le remonter."
+    ],
+    "common_mistakes_en": [
+      "Elbows flaring out",
+      "Arching the lower back"
+    ],
+    "common_mistakes_fr": [
+      "Coudes qui s'écartent",
+      "Creuser le bas du dos"
+    ],
+    "video_front_url": "https://customer-tekto.cloudflarestream.com/overhead-triceps-extension-front/manifest/video.m3u8",
+    "video_side_url": null,
+    "video_duration_sec": 5,
+    "captions_en_url": "captions/overhead-triceps-extension_en.vtt",
+    "captions_fr_url": "captions/overhead-triceps-extension_fr.vtt",
+    "contraindications": [
+      "elbow",
+      "shoulder"
+    ],
+    "variation_easier_slug": "rope-pushdown",
+    "variation_harder_slug": null,
+    "form_check_supported": false,
+    "form_check_lift_key": null
+  },
+  {
+    "slug": "pallof-press",
+    "name_en": "Pallof Press",
+    "name_fr": "Pallof press",
+    "equipment": [
+      "cable"
+    ],
+    "muscle_primary": [
+      "core"
+    ],
+    "muscle_secondary": [],
+    "cues_en": [
+      "Stand side-on to the cable, handle at your chest.",
+      "Press the handle straight out without turning.",
+      "Hold, then bring it back to your chest."
+    ],
+    "cues_fr": [
+      "De profil par rapport à la poulie, poignée contre la poitrine.",
+      "Poussez la poignée droit devant sans pivoter.",
+      "Tenez, puis ramenez-la à la poitrine."
+    ],
+    "common_mistakes_en": [
+      "Letting the torso rotate",
+      "Holding your breath"
+    ],
+    "common_mistakes_fr": [
+      "Laisser le buste pivoter",
+      "Bloquer la respiration"
+    ],
+    "video_front_url": "https://customer-tekto.cloudflarestream.com/pallof-press-front/manifest/video.m3u8",
+    "video_side_url": null,
+    "video_duration_sec": 5,
+    "captions_en_url": "captions/pallof-press_en.vtt",
+    "captions_fr_url": "captions/pallof-press_fr.vtt",
+    "contraindications": [],
+    "variation_easier_slug": "plank",
+    "variation_harder_slug": null,
+    "form_check_supported": false,
+    "form_check_lift_key": null
+  },
+  {
+    "slug": "kettlebell-swing",
+    "name_en": "Kettlebell Swing",
+    "name_fr": "Swing kettlebell",
+    "equipment": [
+      "dumbbell"
+    ],
+    "muscle_primary": [
+      "glutes",
+      "hamstrings"
+    ],
+    "muscle_secondary": [
+      "core",
+      "erectors"
+    ],
+    "cues_en": [
+      "Hinge at the hips with a flat back; hold a kettlebell or one dumbbell.",
+      "Snap the hips forward to swing it to chest height.",
+      "Let it fall back between your legs and hinge again."
+    ],
+    "cues_fr": [
+      "Penchez-vous en charnière, dos plat, kettlebell ou haltère en main.",
+      "Projetez les hanches pour monter la charge à hauteur de poitrine.",
+      "Laissez-la redescendre entre les jambes et repartez."
+    ],
+    "common_mistakes_en": [
+      "Squatting instead of hinging",
+      "Lifting with the arms"
+    ],
+    "common_mistakes_fr": [
+      "Squatter au lieu de basculer les hanches",
+      "Monter la charge avec les bras"
+    ],
+    "video_front_url": "https://customer-tekto.cloudflarestream.com/kettlebell-swing-front/manifest/video.m3u8",
+    "video_side_url": null,
+    "video_duration_sec": 5,
+    "captions_en_url": "captions/kettlebell-swing_en.vtt",
+    "captions_fr_url": "captions/kettlebell-swing_fr.vtt",
+    "contraindications": [
+      "lower_back"
+    ],
+    "variation_easier_slug": "romanian-deadlift",
+    "variation_harder_slug": null,
+    "form_check_supported": false,
+    "form_check_lift_key": null
+  },
+  {
+    "slug": "rear-delt-fly",
+    "name_en": "Bent-Over Rear Delt Fly",
+    "name_fr": "Oiseau penché",
+    "equipment": [
+      "dumbbell"
+    ],
+    "muscle_primary": [
+      "rear_deltoid"
+    ],
+    "muscle_secondary": [
+      "rhomboids",
+      "traps"
+    ],
+    "cues_en": [
+      "Hinge forward with a flat back, dumbbells under your shoulders.",
+      "Open your arms out to the sides up to shoulder height.",
+      "Lower slowly; keep the same slight bend in the elbows."
+    ],
+    "cues_fr": [
+      "Penchez-vous en avant, dos plat, haltères sous les épaules.",
+      "Ouvrez les bras sur les côtés jusqu'à hauteur d'épaules.",
+      "Redescendez lentement, coudes légèrement fléchis."
+    ],
+    "common_mistakes_en": [
+      "Bending the elbows into a row",
+      "Swinging the torso up"
+    ],
+    "common_mistakes_fr": [
+      "Plier les coudes comme un rowing",
+      "Relever le buste avec élan"
+    ],
+    "video_front_url": "https://customer-tekto.cloudflarestream.com/rear-delt-fly-front/manifest/video.m3u8",
+    "video_side_url": null,
+    "video_duration_sec": 5,
+    "captions_en_url": "captions/rear-delt-fly_en.vtt",
+    "captions_fr_url": "captions/rear-delt-fly_fr.vtt",
+    "contraindications": [
+      "shoulder",
+      "lower_back"
+    ],
+    "variation_easier_slug": null,
+    "variation_harder_slug": "face-pull",
+    "form_check_supported": false,
+    "form_check_lift_key": null
+  },
+  {
+    "slug": "hammer-curl",
+    "name_en": "Hammer Curl",
+    "name_fr": "Curl marteau",
+    "equipment": [
+      "dumbbell"
+    ],
+    "muscle_primary": [
+      "biceps"
+    ],
+    "muscle_secondary": [
+      "forearms"
+    ],
+    "cues_en": [
+      "Hold the dumbbells at your sides, palms facing in.",
+      "Curl them up, keeping the dumbbells vertical.",
+      "Lower slowly to straight arms; elbows stay still."
+    ],
+    "cues_fr": [
+      "Haltères le long du corps, paumes face à face.",
+      "Montez-les en gardant les haltères verticaux.",
+      "Redescendez lentement bras tendus, coudes fixes."
+    ],
+    "common_mistakes_en": [
+      "Turning the palms up",
+      "Swinging the elbows forward"
+    ],
+    "common_mistakes_fr": [
+      "Tourner les paumes vers le haut",
+      "Avancer les coudes"
+    ],
+    "video_front_url": "https://customer-tekto.cloudflarestream.com/hammer-curl-front/manifest/video.m3u8",
+    "video_side_url": null,
+    "video_duration_sec": 5,
+    "captions_en_url": "captions/hammer-curl_en.vtt",
+    "captions_fr_url": "captions/hammer-curl_fr.vtt",
+    "contraindications": [
+      "elbow",
+      "wrist"
+    ],
+    "variation_easier_slug": null,
+    "variation_harder_slug": "dumbbell-curl",
+    "form_check_supported": false,
+    "form_check_lift_key": null
+  },
+  {
+    "slug": "glute-bridge",
+    "name_en": "Glute Bridge",
+    "name_fr": "Pont fessier",
+    "equipment": [
+      "bodyweight"
+    ],
+    "muscle_primary": [
+      "glutes"
+    ],
+    "muscle_secondary": [
+      "hamstrings",
+      "core"
+    ],
+    "cues_en": [
+      "Lie on your back, knees bent, feet flat.",
+      "Push through your heels to lift your hips into a straight line.",
+      "Squeeze your glutes, then lower to the floor."
+    ],
+    "cues_fr": [
+      "Sur le dos, genoux fléchis, pieds à plat.",
+      "Poussez sur les talons pour monter le bassin dans l'alignement.",
+      "Serrez les fessiers, puis redescendez au sol."
+    ],
+    "common_mistakes_en": [
+      "Arching the lower back at the top",
+      "Pushing through the toes"
+    ],
+    "common_mistakes_fr": [
+      "Cambrer le bas du dos en haut",
+      "Pousser sur la pointe des pieds"
+    ],
+    "video_front_url": "https://customer-tekto.cloudflarestream.com/glute-bridge-front/manifest/video.m3u8",
+    "video_side_url": null,
+    "video_duration_sec": 5,
+    "captions_en_url": "captions/glute-bridge_en.vtt",
+    "captions_fr_url": "captions/glute-bridge_fr.vtt",
+    "contraindications": [],
+    "variation_easier_slug": null,
+    "variation_harder_slug": "hip-thrust",
+    "form_check_supported": false,
+    "form_check_lift_key": null
+  },
+  {
+    "slug": "reverse-crunch",
+    "name_en": "Reverse Crunch",
+    "name_fr": "Crunch inversé",
+    "equipment": [
+      "bodyweight"
+    ],
+    "muscle_primary": [
+      "core"
+    ],
+    "muscle_secondary": [
+      "hip_flexors"
+    ],
+    "cues_en": [
+      "Lie on your back, knees bent at 90 degrees above your hips.",
+      "Curl your hips off the mat, bringing your knees toward your chest.",
+      "Lower your hips slowly, knees staying above your hips."
+    ],
+    "cues_fr": [
+      "Sur le dos, genoux fléchis à 90 degrés au-dessus des hanches.",
+      "Enroulez le bassin pour décoller les hanches, genoux vers la poitrine.",
+      "Redescendez lentement, genoux toujours au-dessus des hanches."
+    ],
+    "common_mistakes_en": [
+      "Swinging the legs to build momentum",
+      "Pushing hard into the floor with the hands"
+    ],
+    "common_mistakes_fr": [
+      "Balancer les jambes pour prendre de l'élan",
+      "Pousser fort avec les mains au sol"
+    ],
+    "video_front_url": "https://customer-tekto.cloudflarestream.com/reverse-crunch-front/manifest/video.m3u8",
+    "video_side_url": null,
+    "video_duration_sec": 5,
+    "captions_en_url": "captions/reverse-crunch_en.vtt",
+    "captions_fr_url": "captions/reverse-crunch_fr.vtt",
+    "contraindications": [
+      "lower_back"
+    ],
+    "variation_easier_slug": null,
+    "variation_harder_slug": "hanging-leg-raise",
+    "form_check_supported": false,
+    "form_check_lift_key": null
+  },
+  {
+    "slug": "band-lateral-walk",
+    "name_en": "Band Lateral Walk",
+    "name_fr": "Marche latérale avec élastique",
+    "equipment": [
+      "bands"
+    ],
+    "muscle_primary": [
+      "glutes"
+    ],
+    "muscle_secondary": [
+      "quadriceps"
+    ],
+    "cues_en": [
+      "Loop the band above your knees and sit into a half squat.",
+      "Step to the side, keeping the band tight and your knees out.",
+      "Stay low and step back the same way."
+    ],
+    "cues_fr": [
+      "Élastique au-dessus des genoux, descendez en demi-squat.",
+      "Faites un pas de côté, élastique tendu, genoux vers l'extérieur.",
+      "Restez bas et revenez de la même façon."
+    ],
+    "common_mistakes_en": [
+      "Letting the knees cave in",
+      "Standing up between steps"
+    ],
+    "common_mistakes_fr": [
+      "Laisser les genoux rentrer",
+      "Se relever entre les pas"
+    ],
+    "video_front_url": "https://customer-tekto.cloudflarestream.com/band-lateral-walk-front/manifest/video.m3u8",
+    "video_side_url": null,
+    "video_duration_sec": 5,
+    "captions_en_url": "captions/band-lateral-walk_en.vtt",
+    "captions_fr_url": "captions/band-lateral-walk_fr.vtt",
+    "contraindications": [
+      "knee"
+    ],
+    "variation_easier_slug": null,
+    "variation_harder_slug": null,
+    "form_check_supported": false,
+    "form_check_lift_key": null
+  },
+  {
+    "slug": "band-curl",
+    "name_en": "Band Curl",
+    "name_fr": "Curl avec élastique",
+    "equipment": [
+      "bands"
+    ],
+    "muscle_primary": [
+      "biceps"
+    ],
+    "muscle_secondary": [
+      "forearms"
+    ],
+    "cues_en": [
+      "Stand on the band, one end in each hand, arms straight.",
+      "Elbows pinned to your sides, curl your hands to your shoulders.",
+      "Lower slowly to straight arms."
+    ],
+    "cues_fr": [
+      "Debout sur l'élastique, une extrémité dans chaque main, bras tendus.",
+      "Coudes collés au corps, montez les mains vers les épaules.",
+      "Redescendez lentement jusqu'aux bras tendus."
+    ],
+    "common_mistakes_en": [
+      "Moving the elbows forward",
+      "Leaning back to lift"
+    ],
+    "common_mistakes_fr": [
+      "Avancer les coudes",
+      "Se pencher en arrière pour monter"
+    ],
+    "video_front_url": "https://customer-tekto.cloudflarestream.com/band-curl-front/manifest/video.m3u8",
+    "video_side_url": null,
+    "video_duration_sec": 5,
+    "captions_en_url": "captions/band-curl_en.vtt",
+    "captions_fr_url": "captions/band-curl_fr.vtt",
+    "contraindications": [
+      "elbow"
+    ],
+    "variation_easier_slug": null,
+    "variation_harder_slug": "dumbbell-curl",
+    "form_check_supported": false,
+    "form_check_lift_key": null
+  },
+  {
+    "slug": "band-triceps-pushdown",
+    "name_en": "Band Triceps Pushdown",
+    "name_fr": "Extension des triceps à l'élastique",
+    "equipment": [
+      "bands"
+    ],
+    "muscle_primary": [
+      "triceps"
+    ],
+    "muscle_secondary": [],
+    "cues_en": [
+      "Loop the band over a high bar, hands at chest height.",
+      "Upper arms still, push your hands down until your arms are straight.",
+      "Let your hands rise back to chest height with control."
+    ],
+    "cues_fr": [
+      "Élastique accroché en hauteur, mains à hauteur de poitrine.",
+      "Bras immobiles, poussez les mains vers le bas jusqu'à tendre les bras.",
+      "Laissez remonter les mains sous contrôle."
+    ],
+    "common_mistakes_en": [
+      "Letting the elbows drift forward",
+      "Leaning over the hands"
+    ],
+    "common_mistakes_fr": [
+      "Laisser les coudes partir vers l'avant",
+      "Se pencher au-dessus des mains"
+    ],
+    "video_front_url": "https://customer-tekto.cloudflarestream.com/band-triceps-pushdown-front/manifest/video.m3u8",
+    "video_side_url": null,
+    "video_duration_sec": 5,
+    "captions_en_url": "captions/band-triceps-pushdown_en.vtt",
+    "captions_fr_url": "captions/band-triceps-pushdown_fr.vtt",
+    "contraindications": [
+      "elbow"
+    ],
+    "variation_easier_slug": null,
+    "variation_harder_slug": "rope-pushdown",
+    "form_check_supported": false,
+    "form_check_lift_key": null
+  },
+  {
+    "slug": "band-chest-press",
+    "name_en": "Band Chest Press",
+    "name_fr": "Développé poitrine à l'élastique",
+    "equipment": [
+      "bands"
+    ],
+    "muscle_primary": [
+      "chest"
+    ],
+    "muscle_secondary": [
+      "triceps",
+      "front_deltoid"
+    ],
+    "cues_en": [
+      "Band around your upper back, hands beside your chest, one foot forward.",
+      "Press both hands straight forward until your arms are straight.",
+      "Bring your hands back slowly beside your chest."
+    ],
+    "cues_fr": [
+      "Élastique dans le haut du dos, mains près de la poitrine, un pied devant.",
+      "Poussez les deux mains devant vous jusqu'aux bras tendus.",
+      "Ramenez lentement les mains près de la poitrine."
+    ],
+    "common_mistakes_en": [
+      "Shrugging the shoulders",
+      "Arching the lower back"
+    ],
+    "common_mistakes_fr": [
+      "Hausser les épaules",
+      "Cambrer le bas du dos"
+    ],
+    "video_front_url": "https://customer-tekto.cloudflarestream.com/band-chest-press-front/manifest/video.m3u8",
+    "video_side_url": null,
+    "video_duration_sec": 5,
+    "captions_en_url": "captions/band-chest-press_en.vtt",
+    "captions_fr_url": "captions/band-chest-press_fr.vtt",
+    "contraindications": [
+      "shoulder"
+    ],
+    "variation_easier_slug": null,
+    "variation_harder_slug": "push-up",
+    "form_check_supported": false,
+    "form_check_lift_key": null
+  },
+  {
+    "slug": "band-row",
+    "name_en": "Seated Band Row",
+    "name_fr": "Rowing assis à l'élastique",
+    "equipment": [
+      "bands"
+    ],
+    "muscle_primary": [
+      "lats"
+    ],
+    "muscle_secondary": [
+      "rhomboids",
+      "biceps"
+    ],
+    "cues_en": [
+      "Sit tall, legs straight, band looped around your feet.",
+      "Row your hands to your lower ribs, squeezing your shoulder blades.",
+      "Let your arms straighten without leaning back."
+    ],
+    "cues_fr": [
+      "Assis bien droit, jambes tendues, élastique autour des pieds.",
+      "Tirez les mains vers le bas des côtes en serrant les omoplates.",
+      "Tendez les bras sans vous pencher en arrière."
+    ],
+    "common_mistakes_en": [
+      "Leaning back to pull",
+      "Rounding the upper back"
+    ],
+    "common_mistakes_fr": [
+      "Se pencher en arrière pour tirer",
+      "Arrondir le haut du dos"
+    ],
+    "video_front_url": "https://customer-tekto.cloudflarestream.com/band-row-front/manifest/video.m3u8",
+    "video_side_url": null,
+    "video_duration_sec": 5,
+    "captions_en_url": "captions/band-row_en.vtt",
+    "captions_fr_url": "captions/band-row_fr.vtt",
+    "contraindications": [],
+    "variation_easier_slug": null,
+    "variation_harder_slug": "seated-cable-row",
+    "form_check_supported": false,
+    "form_check_lift_key": null
+  },
+  {
+    "slug": "sumo-deadlift",
+    "name_en": "Sumo Deadlift",
+    "name_fr": "Soulevé de terre sumo",
+    "equipment": [
+      "barbell"
+    ],
+    "muscle_primary": [
+      "glutes",
+      "quadriceps"
+    ],
+    "muscle_secondary": [
+      "hamstrings",
+      "erectors"
+    ],
+    "cues_en": [
+      "Wide stance, toes out, grip the bar inside your knees.",
+      "Push your knees out and stand up, bar close to your legs.",
+      "Finish tall with hips through, then lower with a flat back."
+    ],
+    "cues_fr": [
+      "Pieds écartés, pointes vers l'extérieur, mains entre les genoux.",
+      "Poussez les genoux vers l'extérieur et redressez-vous, barre près des jambes.",
+      "Finissez bien droit, hanches en avant, puis redescendez dos plat."
+    ],
+    "common_mistakes_en": [
+      "Stopping before full lockout",
+      "Leaning back at the top"
+    ],
+    "common_mistakes_fr": [
+      "S'arrêter avant le verrouillage",
+      "Se pencher en arrière en haut"
+    ],
+    "video_front_url": "https://customer-tekto.cloudflarestream.com/sumo-deadlift-front/manifest/video.m3u8",
+    "video_side_url": null,
+    "video_duration_sec": 5,
+    "captions_en_url": "captions/sumo-deadlift_en.vtt",
+    "captions_fr_url": "captions/sumo-deadlift_fr.vtt",
+    "contraindications": [
+      "lower_back",
+      "hip"
+    ],
+    "variation_easier_slug": null,
+    "variation_harder_slug": "deadlift",
+    "form_check_supported": false,
+    "form_check_lift_key": null
+  },
+  {
+    "slug": "incline-bench-press",
+    "name_en": "Incline Bench Press",
+    "name_fr": "Développé incliné à la barre",
+    "equipment": [
+      "barbell"
+    ],
+    "muscle_primary": [
+      "upper_chest"
+    ],
+    "muscle_secondary": [
+      "front_deltoid",
+      "triceps"
+    ],
+    "cues_en": [
+      "Lie on an incline bench, feet flat, bar over your shoulders.",
+      "Lower the bar to your upper chest, elbows slightly tucked.",
+      "Press back up to straight arms."
+    ],
+    "cues_fr": [
+      "Allongé sur un banc incliné, pieds à plat, barre au-dessus des épaules.",
+      "Descendez la barre en haut de la poitrine, coudes légèrement rentrés.",
+      "Poussez jusqu'aux bras tendus."
+    ],
+    "common_mistakes_en": [
+      "Bouncing the bar off the chest",
+      "Lifting the hips off the bench"
+    ],
+    "common_mistakes_fr": [
+      "Faire rebondir la barre sur la poitrine",
+      "Décoller les fesses du banc"
+    ],
+    "video_front_url": "https://customer-tekto.cloudflarestream.com/incline-bench-press-front/manifest/video.m3u8",
+    "video_side_url": null,
+    "video_duration_sec": 5,
+    "captions_en_url": "captions/incline-bench-press_en.vtt",
+    "captions_fr_url": "captions/incline-bench-press_fr.vtt",
+    "contraindications": [
+      "shoulder"
+    ],
+    "variation_easier_slug": "incline-dumbbell-press",
+    "variation_harder_slug": null,
+    "form_check_supported": false,
+    "form_check_lift_key": null
+  },
+  {
+    "slug": "pendlay-row",
+    "name_en": "Pendlay Row",
+    "name_fr": "Rowing Pendlay",
+    "equipment": [
+      "barbell"
+    ],
+    "muscle_primary": [
+      "lats"
+    ],
+    "muscle_secondary": [
+      "rhomboids",
+      "erectors",
+      "biceps"
+    ],
+    "cues_en": [
+      "Hinge until your back is flat and nearly level with the floor.",
+      "Pull the bar from the floor to your lower chest.",
+      "Lower it back to the floor and reset each rep."
+    ],
+    "cues_fr": [
+      "Penchez-vous, dos plat presque parallèle au sol.",
+      "Tirez la barre du sol jusqu'au bas de la poitrine.",
+      "Reposez-la au sol et replacez-vous à chaque répétition."
+    ],
+    "common_mistakes_en": [
+      "Standing up as you pull",
+      "Rounding the back"
+    ],
+    "common_mistakes_fr": [
+      "Se redresser en tirant",
+      "Arrondir le dos"
+    ],
+    "video_front_url": "https://customer-tekto.cloudflarestream.com/pendlay-row-front/manifest/video.m3u8",
+    "video_side_url": null,
+    "video_duration_sec": 5,
+    "captions_en_url": "captions/pendlay-row_en.vtt",
+    "captions_fr_url": "captions/pendlay-row_fr.vtt",
+    "contraindications": [
+      "lower_back"
+    ],
+    "variation_easier_slug": "barbell-row",
+    "variation_harder_slug": null,
+    "form_check_supported": false,
+    "form_check_lift_key": null
+  },
+  {
+    "slug": "close-grip-bench-press",
+    "name_en": "Close-Grip Bench Press",
+    "name_fr": "Développé couché prise serrée",
+    "equipment": [
+      "barbell"
+    ],
+    "muscle_primary": [
+      "triceps"
+    ],
+    "muscle_secondary": [
+      "chest",
+      "front_deltoid"
+    ],
+    "cues_en": [
+      "Grip the bar about shoulder-width apart, elbows tucked.",
+      "Lower the bar to your lower chest.",
+      "Press back up to straight arms."
+    ],
+    "cues_fr": [
+      "Mains environ à largeur d'épaules, coudes près du corps.",
+      "Descendez la barre sur le bas de la poitrine.",
+      "Poussez jusqu'aux bras tendus."
+    ],
+    "common_mistakes_en": [
+      "Flaring the elbows",
+      "Gripping too narrow"
+    ],
+    "common_mistakes_fr": [
+      "Écarter les coudes",
+      "Serrer les mains trop près"
+    ],
+    "video_front_url": "https://customer-tekto.cloudflarestream.com/close-grip-bench-press-front/manifest/video.m3u8",
+    "video_side_url": null,
+    "video_duration_sec": 5,
+    "captions_en_url": "captions/close-grip-bench-press_en.vtt",
+    "captions_fr_url": "captions/close-grip-bench-press_fr.vtt",
+    "contraindications": [
+      "shoulder",
+      "elbow"
+    ],
+    "variation_easier_slug": "bench-press",
+    "variation_harder_slug": null,
+    "form_check_supported": false,
+    "form_check_lift_key": null
+  },
+  {
+    "slug": "push-press",
+    "name_en": "Push Press",
+    "name_fr": "Push press",
+    "equipment": [
+      "barbell"
+    ],
+    "muscle_primary": [
+      "shoulders"
+    ],
+    "muscle_secondary": [
+      "triceps",
+      "quadriceps",
+      "core"
+    ],
+    "cues_en": [
+      "Bar on your front shoulders, elbows slightly forward.",
+      "Dip a few centimetres, then drive up hard with your legs.",
+      "Press to locked arms overhead, head through, then lower to your shoulders."
+    ],
+    "cues_fr": [
+      "Barre sur l'avant des épaules, coudes légèrement en avant.",
+      "Fléchissez de quelques centimètres, puis poussez fort avec les jambes.",
+      "Verrouillez les bras au-dessus de la tête, tête passée, puis redescendez aux épaules."
+    ],
+    "common_mistakes_en": [
+      "Pressing before the legs finish driving",
+      "Leaning back at lockout"
+    ],
+    "common_mistakes_fr": [
+      "Pousser avec les bras avant la fin de l'impulsion",
+      "Se cambrer au verrouillage"
+    ],
+    "video_front_url": "https://customer-tekto.cloudflarestream.com/push-press-front/manifest/video.m3u8",
+    "video_side_url": null,
+    "video_duration_sec": 5,
+    "captions_en_url": "captions/push-press_en.vtt",
+    "captions_fr_url": "captions/push-press_fr.vtt",
+    "contraindications": [
+      "shoulder",
+      "lower_back"
+    ],
+    "variation_easier_slug": "overhead-press",
+    "variation_harder_slug": null,
+    "form_check_supported": false,
+    "form_check_lift_key": null
+  },
+  {
+    "slug": "dumbbell-rdl",
+    "name_en": "Dumbbell Romanian Deadlift",
+    "name_fr": "Soulevé de terre roumain aux haltères",
+    "equipment": [
+      "dumbbell"
+    ],
+    "muscle_primary": [
+      "hamstrings"
+    ],
+    "muscle_secondary": [
+      "glutes",
+      "erectors"
+    ],
+    "cues_en": [
+      "Stand tall, dumbbells in front of your thighs, knees soft.",
+      "Push your hips back until your torso is parallel to the floor.",
+      "Keep your back flat and drive your hips forward to stand fully upright."
+    ],
+    "cues_fr": [
+      "Debout, haltères devant les cuisses, genoux souples.",
+      "Reculez les hanches jusqu'au buste parallèle au sol.",
+      "Dos plat, poussez les hanches vers l'avant pour vous redresser complètement."
+    ],
+    "common_mistakes_en": [
+      "Rounding the back",
+      "Stopping before standing fully upright"
+    ],
+    "common_mistakes_fr": [
+      "Arrondir le dos",
+      "Ne pas se redresser complètement"
+    ],
+    "video_front_url": "https://customer-tekto.cloudflarestream.com/dumbbell-rdl-front/manifest/video.m3u8",
+    "video_side_url": null,
+    "video_duration_sec": 7,
+    "captions_en_url": "captions/dumbbell-rdl_en.vtt",
+    "captions_fr_url": "captions/dumbbell-rdl_fr.vtt",
+    "contraindications": [
+      "lower_back"
+    ],
+    "variation_easier_slug": null,
+    "variation_harder_slug": "romanian-deadlift",
+    "form_check_supported": false,
+    "form_check_lift_key": null
+  },
+  {
+    "slug": "front-raise",
+    "name_en": "Front Raise",
+    "name_fr": "Élévation frontale",
+    "equipment": [
+      "dumbbell"
+    ],
+    "muscle_primary": [
+      "front_deltoid"
+    ],
+    "muscle_secondary": [
+      "shoulders"
+    ],
+    "cues_en": [
+      "Stand tall, dumbbells in front of your thighs.",
+      "Raise both arms in front of you to shoulder height.",
+      "Lower slowly without swinging."
+    ],
+    "cues_fr": [
+      "Debout, haltères devant les cuisses.",
+      "Levez les deux bras devant vous jusqu'à hauteur d'épaules.",
+      "Redescendez lentement sans balancer."
+    ],
+    "common_mistakes_en": [
+      "Swinging the body",
+      "Raising above shoulder height"
+    ],
+    "common_mistakes_fr": [
+      "Balancer le corps",
+      "Monter au-dessus des épaules"
+    ],
+    "video_front_url": "https://customer-tekto.cloudflarestream.com/front-raise-front/manifest/video.m3u8",
+    "video_side_url": null,
+    "video_duration_sec": 5,
+    "captions_en_url": "captions/front-raise_en.vtt",
+    "captions_fr_url": "captions/front-raise_fr.vtt",
+    "contraindications": [
+      "shoulder"
+    ],
+    "variation_easier_slug": null,
+    "variation_harder_slug": null,
+    "form_check_supported": false,
+    "form_check_lift_key": null
+  },
+  {
+    "slug": "dumbbell-fly",
+    "name_en": "Dumbbell Fly",
+    "name_fr": "Écarté couché aux haltères",
+    "equipment": [
+      "dumbbell"
+    ],
+    "muscle_primary": [
+      "chest"
+    ],
+    "muscle_secondary": [
+      "front_deltoid"
+    ],
+    "cues_en": [
+      "Lie on a flat bench, dumbbells above your chest, elbows soft.",
+      "Open your arms wide until you feel a stretch in your chest.",
+      "Bring the dumbbells back together over your chest."
+    ],
+    "cues_fr": [
+      "Allongé sur un banc plat, haltères au-dessus de la poitrine, coudes souples.",
+      "Ouvrez les bras jusqu'à sentir l'étirement des pectoraux.",
+      "Ramenez les haltères au-dessus de la poitrine."
+    ],
+    "common_mistakes_en": [
+      "Bending the elbows into a press",
+      "Dropping the arms too low"
+    ],
+    "common_mistakes_fr": [
+      "Plier les coudes comme pour un développé",
+      "Descendre les bras trop bas"
+    ],
+    "video_front_url": "https://customer-tekto.cloudflarestream.com/dumbbell-fly-front/manifest/video.m3u8",
+    "video_side_url": null,
+    "video_duration_sec": 5,
+    "captions_en_url": "captions/dumbbell-fly_en.vtt",
+    "captions_fr_url": "captions/dumbbell-fly_fr.vtt",
+    "contraindications": [
+      "shoulder"
+    ],
+    "variation_easier_slug": null,
+    "variation_harder_slug": "cable-fly",
+    "form_check_supported": false,
+    "form_check_lift_key": null
+  },
+  {
+    "slug": "straight-arm-pulldown",
+    "name_en": "Straight-Arm Pulldown",
+    "name_fr": "Tirage bras tendus à la poulie",
+    "equipment": [
+      "cable"
+    ],
+    "muscle_primary": [
+      "lats"
+    ],
+    "muscle_secondary": [
+      "triceps",
+      "core"
+    ],
+    "cues_en": [
+      "Face the high pulley, arms straight at shoulder height.",
+      "Sweep the bar down to your thighs, arms staying straight.",
+      "Let it rise back to shoulder height with control."
+    ],
+    "cues_fr": [
+      "Face à la poulie haute, bras tendus à hauteur d'épaules.",
+      "Descendez la barre jusqu'aux cuisses, bras toujours tendus.",
+      "Laissez-la remonter sous contrôle."
+    ],
+    "common_mistakes_en": [
+      "Bending the elbows",
+      "Swinging with the hips"
+    ],
+    "common_mistakes_fr": [
+      "Plier les coudes",
+      "Balancer avec les hanches"
+    ],
+    "video_front_url": "https://customer-tekto.cloudflarestream.com/straight-arm-pulldown-front/manifest/video.m3u8",
+    "video_side_url": null,
+    "video_duration_sec": 5,
+    "captions_en_url": "captions/straight-arm-pulldown_en.vtt",
+    "captions_fr_url": "captions/straight-arm-pulldown_fr.vtt",
+    "contraindications": [
+      "shoulder"
+    ],
+    "variation_easier_slug": null,
+    "variation_harder_slug": "lat-pulldown",
+    "form_check_supported": false,
+    "form_check_lift_key": null
+  },
+  {
+    "slug": "cable-curl",
+    "name_en": "Cable Curl",
+    "name_fr": "Curl à la poulie",
+    "equipment": [
+      "cable"
+    ],
+    "muscle_primary": [
+      "biceps"
+    ],
+    "muscle_secondary": [
+      "forearms"
+    ],
+    "cues_en": [
+      "Face the low pulley, straight bar in your hands, arms straight.",
+      "Elbows pinned, curl the bar to your shoulders.",
+      "Lower slowly to straight arms."
+    ],
+    "cues_fr": [
+      "Face à la poulie basse, barre droite en main, bras tendus.",
+      "Coudes fixes, montez la barre vers les épaules.",
+      "Redescendez lentement jusqu'aux bras tendus."
+    ],
+    "common_mistakes_en": [
+      "Moving the elbows forward",
+      "Leaning back"
+    ],
+    "common_mistakes_fr": [
+      "Avancer les coudes",
+      "Se pencher en arrière"
+    ],
+    "video_front_url": "https://customer-tekto.cloudflarestream.com/cable-curl-front/manifest/video.m3u8",
+    "video_side_url": null,
+    "video_duration_sec": 5,
+    "captions_en_url": "captions/cable-curl_en.vtt",
+    "captions_fr_url": "captions/cable-curl_fr.vtt",
+    "contraindications": [
+      "elbow",
+      "wrist"
+    ],
+    "variation_easier_slug": "band-curl",
+    "variation_harder_slug": null,
+    "form_check_supported": false,
+    "form_check_lift_key": null
+  },
+  {
+    "slug": "cable-lateral-raise",
+    "name_en": "Cable Lateral Raise",
+    "name_fr": "Élévation latérale à la poulie",
+    "equipment": [
+      "cable"
+    ],
+    "muscle_primary": [
+      "shoulders"
+    ],
+    "muscle_secondary": [
+      "traps"
+    ],
+    "cues_en": [
+      "Stand side-on to the low pulley, handle in your far hand.",
+      "With a slight elbow bend, raise your arm out to shoulder height.",
+      "Lower slowly against the cable."
+    ],
+    "cues_fr": [
+      "De profil à la poulie basse, poignée dans la main opposée.",
+      "Coude légèrement fléchi, levez le bras sur le côté jusqu'aux épaules.",
+      "Redescendez lentement en retenant le câble."
+    ],
+    "common_mistakes_en": [
+      "Shrugging the shoulder",
+      "Swinging the torso"
+    ],
+    "common_mistakes_fr": [
+      "Hausser l'épaule",
+      "Balancer le buste"
+    ],
+    "video_front_url": "https://customer-tekto.cloudflarestream.com/cable-lateral-raise-front/manifest/video.m3u8",
+    "video_side_url": null,
+    "video_duration_sec": 5,
+    "captions_en_url": "captions/cable-lateral-raise_en.vtt",
+    "captions_fr_url": "captions/cable-lateral-raise_fr.vtt",
+    "contraindications": [
+      "shoulder"
+    ],
+    "variation_easier_slug": "lateral-raise",
+    "variation_harder_slug": null,
+    "form_check_supported": false,
+    "form_check_lift_key": null
+  },
+  {
+    "slug": "band-overhead-press",
+    "name_en": "Band Overhead Press",
+    "name_fr": "Développé militaire à l'élastique",
+    "equipment": [
+      "bands"
+    ],
+    "muscle_primary": [
+      "shoulders"
+    ],
+    "muscle_secondary": [
+      "triceps",
+      "core"
+    ],
+    "cues_en": [
+      "Stand on the band, handles at your shoulders, palms forward.",
+      "Press both hands straight overhead until your arms are straight.",
+      "Lower slowly back to your shoulders."
+    ],
+    "cues_fr": [
+      "Debout sur l'élastique, poignées aux épaules, paumes vers l'avant.",
+      "Poussez les deux mains au-dessus de la tête jusqu'aux bras tendus.",
+      "Redescendez lentement aux épaules."
+    ],
+    "common_mistakes_en": [
+      "Arching the lower back",
+      "Pressing forward instead of up"
+    ],
+    "common_mistakes_fr": [
+      "Cambrer le bas du dos",
+      "Pousser vers l'avant au lieu de vers le haut"
+    ],
+    "video_front_url": "https://customer-tekto.cloudflarestream.com/band-overhead-press-front/manifest/video.m3u8",
+    "video_side_url": null,
+    "video_duration_sec": 5,
+    "captions_en_url": "captions/band-overhead-press_en.vtt",
+    "captions_fr_url": "captions/band-overhead-press_fr.vtt",
+    "contraindications": [
+      "shoulder"
+    ],
+    "variation_easier_slug": null,
+    "variation_harder_slug": "dumbbell-shoulder-press",
+    "form_check_supported": false,
+    "form_check_lift_key": null
+  },
+  {
+    "slug": "dumbbell-step-up",
+    "name_en": "Dumbbell Step-Up",
+    "name_fr": "Montée sur banc aux haltères",
+    "equipment": [
+      "dumbbell"
+    ],
+    "muscle_primary": [
+      "quadriceps",
+      "glutes"
+    ],
+    "muscle_secondary": [
+      "hamstrings"
+    ],
+    "cues_en": [
+      "Stand behind a knee-height box, dumbbells at your sides.",
+      "Step one whole foot onto the box and drive up to stand tall on top.",
+      "Step down, then lead with the other leg on the next rep."
+    ],
+    "cues_fr": [
+      "Debout derrière une box à hauteur de genou, haltères le long du corps.",
+      "Posez tout un pied sur la box et poussez pour vous redresser dessus.",
+      "Redescendez, puis attaquez avec l'autre jambe à la répétition suivante."
+    ],
+    "common_mistakes_en": [
+      "Pushing off the floor foot",
+      "Letting the knee cave in"
+    ],
+    "common_mistakes_fr": [
+      "Pousser avec le pied resté au sol",
+      "Laisser le genou rentrer"
+    ],
+    "video_front_url": "https://customer-tekto.cloudflarestream.com/dumbbell-step-up-front/manifest/video.m3u8",
+    "video_side_url": null,
+    "video_duration_sec": 7,
+    "captions_en_url": "captions/dumbbell-step-up_en.vtt",
+    "captions_fr_url": "captions/dumbbell-step-up_fr.vtt",
+    "contraindications": [
+      "knee"
+    ],
+    "variation_easier_slug": "bodyweight-lunge",
+    "variation_harder_slug": "bulgarian-split-squat",
+    "form_check_supported": false,
+    "form_check_lift_key": null
+  },
+  {
+    "slug": "kettlebell-sumo-squat",
+    "name_en": "Kettlebell Sumo Squat",
+    "name_fr": "Squat sumo au kettlebell",
+    "equipment": [
+      "dumbbell"
+    ],
+    "muscle_primary": [
+      "quadriceps",
+      "glutes"
+    ],
+    "muscle_secondary": [
+      "hamstrings",
+      "core"
+    ],
+    "cues_en": [
+      "Wide stance, toes out, kettlebell hanging in both hands.",
+      "Chest up, sit down until your thighs are level with the floor.",
+      "Stand all the way up and squeeze your glutes at the top."
+    ],
+    "cues_fr": [
+      "Pieds écartés, pointes vers l'extérieur, kettlebell tenu à deux mains.",
+      "Poitrine haute, descendez jusqu'aux cuisses parallèles au sol.",
+      "Remontez complètement et serrez les fessiers en haut."
+    ],
+    "common_mistakes_en": [
+      "Stopping short of standing tall",
+      "Letting the knees cave in"
+    ],
+    "common_mistakes_fr": [
+      "Ne pas se redresser complètement",
+      "Laisser les genoux rentrer"
+    ],
+    "video_front_url": "https://customer-tekto.cloudflarestream.com/kettlebell-sumo-squat-front/manifest/video.m3u8",
+    "video_side_url": null,
+    "video_duration_sec": 5,
+    "captions_en_url": "captions/kettlebell-sumo-squat_en.vtt",
+    "captions_fr_url": "captions/kettlebell-sumo-squat_fr.vtt",
+    "contraindications": [
+      "knee",
+      "hip"
+    ],
+    "variation_easier_slug": "bodyweight-squat",
+    "variation_harder_slug": "sumo-deadlift",
+    "form_check_supported": false,
+    "form_check_lift_key": null
+  },
+  {
+    "slug": "pec-deck",
+    "name_en": "Pec Deck",
+    "name_fr": "Pec deck (butterfly)",
+    "equipment": [
+      "cable"
+    ],
+    "muscle_primary": [
+      "chest"
+    ],
+    "muscle_secondary": [
+      "front_deltoid"
+    ],
+    "cues_en": [
+      "Sit tall, back on the pad, arms out wide with elbows almost straight.",
+      "Sweep your straight arms forward until your hands meet in front of you.",
+      "Open your arms slowly back out to a full chest stretch."
+    ],
+    "cues_fr": [
+      "Assis bien droit, dos contre le dossier, bras écartés, coudes presque tendus.",
+      "Ramenez les bras tendus vers l'avant jusqu'à ce que les mains se touchent.",
+      "Rouvrez lentement les bras jusqu'à l'étirement complet des pectoraux."
+    ],
+    "common_mistakes_en": [
+      "Bending the elbows into a press",
+      "Letting the back come off the pad"
+    ],
+    "common_mistakes_fr": [
+      "Plier les coudes comme un développé",
+      "Décoller le dos du dossier"
+    ],
+    "video_front_url": "https://customer-tekto.cloudflarestream.com/pec-deck-front/manifest/video.m3u8",
+    "video_side_url": null,
+    "video_duration_sec": 7,
+    "captions_en_url": "captions/pec-deck_en.vtt",
+    "captions_fr_url": "captions/pec-deck_fr.vtt",
+    "contraindications": [
+      "shoulder"
+    ],
+    "variation_easier_slug": null,
+    "variation_harder_slug": "cable-fly",
+    "form_check_supported": false,
+    "form_check_lift_key": null
+  },
+  {
+    "slug": "bodyweight-lunge",
+    "name_en": "Bodyweight Reverse Lunge",
+    "name_fr": "Fente arrière au poids du corps",
+    "equipment": [
+      "bodyweight"
+    ],
+    "muscle_primary": [
+      "quadriceps",
+      "glutes"
+    ],
+    "muscle_secondary": [
+      "hamstrings"
+    ],
+    "cues_en": [
+      "Stand tall, hands on your hips.",
+      "Step one foot back and lower until both knees reach about 90 degrees.",
+      "Push through your front foot to stand back up."
+    ],
+    "cues_fr": [
+      "Debout bien droit, mains sur les hanches.",
+      "Reculez un pied et descendez jusqu'à environ 90 degrés aux deux genoux.",
+      "Poussez sur le pied avant pour vous relever."
+    ],
+    "common_mistakes_en": [
+      "Leaning the torso forward",
+      "Letting the front knee cave in"
+    ],
+    "common_mistakes_fr": [
+      "Pencher le buste vers l'avant",
+      "Laisser le genou avant rentrer"
+    ],
+    "video_front_url": "https://customer-tekto.cloudflarestream.com/bodyweight-lunge-front/manifest/video.m3u8",
+    "video_side_url": null,
+    "video_duration_sec": 5,
+    "captions_en_url": "captions/bodyweight-lunge_en.vtt",
+    "captions_fr_url": "captions/bodyweight-lunge_fr.vtt",
+    "contraindications": [
+      "knee"
+    ],
+    "variation_easier_slug": null,
+    "variation_harder_slug": "dumbbell-lunge",
+    "form_check_supported": false,
+    "form_check_lift_key": null
+  },
+  {
+    "slug": "side-plank",
+    "name_en": "Side Plank",
+    "name_fr": "Gainage latéral",
+    "equipment": [
+      "bodyweight"
+    ],
+    "muscle_primary": [
+      "core"
+    ],
+    "muscle_secondary": [
+      "glutes",
+      "shoulders"
+    ],
+    "cues_en": [
+      "Support yourself on one hand, feet stacked, body in a straight line.",
+      "Lower your hips a few centimetres toward the floor.",
+      "Lift them back up into a straight line and hold."
+    ],
+    "cues_fr": [
+      "Appui sur une main, pieds superposés, corps bien aligné.",
+      "Descendez les hanches de quelques centimètres vers le sol.",
+      "Remontez-les dans l'alignement et tenez."
+    ],
+    "common_mistakes_en": [
+      "Letting the hips sag",
+      "Rolling the chest toward the floor"
+    ],
+    "common_mistakes_fr": [
+      "Laisser les hanches s'affaisser",
+      "Tourner la poitrine vers le sol"
+    ],
+    "video_front_url": "https://customer-tekto.cloudflarestream.com/side-plank-front/manifest/video.m3u8",
+    "video_side_url": null,
+    "video_duration_sec": 5,
+    "captions_en_url": "captions/side-plank_en.vtt",
+    "captions_fr_url": "captions/side-plank_fr.vtt",
+    "contraindications": [
+      "shoulder",
+      "wrist"
+    ],
+    "variation_easier_slug": "plank",
+    "variation_harder_slug": null,
+    "form_check_supported": false,
+    "form_check_lift_key": null
+  },
+  {
+    "slug": "band-pull-apart",
+    "name_en": "Band Pull-Apart",
+    "name_fr": "Écartement d'élastique",
+    "equipment": [
+      "bands"
+    ],
+    "muscle_primary": [
+      "rear_deltoid"
+    ],
+    "muscle_secondary": [
+      "rhomboids",
+      "traps"
+    ],
+    "cues_en": [
+      "Hold the band in front of your chest, arms straight.",
+      "Pull your hands apart until your arms form a T.",
+      "Bring your hands back together slowly, arms still straight."
+    ],
+    "cues_fr": [
+      "Tenez l'élastique devant la poitrine, bras tendus.",
+      "Écartez les mains jusqu'à former un T avec les bras.",
+      "Ramenez lentement les mains, bras toujours tendus."
+    ],
+    "common_mistakes_en": [
+      "Bending the elbows",
+      "Shrugging the shoulders"
+    ],
+    "common_mistakes_fr": [
+      "Plier les coudes",
+      "Hausser les épaules"
+    ],
+    "video_front_url": "https://customer-tekto.cloudflarestream.com/band-pull-apart-front/manifest/video.m3u8",
+    "video_side_url": null,
+    "video_duration_sec": 5,
+    "captions_en_url": "captions/band-pull-apart_en.vtt",
+    "captions_fr_url": "captions/band-pull-apart_fr.vtt",
+    "contraindications": [
+      "shoulder"
+    ],
+    "variation_easier_slug": null,
+    "variation_harder_slug": "face-pull",
+    "form_check_supported": false,
+    "form_check_lift_key": null
+  },
+  {
+    "slug": "cable-crunch",
+    "name_en": "Cable Crunch",
+    "name_fr": "Crunch à la poulie",
+    "equipment": [
+      "cable"
+    ],
+    "muscle_primary": [
+      "core"
+    ],
+    "muscle_secondary": [],
+    "cues_en": [
+      "Kneel an arm's length from the cable, rope held at your forehead.",
+      "Keep your hips still and round your spine until your head is near the floor.",
+      "Uncurl slowly until your torso is upright."
+    ],
+    "cues_fr": [
+      "À genoux à une longueur de bras de la poulie, corde tenue contre le front.",
+      "Hanches immobiles, enroulez la colonne jusqu'à la tête près du sol.",
+      "Déroulez lentement jusqu'au buste droit."
+    ],
+    "common_mistakes_en": [
+      "Sitting the hips back to pull the weight",
+      "Pulling with the arms instead of the abs"
+    ],
+    "common_mistakes_fr": [
+      "Reculer les hanches pour tirer la charge",
+      "Tirer avec les bras plutôt qu'avec les abdos"
+    ],
+    "video_front_url": "https://customer-tekto.cloudflarestream.com/cable-crunch-front/manifest/video.m3u8",
+    "video_side_url": null,
+    "video_duration_sec": 7,
+    "captions_en_url": "captions/cable-crunch_en.vtt",
+    "captions_fr_url": "captions/cable-crunch_fr.vtt",
+    "contraindications": [
+      "lower_back"
+    ],
+    "variation_easier_slug": "reverse-crunch",
+    "variation_harder_slug": null,
+    "form_check_supported": false,
+    "form_check_lift_key": null
+  },
+  {
+    "slug": "cable-kickback",
+    "name_en": "Cable Glute Kickback",
+    "name_fr": "Kickback fessier à la poulie",
+    "equipment": [
+      "cable"
+    ],
+    "muscle_primary": [
+      "glutes"
+    ],
+    "muscle_secondary": [
+      "hamstrings"
+    ],
+    "cues_en": [
+      "Strap the cable to your ankle and hold the frame.",
+      "Kick your straight leg back and up, squeezing your glute.",
+      "Bring the foot back beside the other one slowly, hips square."
+    ],
+    "cues_fr": [
+      "Sangle de la poulie à la cheville, mains sur le cadre.",
+      "Poussez la jambe tendue vers l'arrière et le haut en serrant le fessier.",
+      "Ramenez lentement le pied à côté de l'autre, bassin de face."
+    ],
+    "common_mistakes_en": [
+      "Arching the lower back",
+      "Twisting the hips open"
+    ],
+    "common_mistakes_fr": [
+      "Cambrer le bas du dos",
+      "Ouvrir les hanches sur le côté"
+    ],
+    "video_front_url": "https://customer-tekto.cloudflarestream.com/cable-kickback-front/manifest/video.m3u8",
+    "video_side_url": null,
+    "video_duration_sec": 5,
+    "captions_en_url": "captions/cable-kickback_en.vtt",
+    "captions_fr_url": "captions/cable-kickback_fr.vtt",
+    "contraindications": [
+      "lower_back",
+      "hip"
+    ],
+    "variation_easier_slug": "glute-bridge",
+    "variation_harder_slug": null,
+    "form_check_supported": false,
+    "form_check_lift_key": null
+  },
+  {
+    "slug": "single-leg-hip-thrust",
+    "name_en": "Single-Leg Hip Thrust",
+    "name_fr": "Hip thrust sur une jambe",
+    "equipment": [
+      "bodyweight"
+    ],
+    "muscle_primary": [
+      "glutes"
+    ],
+    "muscle_secondary": [
+      "hamstrings",
+      "core"
+    ],
+    "cues_en": [
+      "Upper back on the bench, one foot flat, other knee pulled in.",
+      "Drive through your heel to lift your hips into a straight line.",
+      "Lower your hips slowly and lift again."
+    ],
+    "cues_fr": [
+      "Haut du dos sur le banc, un pied à plat, l'autre genou ramené.",
+      "Poussez dans le talon pour monter les hanches dans l'alignement.",
+      "Redescendez lentement les hanches, puis remontez."
+    ],
+    "common_mistakes_en": [
+      "Arching the lower back at the top",
+      "Letting the hips tilt to one side"
+    ],
+    "common_mistakes_fr": [
+      "Cambrer le bas du dos en haut",
+      "Laisser le bassin pencher d'un côté"
+    ],
+    "video_front_url": "https://customer-tekto.cloudflarestream.com/single-leg-hip-thrust-front/manifest/video.m3u8",
+    "video_side_url": null,
+    "video_duration_sec": 5,
+    "captions_en_url": "captions/single-leg-hip-thrust_en.vtt",
+    "captions_fr_url": "captions/single-leg-hip-thrust_fr.vtt",
+    "contraindications": [
+      "lower_back",
+      "hip"
+    ],
+    "variation_easier_slug": "hip-thrust",
+    "variation_harder_slug": null,
+    "form_check_supported": false,
+    "form_check_lift_key": null
+  },
+  {
+    "slug": "ab-wheel-rollout",
+    "name_en": "Ab Wheel Rollout",
+    "name_fr": "Roue abdominale",
+    "equipment": [
+      "bodyweight"
+    ],
+    "muscle_primary": [
+      "core"
+    ],
+    "muscle_secondary": [
+      "lats",
+      "shoulders"
+    ],
+    "cues_en": [
+      "Kneel with the wheel under your shoulders, arms straight.",
+      "Roll forward slowly, keeping your back flat.",
+      "Pull the wheel back under your shoulders."
+    ],
+    "cues_fr": [
+      "À genoux, roue sous les épaules, bras tendus.",
+      "Roulez lentement vers l'avant, dos bien plat.",
+      "Ramenez la roue sous les épaules."
+    ],
+    "common_mistakes_en": [
+      "Letting the lower back sag",
+      "Rolling out further than you can control"
+    ],
+    "common_mistakes_fr": [
+      "Laisser le bas du dos se creuser",
+      "Aller plus loin que ce que vous contrôlez"
+    ],
+    "video_front_url": "https://customer-tekto.cloudflarestream.com/ab-wheel-rollout-front/manifest/video.m3u8",
+    "video_side_url": null,
+    "video_duration_sec": 5,
+    "captions_en_url": "captions/ab-wheel-rollout_en.vtt",
+    "captions_fr_url": "captions/ab-wheel-rollout_fr.vtt",
+    "contraindications": [
+      "lower_back",
+      "shoulder"
+    ],
+    "variation_easier_slug": "plank",
+    "variation_harder_slug": null,
+    "form_check_supported": false,
+    "form_check_lift_key": null
+  },
+  {
+    "slug": "skull-crusher",
+    "name_en": "Dumbbell Skull Crusher",
+    "name_fr": "Barre au front aux haltères",
+    "equipment": [
+      "dumbbell"
+    ],
+    "muscle_primary": [
+      "triceps"
+    ],
+    "muscle_secondary": [],
+    "cues_en": [
+      "Lie on the bench, upper arms pointing at the ceiling.",
+      "Bend only your elbows to lower the dumbbells beside your ears.",
+      "Straighten your arms fully, upper arms staying still."
+    ],
+    "cues_fr": [
+      "Allongé sur le banc, bras pointés vers le plafond.",
+      "Pliez seulement les coudes pour descendre les haltères près des oreilles.",
+      "Tendez complètement les bras, sans bouger le haut des bras."
+    ],
+    "common_mistakes_en": [
+      "Letting the upper arms drift back",
+      "Flaring the elbows out"
+    ],
+    "common_mistakes_fr": [
+      "Laisser le haut des bras partir en arrière",
+      "Écarter les coudes"
+    ],
+    "video_front_url": "https://customer-tekto.cloudflarestream.com/skull-crusher-front/manifest/video.m3u8",
+    "video_side_url": null,
+    "video_duration_sec": 5,
+    "captions_en_url": "captions/skull-crusher_en.vtt",
+    "captions_fr_url": "captions/skull-crusher_fr.vtt",
+    "contraindications": [
+      "elbow"
+    ],
+    "variation_easier_slug": "band-triceps-pushdown",
+    "variation_harder_slug": null,
+    "form_check_supported": false,
+    "form_check_lift_key": null
+  },
+  {
+    "slug": "leg-extension",
+    "name_en": "Leg Extension",
+    "name_fr": "Leg extension",
+    "equipment": [
+      "cable"
+    ],
+    "muscle_primary": [
+      "quadriceps"
+    ],
+    "muscle_secondary": [],
+    "cues_en": [
+      "Sit back against the pad, roller on the front of your ankles, shins vertical.",
+      "Lift your lower legs until both legs are fully straight.",
+      "Lower slowly all the way until your knees are bent at 90 degrees."
+    ],
+    "cues_fr": [
+      "Dos contre le dossier, rouleau sur le devant des chevilles, tibias verticaux.",
+      "Montez les jambes jusqu'à ce qu'elles soient complètement tendues.",
+      "Redescendez lentement jusqu'aux genoux fléchis à 90 degrés."
+    ],
+    "common_mistakes_en": [
+      "Lifting the hips off the seat",
+      "Cutting the range short at the bottom"
+    ],
+    "common_mistakes_fr": [
+      "Décoller les hanches du siège",
+      "Raccourcir l'amplitude en bas"
+    ],
+    "video_front_url": "https://customer-tekto.cloudflarestream.com/leg-extension-front/manifest/video.m3u8",
+    "video_side_url": null,
+    "video_duration_sec": 7,
+    "captions_en_url": "captions/leg-extension_en.vtt",
+    "captions_fr_url": "captions/leg-extension_fr.vtt",
+    "contraindications": [
+      "knee"
+    ],
+    "variation_easier_slug": null,
+    "variation_harder_slug": null,
+    "form_check_supported": false,
+    "form_check_lift_key": null
+  },
+  {
+    "slug": "inverted-row",
+    "name_en": "Inverted Row",
+    "name_fr": "Rowing inversé",
+    "equipment": [
+      "bodyweight"
+    ],
+    "muscle_primary": [
+      "lats",
+      "rhomboids"
+    ],
+    "muscle_secondary": [
+      "biceps",
+      "rear_deltoid"
+    ],
+    "cues_en": [
+      "Set a bar in squat stands at hip height and hang under it, arms straight, heels down.",
+      "Keep your body straight and pull your chest up to touch the bar.",
+      "Lower slowly until your arms are straight again."
+    ],
+    "cues_fr": [
+      "Placez une barre sur des chandelles à hauteur de hanches et suspendez-vous dessous, bras tendus, talons au sol.",
+      "Gardez le corps gainé et tirez la poitrine jusqu'à toucher la barre.",
+      "Redescendez lentement jusqu'aux bras tendus."
+    ],
+    "common_mistakes_en": [
+      "Letting the hips sag",
+      "Pulling the chin over the bar instead of the chest to it"
+    ],
+    "common_mistakes_fr": [
+      "Laisser les hanches s'affaisser",
+      "Passer le menton au-dessus de la barre au lieu d'y amener la poitrine"
+    ],
+    "video_front_url": "https://customer-tekto.cloudflarestream.com/inverted-row-front/manifest/video.m3u8",
+    "video_side_url": null,
+    "video_duration_sec": 7,
+    "captions_en_url": "captions/inverted-row_en.vtt",
+    "captions_fr_url": "captions/inverted-row_fr.vtt",
+    "contraindications": [
+      "shoulder"
+    ],
+    "variation_easier_slug": null,
+    "variation_harder_slug": "pull-up",
+    "form_check_supported": false,
+    "form_check_lift_key": null
+  },
+  {
+    "slug": "reverse-pec-deck",
+    "name_en": "Reverse Pec Deck",
+    "name_fr": "Pec deck inversé",
+    "equipment": [
+      "cable"
+    ],
+    "muscle_primary": [
+      "rear_deltoid"
+    ],
+    "muscle_secondary": [
+      "rhomboids",
+      "traps"
+    ],
+    "cues_en": [
+      "Sit facing the machine, chest on the pad, handles together in front.",
+      "Keep your arms almost straight and open them until they line up with your shoulders.",
+      "Squeeze your shoulder blades, then bring the handles back slowly."
+    ],
+    "cues_fr": [
+      "Assis face à la machine, poitrine contre le coussin, poignées jointes devant.",
+      "Bras presque tendus, ouvrez-les jusqu'à l'alignement des épaules.",
+      "Serrez les omoplates, puis ramenez lentement les poignées."
+    ],
+    "common_mistakes_en": [
+      "Swinging the arms past the shoulders",
+      "Bending the elbows into a row"
+    ],
+    "common_mistakes_fr": [
+      "Emmener les bras au-delà des épaules",
+      "Plier les coudes comme un rowing"
+    ],
+    "video_front_url": "https://customer-tekto.cloudflarestream.com/reverse-pec-deck-front/manifest/video.m3u8",
+    "video_side_url": null,
+    "video_duration_sec": 7,
+    "captions_en_url": "captions/reverse-pec-deck_en.vtt",
+    "captions_fr_url": "captions/reverse-pec-deck_fr.vtt",
+    "contraindications": [
+      "shoulder"
+    ],
+    "variation_easier_slug": "band-pull-apart",
+    "variation_harder_slug": null,
+    "form_check_supported": false,
+    "form_check_lift_key": null
+  },
+  {
+    "slug": "diamond-push-up",
+    "name_en": "Diamond Push-Up",
+    "name_fr": "Pompes diamant",
+    "equipment": [
+      "bodyweight"
+    ],
+    "muscle_primary": [
+      "triceps",
+      "chest"
+    ],
+    "muscle_secondary": [
+      "front_deltoid",
+      "core"
+    ],
+    "cues_en": [
+      "Hands together under your chest, thumbs and index fingers in a diamond.",
+      "Lower your chest to your hands, elbows close to your body.",
+      "Push back up to straight arms, body in one line."
+    ],
+    "cues_fr": [
+      "Mains jointes sous la poitrine, pouces et index en forme de diamant.",
+      "Descendez la poitrine vers les mains, coudes près du corps.",
+      "Remontez bras tendus, corps aligné."
+    ],
+    "common_mistakes_en": [
+      "Letting the hips sag",
+      "Flaring the elbows"
+    ],
+    "common_mistakes_fr": [
+      "Laisser les hanches s'affaisser",
+      "Écarter les coudes"
+    ],
+    "video_front_url": "https://customer-tekto.cloudflarestream.com/diamond-push-up-front/manifest/video.m3u8",
+    "video_side_url": null,
+    "video_duration_sec": 7,
+    "captions_en_url": "captions/diamond-push-up_en.vtt",
+    "captions_fr_url": "captions/diamond-push-up_fr.vtt",
+    "contraindications": [
+      "wrist",
+      "elbow"
+    ],
+    "variation_easier_slug": "push-up",
+    "variation_harder_slug": null,
+    "form_check_supported": false,
+    "form_check_lift_key": null
+  },
+  {
+    "slug": "decline-bench-press",
+    "name_en": "Decline Bench Press",
+    "name_fr": "Développé couché décliné",
+    "equipment": [
+      "barbell"
+    ],
+    "muscle_primary": [
+      "chest"
+    ],
+    "muscle_secondary": [
+      "triceps",
+      "front_deltoid"
+    ],
+    "cues_en": [
+      "Lie on the decline bench, legs hooked under the pads, bar locked out.",
+      "Lower the bar to your lower chest, elbows about 45 degrees.",
+      "Press back up to straight arms over your lower chest."
+    ],
+    "cues_fr": [
+      "Allongé sur le banc décliné, jambes bloquées, barre bras tendus.",
+      "Descendez la barre vers le bas de la poitrine, coudes à 45 degrés environ.",
+      "Repoussez jusqu'aux bras tendus au-dessus du bas de la poitrine."
+    ],
+    "common_mistakes_en": [
+      "Bouncing the bar off the chest",
+      "Flaring the elbows wide"
+    ],
+    "common_mistakes_fr": [
+      "Faire rebondir la barre sur la poitrine",
+      "Écarter les coudes"
+    ],
+    "video_front_url": "https://customer-tekto.cloudflarestream.com/decline-bench-press-front/manifest/video.m3u8",
+    "video_side_url": null,
+    "video_duration_sec": 7,
+    "captions_en_url": "captions/decline-bench-press_en.vtt",
+    "captions_fr_url": "captions/decline-bench-press_fr.vtt",
+    "contraindications": [
+      "shoulder"
+    ],
+    "variation_easier_slug": "bench-press",
+    "variation_harder_slug": null,
+    "form_check_supported": false,
+    "form_check_lift_key": null
+  },
+  {
+    "slug": "arnold-press",
+    "name_en": "Arnold Press",
+    "name_fr": "Développé Arnold",
+    "equipment": [
+      "dumbbell"
+    ],
+    "muscle_primary": [
+      "front_deltoid"
+    ],
+    "muscle_secondary": [
+      "shoulders",
+      "triceps"
+    ],
+    "cues_en": [
+      "Sit tall, dumbbells in front of your shoulders, palms facing you.",
+      "Press up, turning your palms forward as your arms straighten.",
+      "Lower back down, turning your palms toward you again."
+    ],
+    "cues_fr": [
+      "Assis bien droit, haltères devant les épaules, paumes vers vous.",
+      "Poussez en tournant les paumes vers l'avant jusqu'aux bras tendus.",
+      "Redescendez en ramenant les paumes vers vous."
+    ],
+    "common_mistakes_en": [
+      "Arching the lower back",
+      "Rushing the rotation"
+    ],
+    "common_mistakes_fr": [
+      "Cambrer le bas du dos",
+      "Tourner les poignets trop vite"
+    ],
+    "video_front_url": "https://customer-tekto.cloudflarestream.com/arnold-press-front/manifest/video.m3u8",
+    "video_side_url": null,
+    "video_duration_sec": 7,
+    "captions_en_url": "captions/arnold-press_en.vtt",
+    "captions_fr_url": "captions/arnold-press_fr.vtt",
+    "contraindications": [
+      "shoulder"
+    ],
+    "variation_easier_slug": "dumbbell-shoulder-press",
+    "variation_harder_slug": "overhead-press",
+    "form_check_supported": false,
+    "form_check_lift_key": null
+  },
+  {
+    "slug": "barbell-curl",
+    "name_en": "Barbell Curl",
+    "name_fr": "Curl à la barre",
+    "equipment": [
+      "barbell"
+    ],
+    "muscle_primary": [
+      "biceps"
+    ],
+    "muscle_secondary": [
+      "forearms"
+    ],
+    "cues_en": [
+      "Stand tall, underhand grip, bar at your thighs.",
+      "Elbows pinned, curl the bar up to your shoulders.",
+      "Lower slowly to straight arms without swinging."
+    ],
+    "cues_fr": [
+      "Debout, prise en supination, barre contre les cuisses.",
+      "Coudes collés, montez la barre jusqu'aux épaules.",
+      "Redescendez lentement jusqu'aux bras tendus, sans balancer."
+    ],
+    "common_mistakes_en": [
+      "Swinging the body",
+      "Moving the elbows forward"
+    ],
+    "common_mistakes_fr": [
+      "Balancer le corps",
+      "Avancer les coudes"
+    ],
+    "video_front_url": "https://customer-tekto.cloudflarestream.com/barbell-curl-front/manifest/video.m3u8",
+    "video_side_url": null,
+    "video_duration_sec": 7,
+    "captions_en_url": "captions/barbell-curl_en.vtt",
+    "captions_fr_url": "captions/barbell-curl_fr.vtt",
+    "contraindications": [
+      "elbow"
+    ],
+    "variation_easier_slug": "dumbbell-curl",
+    "variation_harder_slug": "preacher-curl",
+    "form_check_supported": false,
+    "form_check_lift_key": null
+  },
+  {
+    "slug": "preacher-curl",
+    "name_en": "Preacher Curl",
+    "name_fr": "Curl pupitre",
+    "equipment": [
+      "barbell"
+    ],
+    "muscle_primary": [
+      "biceps"
+    ],
+    "muscle_secondary": [
+      "forearms"
+    ],
+    "cues_en": [
+      "Upper arms flat on the pad, EZ bar in an underhand grip.",
+      "Curl the bar up toward your shoulders.",
+      "Lower slowly until your arms are almost straight."
+    ],
+    "cues_fr": [
+      "Haut des bras à plat sur le pupitre, barre EZ en supination.",
+      "Montez la barre vers les épaules.",
+      "Redescendez lentement jusqu'aux bras presque tendus."
+    ],
+    "common_mistakes_en": [
+      "Lifting the upper arms off the pad",
+      "Dropping the bar at the bottom"
+    ],
+    "common_mistakes_fr": [
+      "Décoller le haut des bras du pupitre",
+      "Laisser tomber la barre en bas"
+    ],
+    "video_front_url": "https://customer-tekto.cloudflarestream.com/preacher-curl-front/manifest/video.m3u8",
+    "video_side_url": null,
+    "video_duration_sec": 7,
+    "captions_en_url": "captions/preacher-curl_en.vtt",
+    "captions_fr_url": "captions/preacher-curl_fr.vtt",
+    "contraindications": [
+      "elbow"
+    ],
+    "variation_easier_slug": "barbell-curl",
+    "variation_harder_slug": null,
+    "form_check_supported": false,
+    "form_check_lift_key": null
+  },
+  {
+    "slug": "incline-dumbbell-curl",
+    "name_en": "Incline Dumbbell Curl",
+    "name_fr": "Curl incliné aux haltères",
+    "equipment": [
+      "dumbbell"
+    ],
+    "muscle_primary": [
+      "biceps"
+    ],
+    "muscle_secondary": [
+      "forearms"
+    ],
+    "cues_en": [
+      "Lie back on a 45-degree bench, arms hanging straight down.",
+      "Keep your upper arms still and curl both dumbbells up.",
+      "Lower slowly to straight arms."
+    ],
+    "cues_fr": [
+      "Allongé sur un banc à 45 degrés, bras pendants.",
+      "Haut des bras immobile, montez les deux haltères.",
+      "Redescendez lentement jusqu'aux bras tendus."
+    ],
+    "common_mistakes_en": [
+      "Swinging the elbows forward",
+      "Lifting the shoulders off the bench"
+    ],
+    "common_mistakes_fr": [
+      "Avancer les coudes",
+      "Décoller les épaules du banc"
+    ],
+    "video_front_url": "https://customer-tekto.cloudflarestream.com/incline-dumbbell-curl-front/manifest/video.m3u8",
+    "video_side_url": null,
+    "video_duration_sec": 7,
+    "captions_en_url": "captions/incline-dumbbell-curl_en.vtt",
+    "captions_fr_url": "captions/incline-dumbbell-curl_fr.vtt",
+    "contraindications": [
+      "elbow",
+      "shoulder"
+    ],
+    "variation_easier_slug": "dumbbell-curl",
+    "variation_harder_slug": null,
+    "form_check_supported": false,
+    "form_check_lift_key": null
+  },
+  {
+    "slug": "triceps-pushdown",
+    "name_en": "Triceps Pushdown",
+    "name_fr": "Extension triceps à la poulie",
+    "equipment": [
+      "cable"
+    ],
+    "muscle_primary": [
+      "triceps"
+    ],
+    "muscle_secondary": [],
+    "cues_en": [
+      "Face the cable, short bar at chest height, elbows tucked.",
+      "Push the bar down until your arms are straight.",
+      "Let it rise slowly, upper arms staying still."
+    ],
+    "cues_fr": [
+      "Face à la poulie, barre courte à hauteur de poitrine, coudes collés.",
+      "Poussez la barre vers le bas jusqu'aux bras tendus.",
+      "Laissez-la remonter lentement, haut des bras immobile."
+    ],
+    "common_mistakes_en": [
+      "Letting the elbows drift forward",
+      "Leaning over the bar"
+    ],
+    "common_mistakes_fr": [
+      "Laisser les coudes avancer",
+      "Se pencher sur la barre"
+    ],
+    "video_front_url": "https://customer-tekto.cloudflarestream.com/triceps-pushdown-front/manifest/video.m3u8",
+    "video_side_url": null,
+    "video_duration_sec": 7,
+    "captions_en_url": "captions/triceps-pushdown_en.vtt",
+    "captions_fr_url": "captions/triceps-pushdown_fr.vtt",
+    "contraindications": [
+      "elbow"
+    ],
+    "variation_easier_slug": "band-triceps-pushdown",
+    "variation_harder_slug": "skull-crusher",
+    "form_check_supported": false,
+    "form_check_lift_key": null
+  },
+  {
+    "slug": "bench-dip",
+    "name_en": "Bench Dip",
+    "name_fr": "Dips sur banc",
+    "equipment": [
+      "bodyweight"
+    ],
+    "muscle_primary": [
+      "triceps"
+    ],
+    "muscle_secondary": [
+      "chest",
+      "front_deltoid"
+    ],
+    "cues_en": [
+      "Hands on the bench edge beside your hips, legs out in front.",
+      "Bend your elbows to lower until your upper arms are level.",
+      "Push back up to straight arms, back close to the bench."
+    ],
+    "cues_fr": [
+      "Mains sur le bord du banc près des hanches, jambes tendues devant.",
+      "Pliez les coudes jusqu'au haut des bras à l'horizontale.",
+      "Remontez bras tendus, dos près du banc."
+    ],
+    "common_mistakes_en": [
+      "Drifting away from the bench",
+      "Going too deep for your shoulders"
+    ],
+    "common_mistakes_fr": [
+      "S'éloigner du banc",
+      "Descendre trop bas pour les épaules"
+    ],
+    "video_front_url": "https://customer-tekto.cloudflarestream.com/bench-dip-front/manifest/video.m3u8",
+    "video_side_url": null,
+    "video_duration_sec": 7,
+    "captions_en_url": "captions/bench-dip_en.vtt",
+    "captions_fr_url": "captions/bench-dip_fr.vtt",
+    "contraindications": [
+      "shoulder",
+      "wrist"
+    ],
+    "variation_easier_slug": null,
+    "variation_harder_slug": "chest-dip",
+    "form_check_supported": false,
+    "form_check_lift_key": null
+  },
+  {
+    "slug": "crunch",
+    "name_en": "Crunch",
+    "name_fr": "Crunch",
+    "equipment": [
+      "bodyweight"
+    ],
+    "muscle_primary": [
+      "core"
+    ],
+    "muscle_secondary": [],
+    "cues_en": [
+      "Lie on your back, knees bent, fingertips behind your ears.",
+      "Curl your shoulders off the mat toward your knees.",
+      "Lower slowly, lower back staying on the mat."
+    ],
+    "cues_fr": [
+      "Sur le dos, genoux fléchis, doigts derrière les oreilles.",
+      "Enroulez les épaules vers les genoux.",
+      "Redescendez lentement, bas du dos au sol."
+    ],
+    "common_mistakes_en": [
+      "Pulling on the head",
+      "Lifting the lower back"
+    ],
+    "common_mistakes_fr": [
+      "Tirer sur la tête",
+      "Décoller le bas du dos"
+    ],
+    "video_front_url": "https://customer-tekto.cloudflarestream.com/crunch-front/manifest/video.m3u8",
+    "video_side_url": null,
+    "video_duration_sec": 7,
+    "captions_en_url": "captions/crunch_en.vtt",
+    "captions_fr_url": "captions/crunch_fr.vtt",
+    "contraindications": [
+      "lower_back"
+    ],
+    "variation_easier_slug": null,
+    "variation_harder_slug": "sit-up",
+    "form_check_supported": false,
+    "form_check_lift_key": null
+  },
+  {
+    "slug": "cable-pull-through",
+    "name_en": "Cable Pull-Through",
+    "name_fr": "Pull-through à la poulie",
+    "equipment": [
+      "cable"
+    ],
+    "muscle_primary": [
+      "glutes",
+      "hamstrings"
+    ],
+    "muscle_secondary": [
+      "erectors"
+    ],
+    "cues_en": [
+      "Face away from the low pulley, rope between your legs.",
+      "Hinge back with a flat back, rope between your legs.",
+      "Drive your hips forward to stand tall, glutes squeezed."
+    ],
+    "cues_fr": [
+      "Dos à la poulie basse, corde entre les jambes.",
+      "Pliez aux hanches, dos plat, la corde passe entre les jambes.",
+      "Poussez les hanches vers l'avant pour vous redresser, fessiers serrés."
+    ],
+    "common_mistakes_en": [
+      "Squatting instead of hinging",
+      "Pulling with the arms"
+    ],
+    "common_mistakes_fr": [
+      "Faire un squat au lieu de plier aux hanches",
+      "Tirer avec les bras"
+    ],
+    "video_front_url": "https://customer-tekto.cloudflarestream.com/cable-pull-through-front/manifest/video.m3u8",
+    "video_side_url": null,
+    "video_duration_sec": 7,
+    "captions_en_url": "captions/cable-pull-through_en.vtt",
+    "captions_fr_url": "captions/cable-pull-through_fr.vtt",
+    "contraindications": [
+      "lower_back"
+    ],
+    "variation_easier_slug": "glute-bridge",
+    "variation_harder_slug": "romanian-deadlift",
+    "form_check_supported": false,
+    "form_check_lift_key": null
+  },
+  {
+    "slug": "back-extension",
+    "name_en": "Back Extension",
+    "name_fr": "Extension lombaire",
+    "equipment": [
+      "bodyweight"
+    ],
+    "muscle_primary": [
+      "erectors"
+    ],
+    "muscle_secondary": [
+      "glutes",
+      "hamstrings"
+    ],
+    "cues_en": [
+      "Hips on the pad, ankles locked, arms crossed on your chest.",
+      "Hinge at the hips and lower your torso with a flat back.",
+      "Rise to a straight line from head to heels, no further."
+    ],
+    "cues_fr": [
+      "Hanches sur le coussin, chevilles bloquées, bras croisés sur la poitrine.",
+      "Pliez aux hanches et descendez le buste, dos plat.",
+      "Remontez jusqu'à l'alignement tête-talons, sans aller au-delà."
+    ],
+    "common_mistakes_en": [
+      "Arching past a straight line at the top",
+      "Rounding the back"
+    ],
+    "common_mistakes_fr": [
+      "Se cambrer au-delà de l'alignement en haut",
+      "Arrondir le dos"
+    ],
+    "video_front_url": "https://customer-tekto.cloudflarestream.com/back-extension-front/manifest/video.m3u8",
+    "video_side_url": null,
+    "video_duration_sec": 7,
+    "captions_en_url": "captions/back-extension_en.vtt",
+    "captions_fr_url": "captions/back-extension_fr.vtt",
+    "contraindications": [
+      "lower_back"
+    ],
+    "variation_easier_slug": "glute-bridge",
+    "variation_harder_slug": "romanian-deadlift",
+    "form_check_supported": false,
+    "form_check_lift_key": null
+  },
+  {
+    "slug": "concentration-curl",
+    "name_en": "Concentration Curl",
+    "name_fr": "Curl concentré",
+    "equipment": [
+      "dumbbell"
+    ],
+    "muscle_primary": [
+      "biceps"
+    ],
+    "muscle_secondary": [
+      "forearms"
+    ],
+    "cues_en": [
+      "Sit, lean forward, elbow braced on the inside of your thigh.",
+      "Curl the dumbbell up toward your shoulder.",
+      "Lower to a straight arm, then switch arms."
+    ],
+    "cues_fr": [
+      "Assis, penché en avant, coude calé à l'intérieur de la cuisse.",
+      "Montez l'haltère vers l'épaule.",
+      "Redescendez bras tendu, puis changez de bras."
+    ],
+    "common_mistakes_en": [
+      "Lifting the elbow off the thigh",
+      "Swinging the torso"
+    ],
+    "common_mistakes_fr": [
+      "Décoller le coude de la cuisse",
+      "Balancer le buste"
+    ],
+    "video_front_url": "https://customer-tekto.cloudflarestream.com/concentration-curl-front/manifest/video.m3u8",
+    "video_side_url": null,
+    "video_duration_sec": 7,
+    "captions_en_url": "captions/concentration-curl_en.vtt",
+    "captions_fr_url": "captions/concentration-curl_fr.vtt",
+    "contraindications": [
+      "elbow"
+    ],
+    "variation_easier_slug": "dumbbell-curl",
+    "variation_harder_slug": null,
+    "form_check_supported": false,
+    "form_check_lift_key": null
+  },
+  {
+    "slug": "hack-squat",
+    "name_en": "Hack Squat",
+    "name_fr": "Hack squat",
+    "equipment": [
+      "cable"
+    ],
+    "muscle_primary": [
+      "quadriceps"
+    ],
+    "muscle_secondary": [
+      "glutes"
+    ],
+    "cues_en": [
+      "Back flat on the pad, shoulders under the pads, feet shoulder-width.",
+      "Squat down until your thighs are level with the foot plate.",
+      "Push back up without locking your knees."
+    ],
+    "cues_fr": [
+      "Dos à plat sur le dossier, épaules sous les coussins, pieds écartés.",
+      "Descendez jusqu'aux cuisses parallèles à la plateforme.",
+      "Remontez sans verrouiller les genoux."
+    ],
+    "common_mistakes_en": [
+      "Letting the back come off the pad",
+      "Locking the knees hard at the top"
+    ],
+    "common_mistakes_fr": [
+      "Décoller le dos du dossier",
+      "Verrouiller brutalement les genoux"
+    ],
+    "video_front_url": "https://customer-tekto.cloudflarestream.com/hack-squat-front/manifest/video.m3u8",
+    "video_side_url": null,
+    "video_duration_sec": 7,
+    "captions_en_url": "captions/hack-squat_en.vtt",
+    "captions_fr_url": "captions/hack-squat_fr.vtt",
+    "contraindications": [
+      "knee"
+    ],
+    "variation_easier_slug": "leg-press",
+    "variation_harder_slug": "barbell-squat",
+    "form_check_supported": false,
+    "form_check_lift_key": null
+  },
+  {
+    "slug": "seated-leg-curl",
+    "name_en": "Seated Leg Curl",
+    "name_fr": "Leg curl assis",
+    "equipment": [
+      "cable"
+    ],
+    "muscle_primary": [
+      "hamstrings"
+    ],
+    "muscle_secondary": [
+      "calves"
+    ],
+    "cues_en": [
+      "Back on the pad, thigh pad over your knees, legs straight.",
+      "Curl your heels down and back under the seat.",
+      "Let your legs return slowly to straight."
+    ],
+    "cues_fr": [
+      "Dos contre le dossier, coussin sur les genoux, jambes tendues.",
+      "Ramenez les talons vers le bas et sous le siège.",
+      "Laissez revenir lentement les jambes tendues."
+    ],
+    "common_mistakes_en": [
+      "Lifting the hips off the seat",
+      "Letting the weight slam back"
+    ],
+    "common_mistakes_fr": [
+      "Décoller les hanches du siège",
+      "Laisser la charge revenir brusquement"
+    ],
+    "video_front_url": "https://customer-tekto.cloudflarestream.com/seated-leg-curl-front/manifest/video.m3u8",
+    "video_side_url": null,
+    "video_duration_sec": 7,
+    "captions_en_url": "captions/seated-leg-curl_en.vtt",
+    "captions_fr_url": "captions/seated-leg-curl_fr.vtt",
+    "contraindications": [
+      "knee"
+    ],
+    "variation_easier_slug": null,
+    "variation_harder_slug": "lying-leg-curl",
+    "form_check_supported": false,
+    "form_check_lift_key": null
   }
 ]

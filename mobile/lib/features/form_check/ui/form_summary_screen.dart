@@ -29,7 +29,9 @@ class FormSummaryScreen extends StatelessWidget {
     final topTip = fr ? summary.topTipFr : summary.topTipEn;
     return Scaffold(
       appBar: AppBar(
-        title: Row(mainAxisSize: MainAxisSize.min, children: [Text(l.formCheckSummaryTitle), const SizedBox(width: 8), const BetaBadge()]),
+        title: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [Text(l.formCheckSummaryTitle), const SizedBox(width: 8), const BetaBadge()]),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(AppSpacing.lg),
@@ -47,9 +49,11 @@ class FormSummaryScreen extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(Icons.repeat, color: AppColors.accent),
+                const Icon(Icons.repeat, color: AppColors.glacier),
                 const SizedBox(width: 8),
-                Flexible(child: Text(l.formCheckRepsCounted(summary.repCount), style: Theme.of(context).textTheme.titleMedium)),
+                Flexible(
+                    child:
+                        Text(l.formCheckRepsCounted(summary.repCount), style: Theme.of(context).textTheme.titleMedium)),
               ],
             ),
             const SizedBox(height: AppSpacing.sm),
@@ -57,11 +61,13 @@ class FormSummaryScreen extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Icon(summary.flaggedReps.isEmpty ? Icons.check_circle_outline : Icons.flag_outlined,
-                    color: summary.flaggedReps.isEmpty ? Colors.green : Colors.orange),
+                    color: summary.flaggedReps.isEmpty ? AppColors.mint : AppColors.glacier),
                 const SizedBox(width: 8),
                 Flexible(
                   child: Text(
-                    summary.flaggedReps.isEmpty ? l.formCheckNoFlaggedReps : l.formCheckFlaggedReps(summary.flaggedReps.join(', ')),
+                    summary.flaggedReps.isEmpty
+                        ? l.formCheckNoFlaggedReps
+                        : l.formCheckFlaggedReps(summary.flaggedReps.join(', ')),
                     style: Theme.of(context).textTheme.titleSmall,
                   ),
                 ),
@@ -78,9 +84,10 @@ class FormSummaryScreen extends StatelessWidget {
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Icon(Icons.info_outline, size: 16, color: AppColors.onDarkSecondary),
+                        const Icon(Icons.info_outline, size: 16, color: AppColors.mist),
                         const SizedBox(width: 8),
-                        Expanded(child: Text(fr ? cue.textFr : cue.textEn, style: Theme.of(context).textTheme.bodySmall)),
+                        Expanded(
+                            child: Text(fr ? cue.textFr : cue.textEn, style: Theme.of(context).textTheme.bodySmall)),
                       ],
                     ),
                   ),
@@ -92,7 +99,8 @@ class FormSummaryScreen extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(l.formCheckTopTipLabel, style: Theme.of(context).textTheme.labelMedium?.copyWith(color: AppColors.accent)),
+                    Text(l.formCheckTopTipLabel,
+                        style: Theme.of(context).textTheme.labelMedium?.copyWith(color: AppColors.glacier)),
                     const SizedBox(height: 8),
                     Text(topTip.isEmpty ? l.formCheckGreatForm : topTip),
                   ],
@@ -100,7 +108,7 @@ class FormSummaryScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: AppSpacing.sm),
-            Text(l.formCheckBetaNote, style: Theme.of(context).textTheme.bodySmall?.copyWith(color: AppColors.onDarkSecondary)),
+            Text(l.formCheckBetaNote, style: Theme.of(context).textTheme.bodySmall?.copyWith(color: AppColors.mist)),
             const SizedBox(height: AppSpacing.xl),
             ElevatedButton(onPressed: () => context.pop(), child: Text(l.formCheckDone)),
             const SizedBox(height: AppSpacing.sm),
@@ -136,17 +144,11 @@ class _FormScoreGauge extends StatelessWidget {
               children: [
                 Text(
                   '$score',
-                  style: Theme.of(context)
-                      .textTheme
-                      .displayLarge
-                      ?.copyWith(fontSize: 56, color: _scoreColor(score)),
+                  style: Theme.of(context).textTheme.displayLarge?.copyWith(fontSize: 56, color: _scoreColor(score)),
                 ),
                 Text(
                   '/ 100',
-                  style: Theme.of(context)
-                      .textTheme
-                      .bodySmall
-                      ?.copyWith(color: AppColors.onDarkSecondary),
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(color: AppColors.mist),
                 ),
               ],
             ),
@@ -155,9 +157,9 @@ class _FormScoreGauge extends StatelessWidget {
       );
 
   Color _scoreColor(int score) {
-    if (score >= 80) return Colors.green;
-    if (score >= 60) return AppColors.accent;
-    return Colors.red;
+    if (score >= 80) return AppColors.mint;
+    if (score >= 60) return AppColors.glacier;
+    return AppColors.mist;
   }
 }
 
@@ -174,7 +176,7 @@ class _GaugePainter extends CustomPainter {
 
     // Background arc
     final bgPaint = Paint()
-      ..color = AppColors.charcoalElevated
+      ..color = AppColors.deep
       ..style = PaintingStyle.stroke
       ..strokeWidth = 12
       ..strokeCap = StrokeCap.round;
@@ -204,9 +206,9 @@ class _GaugePainter extends CustomPainter {
   }
 
   Color _scoreColor(int score) {
-    if (score >= 80) return Colors.green;
-    if (score >= 60) return AppColors.accent;
-    return Colors.red;
+    if (score >= 80) return AppColors.mint;
+    if (score >= 60) return AppColors.glacier;
+    return AppColors.mist;
   }
 
   @override

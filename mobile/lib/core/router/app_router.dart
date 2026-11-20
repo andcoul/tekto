@@ -1,4 +1,5 @@
 import 'package:tekto/core/l10n/gen/app_localizations.dart';
+import '../../shared/widgets/tekto_tab_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -116,13 +117,41 @@ GoRouter appRouter(Ref ref) {
       ),
 
       // ── Main shell ──────────────────────────────────────────────────────
-      GoRoute(
-        path: '/home',
-        builder: (context, state) => const HomeScreen(),
-      ),
-      GoRoute(
-        path: '/plan',
-        builder: (context, state) => const PlanOverviewScreen(),
+      // Home, Plan, Library and Progress share the floating tab bar (TabShell);
+      // deeper screens such as an exercise detail hide it.
+      ShellRoute(
+        builder: (context, state, child) => TabShell(location: state.uri.path, child: child),
+        routes: [
+          GoRoute(
+            path: '/home',
+            builder: (context, state) => const HomeScreen(),
+          ),
+          GoRoute(
+            path: '/plan',
+            builder: (context, state) => const PlanOverviewScreen(),
+          ),
+
+          // ── Library ─────────────────────────────────────────────────────────
+          GoRoute(
+            path: '/library',
+            builder: (context, state) => const ExerciseListScreen(),
+            routes: [
+              GoRoute(
+                path: ':exerciseSlug',
+                builder: (context, state) {
+                  final slug = state.pathParameters['exerciseSlug']!;
+                  return ExerciseDetailScreen(exerciseSlug: slug);
+                },
+              ),
+            ],
+          ),
+
+          // ── Progress ────────────────────────────────────────────────────────
+          GoRoute(
+            path: '/progress',
+            builder: (context, state) => const ProgressScreen(),
+          ),
+        ],
       ),
 
       // ── Workout ─────────────────────────────────────────────────────────
@@ -139,21 +168,6 @@ GoRouter appRouter(Ref ref) {
           final sessionId = state.pathParameters['sessionId']!;
           return WorkoutSummaryScreen(sessionId: sessionId, workoutLogId: state.uri.queryParameters['log']);
         },
-      ),
-
-      // ── Library ─────────────────────────────────────────────────────────
-      GoRoute(
-        path: '/library',
-        builder: (context, state) => const ExerciseListScreen(),
-        routes: [
-          GoRoute(
-            path: ':exerciseSlug',
-            builder: (context, state) {
-              final slug = state.pathParameters['exerciseSlug']!;
-              return ExerciseDetailScreen(exerciseSlug: slug);
-            },
-          ),
-        ],
       ),
 
       // ── Coach ───────────────────────────────────────────────────────────
@@ -184,12 +198,6 @@ GoRouter appRouter(Ref ref) {
         ],
       ),
 
-      // ── Progress ────────────────────────────────────────────────────────
-      GoRoute(
-        path: '/progress',
-        builder: (context, state) => const ProgressScreen(),
-      ),
-
       // ── Settings ────────────────────────────────────────────────────────
       GoRoute(
         path: '/settings',
@@ -211,14 +219,14 @@ GoRouter appRouter(Ref ref) {
       GoRoute(
         path: '/paywall',
         // Feature-specific clip and copy: /paywall?feature=form_check|coach|adaptive_plan|general.
-        builder: (context, state) => PaywallScreen(feature: PaywallFeature.fromKey(state.uri.queryParameters['feature'])),
+        builder: (context, state) =>
+            PaywallScreen(feature: PaywallFeature.fromKey(state.uri.queryParameters['feature'])),
       ),
 
       // ── Plan adaptation ─────────────────────────────────────────────────
       GoRoute(
         path: '/plan/adaptation',
-        builder: (context, state) =>
-            AdaptationSummaryScreen(summary: state.extra! as AdaptationSummary),
+        builder: (context, state) => AdaptationSummaryScreen(summary: state.extra! as AdaptationSummary),
       ),
     ],
     errorBuilder: (context, state) => Scaffold(

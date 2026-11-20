@@ -454,6 +454,40 @@ WebVTT caption files per exercise and language, stored in `content/exercises/cap
 
 ---
 
+## 16. Imagery and Casting (Constitution VI, design 2026-11-17)
+
+### Decision
+All people shown in Tekto (design photos, exercise thumbnails, welcome and paywall clips from T132, and the filmed exercise videos from T022) come from a mixed cast in which **Black men and Black women play lead roles**, not background ones. The rule applies to the Figma file now and to the filmed content later.
+
+- **Share:** at least half of the photos of people in each set show Black athletes, split about evenly between men and women. The other half is also mixed.
+- **Lighting:** the app is dark only (#0F1014), so deep skin tones need a warm key light plus a cool Glacier rim light (#9DB8FF). Faces must stay readable under the bottom scrims. Exposure is checked on the dark background, not on white.
+- **Styling:** real gym clothing in neutral or dark colours. No yellow and no red.
+- **One person per exercise photo,** with the movement clearly visible, so the photo still reads as an icon at 56 px in the library chips.
+
+### Casting for the 24 Figma images (Imagery section 10:6, exported to `design/images/`)
+
+The existing photos are recast by **image editing**: pose, gender, framing and lighting stay the same, and only the person changes. The prompts are in `design/video-prompts.md`, under "Photo edits".
+
+| Change | Images |
+|---|---|
+| Black woman (7) | hero/signin, hero/live, barbell row, Romanian deadlift, goblet squat, rope pushdown, hip thrust |
+| Black man (8) | hero/story-1, hero/session (the red tint on the arm is also removed), avatar/user, bench press, lat pulldown, back squat, DB curl, plank |
+| Unchanged (9) | hero/story-2, hero/formcheck, incline DB press, push-up, pull-up, walking lunge, overhead press, lateral raise, hanging leg raise |
+
+That gives 15 of 24 Black leads (7 women, 8 men). Because genders are kept, the onboarding screens already built in Figma still match. Recasting the 9 unchanged photos (all currently white) to other backgrounds is a follow-up.
+
+### Rationale
+The user asked for it, and Constitution VI asks for a premium product that every user feels is made for them. Image tools default to light-skinned subjects unless the prompt says otherwise, so the cast has to be written into each prompt, and the dark-UI lighting has to be specified up front.
+
+### Alternatives considered
+- Leaving it to the image model: rejected, because the result is inconsistent and usually not diverse.
+- One Black model across all photos: rejected, because it reads as a single persona, and the library needs a different person per exercise.
+
+### Impact
+No change to data-model.md or contracts/. This is a content and design rule. T022 and T132 (filming) adopt the same casting brief.
+
+---
+
 ## Summary of All Decisions
 
 | Area | Decision |
@@ -474,3 +508,4 @@ WebVTT caption files per exercise and language, stored in `content/exercises/cap
 | Localization | Flutter ARB (en, fr); language chosen at onboarding |
 | Offline sync | Drift + custom sync queue via Supabase REST |
 | Guardrail validation | Adversarial eval suite, 100 % pass bar |
+| Imagery and casting | Mixed cast with Black men and women in lead roles (at least half of each set); dark-UI lighting brief (§16) |

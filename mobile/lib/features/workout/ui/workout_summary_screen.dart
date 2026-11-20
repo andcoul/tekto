@@ -40,7 +40,8 @@ class _WorkoutSummaryScreenState extends ConsumerState<WorkoutSummaryScreen> {
     }
     setState(() => _saving = true);
     final summary = await ref.read(workoutSummaryProvider(logId).future);
-    final finishedAt = await logs.finishWorkout(logId, effortRating: _effortRating, totalVolumeKg: summary.totalVolumeKg);
+    final finishedAt =
+        await logs.finishWorkout(logId, effortRating: _effortRating, totalVolumeKg: summary.totalVolumeKg);
     final prefs = await ref.read(userPrefsProvider.future);
 
     // Fire and forget: the workout is saved; Health must never hold the user here (FR-012).
@@ -125,7 +126,7 @@ class _WorkoutSummaryScreenState extends ConsumerState<WorkoutSummaryScreen> {
                     max: 10,
                     divisions: 9,
                     label: '$_effortRating',
-                    activeColor: AppColors.accent,
+                    activeColor: AppColors.glacier,
                     onChanged: (v) => setState(() => _effortRating = v.round()),
                   ),
                 ),
@@ -156,7 +157,7 @@ class _Stat extends StatelessWidget {
   Widget build(BuildContext context) => Column(children: [
         Text(
           value,
-          style: Theme.of(context).textTheme.headlineSmall?.copyWith(color: highlight ? AppColors.pr : null),
+          style: Theme.of(context).textTheme.headlineSmall?.copyWith(color: highlight ? AppColors.mint : null),
         ),
         Text(label, style: Theme.of(context).textTheme.bodyMedium),
       ]);

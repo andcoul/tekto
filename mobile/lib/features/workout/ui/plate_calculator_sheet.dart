@@ -57,7 +57,7 @@ class _PlateCalculatorSheetState extends State<PlateCalculatorSheet> {
             onChanged: (v) => setState(() => _weight = parseWeight(v) ?? 0),
           ),
           const SizedBox(height: AppSpacing.lg),
-          Text(l.platesPerSide, style: text.labelLarge?.copyWith(color: AppColors.onDarkSecondary)),
+          Text(l.platesPerSide, style: text.labelLarge?.copyWith(color: AppColors.mist)),
           const SizedBox(height: AppSpacing.xs),
           Text(plates, style: text.headlineSmall),
           const SizedBox(height: AppSpacing.sm),
@@ -67,7 +67,7 @@ class _PlateCalculatorSheetState extends State<PlateCalculatorSheet> {
               padding: const EdgeInsets.only(top: AppSpacing.sm),
               child: Text(
                 l.platesNotExact('${_format(_weight)} $unit', '${_format(load.loadable)} $unit'),
-                style: text.bodyMedium?.copyWith(color: AppColors.accent),
+                style: text.bodyMedium?.copyWith(color: AppColors.glacier),
               ),
             ),
         ],
