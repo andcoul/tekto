@@ -30,10 +30,11 @@ async function main() {
     .filter((f) => f.endsWith('.json') && !f.startsWith('package'))
     .map((f) => ({ file: f, body: JSON.parse(readFileSync(join(here, f), 'utf8')) }));
 
-  const { data: exercises, error } = await supabase.from('exercises').select('slug, video_front_url, muscle_primary');
+  const { data: exercises, error } = await supabase.from('exercises').select('slug, video_front_url, muscle_primary, equipment');
   if (error) throw new Error(`Cannot read exercises: ${error.message}`);
   const withVideo = new Set(exercises.filter((e) => e.video_front_url).map((e) => e.slug));
   const musclesOf = new Map(exercises.map((e) => [e.slug, e.muscle_primary ?? []]));
+  const equipmentOf = new Map(exercises.map((e) => [e.slug, e.equipment ?? []]));
 
   const errors = [];
   for (const { file, body } of templates) {
@@ -44,6 +45,7 @@ async function main() {
       }
     }
     errors.push(...volumeErrors(file, body, musclesOf));
+    errors.push(...equipmentErrors(file, body, equipmentOf));
   }
   if (errors.length) {
     errors.forEach((e) => console.error(`❌ ${e}`));
@@ -62,6 +64,19 @@ async function main() {
   const { error: upsertError } = await supabase.from('plan_templates').upsert(rows, { onConflict: 'slug' });
   if (upsertError) throw new Error(`Upsert failed: ${upsertError.message}`);
   console.log(`✅ ${rows.length} templates seeded: ${rows.map((r) => r.slug).join(', ')}`);
+}
+
+/** Exercises needing equipment the template does not list in `equipment_required` (FR-013; bodyweight is free). */
+export function equipmentErrors(file, body, equipmentOf) {
+  const allowed = new Set([...(body.equipment_required ?? []), 'bodyweight']);
+  const errors = [];
+  for (const s of body.sessions ?? []) {
+    for (const e of s.exercises ?? []) {
+      const missing = (equipmentOf.get(e.exercise_slug) ?? []).filter((q) => !allowed.has(q));
+      if (missing.length) errors.push(`EQUIPMENT: ${file} ${s.ref}: '${e.exercise_slug}' needs ${missing.join(', ')}, not in equipment_required`);
+    }
+  }
+  return errors;
 }
 
 /** Weekly sets per primary muscle over the template's sessions, against its level maximum. */

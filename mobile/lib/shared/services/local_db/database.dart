@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 
@@ -5,6 +6,7 @@ import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:tekto/shared/models/equipment.dart';
 
 part 'database.g.dart';
 
@@ -72,6 +74,7 @@ class Plans extends Table {
   IntColumn get lastAdaptedWeek => integer().withDefault(const Constant(0))();
   TextColumn get source => text().withDefault(const Constant('ai'))(); // ai | template | template_fallback
   TextColumn get templateSlug => text().nullable()();
+
   /// Deprecated: superseded by [source] / [templateSlug] (migration 005).
   TextColumn get generatedBy => text().withDefault(const Constant('ai'))();
   TextColumn get rationaleEn => text().nullable()();
@@ -110,6 +113,7 @@ class PlanExercises extends Table {
   IntColumn get repsMin => integer()();
   IntColumn get repsMax => integer()();
   RealColumn get rpeTarget => real().nullable()();
+
   /// Reps in reserve target (0–5); exclusive with [rpeTarget] (data-model plan_exercises). v2.
   IntColumn get rirTarget => integer().nullable()();
   IntColumn get restSec => integer().withDefault(const Constant(90))();
@@ -211,7 +215,8 @@ class FormCheckSessions extends Table {
   TextColumn get topTipEn => text().nullable()();
   TextColumn get topTipFr => text().nullable()();
   BoolColumn get wasFreeTry => boolean().withDefault(const Constant(false))();
-  BoolColumn get userShared => boolean().withDefault(const Constant(false))(); // Principle II: false unless the user confirms a share
+  BoolColumn get userShared =>
+      boolean().withDefault(const Constant(false))(); // Principle II: false unless the user confirms a share
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
 
   @override
@@ -306,8 +311,9 @@ class AppDatabase extends _$AppDatabase {
 
   /// v2 (2026-11-15): plan_exercises.rir_target, body_weight_entries.
   /// v3 (2026-11-16): plans.adaptation_seen_week (device-only).
+  /// v4 (2026-11-20): users.equipment remapped to the new vocabulary (migration 014, T150).
   @override
-  int get schemaVersion => 3;
+  int get schemaVersion => 4;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -319,6 +325,13 @@ class AppDatabase extends _$AppDatabase {
           }
           if (from < 3) {
             await m.addColumn(plans, plans.adaptationSeenWeek);
+          }
+          if (from < 4) {
+            for (final u in await select(users).get()) {
+              final old = (jsonDecode(u.equipment) as List).cast<String>();
+              await (update(users)..where((t) => t.id.equals(u.id)))
+                  .write(UsersCompanion(equipment: Value(jsonEncode(remapLegacyEquipment(old)))));
+            }
           }
         },
       );
@@ -350,9 +363,7 @@ Future<String> _databaseKey() async {
   final existing = await _keyStorage.read(key: _keyName);
   if (existing != null) return existing;
   final random = Random.secure();
-  final key = List.generate(32, (_) => random.nextInt(256))
-      .map((b) => b.toRadixString(16).padLeft(2, '0'))
-      .join();
+  final key = List.generate(32, (_) => random.nextInt(256)).map((b) => b.toRadixString(16).padLeft(2, '0')).join();
   await _keyStorage.write(key: _keyName, value: key);
   return key;
 }

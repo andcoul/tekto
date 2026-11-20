@@ -3,7 +3,10 @@
   "level": "beginner",
   "days_per_week": 3,
   "equipment_required": [
-    "dumbbell"
+    "barbell",
+    "dumbbell",
+    "bench",
+    "cable"
   ],
   "name_en": "Beginner Full Body 3×",
   "name_fr": "Full Body Débutant 3×",
@@ -24,7 +27,7 @@
           "reps_min": 8,
           "reps_max": 12,
           "rest_sec": 120,
-          "rpe_target": 7.0
+          "rpe_target": 7
         },
         {
           "exercise_slug": "dumbbell-bench-press",
@@ -32,7 +35,7 @@
           "reps_min": 8,
           "reps_max": 12,
           "rest_sec": 90,
-          "rpe_target": 7.0
+          "rpe_target": 7
         },
         {
           "exercise_slug": "dumbbell-row",
@@ -40,7 +43,7 @@
           "reps_min": 8,
           "reps_max": 12,
           "rest_sec": 90,
-          "rpe_target": 7.0
+          "rpe_target": 7
         },
         {
           "exercise_slug": "dumbbell-shoulder-press",
@@ -48,7 +51,7 @@
           "reps_min": 10,
           "reps_max": 15,
           "rest_sec": 90,
-          "rpe_target": 7.0
+          "rpe_target": 7
         }
       ]
     },
@@ -64,7 +67,7 @@
           "reps_min": 8,
           "reps_max": 12,
           "rest_sec": 120,
-          "rpe_target": 7.0
+          "rpe_target": 7
         },
         {
           "exercise_slug": "dumbbell-bench-press",
@@ -72,7 +75,7 @@
           "reps_min": 8,
           "reps_max": 12,
           "rest_sec": 90,
-          "rpe_target": 7.0
+          "rpe_target": 7
         },
         {
           "exercise_slug": "lat-pulldown",
@@ -80,7 +83,7 @@
           "reps_min": 10,
           "reps_max": 15,
           "rest_sec": 90,
-          "rpe_target": 7.0
+          "rpe_target": 7
         },
         {
           "exercise_slug": "dumbbell-lunge",
@@ -88,7 +91,7 @@
           "reps_min": 10,
           "reps_max": 12,
           "rest_sec": 90,
-          "rpe_target": 6.0
+          "rpe_target": 6
         }
       ]
     },
@@ -104,7 +107,7 @@
           "reps_min": 10,
           "reps_max": 15,
           "rest_sec": 90,
-          "rpe_target": 7.0
+          "rpe_target": 7
         },
         {
           "exercise_slug": "dumbbell-shoulder-press",
@@ -112,7 +115,7 @@
           "reps_min": 10,
           "reps_max": 12,
           "rest_sec": 90,
-          "rpe_target": 7.0
+          "rpe_target": 7
         },
         {
           "exercise_slug": "dumbbell-row",
@@ -120,7 +123,7 @@
           "reps_min": 10,
           "reps_max": 12,
           "rest_sec": 90,
-          "rpe_target": 7.0
+          "rpe_target": 7
         },
         {
           "exercise_slug": "hip-thrust",
@@ -128,7 +131,7 @@
           "reps_min": 12,
           "reps_max": 15,
           "rest_sec": 90,
-          "rpe_target": 7.0
+          "rpe_target": 7
         }
       ]
     }

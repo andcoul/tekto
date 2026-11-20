@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:tekto/shared/models/equipment.dart';
 
 import '../../../core/di/providers.dart';
 import 'onboarding_gate.dart';
@@ -132,7 +133,6 @@ class OnboardingState {
         0 => language != null,
         1 => goal != null,
         2 => level != null,
-        5 => equipment.isNotEmpty,
         _ => step >= 0 && step < stepCount,
       };
 
@@ -187,6 +187,12 @@ class OnboardingController extends _$OnboardingController {
   void setLimitationsNote(String text) => state = state.copyWith(limitationsNote: text);
 
   void toggleEquipment(String item) => state = state.copyWith(equipment: _toggle(state.equipment, item));
+
+  /// "Gym": selects every equipment choice; when all are already selected, clears them (FR-001).
+  void toggleGym() {
+    final all = kEquipmentChoices.every(state.equipment.contains);
+    state = state.copyWith(equipment: all ? const [] : List.of(kEquipmentChoices));
+  }
 
   void toggleLimitation(String tag) {
     assert(kLimitationTags.contains(tag));
@@ -244,7 +250,7 @@ class OnboardingController extends _$OnboardingController {
         'level': state.level,
         'days_per_week': state.daysPerWeek,
         'session_length_min': state.sessionLengthMin,
-        'equipment': state.equipment,
+        'equipment': withBodyweight(state.equipment.where((e) => e != kBodyweight).toList()),
         'limitations': state.limitations,
         'limitations_note': state.limitationsNote.trim().isEmpty ? null : state.limitationsNote.trim(),
         'language': state.language ?? 'en',

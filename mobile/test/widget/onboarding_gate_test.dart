@@ -16,13 +16,14 @@ class FakeApi implements OnboardingApi {
   @override
   Future<void> saveProfile(Map<String, dynamic> profile) async => saved = profile;
   @override
-  Future<GeneratedPlanInfo> generatePlan({bool forceRegenerate = false}) async =>
-      const GeneratedPlanInfo(planId: 'p1', source: 'template', fallbackNotice: false, notices: ['free_plan_days_capped']);
+  Future<GeneratedPlanInfo> generatePlan({bool forceRegenerate = false}) async => const GeneratedPlanInfo(
+      planId: 'p1', source: 'template', fallbackNotice: false, notices: ['free_plan_days_capped']);
   @override
   Future<String> deviceTimezone() async => 'Europe/Paris';
 }
 
-Widget app(ProviderContainer container, {String initial = '/onboarding/disclaimer', Locale locale = const Locale('en')}) {
+Widget app(ProviderContainer container,
+    {String initial = '/onboarding/disclaimer', Locale locale = const Locale('en')}) {
   final router = GoRouter(initialLocation: initial, routes: [
     GoRoute(path: '/onboarding/disclaimer', builder: (_, __) => const HealthDisclaimerScreen()),
     GoRoute(path: '/onboarding/consent', builder: (_, __) => const ConsentScreen()),
@@ -33,8 +34,12 @@ Widget app(ProviderContainer container, {String initial = '/onboarding/disclaime
     child: MaterialApp.router(
       routerConfig: router,
       locale: locale,
-      localizationsDelegates: const [AppLocalizations.delegate, GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate, GlobalCupertinoLocalizations.delegate],
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate
+      ],
       supportedLocales: AppLocalizations.supportedLocales,
     ),
   );
@@ -44,20 +49,26 @@ void main() {
   group('onboardingRedirect', () {
     test('consent and quiz require the disclaimer first', () {
       for (final loc in ['/onboarding/consent', '/onboarding/quiz', '/onboarding/generating']) {
-        expect(onboardingRedirect(location: loc, disclaimerAccepted: false, consentGiven: false), '/onboarding/disclaimer');
+        expect(onboardingRedirect(location: loc, disclaimerAccepted: false, consentGiven: false),
+            '/onboarding/disclaimer');
       }
     });
     test('the quiz cannot start until consent is given', () {
-      expect(onboardingRedirect(location: '/onboarding/quiz', disclaimerAccepted: true, consentGiven: false), '/onboarding/consent');
+      expect(onboardingRedirect(location: '/onboarding/quiz', disclaimerAccepted: true, consentGiven: false),
+          '/onboarding/consent');
       expect(onboardingRedirect(location: '/onboarding/quiz', disclaimerAccepted: true, consentGiven: true), isNull);
     });
     test('the trial offer is shown only right after this session generated a plan (FR-004)', () {
-      expect(onboardingRedirect(location: '/onboarding/trial', disclaimerAccepted: true, consentGiven: true, planGenerated: true), isNull);
+      expect(
+          onboardingRedirect(
+              location: '/onboarding/trial', disclaimerAccepted: true, consentGiven: true, planGenerated: true),
+          isNull);
       // A later app open: no plan generated in this session → never shown again.
       expect(onboardingRedirect(location: '/onboarding/trial', disclaimerAccepted: true, consentGiven: true), '/home');
     });
     test('other routes are not affected', () {
-      expect(onboardingRedirect(location: '/onboarding/disclaimer', disclaimerAccepted: false, consentGiven: false), isNull);
+      expect(onboardingRedirect(location: '/onboarding/disclaimer', disclaimerAccepted: false, consentGiven: false),
+          isNull);
       expect(onboardingRedirect(location: '/home', disclaimerAccepted: false, consentGiven: false), isNull);
     });
     test('re-consent when the accepted version is older', () {
@@ -95,10 +106,16 @@ void main() {
 
       expect(api.saved, {
         'goal': 'muscle', 'level': 'intermediate', 'days_per_week': 6, 'session_length_min': 45,
-        'equipment': ['dumbbell'], 'limitations': ['knee'], 'limitations_note': 'old ACL surgery',
+        'equipment': [
+          'dumbbell',
+          'bodyweight'
+        ], // bodyweight is always added (FR-001)
+        'limitations': ['knee'], 'limitations_note': 'old ACL surgery',
         'language': 'fr', 'timezone': 'Europe/Paris', 'consent_at': '2026-11-10T09:00:00.000Z',
         'consent_version': kConsentVersion,
-        'strength_estimates': {'squat': {'weight_kg': 80.0, 'reps': 5}},
+        'strength_estimates': {
+          'squat': {'weight_kg': 80.0, 'reps': 5}
+        },
       });
       final s = c.read(onboardingControllerProvider);
       expect(s.result?.notices, ['free_plan_days_capped']);

@@ -717,11 +717,11 @@
   "@quizEquipmentBarbell": {
     "description": "T094 localization audit"
   },
-  "quizEquipmentDumbbell": "Dumbbells",
+  "quizEquipmentDumbbell": "Dumbbells / kettlebells",
   "@quizEquipmentDumbbell": {
     "description": "T094 localization audit"
   },
-  "quizEquipmentCable": "Cable / machines",
+  "quizEquipmentCable": "Cable",
   "@quizEquipmentCable": {
     "description": "T094 localization audit"
   },
@@ -732,6 +732,26 @@
   "quizEquipmentBands": "Resistance bands",
   "@quizEquipmentBands": {
     "description": "T094 localization audit"
+  },
+  "quizEquipmentBench": "Bench",
+  "@quizEquipmentBench": {
+    "description": "T152 equipment choices (FR-001)"
+  },
+  "quizEquipmentDipStation": "Dip station",
+  "@quizEquipmentDipStation": {
+    "description": "T152 equipment choices (FR-001)"
+  },
+  "quizEquipmentPullUpBar": "Pull-up bar",
+  "@quizEquipmentPullUpBar": {
+    "description": "T152 equipment choices (FR-001)"
+  },
+  "quizEquipmentMachine": "Machines",
+  "@quizEquipmentMachine": {
+    "description": "T152 equipment choices (FR-001)"
+  },
+  "quizEquipmentGym": "Gym",
+  "@quizEquipmentGym": {
+    "description": "T152 equipment choices (FR-001)"
   },
   "quizLimitationsTitle": "Any injuries or limitations?",
   "@quizLimitationsTitle": {

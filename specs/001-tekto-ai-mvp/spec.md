@@ -12,7 +12,7 @@
 
 ## Overview
 
-Tekto is a premium, AI-first strength training app for iOS and Android. It builds a personalized training program, demonstrates every exercise through real filmed video, provides real-time form feedback via the device camera, and answers training questions through an AI coach. The MVP ships four AI pillars: plan generation, video library, AI chat coach, and camera form check, together with full workout tracking.
+Tekto is a premium, AI-first strength training app for iOS and Android. It builds a personalized training program, demonstrates every exercise through a reviewed demonstration video, provides real-time form feedback via the device camera, and answers training questions through an AI coach. The MVP ships four AI pillars: plan generation, video library, AI chat coach, and camera form check, together with full workout tracking.
 
 ---
 
@@ -41,6 +41,14 @@ Tekto is a premium, AI-first strength training app for iOS and Android. It build
 - Q: Do tablets need support? → A: The phone layout must run on tablets without clipping or broken layouts; no tablet-specific layouts in the MVP.
 - Q: Does "support" in FR-022 include live cues for every lift? → A: Yes — rep counting, no-rep detection and at least one lift-specific live cue per launch lift.
 - Q: Can users change their onboarding answers later? → A: Yes, from settings, followed by an offer to regenerate the plan (FR-046).
+
+### Session 2026-11-20
+
+- Q: Can AI-generated exercise clips be the launch video library, or must every exercise have real filmed footage? → A: Generated or filmed clips both count, as long as each passes a human form review; real filming only where generation fails (FR-014). Requires a constitution amendment to §IV and Gate 1 (pending, MAJOR bump).
+- Q: How does the app know whether a user has a pull-up bar, dip station, bench or machines? → A: They are separate equipment choices in the quiz and separate equipment tags in the library (pull-up bar, dip station, bench, machines — machines separate from cable); "Gym" selects all of them (FR-001, FR-013).
+- Q: Does every exercise need a side-angle video as well as the front one? → A: No. One main video per exercise from the angle that shows the form best; a second angle only for the 8 form-check lifts and their variants (FR-014).
+- Q: What minimum length should an exercise clip have? → A: 4–15 s, showing at least one complete rep (or one full hold for static moves); the library records the real length (FR-014).
+- Q: Must every exercise link to both an easier and a harder variation? → A: At least one variation per exercise (easier or harder), both where a sensible one exists; links always point to exercises in the library (FR-014).
 
 ---
 
@@ -149,7 +157,7 @@ After completing workouts in a week, a Pro user's plan automatically adjusts for
 
 **Launch scope**: Required at launch (PRD P0).
 
-Any user (free or Pro) can browse and view the full exercise video library. Each exercise shows filmed demonstrations from front and side angles, target muscles, step-by-step cues, common mistakes, and easier/harder variations. Pro users can download exercise videos for offline use.
+Any user (free or Pro) can browse and view the full exercise video library. Each exercise shows a video demonstration from the angle that shows its form best (a second angle for the form-check lifts), target muscles, step-by-step cues, common mistakes, and easier or harder variations. Pro users can download exercise videos for offline use.
 
 **Why this priority**: Free-tier value anchor; also prerequisite for all other features.
 
@@ -157,7 +165,7 @@ Any user (free or Pro) can browse and view the full exercise video library. Each
 
 **Acceptance Scenarios**:
 
-1. **Given** any user, **When** they open an exercise in the library, **Then** a looped 5–15 second filmed video plays automatically and technique cues are displayed.
+1. **Given** any user, **When** they open an exercise in the library, **Then** a looped 4–15 second demonstration video showing at least one complete rep plays automatically and technique cues are displayed.
 2. **Given** a Pro user with a downloaded plan, **When** they go offline, **Then** all videos in their current plan play without an internet connection.
 3. **Given** a free user offline, **When** they attempt to view a non-downloaded exercise video, **Then** a friendly message explains that offline video requires Pro.
 
@@ -189,6 +197,7 @@ A free user encounters a Pro feature, sees a contextual paywall that communicate
 - How does the system handle a user with conflicting limitations (e.g., knee injury + lower-body goal)? → The plan avoids contraindicated exercises and the coach explains the substitutions when the user asks about an affected exercise.
 - What happens when the LLM service is unavailable during a coach session? → The last generated plan continues to function; the coach shows a "temporarily unavailable" message.
 - How does form check behave when the device has an older/slower CPU? → Confidence threshold is enforced; if below threshold, cues are suppressed rather than shown incorrectly.
+- What happens when a home user owns dumbbells but no pull-up bar, dip station or bench? → Pull-ups, dips, inverted rows, hanging leg raises and bench-supported moves are never planned or offered as swaps; floor or standing alternatives are used (FR-001, FR-013).
 - What happens if a user changes their equipment mid-program? → They can trigger a plan re-generation from settings (FR-046), or use the coach to request substitutions exercise-by-exercise.
 - What happens when a free user starts or continues a workout offline? → Logging, rest timer and text cues work normally; video areas show "Offline video requires Tekto Pro" without blocking the workout (FR-011, FR-030).
 - How does the app handle a user in a storefront where no Pro product is available? → Purchase buttons are hidden and a localized "Tekto Pro is not yet available in your region" message is shown; "Restore purchases" stays visible and the free tier is unaffected (FR-031, FR-032). Prices are never hard-coded or converted by the app.
@@ -201,7 +210,7 @@ A free user encounters a Pro feature, sees a contextual paywall that communicate
 
 **Onboarding & Plan Generation**
 
-- **FR-001**: The system MUST present an onboarding quiz collecting: goal (muscle, strength, fat loss, general fitness), training level, days per week, session length, available equipment, and physical limitations or injuries.
+- **FR-001**: The system MUST present an onboarding quiz collecting: goal (muscle, strength, fat loss, general fitness), training level, days per week, session length, available equipment, and physical limitations or injuries. Equipment choices are: barbell, dumbbells (kettlebells count as dumbbells), cable, machines, resistance bands, pull-up bar, dip station and bench; bodyweight is always available. Choosing "Gym" selects all of them; home users tick what they own.
 - **FR-002**: The system MUST generate a 4–12 week periodized training plan with named exercises, sets, reps, rest periods and RPE/RIR targets within 30 seconds (p95) of onboarding completion; if no plan arrives within the 35-second client timeout, the app offers a retry (network failures only; FR-003b covers AI failures). Pro users receive an AI-generated plan. Free users receive a rule-based plan built from one of the starter templates (FR-029), selected by equipment first, then level, then goal; the system adapts it to the user's chosen days per week (1 day → 1 session; otherwise adding or merging sessions, up to a maximum of 4 sessions per week; a user who chooses 5–7 days receives 4 sessions and a non-blocking card explaining that Pro builds programs for 5 or more days) and session length (trimming exercises from the end of each session, keeping at least 3, then reducing sets and rest if needed). No AI call is made for free plans.
 - **FR-002a**: Every plan, AI-generated or template-based, MUST pass the same plan validator (every exercise has a video, uses only the user's available equipment, rest days present, estimated session duration at most 10 minutes over the chosen session length (template plans are trimmed to fit within it), weekly sets per muscle group within the level's bounds, and for AI plans weekly push sets ÷ pull sets between 0.5 and 2.0, summed per primary muscle — push = chest, shoulders, front delts, triceps; pull = lats, rhomboids, rear delts, biceps, traps) before it is shown to the user. The volume bounds are beginner 10–14, intermediate 14–18, advanced 16–22 sets per muscle per week. The maximum applies to every plan. The minimum applies to AI plans only, for major muscles when the user trains 3 or more days per week, because template plans trimmed to short sessions cannot always reach it.
 - **FR-003**: Every exercise in a generated plan MUST have a corresponding video in the exercise library; no plan may reference a movement without a video.
@@ -232,8 +241,8 @@ A free user encounters a Pro feature, sees a contextual paywall that communicate
 
 **Exercise Video Library**
 
-- **FR-013**: The library MUST contain at least 150 exercises at launch, covering gym barbell, dumbbell, cable, bodyweight and resistance-band movements.
-- **FR-014**: Each exercise MUST include: filmed video (front and side, looped, 5–15 s), target muscles, step-by-step technique cues, common mistakes, and easier/harder variations.
+- **FR-013**: The library MUST contain at least 150 exercises at launch, covering gym barbell, dumbbell, cable, machine, bodyweight and resistance-band movements. Every exercise lists all the equipment it needs from the FR-001 choices (for example, pull-up = pull-up bar; bench dip = bench; leg press = machines), so a plan or swap never offers a move that needs equipment the user did not select.
+- **FR-014**: Each exercise MUST include: a demonstration video (one main angle chosen to show the form best, looped, 4–15 s, showing at least one complete rep — or one full hold for static moves such as the plank — with the library recording the clip's real length; filmed or AI-generated, and approved in a human form review before it enters the library — real filming is used only where generation cannot show the movement correctly), target muscles, step-by-step technique cues, common mistakes, and at least one variation — an easier or a harder exercise, both where a sensible one exists; every variation links to an exercise in the library. Exercises that are one of the 8 form-check lifts (FR-022) or a variant of one (for example, front squat, Romanian deadlift, incline bench press) MUST also include a second-angle video.
 - **FR-015**: Pro users MUST be able to download the videos for all exercises in their active plan for offline use.
 
 **AI Chat Coach (Pro)**
@@ -320,7 +329,7 @@ A free user encounters a Pro feature, sees a contextual paywall that communicate
 ## Assumptions
 
 - The app targets iOS 16+ and Android 10+ from a single cross-platform codebase, phones first. On tablets the phone layout must run without clipping or broken layouts; tablet-specific layouts and a web app are out of scope for the MVP.
-- At least 150 filmed exercise videos will be available before launch; video production timeline is a separate workstream with studio/coach resources.
+- At least 150 reviewed exercise videos will be available before launch, mostly AI-generated with real filming only where generation fails; video production is a separate content workstream with a coach for the form review. The constitution still says "filmed" (§IV, Gate 1) and needs its own amendment PR (MAJOR bump) to match.
 - Vendor choices (LLM, pose estimation, video delivery, billing) are recorded in research.md; the requirements in this spec stay vendor-agnostic.
 - Subscription billing is handled entirely through App Store and Google Play in-app purchase APIs; no direct payment processing is in scope for the MVP.
 - Local payment methods (Wave, Orange Money, etc.) are post-MVP.

@@ -4,8 +4,8 @@ export const LIMITS = {
   aspect: 9 / 16, // width / height
   aspectTolerance: 0.03,
   minWidth: 720,
-  minSec: 3.5,
-  maxSec: 7,
+  minSec: 4, // FR-014: 4–15 s, at least one complete rep (clarified 2026-11-20)
+  maxSec: 15,
   minFps: 24,
   loopPsnrDb: 25, // first vs last frame; below this the loop seam is likely visible
 };
@@ -55,7 +55,7 @@ export function judgeClip(c) {
     errors.push(`Too small: at least ${LIMITS.minWidth} px wide is needed (got ${Math.min(c.width, c.height)}).`);
   }
   if (c.durationSec < LIMITS.minSec || c.durationSec > LIMITS.maxSec) {
-    errors.push(`Length should be about 5 s (${LIMITS.minSec}–${LIMITS.maxSec} s); got ${c.durationSec.toFixed(1)} s.`);
+    errors.push(`Length should be ${LIMITS.minSec}–${LIMITS.maxSec} s; got ${c.durationSec.toFixed(1)} s.`);
   }
   if (c.fps < LIMITS.minFps) warnings.push(`Low frame rate (${Math.round(c.fps)} fps); 24–30 fps looks smoother.`);
   if (c.loopPsnr !== null && c.loopPsnr < LIMITS.loopPsnrDb) {

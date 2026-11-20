@@ -111,3 +111,13 @@ Deno.test('beginner and advanced volume bounds differ', () => {
   // 15 is below the advanced minimum (16).
   assertEquals(codes(validatePlan(baseline(), profile({ level: 'advanced' }), LIBRARY, 'ai')), ['VOLUME']);
 });
+
+// T142 — equipment beyond the loaded basics (FR-001, FR-013; clarified 2026-11-20).
+Deno.test('bar, dip station, bench and machine moves are rejected without that equipment', () => {
+  const dumbbells = profile({ equipment: ['dumbbell', 'bodyweight'] });
+  for (const slug of ['pull-up', 'chest-dip', 'bench-dip', 'incline-dumbbell-press', 'leg-press']) {
+    assertEquals(codes(validatePlan(plan([[ex(slug)]]), dumbbells, LIBRARY, 'template')), ['EQUIPMENT'], slug);
+  }
+  const home = profile({ equipment: ['dumbbell', 'bench', 'pull_up_bar', 'bodyweight'] });
+  assertEquals(validatePlan(plan([[ex('incline-dumbbell-press'), ex('pull-up')]]), home, LIBRARY, 'template').valid, true);
+});

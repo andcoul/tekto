@@ -6,7 +6,7 @@
 //
 // For each clip it:
 //   1. works out the exercise or screen from the file name (name-map.json),
-//   2. checks it is vertical 9:16, about 5 s, at least 720 px wide, and loops cleanly,
+//   2. checks it is vertical 9:16, 4–15 s, at least 720 px wide, and loops cleanly,
 //   3. writes   out/<exercise-slug | hero/name>/loop.mp4   H.264 720×1280, source frame rate (≤ 30 fps), no audio
 //               out/.../poster.jpg   first frame, full size (shown before the video plays)
 //               out/.../thumb.jpg    360 px wide (library tiles, lists)
@@ -107,6 +107,18 @@ for (const f of files) {
 }
 rmSync(tmp, { recursive: true, force: true });
 writeFileSync(join(outputDir, 'manifest.json'), JSON.stringify({ createdAt: new Date().toISOString(), results }, null, 2) + '\n');
+
+// Record each mapped clip's real length in the library (FR-014, T147).
+const exercisesPath = join(here, '../exercises/exercises.json');
+const exercises = JSON.parse(readFileSync(exercisesPath, 'utf8'));
+let lengthsUpdated = 0;
+for (const r of results) {
+  const ex = r.slug && exercises.find((e) => e.slug === r.slug);
+  if (!ex || !r.checks?.durationSec) continue;
+  const sec = Math.round(r.checks.durationSec);
+  if (ex.video_duration_sec !== sec) [ex.video_duration_sec, lengthsUpdated] = [sec, lengthsUpdated + 1];
+}
+if (lengthsUpdated) writeFileSync(exercisesPath, JSON.stringify(exercises, null, 2) + '\n');
 
 const bundled = appAssetsFor(results, map);
 for (const { from, to } of bundled) copyFileSync(join(outputDir, from), join(appAssetDir, to));

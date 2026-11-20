@@ -33,7 +33,7 @@ Batch 4 has 23 clips, numbered 78–100. They are the exercises gym members use 
 4. Set each delivered clip's tracker status to *Delivered* (passed review) or *Redo* (failed, with the reason).
 5. Add each passed clip to `content/exercises/exercises.json`, with cues and English and French captions (Video Gate). Then map it in `name-map.json`.
 
-**Equipment words in the library:** the app only knows `barbell`, `dumbbell`, `cable`, `bodyweight` and `bands`. Machines (chest press, hack squat, leg curl and so on) are `cable`. The preacher curl's EZ bar is `barbell`.
+**Equipment words in the library** (since 2026-11-20, spec FR-001/FR-013): `barbell`, `dumbbell` (kettlebells count as dumbbells), `cable`, `machine`, `bands`, `pull_up_bar`, `dip_station`, `bench` and `bodyweight`. List **every** item an exercise needs: chest press, hack squat and leg curl are `machine`; a dip is `bodyweight` + `dip_station`; the preacher curl is `barbell` + `bench`.
 
 ## Lessons from earlier batches (read before prompting)
 

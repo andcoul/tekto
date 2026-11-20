@@ -32,7 +32,7 @@ Extends Supabase Auth `auth.users`. Stores application-level profile data.
 | `level` | enum | NOT NULL | `beginner \| intermediate \| advanced` |
 | `days_per_week` | int | 1–7, NOT NULL | Training days per week |
 | `session_length_min` | int | 15–120, NOT NULL | Target session duration |
-| `equipment` | text[] | NOT NULL | `['barbell','dumbbell','cable','bodyweight','bands']` subset |
+| `equipment` | text[] | NOT NULL, CHECK vocabulary (014) | Subset of `barbell \| dumbbell \| cable \| machine \| bands \| pull_up_bar \| dip_station \| bench \| bodyweight`; always contains `bodyweight`; "Gym" in the quiz selects all (FR-001, 2026-11-20) |
 | `limitations` | text[] | nullable | Tags from a fixed vocabulary: `knee \| lower_back \| shoulder \| wrist \| elbow \| hip \| ankle \| neck` |
 | `limitations_note` | text | nullable | Optional free text; shown to the coach, not used for filtering |
 | `strength_estimates` | jsonb | nullable | Optional strength check: `{ "squat": {"weight_kg", "reps"}, "bench_press": {…}, "deadlift": {…} }`; null when skipped (conservative defaults apply) |
@@ -64,7 +64,7 @@ Master library of all filmed exercises. Read-only for users; managed by content 
 | `slug` | text | UNIQUE, NOT NULL | URL-safe identifier, e.g. `barbell-back-squat` |
 | `name_en` | text | NOT NULL | English name |
 | `name_fr` | text | NOT NULL | French name |
-| `equipment` | text[] | NOT NULL | Equipment required |
+| `equipment` | text[] | NOT NULL, CHECK vocabulary (014) | **Every** item the exercise needs, from `barbell \| dumbbell \| cable \| machine \| bands \| pull_up_bar \| dip_station \| bench \| bodyweight` (e.g. pull-up = `bodyweight` + `pull_up_bar`; leg press = `machine`); kettlebells count as `dumbbell` (FR-013) |
 | `muscle_primary` | text[] | NOT NULL | Primary muscles targeted |
 | `muscle_secondary` | text[] | nullable | Secondary muscles |
 | `cues_en` | text[] | NOT NULL | 3–5 technique cues (English) |
@@ -72,12 +72,12 @@ Master library of all filmed exercises. Read-only for users; managed by content 
 | `common_mistakes_en` | text[] | NOT NULL | |
 | `common_mistakes_fr` | text[] | NOT NULL | |
 | `video_front_url` | text | NOT NULL | Cloudflare Stream URL (front angle) |
-| `video_side_url` | text | nullable | Side angle video |
-| `video_duration_sec` | int | NOT NULL | 5–15 |
+| `video_side_url` | text | nullable | Second-angle video; required (validator, production) for the 8 form-check lifts and their variants (FR-014, `SECOND_ANGLE_FAMILIES` in `validate.js`) |
+| `video_duration_sec` | int | NOT NULL, CHECK 4–15 (014) | The clip's real length, written by `content/videos/ingest.js`; each clip shows at least one complete rep (FR-014) |
 | `captions_en_url` | text | NOT NULL | WebVTT caption track (English) |
 | `captions_fr_url` | text | NOT NULL | WebVTT caption track (French) |
 | `contraindications` | text[] | NOT NULL, default `{}` | Limitation tags (same vocabulary as `users.limitations`) for which this exercise is excluded from plans |
-| `variation_easier_id` | uuid | FK → exercises.id, nullable | |
+| `variation_easier_id` | uuid | FK → exercises.id, nullable | At least one of easier / harder is set for every exercise (FR-014; validator error in production) |
 | `variation_harder_id` | uuid | FK → exercises.id, nullable | |
 | `form_check_supported` | bool | NOT NULL, default false | Whether pose estimation is calibrated for this lift |
 | `form_check_lift_key` | text | nullable | Key used by PoseAnalyzer (e.g. `squat`, `deadlift`) |
@@ -389,7 +389,7 @@ Starter templates for free-tier plans and the Pro fallback. Seeded from `content
 | `slug` | text | PK | e.g. `home-dumbbell-3x` |
 | `level` | enum | NOT NULL | Target level |
 | `days_per_week` | int | NOT NULL | 3 or 4 at launch |
-| `equipment_required` | text[] | NOT NULL | Minimum equipment set |
+| `equipment_required` | text[] | NOT NULL, CHECK vocabulary (014) | Every item the template's exercises use besides `bodyweight` (checked at seed time) |
 | `body` | jsonb | NOT NULL | Same schema as the `generate-plan` plan body (weeks, sessions, exercises with `exercise_slug`) |
 | `updated_at` | timestamptz | NOT NULL | |
 

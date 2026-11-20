@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:tekto/shared/models/equipment.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -166,12 +167,21 @@ class _OnboardingQuizScreenState extends ConsumerState<OnboardingQuizScreen> {
         ),
       5 => _MultiStep(
           title: AppLocalizations.of(context).quizEquipmentTitle,
+          // Bodyweight is always included, so it is not a choice (FR-001, clarified 2026-11-20).
+          lead: _OptionCard(
+            label: AppLocalizations.of(context).quizEquipmentGym,
+            selected: kEquipmentChoices.every(state.equipment.contains),
+            onTap: ctrl.toggleGym,
+          ),
           options: {
             'barbell': AppLocalizations.of(context).quizEquipmentBarbell,
             'dumbbell': AppLocalizations.of(context).quizEquipmentDumbbell,
             'cable': AppLocalizations.of(context).quizEquipmentCable,
-            'bodyweight': AppLocalizations.of(context).quizEquipmentBodyweight,
+            'machine': AppLocalizations.of(context).quizEquipmentMachine,
             'bands': AppLocalizations.of(context).quizEquipmentBands,
+            'pull_up_bar': AppLocalizations.of(context).quizEquipmentPullUpBar,
+            'dip_station': AppLocalizations.of(context).quizEquipmentDipStation,
+            'bench': AppLocalizations.of(context).quizEquipmentBench,
           },
           selected: state.equipment,
           onToggle: ctrl.toggleEquipment,
@@ -255,8 +265,10 @@ class _ChoiceStep extends StatelessWidget {
 }
 
 class _MultiStep extends StatelessWidget {
-  const _MultiStep({required this.title, required this.options, required this.selected, required this.onToggle});
+  const _MultiStep(
+      {required this.title, required this.options, required this.selected, required this.onToggle, this.lead});
   final String title;
+  final Widget? lead;
   final Map<String, String> options;
   final List<String> selected;
   final ValueChanged<String> onToggle;
@@ -266,6 +278,7 @@ class _MultiStep extends StatelessWidget {
         children: [
           Text(title, style: Theme.of(context).textTheme.headlineMedium),
           const SizedBox(height: AppSpacing.lg),
+          if (lead != null) lead!,
           for (final MapEntry(:key, :value) in options.entries)
             _OptionCard(label: value, selected: selected.contains(key), onTap: () => onToggle(key)),
         ],

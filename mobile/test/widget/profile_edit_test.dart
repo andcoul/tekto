@@ -46,9 +46,15 @@ void main() {
   });
 
   Future<void> seed() => db.into(db.users).insert(UsersCompanion.insert(
-        id: 'u-1', goal: 'muscle', level: 'beginner', daysPerWeek: 3, sessionLengthMin: 45,
-        equipment: jsonEncode(['dumbbell']), limitations: Value(jsonEncode(['knee'])),
-        limitationsNote: const Value('old ACL'), language: const Value('en'),
+        id: 'u-1',
+        goal: 'muscle',
+        level: 'beginner',
+        daysPerWeek: 3,
+        sessionLengthMin: 45,
+        equipment: jsonEncode(['dumbbell']),
+        limitations: Value(jsonEncode(['knee'])),
+        limitationsNote: const Value('old ACL'),
+        language: const Value('en'),
       ));
 
   Future<void> pump(WidgetTester tester) async {
@@ -65,7 +71,12 @@ void main() {
         appDatabaseProvider.overrideWithValue(db),
         currentUserIdProvider.overrideWithValue('u-1'),
         settingsServiceProvider.overrideWithValue(SettingsService(
-          db: db, queue: queue, api: api, userId: 'u-1', applyLocale: (_) {}, wipeLocalData: () async {},
+          db: db,
+          queue: queue,
+          api: api,
+          userId: 'u-1',
+          applyLocale: (_) {},
+          wipeLocalData: () async {},
         )),
       ],
       child: MaterialApp.router(
@@ -108,7 +119,8 @@ void main() {
     expect(find.byIcon(Icons.check_circle), findsOneWidget, reason: 'the saved goal is selected');
   });
 
-  testWidgets('saving updates the profile and queues it; regenerate is offered; cancel leaves the plan', (tester) async {
+  testWidgets('saving updates the profile and queues it; regenerate is offered; cancel leaves the plan',
+      (tester) async {
     await tester.runAsync(seed);
     await pump(tester);
     await tester.tap(find.text('Get stronger'));
@@ -117,7 +129,8 @@ void main() {
 
     final user = (await tester.runAsync(() => db.select(db.users).getSingle()))!;
     expect(user.goal, 'strength');
-    expect(jsonDecode(user.equipment), ['dumbbell'], reason: 'unchanged answers are kept');
+    expect(jsonDecode(user.equipment), ['dumbbell', 'bodyweight'],
+        reason: 'unchanged answers are kept; bodyweight is always added');
     expect(user.limitationsNote, 'old ACL');
     final q = (await tester.runAsync(queued))!;
     expect(q.single['id'], 'u-1');
@@ -143,5 +156,50 @@ void main() {
     }
     await tester.pumpAndSettle();
     expect(api.regenerations, 1);
+  });
+
+  // T144 — equipment choices (FR-001, clarified 2026-11-20).
+  Future<void> toEquipmentStep(WidgetTester tester) async {
+    for (var i = 0; i < 10 && find.text('Your equipment').evaluate().isEmpty; i++) {
+      await tester.tap(find.text('Next'));
+      await tester.pumpAndSettle();
+    }
+  }
+
+  const choices = [
+    'Barbell', 'Dumbbells / kettlebells', 'Cable', 'Machines', 'Resistance bands', 'Pull-up bar', 'Dip station',
+    'Bench', //
+  ];
+
+  testWidgets('the equipment step lists the eight choices and a Gym shortcut, with no Bodyweight option',
+      (tester) async {
+    await tester.runAsync(seed);
+    await pump(tester);
+    await toEquipmentStep(tester);
+    for (final label in choices) {
+      await tester.scrollUntilVisible(find.text(label), 100, scrollable: find.byType(Scrollable).last);
+      expect(find.text(label), findsOneWidget, reason: label);
+    }
+    expect(find.text('Bodyweight'), findsNothing, reason: 'bodyweight is always included');
+    await tester.scrollUntilVisible(find.text('Gym'), -100, scrollable: find.byType(Scrollable).last);
+    await tester.tap(find.text('Gym'));
+    await tester.pumpAndSettle();
+    await finish(tester);
+    final user = (await tester.runAsync(() => db.select(db.users).getSingle()))!;
+    expect(
+      (jsonDecode(user.equipment) as List).toSet(),
+      {'barbell', 'dumbbell', 'cable', 'machine', 'bands', 'pull_up_bar', 'dip_station', 'bench', 'bodyweight'},
+    );
+  });
+
+  testWidgets('a user with no equipment can continue and is saved as bodyweight only', (tester) async {
+    await tester.runAsync(seed);
+    await pump(tester);
+    await toEquipmentStep(tester);
+    await tester.tap(find.text('Dumbbells / kettlebells'));
+    await tester.pumpAndSettle();
+    await finish(tester);
+    final user = (await tester.runAsync(() => db.select(db.users).getSingle()))!;
+    expect(jsonDecode(user.equipment), ['bodyweight']);
   });
 }

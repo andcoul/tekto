@@ -4,7 +4,7 @@
 
 **Input**: Feature specification from `specs/001-tekto-ai-mvp/spec.md`, including Clarifications Session 2026-11-10
 
-**Constitution**: v2.0.1 (amended 2026-11-11)
+**Constitution**: v3.0.0 (amended 2026-11-20: §IV and Gate 1 accept reviewed AI-generated video)
 
 ---
 
@@ -77,7 +77,7 @@ Tekto is a premium, AI-first strength training app for iOS 16+ and Android 10+ p
 - Free tier: rule-based plan, 3 coach questions/ISO week, 1 form-check try per lift.
 
 **Scale/Scope**:
-- ≥ 150 exercises at launch (currently 15 in `content/exercises/exercises.json` — content workstream must close this gap before Gate 1)
+- ≥ 150 exercises at launch (84 in `content/exercises/exercises.json` on 2026-11-20 — content workstream must close this gap before Gate 1)
 - 4 personas; English and French
 - MVP: ~20 screens; 10 Edge Functions; 15 user/content entities (incl. `body_weight_entries`) + 2 system tables (`coach_response_cache`, `plan_templates`) + 1 local-only table (`sync_queue`)
 
@@ -87,21 +87,21 @@ Tekto is a premium, AI-first strength training app for iOS 16+ and Android 10+ p
 
 ## Constitution Check
 
-*GATE: evaluated against constitution v2.0.1 (2.0.1 only clarifies the wording of §IV; no new checks). Re-checked after Phase 1 design (below).*
+*GATE: evaluated against constitution v2.0.1 (2.0.1 only clarifies the wording of §IV; no new checks). Re-checked after Phase 1 design (below) and against v3.0.0 (2026-11-20).*
 
 | Principle | Requirement | Design response | Status |
 |---|---|---|---|
 | **I. Offline-First** | Core workout actions offline for all users; plan + exercise text on device before first workout; Pro videos offline once downloaded; free users see a non-blocking notice | Drift mirrors the active plan, sessions, plan exercises and the exercise text for every exercise in the plan for all users. Writes go through `sync_queue`. `VideoPlayerWidget` shows the Pro notice offline for free users without blocking. | ✅ PASS |
 | **II. Privacy by Default** | Frames on-device; `user_shared` default false; health data encrypted at rest + in transit; in-app export/delete; GDPR consent | SQLCipher on the Drift file (research §9). TLS for all traffic. Consent step after the health disclaimer, stored in `users.consent_at` / `consent_version` (data-model §1). Coach cache stores only answers the model marks as generic (`cacheable: true`), so no user's personalized answer is served to another user (research §8). | ✅ PASS |
 | **III. AI Safety** | All plans validated; video substitution; ≤ 2 retries; validated fallback with notice; injury referral; adversarial validation before prompt changes; unskippable disclaimer | Single `plan-validator.ts` for AI and template plans. Failure flow in research §12. Guardrail eval suite with ≥ 20 adversarial prompts (EN + FR) gates any change to the coach system prompt (research §14). | ✅ PASS |
-| **IV. Video Gate** | Every plan slug resolves to a row with non-null `video_front_url`; library extended only via `content/` pipeline; swaps reject `EXERCISE_NO_VIDEO` | Validator + seed-time check in `seed-exercises.js` and `seed-templates.js`; `swap-exercise` and `coach-confirm-change` re-check. Seeding fails if any row lacks video or captions. | ✅ PASS |
+| **IV. Video Gate** | Every plan slug resolves to a row with non-null `video_front_url`; videos filmed or AI-generated, each approved in a human form review (v3.0.0); library extended only via `content/` pipeline; swaps reject `EXERCISE_NO_VIDEO` | Clips are generated (Google Flow), reviewed frame by frame, then coach-reviewed; the review is recorded per clip in the content pipeline. Validator + seed-time check in `seed-exercises.js` and `seed-templates.js`; `swap-exercise` and `coach-confirm-change` re-check. Seeding fails if any row lacks video or captions. | ✅ PASS |
 | **V. Test-First** | Red-Green-Refactor for `PlanAdaptationService`, `FormScoreCalculator`, `RepCounter`, `CoachQuotaService`, subscription gates; edge cases; widget test per paywall screen; offline flush integration test | `/speckit-tasks` must order each test task **before** its implementation task. New units also covered test-first: `TemplatePlanBuilder`, `ExerciseSubstitution`, `FormCheckFreeTryService`, adaptation scheduler week-boundary logic. Widget tests for `PaywallScreen`, `TrialOfferScreen` and the in-workout paywall bottom sheet. | ✅ PASS (enforced via task order) |
 | **VI. Premium UX** | Dark-first tokens; one primary action in workout; purposeful haptics; non-modal AI cards; gym-sized tap targets; Dynamic Type, screen-reader labels, **captions on all videos** | WebVTT captions (EN + FR) required per exercise in the content schema; Cloudflare Stream serves them in HLS; Pro downloads include caption files (research §15). Adaptation and fallback notices are cards, never modals. | ✅ PASS |
 | **VII. Simplicity** | Spec-driven abstractions; Edge Functions only; justified dependencies; logged tech debt | No new services beyond Supabase + Cloudflare + Anthropic + RevenueCat. Built-in `gte-small` avoids a fourth AI vendor. Three unjustified packages flagged for removal (Technical Context). | ✅ PASS |
 | **Performance Standards** | All six metrics verified on reference devices before each release | One instrument per metric (Technical Context table; research §13). | ✅ PASS |
 | **Quality Gates** | Gate 1 items (5 journeys, perf, GDPR, ≥ 20 adversarial prompts, disclaimer, 150+ videos, privacy audit) | Each item maps to a validation scenario in [quickstart.md](./quickstart.md). 150+ videos is a content dependency outside engineering (see Scale/Scope). | ⚠️ PASS with tracked risk (content volume) |
 
-**Gate result**: PASS. No unjustified violations. The one open risk (exercise content volume: 15 of 150) is a dependency, not a design violation; it is tracked in Complexity Tracking and must be closed before Gate 1.
+**Gate result**: PASS. No unjustified violations. The one open risk (exercise content volume: 84 of 150 on 2026-11-20) is a dependency, not a design violation; it is tracked in Complexity Tracking and must be closed before Gate 1.
 
 **Post-design re-check (after Phase 1)**: re-evaluated against the updated [data-model.md](./data-model.md), [contracts/](./contracts/) and [quickstart.md](./quickstart.md). No new violations introduced. Status unchanged. Re-checked 2026-11-17 after research §16 (imagery and casting): content and design only, so no new violations, and VI (Premium UX) is strengthened.
 
@@ -240,5 +240,5 @@ tekto/
 | SQLCipher | Added | Constitution II: health data encrypted at rest on device |
 | Guardrail eval suite (real API calls) | Added | Constitution III requires adversarial validation. Costs a few cents per run; runs only when the coach prompt or model changes, and before each release. |
 | `plan_templates` table | Added | Free-tier plans (FR-002) need templates reachable at runtime; seeding keeps Video Gate checks |
-| **Tracked risk: content volume** | 15 of ≥ 150 exercises exist, plus the welcome clip (T125) and 4 paywall clips (T055), each ≤ 20 s with EN/FR captions | Blocks Gate 1 and makes the Pro plan validator reject most AI plans for narrow equipment sets. Owner: content workstream. Seeding warns below 150 in dev and fails in production. |
+| **Tracked risk: content volume** | 84 of ≥ 150 exercises exist (2026-11-20); the welcome and 4 paywall clips are done (T132) | Blocks Gate 1 and makes the Pro plan validator reject most AI plans for narrow equipment sets. Owner: content workstream. Seeding warns below 150 in dev and fails in production. |
 | **Tech debt resolved: tasks.md drift** | tasks.md regenerated on 2026-11-10 with no pre-checked tasks | Progress is tracked in tasks.md; `/speckit-converge` reconciles code against it. |
