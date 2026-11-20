@@ -6,8 +6,10 @@ import type { ValidationResult } from './plan-draft.ts';
 
 const codes = (r: ValidationResult) => [...new Set(r.errors.map((e) => e.code))].sort();
 
-// Baseline: 3× bench-press 5 sets (Mon/Wed/Fri) → chest 15 sets/week, ~12 min/session, 4 weeks.
-const baseline = () => plan([[ex('bench-press', { sets: 5 })], [ex('bench-press', { sets: 5 })], [ex('bench-press', { sets: 5 })]]);
+// Baseline: 3× (bench-press 5 sets + dumbbell-row 5 sets) (Mon/Wed/Fri) → chest 15 and lats 15 sets/week
+// (push:pull 1.0), ~23 min/session, 4 weeks.
+const session = (benchSets: number, rowSets = 5) => [ex('bench-press', { sets: benchSets }), ex('dumbbell-row', { sets: rowSets })];
+const baseline = () => plan([session(5), session(5), session(5)]);
 const p = profile();
 
 Deno.test('baseline plan is valid for AI and template sources', () => {
@@ -58,26 +60,64 @@ Deno.test('weeks_total must be between 4 and 12', () => {
   assertEquals(codes(validatePlan({ ...baseline(), weeks_total: 13 }, p, LIBRARY, 'template')), ['WEEKS']);
 });
 
-Deno.test('volume bounds apply to AI plans only', () => {
-  // 30 chest sets/week is above the intermediate maximum (18).
-  const tooMuch = plan([[ex('bench-press', { sets: 10 })], [ex('bench-press', { sets: 10 })], [ex('bench-press', { sets: 10 })]]);
-  // ~23 min sessions: fits 60 min, so VOLUME is the only error.
-  assertEquals(codes(validatePlan(tooMuch, p, LIBRARY, 'ai')), ['VOLUME']);
-  assertEquals(validatePlan(tooMuch, p, LIBRARY, 'template').valid, true);
-  assertEquals(validatePlan(tooMuch, p, LIBRARY, 'template_fallback').valid, true);
+Deno.test('the volume maximum applies to every plan source (FR-002a, Constitution III)', () => {
+  // 30 chest sets/week is above the intermediate maximum (18); push:pull 30/15 = 2.0 stays in range.
+  const tooMuch = plan([session(10), session(10), session(10)]);
+  // ~34 min sessions: fits 60 min, so VOLUME is the only error.
+  for (const source of ['ai', 'template', 'template_fallback'] as const) {
+    assertEquals(codes(validatePlan(tooMuch, p, LIBRARY, source)), ['VOLUME'], source);
+  }
+});
+
+Deno.test('the volume minimum applies to AI plans only', () => {
+  // 6 chest and 6 lats sets/week: below the intermediate minimum (14), but templates trimmed
+  // to short sessions cannot always reach it.
+  const light = plan([session(2, 2), session(2, 2), session(2, 2)]);
+  assertEquals(validatePlan(light, p, LIBRARY, 'template').valid, true);
+  assertEquals(validatePlan(light, p, LIBRARY, 'template_fallback').valid, true);
+  assertEquals(codes(validatePlan(light, p, LIBRARY, 'ai')), ['VOLUME']);
+});
+
+Deno.test('AI plans must keep weekly push:pull sets between 0.5 and 2.0', () => {
+  // No pulling at all: 15 chest sets, 0 pull sets.
+  const pushOnly = plan([[ex('bench-press', { sets: 5 })], [ex('bench-press', { sets: 5 })], [ex('bench-press', { sets: 5 })]]);
+  assertEquals(codes(validatePlan(pushOnly, p, LIBRARY, 'ai')), ['BALANCE']);
+  // 15 push vs 6 pull = 2.5 → too push-heavy.
+  const pushHeavy = plan([session(5, 2), session(5, 2), session(5, 2)]);
+  assertEquals(codes(validatePlan(pushHeavy, p, LIBRARY, 'ai')).includes('BALANCE'), true);
+  // 6 push vs 15 pull = 0.4 → too pull-heavy.
+  const pullHeavy = plan([session(2, 5), session(2, 5), session(2, 5)]);
+  assertEquals(codes(validatePlan(pullHeavy, p, LIBRARY, 'ai')).includes('BALANCE'), true);
+  // Exactly 2.0 is allowed (inclusive bound).
+  assertEquals(codes(validatePlan(plan([session(10), session(10), session(10)]), p, LIBRARY, 'ai')).includes('BALANCE'), false);
+  // Lower-body-only plans have no upper-body sets, so balance does not apply.
+  const legs = plan([[ex('goblet-squat', { sets: 5 })], [ex('dumbbell-rdl', { sets: 5 })], [ex('goblet-squat', { sets: 5 })]]);
+  assertEquals(codes(validatePlan(legs, profile({ limitations: [] }), LIBRARY, 'ai')).includes('BALANCE'), false);
+  // Templates are not balance-checked.
+  assertEquals(validatePlan(pushOnly, p, LIBRARY, 'template').valid, true);
 });
 
 Deno.test('AI plans below the level minimum for a trained major muscle are rejected', () => {
   // 6 chest sets/week is below the intermediate minimum (14).
-  const tooLittle = plan([[ex('bench-press', { sets: 2 })], [ex('bench-press', { sets: 2 })], [ex('bench-press', { sets: 2 })]]);
+  const tooLittle = plan([session(2, 2), session(2, 2), session(2, 2)]);
   const r = validatePlan(tooLittle, p, LIBRARY, 'ai');
   assertEquals(codes(r), ['VOLUME']);
   assert(r.errors[0].message.includes('chest'));
 });
 
 Deno.test('beginner and advanced volume bounds differ', () => {
-  // 15 chest sets/week: inside beginner max? No — beginner max is 14.
+  // 15 chest and 15 lats sets/week: above the beginner maximum (14).
   assertEquals(codes(validatePlan(baseline(), profile({ level: 'beginner' }), LIBRARY, 'ai')), ['VOLUME']);
   // 15 is below the advanced minimum (16).
   assertEquals(codes(validatePlan(baseline(), profile({ level: 'advanced' }), LIBRARY, 'ai')), ['VOLUME']);
+});
+
+// T142 — equipment beyond the loaded basics (FR-001, FR-013; clarified 2026-11-20).
+Deno.test('bar, dip station, bench and machine moves are rejected without that equipment', () => {
+  const dumbbells = profile({ equipment: ['dumbbell', 'bodyweight'] });
+  for (const slug of ['pull-up', 'chest-dip', 'bench-dip', 'incline-dumbbell-press', 'leg-press']) {
+    assertEquals(codes(validatePlan(plan([[ex(slug)]]), dumbbells, LIBRARY, 'template')), ['EQUIPMENT'], slug);
+  }
+  const home = profile({ equipment: ['dumbbell', 'bench', 'pull_up_bar', 'bodyweight'] });
+  assertEquals(validatePlan(plan([[ex('incline-dumbbell-press'), ex('pull-up')]]), home, LIBRARY, 'template').valid, true);
 });

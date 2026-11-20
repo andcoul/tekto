@@ -17,22 +17,27 @@ const _failed = 'failed';
 /// [flush] processes the queue in insertion order and replays each operation
 /// against the Supabase REST API via [TektoDioClient].
 class SyncQueue {
-  SyncQueue({required this.db, required this.dio}) {
-    _startConnectivityListener();
+  /// [connectivityChanges] defaults to the platform connectivity stream; tests inject their own.
+  SyncQueue({
+    required this.db,
+    required this.dio,
+    Stream<List<ConnectivityResult>>? connectivityChanges,
+  }) {
+    _connectivitySub = (connectivityChanges ?? Connectivity().onConnectivityChanged).listen((results) {
+      if (results.any((r) => r != ConnectivityResult.none)) {
+        unawaited(flush());
+      }
+    });
   }
 
   final AppDatabase db;
   final TektoDioClient dio;
 
   StreamSubscription<List<ConnectivityResult>>? _connectivitySub;
+  Future<void>? _running;
 
-  void _startConnectivityListener() {
-    _connectivitySub = Connectivity().onConnectivityChanged.listen((results) {
-      if (results.any((r) => r != ConnectivityResult.none)) {
-        flush();
-      }
-    });
-  }
+  /// Completes when no flush is in progress.
+  Future<void> get idle => _running ?? Future<void>.value();
 
   /// Enqueue a write operation. Returns immediately — does NOT wait for network.
   Future<void> enqueue({
@@ -52,8 +57,13 @@ class SyncQueue {
   /// Process all pending queue entries in insertion order.
   /// Called automatically on reconnect and manually after app foreground.
   /// A row that fails [_maxRetries] times is marked `failed` for manual review and
-  /// never blocks the rows after it.
-  Future<void> flush() async {
+  /// never blocks the rows after it. Overlapping calls share one pass, so a row is
+  /// never sent twice (reconnect events and foreground flushes can coincide).
+  Future<void> flush() {
+    return _running ??= _flushPending().whenComplete(() => _running = null);
+  }
+
+  Future<void> _flushPending() async {
     final pending = await (db.select(db.syncQueueTable)
           ..where((q) => q.status.equals(_pending))
           ..orderBy([(q) => OrderingTerm.asc(q.id)]))
@@ -62,17 +72,13 @@ class SyncQueue {
     for (final entry in pending) {
       try {
         await _replay(entry);
-        await (db.delete(db.syncQueueTable)
-              ..where((q) => q.id.equals(entry.id)))
-            .go();
+        await (db.delete(db.syncQueueTable)..where((q) => q.id.equals(entry.id))).go();
       } on Exception {
         final retries = entry.retryCount + 1;
-        await (db.update(db.syncQueueTable)
-              ..where((q) => q.id.equals(entry.id)))
-            .write(SyncQueueTableCompanion(
-              retryCount: Value(retries),
-              status: Value(retries >= _maxRetries ? _failed : _pending),
-            ));
+        await (db.update(db.syncQueueTable)..where((q) => q.id.equals(entry.id))).write(SyncQueueTableCompanion(
+          retryCount: Value(retries),
+          status: Value(retries >= _maxRetries ? _failed : _pending),
+        ));
       }
     }
   }
@@ -83,21 +89,19 @@ class SyncQueue {
 
     switch (entry.operation) {
       case 'insert':
-        await dio.post(path, data: payload);
+        await dio.post<dynamic>(path, data: payload);
       case 'update':
         final id = payload['id'] as String?;
         if (id == null) return;
-        await dio.patch('$path?id=eq.$id', data: payload);
+        await dio.patch<dynamic>('$path?id=eq.$id', data: payload);
       case 'delete':
         final id = payload['id'] as String?;
         if (id == null) return;
-        await dio.delete('$path?id=eq.$id');
+        await dio.delete<dynamic>('$path?id=eq.$id');
     }
   }
 
-  Future<int> pendingCount() => db.syncQueueTable
-      .count(where: (q) => q.status.equals(_pending))
-      .getSingle();
+  Future<int> pendingCount() => db.syncQueueTable.count(where: (q) => q.status.equals(_pending)).getSingle();
 
   void dispose() {
     _connectivitySub?.cancel();

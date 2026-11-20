@@ -19,6 +19,12 @@ SupabaseClient supabaseClient(Ref ref) {
   return Supabase.instance.client;
 }
 
+/// The signed-in user's id, or null when signed out. Overridden in widget tests.
+final currentUserIdProvider = Provider<String?>((ref) => Supabase.instance.client.auth.currentUser?.id);
+
+/// Wall clock, injectable so "today" can be fixed in tests.
+final clockProvider = Provider<DateTime Function()>((ref) => DateTime.now);
+
 // ── Secure storage ────────────────────────────────────────────────────────
 
 @riverpod

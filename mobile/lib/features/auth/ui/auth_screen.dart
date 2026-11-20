@@ -1,3 +1,4 @@
+import 'package:tekto/core/l10n/gen/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -28,7 +29,10 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
   }
 
   Future<void> _signInApple() async {
-    setState(() { _loading = true; _error = null; });
+    setState(() {
+      _loading = true;
+      _error = null;
+    });
     try {
       await ref.read(authServiceProvider).signInWithApple();
     } catch (e) {
@@ -39,7 +43,10 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
   }
 
   Future<void> _signInGoogle() async {
-    setState(() { _loading = true; _error = null; });
+    setState(() {
+      _loading = true;
+      _error = null;
+    });
     try {
       await ref.read(authServiceProvider).signInWithGoogle();
     } catch (e) {
@@ -50,7 +57,10 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
   }
 
   Future<void> _signInEmail() async {
-    setState(() { _loading = true; _error = null; });
+    setState(() {
+      _loading = true;
+      _error = null;
+    });
     try {
       final auth = ref.read(authServiceProvider);
       final email = _emailController.text.trim();
@@ -86,7 +96,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                   fontFamily: 'Inter',
                   fontSize: 48,
                   fontWeight: FontWeight.w700,
-                  color: AppColors.accent,
+                  color: AppColors.glacier,
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -94,7 +104,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
               Text(
                 'Build your strength.',
                 style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      color: AppColors.onDarkSecondary,
+                      color: AppColors.mist,
                     ),
                 textAlign: TextAlign.center,
               ),
@@ -105,7 +115,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                   padding: const EdgeInsets.only(bottom: 16),
                   child: Text(
                     _error!,
-                    style: const TextStyle(color: AppColors.error),
+                    style: const TextStyle(color: AppColors.danger),
                     textAlign: TextAlign.center,
                   ),
                 ),
@@ -113,21 +123,19 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
               if (!_showEmail) ...[
                 _SocialButton(
                   icon: Icons.apple,
-                  label: 'Continue with Apple',
+                  label: AppLocalizations.of(context).authApple,
                   onPressed: _loading ? null : _signInApple,
                 ),
                 const SizedBox(height: 12),
                 _SocialButton(
                   icon: Icons.g_mobiledata_rounded,
-                  label: 'Continue with Google',
+                  label: AppLocalizations.of(context).authGoogle,
                   onPressed: _loading ? null : _signInGoogle,
                 ),
                 const SizedBox(height: 12),
                 TextButton(
-                  onPressed: _loading
-                      ? null
-                      : () => setState(() => _showEmail = true),
-                  child: const Text('Sign in with email'),
+                  onPressed: _loading ? null : () => setState(() => _showEmail = true),
+                  child: Text(AppLocalizations.of(context).authEmail),
                 ),
               ] else ...[
                 TextField(
@@ -150,7 +158,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                           width: 20,
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
-                            color: AppColors.onDark,
+                            color: AppColors.ink,
                           ),
                         )
                       : Text(_creatingAccount ? 'Create account' : 'Sign in'),
@@ -190,8 +198,8 @@ class _SocialButton extends StatelessWidget {
         label: Text(label),
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.charcoalElevated,
-          foregroundColor: AppColors.onDark,
+          backgroundColor: AppColors.deep,
+          foregroundColor: AppColors.frost,
         ),
       );
 }

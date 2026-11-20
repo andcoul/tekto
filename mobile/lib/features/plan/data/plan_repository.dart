@@ -74,6 +74,10 @@ class PlanRepository {
       lastAdaptedWeek: Value(row['last_adapted_week'] as int? ?? 0),
       source: Value(row['source'] as String? ?? 'ai'),
       templateSlug: Value(row['template_slug'] as String?),
+      rationaleEn: Value(row['rationale_en'] as String?),
+      rationaleFr: Value(row['rationale_fr'] as String?),
+      // Weekly summaries from adapt-plan (both triggers), shown as a card until seen (T086).
+      adaptationLog: Value(jsonEncode(row['adaptation_log'] ?? const [])),
     ));
   }
 
@@ -104,6 +108,7 @@ class PlanRepository {
             repsMin: e['reps_min'] as int,
             repsMax: e['reps_max'] as int,
             rpeTarget: Value((e['rpe_target'] as num?)?.toDouble()),
+            rirTarget: Value(e['rir_target'] as int?),
             restSec: Value(e['rest_sec'] as int? ?? 90),
             suggestedWeightKg: Value((e['suggested_weight_kg'] as num?)?.toDouble()),
           ),

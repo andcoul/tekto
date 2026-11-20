@@ -34,11 +34,7 @@ class FilteredExercises extends _$FilteredExercises {
       all = all.where((e) => e.equipment.contains(equipment)).toList();
     }
     if (muscle != null) {
-      all = all
-          .where((e) =>
-              e.musclePrimary.contains(muscle) ||
-              e.muscleSecondary.contains(muscle))
-          .toList();
+      all = all.where((e) => e.musclePrimary.contains(muscle) || e.muscleSecondary.contains(muscle)).toList();
     }
     if (query != null && query.isNotEmpty) {
       final q = query.toLowerCase();

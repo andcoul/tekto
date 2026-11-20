@@ -1,3 +1,5 @@
+import 'package:tekto/core/l10n/gen/app_localizations.dart';
+import 'package:tekto/features/coach/ui/coach_launcher.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -19,12 +21,25 @@ class _ExerciseListScreenState extends ConsumerState<ExerciseListScreen> {
   String _query = '';
 
   static const _muscleGroups = [
-    'quadriceps', 'glutes', 'hamstrings', 'chest', 'shoulders',
-    'lats', 'traps', 'biceps', 'triceps', 'core', 'erectors',
+    'quadriceps',
+    'glutes',
+    'hamstrings',
+    'chest',
+    'shoulders',
+    'lats',
+    'traps',
+    'biceps',
+    'triceps',
+    'core',
+    'erectors',
   ];
 
   static const _equipment = [
-    'barbell', 'dumbbell', 'cable', 'bodyweight', 'bands',
+    'barbell',
+    'dumbbell',
+    'cable',
+    'bodyweight',
+    'bands',
   ];
 
   @override
@@ -39,7 +54,8 @@ class _ExerciseListScreenState extends ConsumerState<ExerciseListScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Exercise Library'),
+        title: Text(AppLocalizations.of(context).libraryTitle),
+        actions: const [CoachButton(screen: 'library')],
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(60),
           child: Padding(
@@ -52,6 +68,7 @@ class _ExerciseListScreenState extends ConsumerState<ExerciseListScreen> {
                 suffixIcon: _query.isNotEmpty
                     ? IconButton(
                         icon: const Icon(Icons.clear),
+                        tooltip: AppLocalizations.of(context).libraryClearSearch,
                         onPressed: () => setState(() => _query = ''),
                       )
                     : null,
@@ -67,22 +84,18 @@ class _ExerciseListScreenState extends ConsumerState<ExerciseListScreen> {
             equipment: _equipment,
             selectedMuscle: _selectedMuscle,
             selectedEquipment: _selectedEquipment,
-            onMuscleSelected: (m) => setState(() =>
-                _selectedMuscle = _selectedMuscle == m ? null : m),
-            onEquipmentSelected: (e) => setState(() =>
-                _selectedEquipment = _selectedEquipment == e ? null : e),
+            onMuscleSelected: (m) => setState(() => _selectedMuscle = _selectedMuscle == m ? null : m),
+            onEquipmentSelected: (e) => setState(() => _selectedEquipment = _selectedEquipment == e ? null : e),
           ),
           Expanded(
             child: exercisesAsync.when(
-              loading: () =>
-                  const Center(child: CircularProgressIndicator()),
-              error: (e, _) => Center(child: Text('Error: $e')),
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (e, _) => Center(child: Text(AppLocalizations.of(context).commonLoadError)),
               data: (exercises) => exercises.isEmpty
-                  ? const Center(child: Text('No exercises found.'))
+                  ? Center(child: Text(AppLocalizations.of(context).libraryEmpty))
                   : ListView.builder(
                       itemCount: exercises.length,
-                      itemBuilder: (context, index) =>
-                          _ExerciseRow(exercise: exercises[index]),
+                      itemBuilder: (context, index) => _ExerciseRow(exercise: exercises[index]),
                     ),
             ),
           ),
@@ -143,8 +156,7 @@ class _FilterChips extends StatelessWidget {
     );
   }
 
-  static String _capitalize(String s) =>
-      s.isEmpty ? s : s[0].toUpperCase() + s.substring(1);
+  static String _capitalize(String s) => s.isEmpty ? s : s[0].toUpperCase() + s.substring(1);
 }
 
 class _ExerciseRow extends StatelessWidget {
@@ -162,10 +174,10 @@ class _ExerciseRow extends StatelessWidget {
         width: 56,
         height: 56,
         decoration: BoxDecoration(
-          color: AppColors.charcoalElevated,
+          color: AppColors.deep,
           borderRadius: BorderRadius.circular(8),
         ),
-        child: const Icon(Icons.fitness_center, color: AppColors.accent),
+        child: const Icon(Icons.fitness_center, color: AppColors.glacier),
       ),
       title: Text(exercise.nameEn),
       subtitle: Text(

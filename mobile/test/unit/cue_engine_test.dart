@@ -3,7 +3,7 @@ import 'package:tekto/shared/services/form_check/cue_engine.dart';
 import 'package:tekto/shared/services/form_check/pose_analyzer.dart';
 
 // ---------------------------------------------------------------------------
-// T084 — CueEngine unit tests
+// T060 — CueEngine unit tests
 // ---------------------------------------------------------------------------
 
 void main() {
@@ -94,7 +94,33 @@ void main() {
       );
 
       final cues = engine.evaluate(result);
-      expect(cues.length, lessThanOrEqualTo(3));
+      expect(cues.length, 3);
+    });
+
+    test('with more than 3 violations, the 3 returned are the highest severity', () {
+      const result = FormFrameResult(
+        // 2 warnings first, then 3 errors.
+        activeCues: ['depth_too_shallow', 'elbow_flare', 'knee_cave', 'back_rounding', 'hips_sagging'],
+        repDetected: false,
+        jointAngleSnapshot: {},
+        confidence: 0.9,
+      );
+
+      final cues = engine.evaluate(result);
+      expect(cues.map((c) => c.key), ['knee_cave', 'back_rounding', 'hips_sagging']);
+      expect(cues.every((c) => c.severity == CueSeverity.error), isTrue);
+    });
+
+    test('a warning is kept when fewer than 3 errors exist', () {
+      const result = FormFrameResult(
+        activeCues: ['depth_too_shallow', 'elbow_flare', 'knee_cave', 'back_rounding'],
+        repDetected: false,
+        jointAngleSnapshot: {},
+        confidence: 0.9,
+      );
+
+      final cues = engine.evaluate(result);
+      expect(cues.map((c) => c.key), ['knee_cave', 'back_rounding', 'depth_too_shallow']);
     });
 
     test('returns empty list when no active cues and confidence is high', () {

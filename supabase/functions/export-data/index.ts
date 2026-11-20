@@ -1,88 +1,50 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
-import { getAuthUser, errorResponse, jsonResponse } from '../_shared/auth.ts';
+import { errorResponse, getAuthUser, jsonResponse } from '../_shared/auth.ts';
 import { getDb } from '../_shared/db.ts';
+import { buildExport } from './export.ts';
 
-// ---------------------------------------------------------------------------
-// GDPR data export — FR-034
-// ---------------------------------------------------------------------------
-// Serializes all user rows from all 14 tables to JSON.
-// Uploads to private Supabase Storage.
-// Returns signed 1-hour download URL.
-
-const USER_TABLES = [
-  'users',
-  'plans',
-  'sessions',
-  'plan_exercises',
-  'workout_logs',
-  'set_logs',
-  'personal_records',
-  'coach_conversations',
-  'coach_messages',
-  'coach_quota_usage',
-  'form_check_sessions',
-  'subscriptions',
-];
+// POST /export-data — contracts/backend-api.md §7 (FR-037, FR-038, Constitution II).
+// Synchronous: one JSON file of every user-owned table (export.ts), stored in the private
+// `exports` bucket (migration 012) at <user_id>/<job_id>.json and signed for 1 hour.
+const BUCKET = 'exports';
+const URL_TTL_SEC = 3600;
 
 serve(async (req: Request) => {
   if (req.method !== 'POST') return errorResponse('Method not allowed', 405);
 
   const user = await getAuthUser(req);
-  if (!user) return errorResponse('Unauthorized', 401);
+  if (!user) return errorResponse('Unauthorized', 401, 'UNAUTHORIZED');
 
   const db = getDb();
-  const exportData: Record<string, unknown[]> = {};
-
-  // ---- Fetch all user data ----
-  for (const table of USER_TABLES) {
-    if (table === 'users') {
-      const { data } = await db
-        .from(table)
-        .select('*')
-        .eq('id', user.id);
-      exportData[table] = data ?? [];
-    } else if (['plans', 'coach_conversations', 'coach_quota_usage',
-                 'form_check_sessions', 'subscriptions'].includes(table)) {
-      const { data } = await db.from(table).select('*').eq('user_id', user.id);
-      exportData[table] = data ?? [];
-    } else {
-      // For nested tables, do a best-effort fetch (may require joins in production)
-      exportData[table] = [];
-    }
-  }
-
-  const exportJson = JSON.stringify({
-    exported_at: new Date().toISOString(),
-    user_id: user.id,
-    data: exportData,
-  }, null, 2);
-
-  const jobId = crypto.randomUUID();
-  const fileName = `exports/${user.id}/${jobId}.json`;
-
-  // ---- Upload to Supabase Storage ----
-  const { error: uploadError } = await db.storage
-    .from('user-exports')
-    .upload(fileName, new Blob([exportJson], { type: 'application/json' }), {
-      contentType: 'application/json',
+  try {
+    const data = await buildExport(user.id, {
+      select: async (table, column, values) => {
+        const { data, error } = await db.from(table).select('*').in(column, values);
+        if (error) throw new Error(`${table}: ${error.message}`);
+        return data ?? [];
+      },
     });
 
-  if (uploadError) {
-    console.error('Upload error:', uploadError);
-    return errorResponse('Failed to generate export', 500);
+    const jobId = crypto.randomUUID();
+    const path = `${user.id}/${jobId}.json`;
+    const exportedAt = new Date();
+    const file = JSON.stringify({ exported_at: exportedAt.toISOString(), user_id: user.id, data }, null, 2);
+
+    const { error: uploadError } = await db.storage
+      .from(BUCKET)
+      .upload(path, new Blob([file], { type: 'application/json' }), { contentType: 'application/json' });
+    if (uploadError) throw new Error(`upload: ${uploadError.message}`);
+
+    const { data: signed, error: signError } = await db.storage.from(BUCKET).createSignedUrl(path, URL_TTL_SEC);
+    if (signError || !signed) throw new Error(`sign: ${signError?.message}`);
+
+    return jsonResponse({
+      job_id: jobId,
+      download_url: signed.signedUrl,
+      expires_at: new Date(exportedAt.getTime() + URL_TTL_SEC * 1000).toISOString(),
+    });
+  } catch (err) {
+    console.error(JSON.stringify({ event: 'export_failed', error: String(err) }));
+    return errorResponse('Failed to generate export', 500, 'EXPORT_FAILED');
   }
-
-  // ---- Create signed URL (1 hour) ----
-  const { data: signedUrl, error: urlError } = await db.storage
-    .from('user-exports')
-    .createSignedUrl(fileName, 3600);
-
-  if (urlError || !signedUrl) {
-    return errorResponse('Failed to create download URL', 500);
-  }
-
-  return jsonResponse({
-    job_id: jobId,
-    download_url: signedUrl.signedUrl,
-  });
 });

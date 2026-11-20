@@ -16,6 +16,11 @@ export const FIXTURE_ROWS: LibraryExercise[] = [
   { slug: 'dumbbell-row', equipment: ['dumbbell'], muscle_primary: ['lats'], video_front_url: v('dumbbell-row'), contraindications: [] },
   { slug: 'deadlift', equipment: ['barbell'], muscle_primary: ['hamstrings', 'glutes'], video_front_url: v('deadlift'), contraindications: ['lower_back'] },
   { slug: 'dumbbell-rdl', equipment: ['dumbbell'], muscle_primary: ['hamstrings', 'glutes'], video_front_url: v('dumbbell-rdl'), contraindications: ['lower_back'] },
+  // Equipment beyond the loaded basics (FR-001, FR-013 — clarified 2026-11-20).
+  { slug: 'pull-up', equipment: ['bodyweight', 'pull_up_bar'], muscle_primary: ['lats'], video_front_url: v('pull-up'), contraindications: ['shoulder'] },
+  { slug: 'chest-dip', equipment: ['bodyweight', 'dip_station'], muscle_primary: ['chest'], video_front_url: v('chest-dip'), contraindications: ['shoulder'] },
+  { slug: 'bench-dip', equipment: ['bodyweight', 'bench'], muscle_primary: ['triceps'], video_front_url: v('bench-dip'), contraindications: ['shoulder'] },
+  { slug: 'incline-dumbbell-press', equipment: ['dumbbell', 'bench'], muscle_primary: ['chest'], video_front_url: v('incline-dumbbell-press'), contraindications: ['shoulder'] },
 ];
 
 export const LIBRARY = libraryFrom(FIXTURE_ROWS);

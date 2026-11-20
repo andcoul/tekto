@@ -49,3 +49,23 @@ Deno.test('isAllowed: equipment must be available, bodyweight always is; limitat
   assertEquals(isAllowed(LIBRARY.get('dumbbell-row')!, p), true);
   assertEquals(isAllowed(LIBRARY.get('dumbbell-rdl')!, profile({ limitations: ['lower_back'] })), false);
 });
+
+// T142 — equipment beyond the loaded basics (FR-001, FR-013, spec Edge Cases; clarified 2026-11-20).
+Deno.test('isAllowed: bar, dip station, bench and machine moves need that equipment', () => {
+  const dumbbells = profile({ equipment: ['dumbbell', 'bodyweight'] });
+  for (const slug of ['pull-up', 'chest-dip', 'bench-dip', 'incline-dumbbell-press', 'leg-press']) {
+    assertEquals(isAllowed(LIBRARY.get(slug)!, dumbbells), false, slug);
+  }
+  assertEquals(isAllowed(LIBRARY.get('leg-press')!, profile({ equipment: ['cable'] })), false, 'cable is not machine');
+  assertEquals(isAllowed(LIBRARY.get('leg-press')!, profile({ equipment: ['machine'] })), true);
+  assertEquals(isAllowed(LIBRARY.get('pull-up')!, profile({ equipment: ['pull_up_bar'] })), true);
+  assertEquals(isAllowed(LIBRARY.get('incline-dumbbell-press')!, profile({ equipment: ['dumbbell', 'bench'] })), true);
+});
+
+Deno.test('a dumbbell-only user is never offered a bar or dip-station substitute', () => {
+  const dumbbells = profile({ equipment: ['dumbbell', 'bodyweight'] });
+  assertEquals(findSubstitute('barbell-row', dumbbells, LIBRARY)?.slug, 'dumbbell-row');
+  assertEquals(findSubstitute('barbell-row', dumbbells, LIBRARY, { exclude: new Set(['dumbbell-row']) }), null);
+  const noShoulder = profile({ equipment: ['dumbbell', 'bodyweight', 'dip_station'] });
+  assertEquals(findSubstitute('bench-press', noShoulder, LIBRARY, { exclude: new Set(['dumbbell-bench-press', 'push-up']) })?.slug, 'chest-dip');
+});

@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 
@@ -5,6 +6,7 @@ import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:tekto/shared/models/equipment.dart';
 
 part 'database.g.dart';
 
@@ -72,11 +74,14 @@ class Plans extends Table {
   IntColumn get lastAdaptedWeek => integer().withDefault(const Constant(0))();
   TextColumn get source => text().withDefault(const Constant('ai'))(); // ai | template | template_fallback
   TextColumn get templateSlug => text().nullable()();
+
   /// Deprecated: superseded by [source] / [templateSlug] (migration 005).
   TextColumn get generatedBy => text().withDefault(const Constant('ai'))();
   TextColumn get rationaleEn => text().nullable()();
   TextColumn get rationaleFr => text().nullable()();
   TextColumn get adaptationLog => text().withDefault(const Constant('[]'))(); // JSON
+  /// Device-only: the newest adaptation week whose card the user dismissed or opened (T086). v3.
+  IntColumn get adaptationSeenWeek => integer().withDefault(const Constant(0))();
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
   DateTimeColumn get updatedAt => dateTime().withDefault(currentDateAndTime)();
 
@@ -108,6 +113,9 @@ class PlanExercises extends Table {
   IntColumn get repsMin => integer()();
   IntColumn get repsMax => integer()();
   RealColumn get rpeTarget => real().nullable()();
+
+  /// Reps in reserve target (0–5); exclusive with [rpeTarget] (data-model plan_exercises). v2.
+  IntColumn get rirTarget => integer().nullable()();
   IntColumn get restSec => integer().withDefault(const Constant(90))();
   RealColumn get suggestedWeightKg => real().nullable()();
 
@@ -207,7 +215,8 @@ class FormCheckSessions extends Table {
   TextColumn get topTipEn => text().nullable()();
   TextColumn get topTipFr => text().nullable()();
   BoolColumn get wasFreeTry => boolean().withDefault(const Constant(false))();
-  BoolColumn get userShared => boolean().withDefault(const Constant(false))(); // Principle II: false unless the user confirms a share
+  BoolColumn get userShared =>
+      boolean().withDefault(const Constant(false))(); // Principle II: false unless the user confirms a share
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
 
   @override
@@ -228,6 +237,23 @@ class Subscriptions extends Table {
 
   @override
   Set<Column> get primaryKey => {id};
+}
+
+/// One body-weight measurement (FR-041, data-model entity 17). Synced through the queue. v2.
+class BodyWeightEntries extends Table {
+  TextColumn get id => text()();
+  TextColumn get userId => text()();
+  RealColumn get weightKg => real()(); // always kg; shown in the user's unit
+  DateTimeColumn get measuredOn => dateTime()(); // local date at midnight
+  DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
+
+  @override
+  Set<Column> get primaryKey => {id};
+
+  @override
+  List<Set<Column>> get uniqueKeys => [
+        {userId, measuredOn},
+      ];
 }
 
 /// Device-only (never synced): one row per exercise downloaded on this device (Pro only).
@@ -274,6 +300,7 @@ class SyncQueueTable extends Table {
   Subscriptions,
   ExerciseVideoDownloads,
   SyncQueueTable,
+  BodyWeightEntries,
 ])
 class AppDatabase extends _$AppDatabase {
   /// Production database: SQLCipher-encrypted file, key in the OS keystore (Constitution II).
@@ -282,8 +309,32 @@ class AppDatabase extends _$AppDatabase {
   /// Tests: pass e.g. `NativeDatabase.memory()`.
   AppDatabase.forTesting(super.executor);
 
+  /// v2 (2026-11-15): plan_exercises.rir_target, body_weight_entries.
+  /// v3 (2026-11-16): plans.adaptation_seen_week (device-only).
+  /// v4 (2026-11-20): users.equipment remapped to the new vocabulary (migration 014, T150).
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 4;
+
+  @override
+  MigrationStrategy get migration => MigrationStrategy(
+        onCreate: (m) => m.createAll(),
+        onUpgrade: (m, from, to) async {
+          if (from < 2) {
+            await m.addColumn(planExercises, planExercises.rirTarget);
+            await m.createTable(bodyWeightEntries);
+          }
+          if (from < 3) {
+            await m.addColumn(plans, plans.adaptationSeenWeek);
+          }
+          if (from < 4) {
+            for (final u in await select(users).get()) {
+              final old = (jsonDecode(u.equipment) as List).cast<String>();
+              await (update(users)..where((t) => t.id.equals(u.id)))
+                  .write(UsersCompanion(equipment: Value(jsonEncode(remapLegacyEquipment(old)))));
+            }
+          }
+        },
+      );
 
   /// Deletes the encrypted database file and its key (account deletion). The instance is
   /// unusable afterwards; recreate the provider.
@@ -312,9 +363,7 @@ Future<String> _databaseKey() async {
   final existing = await _keyStorage.read(key: _keyName);
   if (existing != null) return existing;
   final random = Random.secure();
-  final key = List.generate(32, (_) => random.nextInt(256))
-      .map((b) => b.toRadixString(16).padLeft(2, '0'))
-      .join();
+  final key = List.generate(32, (_) => random.nextInt(256)).map((b) => b.toRadixString(16).padLeft(2, '0')).join();
   await _keyStorage.write(key: _keyName, value: key);
   return key;
 }

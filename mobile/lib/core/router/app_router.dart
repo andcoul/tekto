@@ -1,10 +1,12 @@
+import 'package:tekto/core/l10n/gen/app_localizations.dart';
+import '../../shared/widgets/tekto_tab_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../features/auth/data/auth_service.dart';
+import '../../features/auth/data/user_profile_provider.dart';
 import '../../features/auth/ui/auth_screen.dart';
 import '../../features/coach/ui/coach_screen.dart';
 import '../../features/form_check/ui/form_check_screen.dart';
@@ -18,6 +20,7 @@ import '../../features/onboarding/ui/health_disclaimer_screen.dart';
 import '../../features/onboarding/ui/onboarding_quiz_screen.dart';
 import '../../features/onboarding/ui/plan_generation_screen.dart';
 import '../../features/onboarding/ui/trial_offer_screen.dart';
+import '../../features/onboarding/ui/welcome_screen.dart';
 import '../../features/plan/domain/adaptation_provider.dart';
 import '../../features/plan/ui/adaptation_summary_screen.dart';
 import '../../features/plan/ui/plan_overview_screen.dart';
@@ -31,15 +34,6 @@ import '../../features/workout/ui/workout_summary_screen.dart';
 import '../../shared/services/form_check/form_score_calculator.dart';
 
 part 'app_router.g.dart';
-
-/// The signed-in user's `users` row (null before onboarding saves it). Drives onboarding
-/// entry and re-consent in the router.
-@riverpod
-Future<Map<String, dynamic>?> userProfile(Ref ref) async {
-  final user = ref.watch(authStateProvider).value;
-  if (user == null) return null;
-  return Supabase.instance.client.from('users').select('consent_version').eq('id', user.id).maybeSingle();
-}
 
 @Riverpod(keepAlive: true)
 GoRouter appRouter(Ref ref) {
@@ -61,8 +55,8 @@ GoRouter appRouter(Ref ref) {
       final profile = ref.read(userProfileProvider);
       final onboarding = ref.read(onboardingControllerProvider);
 
-      // 1. Everything except /auth needs a signed-in user (the profile is saved per user).
-      if (!isAuthenticated) return location == '/auth' ? null : '/auth';
+      // 1. Signed out: only the welcome screen and sign-in (the profile is saved per user).
+      if (!isAuthenticated) return signedOutRedirect(location);
 
       final inOnboarding = location.startsWith('/onboarding');
       if (profile.hasValue) {
@@ -74,13 +68,14 @@ GoRouter appRouter(Ref ref) {
           return '/onboarding/reconsent';
         }
       }
-      if (location == '/auth') return '/home';
+      if (location == '/auth' || location == '/onboarding/welcome') return '/home';
 
       // 4. Disclaimer → consent → quiz order (Constitution II/III).
       return onboardingRedirect(
         location: location,
         disclaimerAccepted: onboarding.disclaimerAccepted,
         consentGiven: onboarding.consentGiven,
+        planGenerated: onboarding.result != null,
       );
     },
     routes: [
@@ -91,6 +86,10 @@ GoRouter appRouter(Ref ref) {
       ),
 
       // ── Onboarding ──────────────────────────────────────────────────────
+      GoRoute(
+        path: '/onboarding/welcome',
+        builder: (context, state) => const WelcomeScreen(),
+      ),
       GoRoute(
         path: '/onboarding/disclaimer',
         builder: (context, state) => const HealthDisclaimerScreen(),
@@ -109,7 +108,8 @@ GoRouter appRouter(Ref ref) {
       ),
       GoRoute(
         path: '/onboarding/generating',
-        builder: (context, state) => const PlanGenerationScreen(),
+        // `?upgrade=1`: a trial was just started → regenerate as an AI plan (FR-004).
+        builder: (context, state) => PlanGenerationScreen(upgrade: state.uri.queryParameters['upgrade'] == '1'),
       ),
       GoRoute(
         path: '/onboarding/trial',
@@ -117,13 +117,41 @@ GoRouter appRouter(Ref ref) {
       ),
 
       // ── Main shell ──────────────────────────────────────────────────────
-      GoRoute(
-        path: '/home',
-        builder: (context, state) => const HomeScreen(),
-      ),
-      GoRoute(
-        path: '/plan',
-        builder: (context, state) => const PlanOverviewScreen(),
+      // Home, Plan, Library and Progress share the floating tab bar (TabShell);
+      // deeper screens such as an exercise detail hide it.
+      ShellRoute(
+        builder: (context, state, child) => TabShell(location: state.uri.path, child: child),
+        routes: [
+          GoRoute(
+            path: '/home',
+            builder: (context, state) => const HomeScreen(),
+          ),
+          GoRoute(
+            path: '/plan',
+            builder: (context, state) => const PlanOverviewScreen(),
+          ),
+
+          // ── Library ─────────────────────────────────────────────────────────
+          GoRoute(
+            path: '/library',
+            builder: (context, state) => const ExerciseListScreen(),
+            routes: [
+              GoRoute(
+                path: ':exerciseSlug',
+                builder: (context, state) {
+                  final slug = state.pathParameters['exerciseSlug']!;
+                  return ExerciseDetailScreen(exerciseSlug: slug);
+                },
+              ),
+            ],
+          ),
+
+          // ── Progress ────────────────────────────────────────────────────────
+          GoRoute(
+            path: '/progress',
+            builder: (context, state) => const ProgressScreen(),
+          ),
+        ],
       ),
 
       // ── Workout ─────────────────────────────────────────────────────────
@@ -138,23 +166,8 @@ GoRouter appRouter(Ref ref) {
         path: '/workout/:sessionId/summary',
         builder: (context, state) {
           final sessionId = state.pathParameters['sessionId']!;
-          return WorkoutSummaryScreen(sessionId: sessionId);
+          return WorkoutSummaryScreen(sessionId: sessionId, workoutLogId: state.uri.queryParameters['log']);
         },
-      ),
-
-      // ── Library ─────────────────────────────────────────────────────────
-      GoRoute(
-        path: '/library',
-        builder: (context, state) => const ExerciseListScreen(),
-        routes: [
-          GoRoute(
-            path: ':exerciseSlug',
-            builder: (context, state) {
-              final slug = state.pathParameters['exerciseSlug']!;
-              return ExerciseDetailScreen(exerciseSlug: slug);
-            },
-          ),
-        ],
       ),
 
       // ── Coach ───────────────────────────────────────────────────────────
@@ -185,12 +198,6 @@ GoRouter appRouter(Ref ref) {
         ],
       ),
 
-      // ── Progress ────────────────────────────────────────────────────────
-      GoRoute(
-        path: '/progress',
-        builder: (context, state) => const ProgressScreen(),
-      ),
-
       // ── Settings ────────────────────────────────────────────────────────
       GoRoute(
         path: '/settings',
@@ -200,27 +207,30 @@ GoRouter appRouter(Ref ref) {
             path: 'subscription',
             builder: (context, state) => const SubscriptionSettingsScreen(),
           ),
+          // Edit onboarding answers (FR-046, T131): the quiz without its language step.
+          GoRoute(
+            path: 'profile',
+            builder: (context, state) => const OnboardingQuizScreen(editProfile: true),
+          ),
         ],
       ),
 
       // ── Paywall ─────────────────────────────────────────────────────────
       GoRoute(
         path: '/paywall',
-        builder: (context, state) {
-          // Feature-specific copy is chosen by the caller via ProGateWidget (T055/T056).
-          return const PaywallScreen();
-        },
+        // Feature-specific clip and copy: /paywall?feature=form_check|coach|adaptive_plan|general.
+        builder: (context, state) =>
+            PaywallScreen(feature: PaywallFeature.fromKey(state.uri.queryParameters['feature'])),
       ),
 
       // ── Plan adaptation ─────────────────────────────────────────────────
       GoRoute(
         path: '/plan/adaptation',
-        builder: (context, state) =>
-            AdaptationSummaryScreen(summary: state.extra! as AdaptationSummary),
+        builder: (context, state) => AdaptationSummaryScreen(summary: state.extra! as AdaptationSummary),
       ),
     ],
     errorBuilder: (context, state) => Scaffold(
-      body: Center(child: Text('Page not found: ${state.error}')),
+      body: Center(child: Text(AppLocalizations.of(context).commonNotFound)),
     ),
   );
 }

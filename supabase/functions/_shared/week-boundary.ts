@@ -1,5 +1,5 @@
 // Training weeks: Monday–Sunday in the user's IANA time zone, counted from plans.start_date
-// (research §10, data-model plans.start_date). US5 adds the week-end helpers (T079/T082).
+// (research §10, data-model plans.start_date). Week-end helpers: T079/T082 (FR-026).
 
 export interface LocalDate {
   /** YYYY-MM-DD in the user's zone */
@@ -45,4 +45,29 @@ export function planStartDate(createdAt: Date, timeZone: string): string {
   const { date, isoWeekday } = localDate(createdAt, timeZone);
   const thisMonday = addDays(date, 1 - isoWeekday);
   return isoWeekday <= 3 ? thisMonday : addDays(thisMonday, 7);
+}
+
+/** Days from [from] to [to] (YYYY-MM-DD), negative when [to] is earlier. */
+function daysBetween(from: string, to: string): number {
+  return Math.round((Date.parse(`${to}T00:00:00Z`) - Date.parse(`${from}T00:00:00Z`)) / 86_400_000);
+}
+
+/** Week [week] (1-based) of a plan starting on [startDate]: Monday to Sunday, local dates. */
+export function trainingWeek(startDate: string, week: number): { first: string; last: string } {
+  const first = addDays(startDate, 7 * (week - 1));
+  return { first, last: addDays(first, 6) };
+}
+
+/**
+ * True once week [week] is over: its Sunday 23:59 has passed in [timeZone], i.e. the user's
+ * local date is after that Sunday. Comparing local dates keeps DST weeks exact.
+ */
+export function weekEnded(startDate: string, week: number, timeZone: string, now: Date): boolean {
+  return localDate(now, timeZone).date > trainingWeek(startDate, week).last;
+}
+
+/** The training week [now] falls in for the user; days before [startDate] count as week 1. */
+export function weekNumberAt(startDate: string, timeZone: string, now: Date): number {
+  const days = daysBetween(startDate, localDate(now, timeZone).date);
+  return days < 0 ? 1 : Math.floor(days / 7) + 1;
 }

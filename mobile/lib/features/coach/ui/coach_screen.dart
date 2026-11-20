@@ -1,21 +1,34 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:tekto/core/l10n/gen/app_localizations.dart';
 import 'package:tekto/core/theme/app_theme.dart';
 import 'package:tekto/features/coach/domain/coach_provider.dart';
 import 'package:tekto/features/coach/ui/plan_change_pending_card.dart';
 import 'package:tekto/features/coach/ui/widgets/message_rating_widget.dart';
 import 'package:tekto/features/subscription/domain/entitlement_provider.dart';
+import 'package:tekto/features/subscription/ui/paywall_screen.dart';
 import 'package:tekto/shared/models/coach_model.dart';
+import 'package:tekto/shared/widgets/pro_gate_widget.dart';
 
-/// Slide-up coach panel accessible from any screen via a FAB.
+/// Slide-up coach panel accessible from any screen (FR-016, T077).
 ///
-/// Displays conversation history, an input field, and a quota remaining badge
-/// for free users.
+/// - The reply appears as it streams in.
+/// - `AI_UNAVAILABLE` (or any failed reply) shows an inline message, never a spinner.
+/// - `QUOTA_EXCEEDED` opens the coach paywall through [showProPaywall] (a bottom sheet during
+///   a workout) and keeps the typed question in the input to re-send after upgrading.
+/// - Free users see how many questions they have left this ISO week.
 class CoachScreen extends ConsumerStatefulWidget {
-  const CoachScreen({super.key, this.screenContext});
+  const CoachScreen({super.key, this.screenContext, this.exerciseSlug, this.sessionId, this.onShowPaywall});
 
-  /// Current route + optional context (e.g. "library/barbell-squat").
+  /// The screen the coach was opened from (e.g. `live_workout`, `exercise_detail`).
   final String? screenContext;
+
+  /// The exercise and session in view, when there is one (FR-016).
+  final String? exerciseSlug;
+  final String? sessionId;
+
+  /// Opens the full-screen paywall; defaults to `/paywall?feature=coach` (see [showProPaywall]).
+  final void Function(PaywallFeature feature)? onShowPaywall;
 
   @override
   ConsumerState<CoachScreen> createState() => _CoachScreenState();
@@ -23,20 +36,33 @@ class CoachScreen extends ConsumerStatefulWidget {
 
 class _CoachScreenState extends ConsumerState<CoachScreen> {
   final _inputController = TextEditingController();
-  final _scrollController = ScrollController();
+  String _lastQuestion = '';
+
+  @override
+  void initState() {
+    super.initState();
+    Future.microtask(() => ref.read(coachControllerProvider.notifier).refreshQuota());
+  }
 
   @override
   void dispose() {
     _inputController.dispose();
-    _scrollController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
     final coachState = ref.watch(coachControllerProvider);
-    final entitlement = ref.watch(entitlementProvider).value;
-    final isPro = entitlement?.isPro ?? false;
+    final isPro = ref.watch(entitlementProvider).value?.isPro ?? false;
+
+    ref.listen(coachControllerProvider, (previous, next) {
+      final quotaHit = next.status == CoachStatus.error && next.errorMessage == 'QUOTA_EXCEEDED';
+      final wasQuotaHit = previous?.status == CoachStatus.error && previous?.errorMessage == 'QUOTA_EXCEEDED';
+      if (quotaHit && !wasQuotaHit) _onQuotaExceeded();
+    });
+
+    final unavailable = coachState.status == CoachStatus.error && coachState.errorMessage != 'QUOTA_EXCEEDED';
 
     return DraggableScrollableSheet(
       initialChildSize: 0.6,
@@ -51,53 +77,39 @@ class _CoachScreenState extends ConsumerState<CoachScreen> {
             width: 40,
             height: 4,
             decoration: BoxDecoration(
-              color: AppColors.onDarkSecondary,
+              color: AppColors.mist,
               borderRadius: BorderRadius.circular(2),
             ),
           ),
-          // ---- Title + quota badge ----
+          // ---- Title + remaining questions ----
           Padding(
-            padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.base, vertical: 4),
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.base, vertical: 4),
             child: Row(
               children: [
-                const Text('AI Coach',
-                    style: TextStyle(
-                        fontSize: 18, fontWeight: FontWeight.w600)),
+                Text(l.coachTitle, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
                 const Spacer(),
-                if (!isPro)
-                  _QuotaBadge(coachState: coachState),
+                if (!isPro && coachState.quotaRemaining != null) _QuotaBadge(remaining: coachState.quotaRemaining!),
               ],
             ),
           ),
           const Divider(height: 1),
-          // ---- Messages ----
+          // ---- Messages (+ inline "unavailable" notice) ----
           Expanded(
             child: ListView.builder(
               controller: scrollController,
               padding: const EdgeInsets.all(AppSpacing.sm),
-              itemCount: coachState.messages.length,
+              itemCount: coachState.messages.length + (unavailable ? 1 : 0),
               itemBuilder: (context, index) {
-                final msg = coachState.messages[index];
-                return _MessageBubble(message: msg);
+                if (index == coachState.messages.length) return _InlineNotice(text: l.coachUnavailable);
+                return _MessageBubble(message: coachState.messages[index]);
               },
             ),
           ),
-          // ---- Error ----
-          if (coachState.status == CoachStatus.error &&
-              coachState.errorMessage != null)
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.base),
-              child: Text(
-                _friendlyError(coachState.errorMessage!),
-                style: const TextStyle(color: Colors.red, fontSize: 13),
-                textAlign: TextAlign.center,
-              ),
-            ),
           // ---- Input ----
           _InputRow(
             controller: _inputController,
-            loading: coachState.status == CoachStatus.loading,
+            hint: l.coachInputHint,
+            sending: coachState.status == CoachStatus.loading,
             onSend: _send,
           ),
         ],
@@ -108,17 +120,19 @@ class _CoachScreenState extends ConsumerState<CoachScreen> {
   void _send() {
     final text = _inputController.text.trim();
     if (text.isEmpty) return;
+    _lastQuestion = text;
     _inputController.clear();
-    ref
-        .read(coachControllerProvider.notifier)
-        .sendMessage(text, screenContext: widget.screenContext);
+    ref.read(coachControllerProvider.notifier).sendMessage(
+          text,
+          screenContext: widget.screenContext,
+          exerciseSlug: widget.exerciseSlug,
+          sessionId: widget.sessionId,
+        );
   }
 
-  String _friendlyError(String code) {
-    if (code == 'QUOTA_EXCEEDED') {
-      return 'You\'ve used your 3 free questions this week. Upgrade to Pro for unlimited coaching.';
-    }
-    return 'Something went wrong. Please try again.';
+  void _onQuotaExceeded() {
+    if (_inputController.text.isEmpty) _inputController.text = _lastQuestion;
+    showProPaywall(context, ref, PaywallFeature.coach, onShowPaywall: widget.onShowPaywall);
   }
 }
 
@@ -127,19 +141,48 @@ class _CoachScreenState extends ConsumerState<CoachScreen> {
 // ---------------------------------------------------------------------------
 
 class _QuotaBadge extends StatelessWidget {
-  const _QuotaBadge({required this.coachState});
-  final CoachState coachState;
+  const _QuotaBadge({required this.remaining});
+  final int remaining;
 
   @override
-  Widget build(BuildContext context) => Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-        decoration: BoxDecoration(
-          color: AppColors.charcoalElevated,
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: const Text(
-          'Free: 3 Q/week',
-          style: TextStyle(fontSize: 12, color: AppColors.onDarkSecondary),
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: AppColors.deep,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Text(
+        remaining > 0 ? l.coachQuotaRemaining(remaining) : l.coachQuotaExhausted,
+        style: const TextStyle(fontSize: 12, color: AppColors.mist),
+      ),
+    );
+  }
+}
+
+/// A coach-side message that is not an answer (e.g. the coach is unavailable).
+class _InlineNotice extends StatelessWidget {
+  const _InlineNotice({required this.text});
+  final String text;
+
+  @override
+  Widget build(BuildContext context) => Padding(
+        padding: const EdgeInsets.only(right: 60, bottom: AppSpacing.sm),
+        child: Container(
+          padding: const EdgeInsets.all(AppSpacing.sm),
+          decoration: BoxDecoration(
+            color: AppColors.deep,
+            borderRadius: BorderRadius.circular(AppSizes.borderRadius),
+            border: Border.all(color: AppColors.mist.withValues(alpha: 0.4)),
+          ),
+          child: Row(
+            children: [
+              const Icon(Icons.info_outline, size: 18, color: AppColors.mist),
+              const SizedBox(width: 8),
+              Expanded(child: Text(text, style: const TextStyle(fontSize: 14))),
+            ],
+          ),
         ),
       );
 }
@@ -151,6 +194,7 @@ class _MessageBubble extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isUser = message.role == 'user';
+    final streaming = message.id == CoachController.streamingMessageId;
 
     return Padding(
       padding: EdgeInsets.only(
@@ -159,27 +203,26 @@ class _MessageBubble extends ConsumerWidget {
         bottom: AppSpacing.sm,
       ),
       child: Column(
-        crossAxisAlignment:
-            isUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+        crossAxisAlignment: isUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
         children: [
           Container(
-            padding: const EdgeInsets.all(AppSpacing.sm),
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
             decoration: BoxDecoration(
-              color:
-                  isUser ? AppColors.accent : AppColors.charcoalElevated,
-              borderRadius: BorderRadius.circular(AppSizes.borderRadius),
+              color: isUser ? AppColors.glacier : AppColors.deep,
+              borderRadius: BorderRadius.only(
+                topLeft: const Radius.circular(20),
+                topRight: const Radius.circular(20),
+                bottomLeft: Radius.circular(isUser ? 20 : 6),
+                bottomRight: Radius.circular(isUser ? 6 : 20),
+              ),
             ),
-            child: Text(
-              message.content,
-              style: const TextStyle(fontSize: 14),
-            ),
+            // While the first words are on their way, a plain ellipsis — never a spinner.
+            child: Text(message.content.isEmpty && streaming ? '…' : message.content,
+                style: TextStyle(fontSize: 14.5, height: 1.45, color: isUser ? AppColors.ink : AppColors.frost)),
           ),
-          // Plan change card
-          if (!isUser && message.planChangeProposed != null)
-            PlanChangePendingCard(message: message),
-          // Rating (assistant only)
-          if (!isUser)
-            MessageRatingWidget(messageId: message.id),
+          if (!isUser && !streaming && message.planChangeProposed != null) PlanChangePendingCard(message: message),
+          if (!isUser && !streaming)
+            MessageRatingWidget(messageId: message.id, initialRating: message.satisfactionRating),
         ],
       ),
     );
@@ -187,13 +230,10 @@ class _MessageBubble extends ConsumerWidget {
 }
 
 class _InputRow extends StatelessWidget {
-  const _InputRow({
-    required this.controller,
-    required this.loading,
-    required this.onSend,
-  });
+  const _InputRow({required this.controller, required this.hint, required this.sending, required this.onSend});
   final TextEditingController controller;
-  final bool loading;
+  final String hint;
+  final bool sending;
   final VoidCallback onSend;
 
   @override
@@ -206,26 +246,21 @@ class _InputRow extends StatelessWidget {
                 child: TextField(
                   controller: controller,
                   textInputAction: TextInputAction.send,
-                  onSubmitted: (_) => onSend(),
-                  decoration: const InputDecoration(
-                    hintText: 'Ask your coach…',
-                    isDense: true,
-                  ),
+                  onSubmitted: (_) => sending ? null : onSend(),
+                  decoration: InputDecoration(hintText: hint, isDense: true),
                 ),
               ),
               const SizedBox(width: 8),
               SizedBox(
                 width: AppSizes.minTapTarget,
                 height: AppSizes.minTapTarget,
-                child: loading
-                    ? const Padding(
-                        padding: EdgeInsets.all(12),
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                    : IconButton(
-                        icon: const Icon(Icons.send, color: AppColors.accent),
-                        onPressed: onSend,
-                      ),
+                // Disabled while a reply is streaming in; no spinner (the bubble shows progress).
+                child: IconButton(
+                  icon: const Icon(Icons.send),
+                  tooltip: AppLocalizations.of(context).coachSend,
+                  color: AppColors.glacier,
+                  onPressed: sending ? null : onSend,
+                ),
               ),
             ],
           ),

@@ -6,6 +6,7 @@ import '../../../core/di/providers.dart';
 import '../../../core/l10n/gen/app_localizations.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../subscription/domain/pro_offers.dart';
+import '../domain/onboarding_controller.dart';
 
 /// Skippable post-plan trial offer (FR-004, T043). Never blocks the plan: "Skip for now" is
 /// always visible. Prices come from the store (FR-032); Restore and cancel-anytime are always
@@ -23,18 +24,16 @@ class _TrialOfferScreenState extends ConsumerState<TrialOfferScreen> {
   String? _error;
 
   Future<void> _purchase(ProOffer offer) async {
-    if (offer.package == null) return;
     setState(() {
       _busy = true;
       _error = null;
     });
     try {
-      await ref.read(revenueCatServiceProvider).purchasePackage(offer.package!);
-      if (mounted) context.go('/plan');
-    } on Exception {
-      if (mounted)
-        setState(
-            () => _error = AppLocalizations.of(context).paywallPurchaseFailed);
+      await ref.read(proPurchaseProvider)(offer);
+      // Trial started: replace the template plan with an AI plan (FR-004).
+      if (mounted) context.go('/onboarding/generating?upgrade=1');
+    } on Object {
+      if (mounted) setState(() => _error = AppLocalizations.of(context).paywallPurchaseFailed);
     } finally {
       if (mounted) setState(() => _busy = false);
     }
@@ -55,6 +54,9 @@ class _TrialOfferScreenState extends ConsumerState<TrialOfferScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final offers = ref.watch(proOffersProvider);
+    final rationale =
+        ref.watch(onboardingControllerProvider).result?.rationaleFor(Localizations.localeOf(context).languageCode) ??
+            '';
 
     return Scaffold(
       body: SafeArea(
@@ -67,48 +69,38 @@ class _TrialOfferScreenState extends ConsumerState<TrialOfferScreen> {
               Expanded(
                   child: ListView(children: [
                 const SizedBox(height: AppSpacing.xl),
-                const Icon(Icons.auto_awesome,
-                    size: 56, color: AppColors.accent),
+                const Icon(Icons.auto_awesome, size: 56, color: AppColors.glacier),
                 const SizedBox(height: AppSpacing.base),
-                Text(l10n.trialTitle,
-                    style: Theme.of(context).textTheme.displayMedium,
-                    textAlign: TextAlign.center),
+                Text(l10n.trialTitle, style: Theme.of(context).textTheme.displayMedium, textAlign: TextAlign.center),
+                // Why this plan fits (FR-044), right after generation.
+                if (rationale.isNotEmpty) ...[
+                  const SizedBox(height: AppSpacing.sm),
+                  Text(rationale,
+                      key: const Key('plan-rationale'),
+                      style: Theme.of(context).textTheme.bodyLarge,
+                      textAlign: TextAlign.center),
+                ],
                 const SizedBox(height: AppSpacing.sm),
                 Text(l10n.trialSubtitle, textAlign: TextAlign.center),
                 const SizedBox(height: AppSpacing.xl),
                 ...offers.when(
-                  loading: () =>
-                      [const Center(child: CircularProgressIndicator())],
-                  error: (_, __) => [
-                    Text(l10n.proUnavailableInRegion,
-                        textAlign: TextAlign.center)
-                  ],
+                  loading: () => [const Center(child: CircularProgressIndicator())],
+                  error: (_, __) => [Text(l10n.proUnavailableInRegion, textAlign: TextAlign.center)],
                   data: (list) {
-                    if (list == null)
-                      return [
-                        Text(l10n.proUnavailableInRegion,
-                            textAlign: TextAlign.center)
-                      ];
-                    final selected = list.firstWhere(
-                        (o) => o.isAnnual == _annual,
-                        orElse: () => list.first);
+                    if (list == null) return [Text(l10n.proUnavailableInRegion, textAlign: TextAlign.center)];
+                    final selected = list.firstWhere((o) => o.isAnnual == _annual, orElse: () => list.first);
                     return [
                       for (final o in list)
                         RadioListTile<bool>(
                           value: o.isAnnual,
                           groupValue: selected.isAnnual,
                           onChanged: (v) => setState(() => _annual = v ?? true),
-                          title: Text(o.isAnnual
-                              ? l10n.paywallAnnual
-                              : l10n.paywallMonthly),
-                          secondary: Text(o.priceString,
-                              style: Theme.of(context).textTheme.titleMedium),
+                          title: Text(o.isAnnual ? l10n.paywallAnnual : l10n.paywallMonthly),
+                          secondary: Text(o.priceString, style: Theme.of(context).textTheme.titleMedium),
                         ),
                       const SizedBox(height: AppSpacing.base),
                       if (_error != null)
-                        Text(_error!,
-                            style: const TextStyle(color: AppColors.error),
-                            textAlign: TextAlign.center),
+                        Text(_error!, style: const TextStyle(color: AppColors.danger), textAlign: TextAlign.center),
                       ElevatedButton(
                         onPressed: _busy ? null : () => _purchase(selected),
                         child: Text(l10n.trialStart),
@@ -119,14 +111,9 @@ class _TrialOfferScreenState extends ConsumerState<TrialOfferScreen> {
               ])),
               // Pinned outside the scroll area so they are always visible (FR-004, FR-031).
               Text(l10n.paywallCancelAnytime,
-                  textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.bodySmall),
-              TextButton(
-                  onPressed: _busy ? null : _restore,
-                  child: Text(l10n.paywallRestore)),
-              TextButton(
-                  onPressed: () => context.go('/plan'),
-                  child: Text(l10n.trialSkip)),
+                  textAlign: TextAlign.center, style: Theme.of(context).textTheme.bodySmall),
+              TextButton(onPressed: _busy ? null : _restore, child: Text(l10n.paywallRestore)),
+              TextButton(onPressed: () => context.go('/plan'), child: Text(l10n.trialSkip)),
             ],
           ),
         ),

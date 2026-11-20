@@ -3,7 +3,8 @@
   "level": "beginner",
   "days_per_week": 3,
   "equipment_required": [
-    "dumbbell"
+    "dumbbell",
+    "bench"
   ],
   "name_en": "Home Dumbbell 3×",
   "name_fr": "Haltères à la Maison 3×",
@@ -67,7 +68,7 @@
           "rpe_target": 8.0
         },
         {
-          "exercise_slug": "romanian-deadlift",
+          "exercise_slug": "dumbbell-rdl",
           "sets": 3,
           "reps_min": 10,
           "reps_max": 12,
@@ -75,7 +76,7 @@
           "rpe_target": 7.5
         },
         {
-          "exercise_slug": "hip-thrust",
+          "exercise_slug": "glute-bridge",
           "sets": 3,
           "reps_min": 12,
           "reps_max": 15,
@@ -100,7 +101,7 @@
       "exercises": [
         {
           "exercise_slug": "goblet-squat",
-          "sets": 4,
+          "sets": 3,
           "reps_min": 8,
           "reps_max": 12,
           "rest_sec": 120,
@@ -123,10 +124,10 @@
           "rpe_target": 8.0
         },
         {
-          "exercise_slug": "hip-thrust",
+          "exercise_slug": "dumbbell-shoulder-press",
           "sets": 3,
-          "reps_min": 10,
-          "reps_max": 15,
+          "reps_min": 8,
+          "reps_max": 10,
           "rest_sec": 90,
           "rpe_target": 7.5
         }

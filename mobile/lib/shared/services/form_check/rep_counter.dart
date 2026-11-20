@@ -1,167 +1,124 @@
-/// State machine for counting reps for a given lift key.
+/// Counts reps for one launch lift from the joint angle [PoseAnalyzer.repAngleKey] names.
 ///
-/// States: NEUTRAL → DESCENDING → BOTTOM → ASCENDING → (rep counted → NEUTRAL)
+/// Every launch lift is a cycle between an open angle (standing, arms locked, hips extended)
+/// and a closed angle (bottom of the squat, bar on the chest, hips hinged). A rep is counted
+/// when the angle has reached the bottom threshold and comes back to the top threshold.
 ///
-/// A rep is counted when the state machine transitions from ASCENDING back to
-/// NEUTRAL (i.e. returns to the starting position after a full cycle).
-/// A partial reversal before reaching BOTTOM is detected as a no-rep.
+///   top ──descendStart──▶ descending ──bottomThreshold──▶ bottom ──topThreshold──▶ rep ✓
+///                              │
+///                              └─ rises [reversalMargin]° above its lowest point before
+///                                 reaching the bottom → no-rep; wait for the top again
 ///
-/// Principle V: this class is unit tested.
+/// Direction comes from the lowest angle seen in the current descent, not from fixed angles,
+/// so jitter of a few degrees does not end a rep. Lifts that start at the bottom (overhead
+/// press from the rack, deadlift from the floor) work too: the first press up counts once.
+///
+/// Principle V: unit tested (rep_counter_test.dart).
 class RepCounter {
-  RepCounter({required this.liftKey}) {
-    _thresholds = _thresholdsFor(liftKey);
-  }
+  RepCounter({required this.liftKey}) : _thresholds = _thresholdsFor(liftKey);
+
+  /// The 8 launch lifts (FR-022).
+  static const launchLifts = {
+    'squat', 'deadlift', 'bench_press', 'overhead_press', 'row', 'lunge', 'hip_thrust', 'push_up', //
+  };
+
+  /// Degrees the angle must rise above its lowest point to count as turning back up.
+  static const reversalMargin = 10.0;
 
   final String liftKey;
-  late final _LiftThresholds _thresholds;
+  final LiftThresholds _thresholds;
 
-  _RepState _state = _RepState.neutral;
+  _RepState _state = _RepState.top;
+  double _lowest = double.infinity;
   int _repCount = 0;
   int _noRepCount = 0;
-  bool _reachedBottom = false;
 
   int get repCount => _repCount;
   int get noRepCount => _noRepCount;
+  LiftThresholds get thresholds => _thresholds;
 
-  /// Feed a [jointAngle] measurement (from [PoseAnalyzer]) to advance the
-  /// state machine.
-  ///
-  /// Returns `true` when a completed rep has just been counted.
-  bool update(double jointAngle) {
+  /// True between leaving the top and finishing the rep (frames here belong to rep
+  /// `repCount + 1`); false while standing at the top or recovering from a no-rep.
+  bool get inRep => _state == _RepState.descending || _state == _RepState.bottom;
+
+  /// True once the current rep has reached full depth and until it is completed.
+  bool get atBottom => _state == _RepState.bottom;
+
+  /// Feeds one joint-angle measurement in degrees. Returns true when a rep was just completed.
+  bool update(double angle) {
     switch (_state) {
-      case _RepState.neutral:
-        if (_isDescending(jointAngle)) {
+      case _RepState.top:
+        if (angle < _thresholds.descendStart) {
           _state = _RepState.descending;
-          _reachedBottom = false;
+          _lowest = angle;
+          _checkBottom(angle);
         }
         return false;
 
       case _RepState.descending:
-        if (_atBottom(jointAngle)) {
-          _state = _RepState.bottom;
-          _reachedBottom = true;
-        } else if (_isAscending(jointAngle) && !_reachedBottom) {
-          // Reversed before bottom → no-rep
-          _noRepCount++;
-          _state = _RepState.neutral;
+        if (angle < _lowest) _lowest = angle;
+        if (_checkBottom(angle)) return false;
+        if (angle >= _lowest + reversalMargin) {
+          _noRepCount++; // turned back up before reaching depth
+          _state = _RepState.recovering;
         }
         return false;
 
       case _RepState.bottom:
-        if (_isAscending(jointAngle)) {
-          _state = _RepState.ascending;
+        if (angle >= _thresholds.topThreshold) {
+          _repCount++;
+          _state = _RepState.top;
+          return true;
         }
         return false;
 
-      case _RepState.ascending:
-        if (_atTop(jointAngle)) {
-          _repCount++;
-          _state = _RepState.neutral;
-          _reachedBottom = false;
-          return true; // rep completed
-        }
-        if (_isDescending(jointAngle)) {
-          // Reversed during ascent — not a no-rep, back to descending
-          _state = _RepState.descending;
-        }
+      case _RepState.recovering:
+        if (angle >= _thresholds.topThreshold) _state = _RepState.top;
         return false;
     }
+  }
+
+  bool _checkBottom(double angle) {
+    if (angle > _thresholds.bottomThreshold) return false;
+    _state = _RepState.bottom;
+    return true;
   }
 
   void reset() {
-    _state = _RepState.neutral;
+    _state = _RepState.top;
+    _lowest = double.infinity;
     _repCount = 0;
     _noRepCount = 0;
-    _reachedBottom = false;
   }
 
-  // ---------------------------------------------------------------------------
-  // Transition predicates
-  // ---------------------------------------------------------------------------
-
-  bool _isDescending(double angle) => angle < _thresholds.descendStart;
-  bool _atBottom(double angle) => angle <= _thresholds.bottomThreshold;
-  bool _isAscending(double angle) => angle > _thresholds.ascendStart;
-  bool _atTop(double angle) => angle >= _thresholds.topThreshold;
-
-  // ---------------------------------------------------------------------------
-  // Per-lift thresholds
-  // ---------------------------------------------------------------------------
-
-  static _LiftThresholds _thresholdsFor(String liftKey) {
-    switch (liftKey) {
-      case 'squat':
-      case 'lunge':
-        return const _LiftThresholds(
-          descendStart: 160, // knee angle starts bending
-          bottomThreshold: 90, // parallel or below
-          ascendStart: 95,
-          topThreshold: 160,
-        );
-      case 'deadlift':
-      case 'romanian_deadlift':
-        return const _LiftThresholds(
-          descendStart: 160,
-          bottomThreshold: 70,
-          ascendStart: 80,
-          topThreshold: 160,
-        );
-      case 'bench_press':
-      case 'overhead_press':
-        return const _LiftThresholds(
-          descendStart: 160,
-          bottomThreshold: 90,
-          ascendStart: 95,
-          topThreshold: 155,
-        );
-      case 'hip_thrust':
-        return const _LiftThresholds(
-          descendStart: 160,
-          bottomThreshold: 100,
-          ascendStart: 110,
-          topThreshold: 170,
-        );
-      case 'row':
-        return const _LiftThresholds(
-          descendStart: 160,
-          bottomThreshold: 90,
-          ascendStart: 100,
-          topThreshold: 155,
-        );
-      case 'push_up':
-        return const _LiftThresholds(
-          descendStart: 160,
-          bottomThreshold: 90,
-          ascendStart: 95,
-          topThreshold: 155,
-        );
-      default:
-        return const _LiftThresholds(
-          descendStart: 160,
-          bottomThreshold: 90,
-          ascendStart: 95,
-          topThreshold: 160,
-        );
-    }
-  }
+  static LiftThresholds _thresholdsFor(String liftKey) => switch (liftKey) {
+        // Knee angle: standing ≈ 170°, thighs parallel ≈ 90°.
+        'squat' || 'lunge' => const LiftThresholds(descendStart: 160, bottomThreshold: 90, topThreshold: 160),
+        // Hip angle: locked out ≈ 175°, hinged ≈ 60–70°.
+        'deadlift' => const LiftThresholds(descendStart: 160, bottomThreshold: 70, topThreshold: 160),
+        // Elbow angle: arms locked ≈ 170°, bar on chest / racked ≈ 80–90°.
+        'bench_press' || 'overhead_press' || 'push_up' =>
+          const LiftThresholds(descendStart: 160, bottomThreshold: 90, topThreshold: 155),
+        // Elbow angle: arms long ≈ 165°, handle at the torso ≈ 75–90°.
+        'row' => const LiftThresholds(descendStart: 155, bottomThreshold: 90, topThreshold: 155),
+        // Hip angle: seated on the floor ≈ 95–100°, full extension ≈ 175°.
+        'hip_thrust' => const LiftThresholds(descendStart: 160, bottomThreshold: 100, topThreshold: 170),
+        _ => throw ArgumentError.value(liftKey, 'liftKey', 'not a launch lift'),
+      };
 }
 
-// ---------------------------------------------------------------------------
-// Supporting types
-// ---------------------------------------------------------------------------
+enum _RepState { top, descending, bottom, recovering }
 
-enum _RepState { neutral, descending, bottom, ascending }
+/// Angles in degrees that drive [RepCounter] for one lift.
+class LiftThresholds {
+  const LiftThresholds({required this.descendStart, required this.bottomThreshold, required this.topThreshold});
 
-class _LiftThresholds {
-  const _LiftThresholds({
-    required this.descendStart,
-    required this.bottomThreshold,
-    required this.ascendStart,
-    required this.topThreshold,
-  });
-
+  /// Below this the lifter has left the top position.
   final double descendStart;
+
+  /// At or below this the rep reached full depth.
   final double bottomThreshold;
-  final double ascendStart;
+
+  /// At or above this (after full depth) the rep is complete.
   final double topThreshold;
 }

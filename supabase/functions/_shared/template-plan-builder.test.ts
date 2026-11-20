@@ -101,6 +101,26 @@ Deno.test('every exercise gets a starting weight', () => {
   }
 });
 
+Deno.test('weekly sets per muscle are capped at the level maximum (FR-002a, Constitution III)', () => {
+  const max = { beginner: 14, intermediate: 18, advanced: 22 } as const;
+  for (const level of ['beginner', 'intermediate', 'advanced'] as const) {
+    for (const equipment of [['dumbbell', 'bodyweight'], ['barbell', 'dumbbell', 'cable', 'bodyweight']]) {
+      for (const days of [3, 4]) {
+        const r = buildTemplatePlan(TEMPLATES, profile({ level, equipment, days_per_week: days, session_length_min: 90 }), LIBRARY);
+        const sets = new Map<string, number>();
+        for (const s of week1(r)) {
+          for (const e of s.exercises) {
+            for (const m of LIBRARY.get(e.exercise_slug)!.muscle_primary) sets.set(m, (sets.get(m) ?? 0) + e.sets);
+          }
+        }
+        for (const [m, n] of sets) assert(n <= max[level], `${level} ${equipment} ${days}d: ${m} has ${n} sets`);
+        // Trimming never removes exercises or goes below 2 sets.
+        for (const s of week1(r)) for (const e of s.exercises) assert(e.sets >= 2, e.exercise_slug);
+      }
+    }
+  }
+});
+
 Deno.test('every built plan passes the shared validator (FR-002a)', () => {
   const equipmentSets = [['dumbbell', 'bodyweight'], ['barbell', 'dumbbell', 'cable', 'bodyweight'], ['dumbbell']];
   for (const equipment of equipmentSets) {

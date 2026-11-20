@@ -99,20 +99,30 @@ flutter:
   assets:
     - assets/images/
     - assets/icons/
+    - assets/video/   # welcome + paywall clips with EN/FR captions (FR-031, FR-043)
 
-  # TECH DEBT (Constitution VII): the Inter font files were never added to assets/fonts/.
-  # Until they are (Inter is SIL OFL — https://github.com/rsms/inter), the theme's
-  # fontFamily 'Inter' falls back to the platform font. Re-enable this block with the files.
-  # fonts:
-  #   - family: Inter
-  #     fonts:
-  #       - asset: assets/fonts/Inter-Regular.ttf
-  #       - asset: assets/fonts/Inter-Medium.ttf
-  #         weight: 500
-  #       - asset: assets/fonts/Inter-SemiBold.ttf
-  #         weight: 600
-  #       - asset: assets/fonts/Inter-Bold.ttf
-  #         weight: 700
+  # Tekto type (design/README.md). All three are SIL OFL 1.1; licences in assets/fonts/.
+  # Bundled so text renders the same offline (Constitution I).
+  fonts:
+    - family: BricolageGrotesque
+      fonts:
+        - asset: assets/fonts/BricolageGrotesque-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/BricolageGrotesque-ExtraBold.ttf
+          weight: 800
+    - family: Geist
+      fonts:
+        - asset: assets/fonts/Geist-Regular.ttf
+        - asset: assets/fonts/Geist-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Geist-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/Geist-Bold.ttf
+          weight: 700
+    - family: GeistMono
+      fonts:
+        - asset: assets/fonts/GeistMono-Medium.ttf
+          weight: 500
 
 # Native build hooks: bundle SQLCipher instead of plain SQLite so the local DB is encrypted at rest
 # (Constitution II; replaces the end-of-life sqlcipher_flutter_libs package).

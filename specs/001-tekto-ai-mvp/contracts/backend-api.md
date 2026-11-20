@@ -46,6 +46,8 @@ Generates a personalized training plan from the authenticated user's profile.
     "source": "ai",
     "template_slug": null,
     "fallback_notice": false,
+    "rationale_en": "A 4-day upper/lower split that fits your 45-minute sessions…",
+    "rationale_fr": "Un split haut/bas sur 4 jours adapté à vos séances de 45 minutes…",
     "notices": [],
     "sessions": [
       {
@@ -86,6 +88,7 @@ Generates a personalized training plan from the authenticated user's profile.
 | Response field | Values | Meaning |
 |---|---|---|
 | `source` | `ai \| template \| template_fallback` | How the plan was built |
+| `rationale_en` / `rationale_fr` | string | Why the plan fits (FR-044): from the model for `ai`, from the template JSON for `template` and `template_fallback` |
 | `fallback_notice` | bool | `true` only for `template_fallback`; the app shows "We built you a starter plan — you can regenerate it later in Settings" |
 | `notices` | string[] | Localization keys for non-blocking cards, e.g. `free_plan_days_capped` when 5–7 days were requested on the free tier |
 
@@ -182,56 +185,50 @@ Sends a user message to the AI coach and returns the assistant reply.
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| `conversation_id` | uuid | Yes | Must belong to the authenticated user |
+| `conversation_id` | uuid | Yes | Created by the app; the server creates the row on first use. Must not belong to another user |
 | `message` | string | Yes | Max 2000 chars |
 | `context.screen` | string | No | Current screen identifier |
 | `context.exercise_slug` | string | No | Exercise being viewed |
 | `context.session_id` | uuid | No | Session being viewed |
 
-**Response `200 OK`**:
+**Response `200 OK`** — streamed as server-sent events (`Content-Type: text/event-stream`), so the app shows the reply as it is written (ai-services.md §2, first text < 3 s):
+
+```
+event: text
+data: {"text":"The Romanian deadlift targets"}
+
+event: text
+data: {"text":" your hamstrings and glutes..."}
+
+event: done
+data: {"message_id":"uuid","plan_change_proposed":null,"quota_remaining":1}
+```
+
+| Event | Data | Notes |
+|---|---|---|
+| `text` | `{"text": string}` | A piece of the reply; append in order. A cache hit arrives as one `text` event |
+| `done` | `{"message_id", "plan_change_proposed", "quota_remaining"}` | Last event of a successful reply. `quota_remaining` is null for Pro users |
+| `error` | `{"error": "AI_UNAVAILABLE"}` | The model failed after text started; discard the partial text and show the "Coach temporarily unavailable" message. No quota is consumed |
+
+`plan_change_proposed`, when present, follows ai-services.md §2, e.g.:
 ```json
 {
-  "message_id": "uuid",
-  "content": "The Romanian deadlift targets your hamstrings and glutes...",
-  "plan_change_proposed": null,
-  "quota_remaining": null
+  "type": "exercise_swap",
+  "plan_exercise_id": "uuid",
+  "old_exercise_slug": "barbell-back-squat",
+  "new_exercise_slug": "leg-press",
+  "reason_en": "Knee-friendly alternative targeting the same muscles.",
+  "reason_fr": "Alternative sans contrainte pour le genou ciblant les mêmes muscles."
 }
 ```
 
-When a plan change is proposed:
-```json
-{
-  "message_id": "uuid",
-  "content": "Sure, I can swap squats for leg press given your knee discomfort. Here's what would change:",
-  "plan_change_proposed": {
-    "type": "exercise_swap",
-    "plan_exercise_id": "uuid",
-    "old_exercise_slug": "barbell-back-squat",
-    "new_exercise_slug": "leg-press",
-    "reason_en": "Knee-friendly alternative targeting the same muscles.",
-    "reason_fr": "Alternative sans contrainte pour le genou ciblant les mêmes muscles."
-  },
-  "quota_remaining": null
-}
-```
-
-For free-tier users (quota tracked):
-```json
-{
-  "message_id": "uuid",
-  "content": "...",
-  "plan_change_proposed": null,
-  "quota_remaining": 1
-}
-```
-
-**Errors**:
+**Errors** (plain JSON `{"error": code}` with the HTTP status, returned before any event is sent):
 | Code | HTTP | Meaning |
 |---|---|---|
-| `QUOTA_EXCEEDED` | 429 | Free user hit 3 questions/week limit |
-| `CONVERSATION_NOT_FOUND` | 404 | |
+| `QUOTA_EXCEEDED` | 429 | Free user hit 3 questions/week limit; checked before any cache lookup or model call |
+| `CONVERSATION_NOT_FOUND` | 404 | `conversation_id` belongs to another user |
 | `MESSAGE_TOO_LONG` | 400 | Message exceeds 2000 chars |
-| `AI_UNAVAILABLE` | 503 | LLM temporarily down or refused; app shows the localized "Coach temporarily unavailable" message (never a spinner). Does **not** consume free quota. |
+| `AI_UNAVAILABLE` | 503 | LLM down or refused before any text was sent; app shows the localized "Coach temporarily unavailable" message (never a spinner). Does **not** consume free quota. After text has started, the same failure arrives as an `error` event |
 
 Replies are in `users.language`. Free quota is consumed only when a reply is returned (including cache hits).
 
@@ -277,9 +274,12 @@ Confirms or rejects a proposed plan modification from the coach.
 | `NO_PENDING_CHANGE` | 400 | Message has no `plan_change_proposed`, or it was already applied |
 | `EXERCISE_NO_VIDEO` | 400 | Swap target has no video (Constitution IV) |
 | `EXERCISE_NOT_ALLOWED` | 400 | Swap target needs unavailable equipment or is contraindicated |
-| `MESSAGE_NOT_FOUND` | 404 | |
+| `EXERCISE_NOT_EQUIVALENT` | 400 | Swap target does not train the same primary muscle (same rule as §4) |
+| `INVALID_CHANGE` | 400 | The proposal is missing fields for its type, or sets an invalid weight / rep range |
+| `PLAN_TARGET_NOT_FOUND` | 404 | The plan exercise, session or week is not in the user's active plan |
+| `MESSAGE_NOT_FOUND` | 404 | Unknown message, or one from another user's conversation |
 
-`confirmed: false` records the rejection and returns `{ "applied": false }`.
+`confirmed: false` records the rejection and returns `{ "applied": false }`. The rejection is stored in `coach_messages.plan_change_rejected_at` (migration 011); an applied or rejected change returns `NO_PENDING_CHANGE` afterwards. `session_shorten` also returns `removed_plan_exercise_ids`.
 
 ---
 
@@ -289,7 +289,7 @@ Confirms or rejects a proposed plan modification from the coach.
 
 Swaps a `plan_exercise` for an equivalent alternative selected by the user (from the library or coach suggestion).
 
-**Auth**: Required (user JWT).
+**Auth**: Required (user JWT). Available to free and Pro users; never returns `PRO_REQUIRED` (FR-028).
 
 **Request body**:
 ```json
@@ -298,19 +298,25 @@ Swaps a `plan_exercise` for an equivalent alternative selected by the user (from
   "new_exercise_id": "uuid"
 }
 ```
+`new_exercise_slug` (string) may be sent instead of `new_exercise_id`; the app caches exercises by slug.
 
 **Response `200 OK`**:
 ```json
 {
   "plan_exercise_id": "uuid",
-  "new_exercise": { "id": "uuid", "slug": "...", "name_en": "..." }
+  "new_exercise": { "id": "uuid", "slug": "...", "name_en": "...", "name_fr": "..." }
 }
 ```
 
 **Errors**:
 | Code | HTTP | Meaning |
 |---|---|---|
-| `EXERCISE_NO_VIDEO` | 400 | Replacement exercise has no video |
+| `INVALID_REQUEST` | 400 | Missing `plan_exercise_id` or `new_exercise_id` |
+| `EXERCISE_NO_VIDEO` | 400 | Replacement exercise has no video (Constitution IV) |
+| `EXERCISE_NOT_ALLOWED` | 400 | Replacement needs equipment the user lacks or is contraindicated by their limitations |
+| `EXERCISE_NOT_EQUIVALENT` | 400 | Replacement shares no primary muscle with the current exercise |
+| `PLAN_NOT_ACTIVE` | 400 | The plan exercise belongs to an archived or completed plan |
+| `FORBIDDEN` | 403 | The plan exercise belongs to another user |
 | `EXERCISE_NOT_FOUND` | 404 | |
 | `PLAN_EXERCISE_NOT_FOUND` | 404 | |
 
@@ -368,15 +374,21 @@ Receives RevenueCat event webhooks and updates the `subscriptions` table.
 
 **Handled event types**:
 
+RevenueCat reports a trial start as `INITIAL_PURCHASE` with `period_type = "TRIAL"` and a trial conversion as `RENEWAL` with `is_trial_conversion = true`. `TRIAL_STARTED` and `TRIAL_CONVERTED` are accepted as aliases. Rules live in `revenuecat-webhook/handler.ts`; every event computes the next row from the current one, so replays are idempotent.
+
 | Event | Action |
 |---|---|
-| `INITIAL_PURCHASE` | Set `tier = 'pro'`, `is_trial = false` |
-| `RENEWAL` | Update `current_period_ends_at` |
-| `TRIAL_STARTED` | Set `is_trial = true`, `trial_ends_at` |
-| `TRIAL_CONVERTED` | Set `is_trial = false`, `tier = 'pro'` |
-| `CANCELLATION` | Set `cancelled_at`; keep tier until period ends |
-| `EXPIRATION` | Set `tier = 'free'`, clear period fields |
-| `BILLING_ISSUE` | Log; do not immediately downgrade (grace period) |
+| `INITIAL_PURCHASE` (`period_type` ≠ `TRIAL`) | Upsert `tier = 'pro'`, `is_trial = false`, `current_period_ends_at = expiration_at_ms`, `cancelled_at = null` |
+| `INITIAL_PURCHASE` (`period_type = TRIAL`) / `TRIAL_STARTED` | Upsert `tier = 'pro'`, `is_trial = true`, `trial_ends_at = current_period_ends_at = expiration_at_ms` |
+| `RENEWAL` | Update `current_period_ends_at`; clear `cancelled_at` |
+| `RENEWAL` (`is_trial_conversion = true`) / `TRIAL_CONVERTED` | Also `is_trial = false`, `trial_ends_at = null` |
+| `CANCELLATION` | Set `cancelled_at = event_timestamp_ms`; keep `tier` until `EXPIRATION` |
+| `UNCANCELLATION` | Clear `cancelled_at` |
+| `EXPIRATION` | Set `tier = 'free'`, clear `is_trial`, period, trial and cancellation fields |
+| `BILLING_ISSUE` | Log; do not downgrade (grace period) |
+| Any other type, or an update event for a user with no row | Acknowledged (`200`), no write |
+
+`revenuecat_customer_id` is the event's `original_app_user_id` (never the event `id`). A storage error returns `500` so RevenueCat retries.
 
 **Response `200 OK`**: `{ "received": true }`
 

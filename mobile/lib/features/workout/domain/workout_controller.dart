@@ -2,9 +2,16 @@ import 'dart:async';
 
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import 'live_session.dart';
+
 part 'workout_controller.g.dart';
 
 enum WorkoutPhase { idle, active, resting, complete }
+
+/// Rest-timer bounds for the in-workout ±15 s adjustment (FR-008).
+const kRestStepSec = 15;
+const kRestMinSec = 15;
+const kRestMaxSec = 600;
 
 class WorkoutState {
   const WorkoutState({
@@ -12,41 +19,43 @@ class WorkoutState {
     this.workoutLogId,
     this.sessionId,
     this.currentExerciseIndex = 0,
-    this.currentSetIndex = 0,
     this.restSecondsRemaining = 0,
     this.isWorkoutActive = false,
-    this.newPrExerciseSlug,
+    this.logged = const {},
   });
 
   final WorkoutPhase phase;
   final String? workoutLogId;
   final String? sessionId;
   final int currentExerciseIndex;
-  final int currentSetIndex;
   final int restSecondsRemaining;
+
+  /// True from start until the workout is completed; the paywall reads this so it
+  /// never interrupts a workout (FR-030).
   final bool isWorkoutActive;
-  final String? newPrExerciseSlug; // non-null while PR animation is showing
+
+  /// Sets saved so far, keyed by `plan_exercises.id`, in logging order.
+  final Map<String, List<LoggedSet>> logged;
+
+  List<LoggedSet> setsFor(String planExerciseId) => logged[planExerciseId] ?? const [];
 
   WorkoutState copyWith({
     WorkoutPhase? phase,
     String? workoutLogId,
     String? sessionId,
     int? currentExerciseIndex,
-    int? currentSetIndex,
     int? restSecondsRemaining,
     bool? isWorkoutActive,
-    String? newPrExerciseSlug,
-    bool clearPr = false,
+    Map<String, List<LoggedSet>>? logged,
   }) =>
       WorkoutState(
         phase: phase ?? this.phase,
         workoutLogId: workoutLogId ?? this.workoutLogId,
         sessionId: sessionId ?? this.sessionId,
         currentExerciseIndex: currentExerciseIndex ?? this.currentExerciseIndex,
-        currentSetIndex: currentSetIndex ?? this.currentSetIndex,
         restSecondsRemaining: restSecondsRemaining ?? this.restSecondsRemaining,
         isWorkoutActive: isWorkoutActive ?? this.isWorkoutActive,
-        newPrExerciseSlug: clearPr ? null : (newPrExerciseSlug ?? this.newPrExerciseSlug),
+        logged: logged ?? this.logged,
       );
 }
 
@@ -55,80 +64,82 @@ class WorkoutController extends _$WorkoutController {
   Timer? _restTimer;
 
   @override
-  WorkoutState build() => const WorkoutState();
+  WorkoutState build() {
+    ref.onDispose(() => _restTimer?.cancel());
+    return const WorkoutState();
+  }
 
+  /// Starts (or resumes, with [existing] sets) the workout [workoutLogId].
   void startWorkout({
     required String workoutLogId,
     required String sessionId,
+    List<LoggedSet> existing = const [],
+    int currentExerciseIndex = 0,
   }) {
-    state = state.copyWith(
+    _restTimer?.cancel();
+    final logged = <String, List<LoggedSet>>{};
+    for (final s in existing) {
+      (logged[s.planExerciseId] ??= []).add(s);
+    }
+    state = WorkoutState(
       phase: WorkoutPhase.active,
       workoutLogId: workoutLogId,
       sessionId: sessionId,
-      currentExerciseIndex: 0,
-      currentSetIndex: 0,
+      currentExerciseIndex: currentExerciseIndex,
       isWorkoutActive: true,
+      logged: logged,
     );
   }
 
-  void setCompleted({required int restSec, String? prExerciseSlug}) {
+  /// Records a saved set; starts the rest timer when [restSec] is given.
+  void recordSet(LoggedSet set, {int? restSec}) {
+    final logged = {
+      ...state.logged,
+      set.planExerciseId: [...state.setsFor(set.planExerciseId), set]
+    };
     _restTimer?.cancel();
+    if (restSec == null || restSec <= 0) {
+      state = state.copyWith(logged: logged, phase: WorkoutPhase.active, restSecondsRemaining: 0);
+      return;
+    }
+    state = state.copyWith(logged: logged, phase: WorkoutPhase.resting, restSecondsRemaining: restSec);
+    _restTimer = Timer.periodic(const Duration(seconds: 1), (_) => _tick());
+  }
 
-    state = state.copyWith(
-      phase: WorkoutPhase.resting,
-      restSecondsRemaining: restSec,
-      newPrExerciseSlug: prExerciseSlug,
-    );
-
-    _startRestTimer(restSec);
+  /// Changes the running rest by [deltaSec], kept within 15–600 s. Affects this rest only.
+  void adjustRest(int deltaSec) {
+    if (state.phase != WorkoutPhase.resting) return;
+    final next = (state.restSecondsRemaining + deltaSec).clamp(kRestMinSec, kRestMaxSec);
+    state = state.copyWith(restSecondsRemaining: next);
   }
 
   void skipRest() {
     _restTimer?.cancel();
-    state = state.copyWith(
-      phase: WorkoutPhase.active,
-      restSecondsRemaining: 0,
-      currentSetIndex: state.currentSetIndex + 1,
-    );
+    state = state.copyWith(phase: WorkoutPhase.active, restSecondsRemaining: 0);
   }
 
-  void nextExercise() {
-    state = state.copyWith(
-      phase: WorkoutPhase.active,
-      currentExerciseIndex: state.currentExerciseIndex + 1,
-      currentSetIndex: 0,
-      clearPr: true,
-    );
+  void goToExercise(int index) {
+    if (index < 0) return;
+    state = state.copyWith(currentExerciseIndex: index);
   }
 
   void completeWorkout() {
     _restTimer?.cancel();
-    state = state.copyWith(
-      phase: WorkoutPhase.complete,
-      isWorkoutActive: false,
-    );
+    state = state.copyWith(phase: WorkoutPhase.complete, isWorkoutActive: false, restSecondsRemaining: 0);
   }
 
-  void _startRestTimer(int seconds) {
-    _restTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (state.restSecondsRemaining <= 1) {
-        timer.cancel();
-        state = state.copyWith(
-          phase: WorkoutPhase.active,
-          restSecondsRemaining: 0,
-          currentSetIndex: state.currentSetIndex + 1,
-        );
-      } else {
-        state = state.copyWith(
-          restSecondsRemaining: state.restSecondsRemaining - 1,
-        );
-      }
-    });
-  }
-
-  @override
-  void dispose() {
+  /// Clears the finished workout so the next one starts fresh.
+  void reset() {
     _restTimer?.cancel();
-    super.dispose();
+    state = const WorkoutState();
+  }
+
+  void _tick() {
+    if (state.restSecondsRemaining <= 1) {
+      _restTimer?.cancel();
+      state = state.copyWith(phase: WorkoutPhase.active, restSecondsRemaining: 0);
+    } else {
+      state = state.copyWith(restSecondsRemaining: state.restSecondsRemaining - 1);
+    }
   }
 }

@@ -69,16 +69,31 @@ Deno.test('Pro: a valid first answer is saved as an AI plan', async () => {
 });
 
 Deno.test('Pro: exercises the user cannot do are substituted without another AI call', async () => {
-  // The AI answer uses barbell lifts; a dumbbell-only Pro user gets dumbbell substitutes.
-  const dumbbellOnly = input({ profile: { ...input().profile, equipment: ['dumbbell', 'bodyweight'] } });
+  // The AI answer uses barbell lifts; a Pro user with dumbbells and a bench gets dumbbell substitutes.
+  const dumbbellOnly = input({ profile: { ...input().profile, equipment: ['dumbbell', 'bench', 'bodyweight'] } });
   const { d, calls } = deps([aiPlan()]);
   const r = await runGeneratePlan(dumbbellOnly, d);
   assert(r.ok, JSON.stringify(r));
   assertEquals([r.source, calls.length], ['ai', 1]);
   const slugs = new Set(r.plan.sessions.flatMap((s) => s.exercises.map((e) => e.exercise_slug)));
-  // Squat → lunge: same primary muscles and equipment class; ties break alphabetically
-  // (substitution does not rank by movement pattern).
-  assertEquals([...slugs].sort(), ['dumbbell-bench-press', 'dumbbell-lunge', 'dumbbell-row', 'dumbbell-shoulder-press']);
+  // Squat → Bulgarian split squat: same primary muscles and equipment class; ties break
+  // alphabetically (substitution does not rank by movement pattern).
+  assertEquals([...slugs].sort(), [
+    'bulgarian-split-squat', 'dumbbell-bench-press', 'dumbbell-row', 'dumbbell-shoulder-press',
+  ]);
+});
+
+Deno.test('Pro: without a bench or bar, no bench, bar or dip-station exercise is substituted in (FR-013)', async () => {
+  // T142: a home user with dumbbells only — no bench, pull-up bar or dip station.
+  const noBench = input({ profile: { ...input().profile, equipment: ['dumbbell', 'bodyweight'] } });
+  const { d } = deps([aiPlan()]);
+  const r = await runGeneratePlan(noBench, d);
+  assert(r.ok, JSON.stringify(r));
+  const slugs = [...new Set(r.plan.sessions.flatMap((s) => s.exercises.map((e) => e.exercise_slug)))].sort();
+  assertEquals(slugs, ['diamond-push-up', 'dumbbell-lunge', 'dumbbell-row', 'dumbbell-shoulder-press']);
+  for (const banned of ['dumbbell-bench-press', 'bulgarian-split-squat', 'inverted-row', 'pull-up', 'chest-dip', 'bench-dip']) {
+    assert(!slugs.includes(banned), banned);
+  }
 });
 
 Deno.test('Pro: an unknown exercise with no substitute is a validation error that triggers a retry', async () => {
@@ -145,4 +160,20 @@ Deno.test('PLAN_VALIDATION_FAILED and AI_UNAVAILABLE are never returned', async 
     const r = await runGeneratePlan(input(), deps(responses as Array<AiPlan | Error>).d);
     assert(r.ok, 'onboarding must always end with a plan');
   }
+});
+
+Deno.test('every source returns a rationale in both languages (FR-044)', async () => {
+  const free = await runGeneratePlan(input({ isPro: false }), deps([]).d);
+  const ppl = TEMPLATES.find((t) => t.slug === 'intermediate-ppl-4x')!;
+  assert(free.ok);
+  assertEquals([free.rationale_en, free.rationale_fr], [ppl.rationale_en, ppl.rationale_fr]);
+
+  const ai = await runGeneratePlan(input(), deps([{ ...aiPlan(), rationale_en: 'Fits your 3 days.', rationale_fr: 'Adapté à vos 3 jours.' }]).d);
+  assert(ai.ok);
+  assertEquals([ai.rationale_en, ai.rationale_fr], ['Fits your 3 days.', 'Adapté à vos 3 jours.']);
+
+  const fallback = await runGeneratePlan(input(), deps([new Error('503')]).d);
+  assert(fallback.ok);
+  assertEquals(fallback.source, 'template_fallback');
+  assert(fallback.rationale_en.length > 0 && fallback.rationale_fr.length > 0);
 });

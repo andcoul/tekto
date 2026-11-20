@@ -1,6 +1,6 @@
 # Tekto — Product Requirements Document (PRD)
 
-Nov 9, 2026 · @Andy Coul · Draft v0.1
+Nov 9, 2026 · @Andy Coul · Draft v0.2 (Nov 15, 2026: aligned with spec `001-tekto-ai-mvp`)
 
 ## Overview
 
@@ -41,7 +41,7 @@ Tekto serves four personas from day one; onboarding detects the level and adapts
 | --- | --- | --- | --- |
 | Beginner | New to the gym, unsure what to do, fears injury or looking awkward | Clear guidance and confidence | Simple full-body plans, real video for every move, camera form check, coach answers to basic questions |
 | Intermediate lifter | Trains 3 to 5 times a week, has plateaued | Structure and progression | Periodized plans, auto-progression of weights and reps, weekly adjustments from logged performance |
-| Advanced lifter | Years of training, follows hypertrophy or strength science | Control and deep data | Editable programs, RPE/RIR tracking, volume per muscle, e1RM trends, deload logic |
+| Advanced lifter | Years of training, follows hypertrophy or strength science | Control and deep data | Exercise swaps and plan regeneration (full program editing after the MVP), RPE/RIR targets, volume per muscle, e1RM trends, deload logic |
 | Home-gym user | Trains at home with dumbbells, bands or bodyweight | A plan that fits limited equipment | Equipment-aware plans, substitutions for every exercise, short sessions |
 
 All personas: smartphone users aged 18 to 45, global, English or French speakers, willing to pay for a premium experience.
@@ -53,17 +53,18 @@ The MVP ships four AI pillars plus the tracking that feeds them. P0 = must ship 
 ### 1. AI plan generator (P0)
 
 - Onboarding quiz: goal (muscle, strength, fat loss, general fitness), level, days per week, session length, equipment, injuries or limits.
+- Pro users get an AI-generated plan; free users get a rule-based plan built from a starter template (no AI call).
 - Generates a 4 to 12 week program with splits, exercises, sets, reps, rest and target effort (RPE/RIR).
 - Adapts weekly from logged results: progresses load when targets are hit, adjusts when sessions are missed or too hard.
-- Exercise swap with equivalent alternatives (same muscle, available equipment).
+- Exercise swap with equivalent alternatives (same muscle, available equipment), for free and Pro users.
 - Must: every generated exercise exists in the video library; no plan references a movement without a video.
 
 ### 2. Real exercise video library (P0)
 
 - Filmed demonstrations, not 3D animations: front and side angles, looped, 5 to 15 seconds.
-- 150+ exercises at launch covering gym, dumbbell, band and bodyweight.
+- 150+ exercises at launch covering gym barbell, dumbbell, cable, band and bodyweight.
 - Per exercise: target muscles, step-by-step cues, common mistakes, easier and harder variations.
-- Offline download of the videos in the current plan.
+- Offline download of the videos in the current plan (Pro).
 
 ### 3. AI chat coach (P0)
 
@@ -72,22 +73,22 @@ The MVP ships four AI pillars plus the tracking that feeds them. P0 = must ship 
 - Can make plan changes on request ("swap squats, my knee hurts", "I only have 30 minutes today") with user confirmation.
 - Guardrails: no medical diagnosis; pain or injury questions trigger advice to see a professional.
 
-### 4. Camera form check (P1 at launch, P0 by v1.1)
+### 4. Camera form check (required at launch, labelled Beta; more lifts in v1.1)
 
 - On-device pose estimation during a set, phone placed on the floor or a bench.
-- Launch set: 8 to 10 key lifts (squat, deadlift, bench press, overhead press, row, lunge, hip thrust, push-up, pull-up).
+- Launch set: 8 key lifts (squat, deadlift, bench press, overhead press, row, lunge, hip thrust, push-up); pull-up and more lifts in v1.1.
 - Rep counting, range-of-motion check, 2 to 3 real-time cues per lift (knees caving, back rounding, depth).
-- Post-set summary with a form score; video never leaves the phone unless the user chooses to share it.
+- Post-set summary with a form score; video never leaves the phone (sharing footage is post-MVP).
 
 ### 5. Workout tracking and progress (P0)
 
 - Live workout screen: sets, reps, weight, rest timer, plate calculator.
-- History, personal records, estimated 1RM, volume per muscle group, body weight and photos.
+- History, personal records, estimated 1RM, volume per muscle group, body weight (progress photos after the MVP).
 - Apple Health and Google Health Connect sync.
 
 ### Out of MVP
 
-- Nutrition tracking, social feed, wearables beyond Health sync, live human coaching, web app.
+- Nutrition tracking, social feed, wearables beyond Health sync, live human coaching, web app, progress photos, form-check footage sharing, full program editing, in-app speech recognition.
 
 ## User journeys
 
@@ -96,17 +97,18 @@ Five journeys define the MVP; each must be completable in the fewest taps possib
 **Onboarding to first plan (target: under 3 minutes)**
 
 1. Welcome video and value promise.
-2. Quiz: goal, level, days per week, session length, equipment, limitations.
-3. Optional quick strength check (estimated weights for 3 lifts, or "I don't know").
-4. AI generates the plan with a short explanation of why it fits.
-5. Pro trial offer, skippable; account created with Apple, Google or email.
+2. Create an account with Apple, Google or email; accept the health disclaimer and data consent.
+3. Quiz: goal, level, days per week, session length, equipment, limitations.
+4. Optional quick strength check (estimated weights for 3 lifts, or "I don't know").
+5. Tekto generates the plan (AI for Pro, rule-based template for free users) with a short explanation of why it fits.
+6. Pro trial offer, skippable; starting the trial upgrades the plan to an AI plan right away.
 
 **Daily workout**
 
 1. Home shows today's session, duration and target muscles.
 2. Start: each exercise opens with its video and 3 key cues.
 3. Log sets; rest timer starts automatically; suggested weight shown.
-4. Finish: summary, records hit, effort rating; plan adjusts for next time.
+4. Finish: summary, records hit, effort rating; for Pro users the plan adjusts at the next weekly review.
 
 **Form check (Pro)**
 
@@ -118,7 +120,7 @@ Five journeys define the MVP; each must be completable in the fewest taps possib
 **Ask the coach (Pro)**
 
 1. Open the coach from any screen; context of that screen is passed in.
-2. Ask in text or voice; get an answer grounded in the user's plan and history.
+2. Ask in text (or by voice through the phone's keyboard dictation); get an answer grounded in the user's plan and history.
 3. If the answer changes the plan, confirm before it is applied.
 
 **Upgrade**
@@ -170,9 +172,9 @@ These are the product-level requirements; the TRD will turn them into architectu
 
 | Area | Requirement |
 | --- | --- |
-| Platforms | iOS 16+ and Android 10+ from one cross-platform codebase; phones first, tablets supported |
+| Platforms | iOS 16+ and Android 10+ from one cross-platform codebase; phones first; on tablets the phone layout runs without breaking (no tablet-specific layouts in the MVP) |
 | Performance | Cold start under 2 s; exercise video starts under 1 s on 4G; form-check feedback under 150 ms per frame |
-| Offline | Today's workout, its videos and logging work with no connection; sync when back online |
+| Offline | Today's workout, logging and text cues work with no connection for every user; plan videos play offline for Pro users after download; sync when back online |
 | AI quality | Plans pass rule checks (volume, rest, balance) before reaching the user; coach answers grounded in the user's data |
 | Privacy | Camera frames processed on-device; health data encrypted; GDPR-compliant, data export and account deletion in-app |
 | Safety | Health disclaimer at onboarding; injury and pain topics routed to "see a professional"; no medical claims |
@@ -207,7 +209,7 @@ Tekto reaches the stores after two gates: the beta starts only when the core flo
 
 &#91;embedded content: Tekto roadmap · 5 phases, 2 gates\]
 
-Form check ships as P1 at launch and becomes a full P0 feature in v1.1; dates are set in the TRD once team size and budget are known.
+Form check is required at launch with 8 lifts (labelled Beta) and gains more lifts in v1.1; dates are set in the TRD once team size and budget are known.
 
 ### Risks
 

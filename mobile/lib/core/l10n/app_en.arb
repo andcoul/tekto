@@ -108,7 +108,7 @@
       }
     }
   },
-  "libraryTitle": "Exercise Library",
+  "libraryTitle": "Exercise library",
   "librarySearchHint": "Search exercises…",
   "libraryFilterMuscle": "Muscle",
   "libraryFilterEquipment": "Equipment",
@@ -138,10 +138,87 @@
   "coachPlanChangePending": "I suggest this change to your plan:",
   "coachApplyChange": "Apply change",
   "coachDeclineChange": "No thanks",
+  "coachChangeSwap": "Swap {oldName} → {newName}",
+  "@coachChangeSwap": {
+    "placeholders": {
+      "oldName": {
+        "type": "String"
+      },
+      "newName": {
+        "type": "String"
+      }
+    }
+  },
+  "coachChangeShorten": "Shorten this session to {minutes} min",
+  "@coachChangeShorten": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "coachChangeDeload": "Deload week {week}: fewer sets and lighter weights",
+  "@coachChangeDeload": {
+    "placeholders": {
+      "week": {
+        "type": "int"
+      }
+    }
+  },
+  "coachChangeWeight": "{exercise}: {weight} {unit}",
+  "@coachChangeWeight": {
+    "placeholders": {
+      "exercise": {
+        "type": "String"
+      },
+      "weight": {
+        "type": "String"
+      },
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "coachChangeReps": "{exercise}: {repsMin}–{repsMax} reps",
+  "@coachChangeReps": {
+    "placeholders": {
+      "exercise": {
+        "type": "String"
+      },
+      "repsMin": {
+        "type": "int"
+      },
+      "repsMax": {
+        "type": "int"
+      }
+    }
+  },
+  "coachChangeWeightReps": "{exercise}: {weight} {unit} × {repsMin}–{repsMax} reps",
+  "@coachChangeWeightReps": {
+    "placeholders": {
+      "exercise": {
+        "type": "String"
+      },
+      "weight": {
+        "type": "String"
+      },
+      "unit": {
+        "type": "String"
+      },
+      "repsMin": {
+        "type": "int"
+      },
+      "repsMax": {
+        "type": "int"
+      }
+    }
+  },
+  "coachChangeApplied": "Change applied",
+  "coachChangeDismissed": "Change dismissed",
   "formCheckTitle": "Form Check",
   "formCheckPlacementTitle": "Position your phone",
   "formCheckPlacementInstructions": "Place your phone on the floor about 2 m away, facing you. Make sure your whole body is visible in the frame.",
-  "formCheckStartButton": "Start recording",
+  "formCheckStartButton": "Start form check",
   "formCheckAdjustLighting": "Adjust lighting — room is too dark to track your form.",
   "formCheckReps": "{reps} reps",
   "@formCheckReps": {
@@ -163,11 +240,11 @@
   "settingsUnits": "Weight units",
   "settingsUnitKg": "Kilograms (kg)",
   "settingsUnitLb": "Pounds (lb)",
-  "settingsHealthSync": "Sync to Apple Health",
+  "settingsHealthSync": "Sync workouts to Apple Health / Health Connect",
   "settingsSubscription": "Subscription",
   "settingsAccount": "Account",
   "settingsExportData": "Export my data",
-  "settingsExportDataConfirm": "Your data will be prepared and a download link emailed to you.",
+  "settingsExportDataConfirm": "We prepare one file with all your data. The download link works for 1 hour.",
   "settingsDeleteAccount": "Delete account",
   "settingsDeleteAccountConfirm": "This will permanently delete all your data and cannot be undone. Are you sure?",
   "settingsDeleteAccountConfirmSecond": "Delete my account permanently",
@@ -219,16 +296,17 @@
   "freePlanDaysCapped": "Your free plan has 4 sessions a week. Tekto Pro builds programs for 5 or more days.",
   "coachUnavailable": "The coach is temporarily unavailable. Your plan still works — try again in a moment.",
   "proUnavailableInRegion": "Tekto Pro is not yet available in your region.",
-  "adaptationSessionsCompleted": "{completed} of {scheduled} sessions completed",
+  "adaptationSessionsCompleted": "{done} of {total} sessions completed",
   "@adaptationSessionsCompleted": {
     "placeholders": {
-      "completed": {
+      "done": {
         "type": "int"
       },
-      "scheduled": {
+      "total": {
         "type": "int"
       }
-    }
+    },
+    "description": "Weekly adaptation summary (FR-027)"
   },
   "adaptationWhyLabel": "Why",
   "formCheckFreeTryUsed": "You've used your free form check for this lift.",
@@ -237,5 +315,640 @@
   "trialSkip": "Skip for now",
   "paywallPurchaseFailed": "Purchase failed. Please try again.",
   "trialTitle": "Your plan is ready",
-  "trialSubtitle": "Try Tekto Pro free for 7 days: unlimited coach, camera form check, weekly plan updates and offline video."
+  "trialSubtitle": "Try Tekto Pro free for 7 days: unlimited coach, camera form check, weekly plan updates and offline video.",
+  "workoutNextExercise": "Next exercise",
+  "workoutPreviousExercise": "Previous exercise",
+  "workoutFinishShort": "Finish",
+  "workoutRestAdd15": "Add 15 seconds",
+  "workoutRestRemove15": "Remove 15 seconds",
+  "workoutMoreReps": "More reps",
+  "workoutFewerReps": "Fewer reps",
+  "workoutRpe": "RPE",
+  "workoutReps": "reps",
+  "workoutEndTitle": "End workout?",
+  "workoutEndBody": "Your logged sets are saved.",
+  "workoutKeepGoing": "Keep going",
+  "workoutEnd": "End workout",
+  "workoutFormCheck": "Form check",
+  "workoutSummaryExercises": "Exercises",
+  "workoutSummaryPrs": "PRs",
+  "homeNoPlanTitle": "No active plan",
+  "homeNoPlanSubtitle": "Build your first training plan.",
+  "homeBuildPlan": "Build a plan",
+  "homeExercises": "Exercises",
+  "homeCoach": "Coach",
+  "homeProgress": "Progress",
+  "navHome": "Home",
+  "navPlan": "Plan",
+  "navLibrary": "Library",
+  "navProgress": "Progress",
+  "unitKg": "kg",
+  "unitLb": "lb",
+  "workoutExerciseOf": "Exercise {current} of {total}",
+  "@workoutExerciseOf": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "workoutTargetReps": "{min}–{max} reps",
+  "@workoutTargetReps": {
+    "placeholders": {
+      "min": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "homeEstimatedMin": "{minutes} min",
+  "@homeEstimatedMin": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "workoutSetDone": "{weight} {unit} × {reps}",
+  "@workoutSetDone": {
+    "placeholders": {
+      "weight": {
+        "type": "String"
+      },
+      "unit": {
+        "type": "String"
+      },
+      "reps": {
+        "type": "int"
+      }
+    }
+  },
+  "workoutVolumeValue": "{value} {unit}",
+  "@workoutVolumeValue": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      },
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "welcomeTitle": "Build your strength",
+  "welcomeBody": "Your plan, real video for every move, form feedback and a coach — in one app.",
+  "welcomeGetStarted": "Get started",
+  "welcomeSkip": "Skip",
+  "swapTitle": "Swap exercise",
+  "swapNoAlternatives": "No alternative fits your equipment and limitations.",
+  "swapNotAllowed": "This exercise can't replace the current one.",
+  "swapFailed": "Couldn't swap the exercise. Check your connection and try again.",
+  "workoutTargetRpe": "Target RPE {rpe}",
+  "@workoutTargetRpe": {
+    "placeholders": {
+      "rpe": {
+        "type": "String"
+      }
+    }
+  },
+  "workoutTargetRir": "RIR {rir} (≈ RPE {rpe})",
+  "@workoutTargetRir": {
+    "placeholders": {
+      "rir": {
+        "type": "int"
+      },
+      "rpe": {
+        "type": "String"
+      }
+    }
+  },
+  "platesTitle": "Plate calculator",
+  "platesWeightLabel": "Weight",
+  "platesPerSide": "Per side",
+  "platesEmptyBar": "Empty bar",
+  "platesBar": "Bar: {bar}",
+  "@platesBar": {
+    "placeholders": {
+      "bar": {
+        "type": "String"
+      }
+    }
+  },
+  "platesNotExact": "{weight} can't be loaded exactly — nearest is {nearest}",
+  "@platesNotExact": {
+    "placeholders": {
+      "weight": {
+        "type": "String"
+      },
+      "nearest": {
+        "type": "String"
+      }
+    }
+  },
+  "progressTabBodyWeight": "Body weight",
+  "progressLimited": "Showing the last 4 weeks",
+  "progressProCard": "Tekto Pro shows your full history and muscle balance.",
+  "progressProCardAction": "See Pro",
+  "progressNoHistory": "No finished workouts yet.",
+  "progressNoRecords": "No records yet.",
+  "progressRecord": "{weight} × {reps}",
+  "@progressRecord": {
+    "placeholders": {
+      "weight": {
+        "type": "String"
+      },
+      "reps": {
+        "type": "int"
+      }
+    }
+  },
+  "progressE1rm": "e1RM {weight}",
+  "@progressE1rm": {
+    "placeholders": {
+      "weight": {
+        "type": "String"
+      }
+    }
+  },
+  "progressWeeklySets": "Sets per muscle — week of {date}",
+  "@progressWeeklySets": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "progressSets": "{count} sets",
+  "@progressSets": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "progressE1rmTrend": "e1RM trend",
+  "progressBalanceTitle": "Muscle balance",
+  "progressBalance": "Push {push} · Pull {pull}",
+  "@progressBalance": {
+    "placeholders": {
+      "push": {
+        "type": "int"
+      },
+      "pull": {
+        "type": "int"
+      }
+    }
+  },
+  "progressLogBodyWeight": "Log body weight",
+  "progressSave": "Save",
+  "progressNoBodyWeight": "No entries yet.",
+  "paywallOffline": "Connect to the internet to start your trial.",
+  "paywallSave": "Save {percent}%",
+  "@paywallSave": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "paywallContinueWorkout": "Continue workout",
+  "paywallRestoreFailed": "Couldn't restore purchases. Try again later.",
+  "paywallFeatureFormCheck": "Real-time form feedback on your key lifts.",
+  "paywallFeatureCoach": "Unlimited questions to your AI coach.",
+  "paywallFeatureAdaptivePlan": "A plan that adapts to you every week.",
+  "paywallFeatureGeneral": "AI plans, coach, form check and offline video.",
+  "formCheckBeta": "Beta",
+  "formCheckBetaNote": "Form check is in beta: it can miss a rep or misjudge one.",
+  "formCheckPrivacy": "The camera image stays on your phone and is never saved or sent.",
+  "formCheckStop": "Stop",
+  "formCheckFreeTryNote": "Free try: one form check per lift.",
+  "formCheckUnlock": "Unlock unlimited form checks",
+  "formCheckNotSupported": "Form check isn't available for this exercise.",
+  "formCheckNoCamera": "The camera is unavailable. Allow camera access in Settings.",
+  "formCheckSummaryTitle": "Form summary",
+  "formCheckRepsCounted": "{reps} reps counted",
+  "@formCheckRepsCounted": {
+    "placeholders": {
+      "reps": {
+        "type": "int"
+      }
+    }
+  },
+  "formCheckFlaggedReps": "Reps to review: {reps}",
+  "@formCheckFlaggedReps": {
+    "placeholders": {
+      "reps": {
+        "type": "String"
+      }
+    }
+  },
+  "formCheckNoFlaggedReps": "No reps flagged",
+  "formCheckTechniqueNotes": "Technique notes",
+  "formCheckGreatForm": "Great form! Keep it up.",
+  "formCheckDone": "Done",
+  "formCheckTryAgain": "Try again",
+  "coachRateHelpful": "Helpful",
+  "coachRateNotHelpful": "Not helpful",
+  "@coachRateHelpful": {
+    "description": "Tooltip and screen-reader label of the thumbs-up on a coach answer (SC-011)"
+  },
+  "@coachRateNotHelpful": {
+    "description": "Tooltip and screen-reader label of the thumbs-down on a coach answer (SC-011)"
+  },
+  "adaptationWhy": "Why?",
+  "@adaptationWhy": {
+    "description": "Weekly adaptation card / summary (FR-027)"
+  },
+  "adaptationDismiss": "Dismiss",
+  "@adaptationDismiss": {
+    "description": "Weekly adaptation card / summary (FR-027)"
+  },
+  "adaptationTitle": "Week {week} review",
+  "@adaptationTitle": {
+    "placeholders": {
+      "week": {
+        "type": "int"
+      }
+    },
+    "description": "Weekly adaptation summary (FR-027)"
+  },
+  "adaptationNoChanges": "No changes for next week — keep going.",
+  "@adaptationNoChanges": {
+    "description": "Weekly adaptation card / summary (FR-027)"
+  },
+  "@adaptationGotIt": {
+    "description": "Weekly adaptation card / summary (FR-027)"
+  },
+  "adaptationReps": "reps",
+  "@adaptationReps": {
+    "description": "Weekly adaptation card / summary (FR-027)"
+  },
+  "@settingsHealthSync": {
+    "description": "Settings (T091)"
+  },
+  "@settingsExportDataConfirm": {
+    "description": "Settings (T091)"
+  },
+  "settingsExportReady": "Your export is ready",
+  "@settingsExportReady": {
+    "description": "Settings (T091)"
+  },
+  "settingsExportOpen": "Open",
+  "@settingsExportOpen": {
+    "description": "Settings (T091)"
+  },
+  "settingsExportFailed": "Export failed. Check your connection and try again.",
+  "@settingsExportFailed": {
+    "description": "Settings (T091)"
+  },
+  "settingsRegeneratePlan": "Regenerate my plan",
+  "@settingsRegeneratePlan": {
+    "description": "Settings (T091)"
+  },
+  "settingsRegeneratePlanBody": "Build a new plan from your current answers? Your current plan is replaced; your workout history stays.",
+  "@settingsRegeneratePlanBody": {
+    "description": "Settings (T091)"
+  },
+  "settingsRegenerateConfirm": "Regenerate",
+  "@settingsRegenerateConfirm": {
+    "description": "Settings (T091)"
+  },
+  "settingsRegenerateDone": "Your new plan is ready.",
+  "@settingsRegenerateDone": {
+    "description": "Settings (T091)"
+  },
+  "settingsRegenerateFailed": "Could not build a new plan. Check your connection and try again.",
+  "@settingsRegenerateFailed": {
+    "description": "Settings (T091)"
+  },
+  "settingsDeleteAccountFinalTitle": "Last step",
+  "@settingsDeleteAccountFinalTitle": {
+    "description": "Settings (T091)"
+  },
+  "settingsDeleteAccountFinalBody": "Your account, workouts, plans and coach messages will be deleted from our servers and this phone.",
+  "@settingsDeleteAccountFinalBody": {
+    "description": "Settings (T091)"
+  },
+  "settingsDeleteFailed": "Your account could not be deleted. Nothing was removed. Try again when you are online.",
+  "@settingsDeleteFailed": {
+    "description": "Settings (T091)"
+  },
+  "settingsPrivacyPolicy": "Privacy policy",
+  "@settingsPrivacyPolicy": {
+    "description": "Settings (T091)"
+  },
+  "settingsManageSubscription": "Manage subscription",
+  "@settingsManageSubscription": {
+    "description": "Settings (T091)"
+  },
+  "settingsEditProfile": "Edit my training profile",
+  "@settingsEditProfile": {
+    "description": "Settings (T091)"
+  },
+  "settingsNeedsConnection": "Connect to the internet to do this.",
+  "@settingsNeedsConnection": {
+    "description": "Settings (T091)"
+  },
+  "profileEditSave": "Save",
+  "@profileEditSave": {
+    "description": "Edit training profile from Settings (FR-046, T131)"
+  },
+  "profileEditRegenerateBody": "Your answers are saved. Build a new plan from them now? Your current plan stays until you do.",
+  "@profileEditRegenerateBody": {
+    "description": "Edit training profile from Settings (FR-046, T131)"
+  },
+  "profileEditNotNow": "Not now",
+  "@profileEditNotNow": {
+    "description": "Edit training profile from Settings (FR-046, T131)"
+  },
+  "quizGoalTitle": "What is your main goal?",
+  "@quizGoalTitle": {
+    "description": "T094 localization audit"
+  },
+  "quizGoalMuscle": "Build muscle",
+  "@quizGoalMuscle": {
+    "description": "T094 localization audit"
+  },
+  "quizGoalStrength": "Get stronger",
+  "@quizGoalStrength": {
+    "description": "T094 localization audit"
+  },
+  "quizGoalFatLoss": "Lose fat",
+  "@quizGoalFatLoss": {
+    "description": "T094 localization audit"
+  },
+  "quizGoalGeneral": "General fitness",
+  "@quizGoalGeneral": {
+    "description": "T094 localization audit"
+  },
+  "quizLevelTitle": "Your training level",
+  "@quizLevelTitle": {
+    "description": "T094 localization audit"
+  },
+  "quizLevelBeginner": "Beginner",
+  "@quizLevelBeginner": {
+    "description": "T094 localization audit"
+  },
+  "quizLevelIntermediate": "Intermediate",
+  "@quizLevelIntermediate": {
+    "description": "T094 localization audit"
+  },
+  "quizLevelAdvanced": "Advanced",
+  "@quizLevelAdvanced": {
+    "description": "T094 localization audit"
+  },
+  "quizDaysTitle": "Days per week",
+  "@quizDaysTitle": {
+    "description": "T094 localization audit"
+  },
+  "quizSessionTitle": "Session length",
+  "@quizSessionTitle": {
+    "description": "T094 localization audit"
+  },
+  "quizEquipmentTitle": "Your equipment",
+  "@quizEquipmentTitle": {
+    "description": "T094 localization audit"
+  },
+  "quizEquipmentBarbell": "Barbell",
+  "@quizEquipmentBarbell": {
+    "description": "T094 localization audit"
+  },
+  "quizEquipmentDumbbell": "Dumbbells / kettlebells",
+  "@quizEquipmentDumbbell": {
+    "description": "T094 localization audit"
+  },
+  "quizEquipmentCable": "Cable",
+  "@quizEquipmentCable": {
+    "description": "T094 localization audit"
+  },
+  "quizEquipmentBodyweight": "Bodyweight",
+  "@quizEquipmentBodyweight": {
+    "description": "T094 localization audit"
+  },
+  "quizEquipmentBands": "Resistance bands",
+  "@quizEquipmentBands": {
+    "description": "T094 localization audit"
+  },
+  "quizEquipmentBench": "Bench",
+  "@quizEquipmentBench": {
+    "description": "T152 equipment choices (FR-001)"
+  },
+  "quizEquipmentDipStation": "Dip station",
+  "@quizEquipmentDipStation": {
+    "description": "T152 equipment choices (FR-001)"
+  },
+  "quizEquipmentPullUpBar": "Pull-up bar",
+  "@quizEquipmentPullUpBar": {
+    "description": "T152 equipment choices (FR-001)"
+  },
+  "quizEquipmentMachine": "Machines",
+  "@quizEquipmentMachine": {
+    "description": "T152 equipment choices (FR-001)"
+  },
+  "quizEquipmentGym": "Gym",
+  "@quizEquipmentGym": {
+    "description": "T152 equipment choices (FR-001)"
+  },
+  "quizLimitationsTitle": "Any injuries or limitations?",
+  "@quizLimitationsTitle": {
+    "description": "T094 localization audit"
+  },
+  "quizLimitationsNote": "Anything else? (optional)",
+  "@quizLimitationsNote": {
+    "description": "T094 localization audit"
+  },
+  "quizStrengthTitle": "Strength check (optional)",
+  "@quizStrengthTitle": {
+    "description": "T094 localization audit"
+  },
+  "quizNext": "Next",
+  "@quizNext": {
+    "description": "T094 localization audit"
+  },
+  "quizBuildPlan": "Build my plan",
+  "@quizBuildPlan": {
+    "description": "T094 localization audit"
+  },
+  "quizReps": "reps",
+  "@quizReps": {
+    "description": "T094 localization audit"
+  },
+  "quizLimitationsBody": "Optional. We will avoid exercises that stress these areas.",
+  "@quizLimitationsBody": {
+    "description": "T094 localization audit"
+  },
+  "quizStrengthBody": "A recent weight (kg) you lifted and for how many reps. Leave empty if you don't know — we start conservatively.",
+  "@quizStrengthBody": {
+    "description": "T094 localization audit"
+  },
+  "limitationKnee": "Knee",
+  "@limitationKnee": {
+    "description": "T094 localization audit"
+  },
+  "limitationLowerBack": "Lower back",
+  "@limitationLowerBack": {
+    "description": "T094 localization audit"
+  },
+  "limitationShoulder": "Shoulder",
+  "@limitationShoulder": {
+    "description": "T094 localization audit"
+  },
+  "limitationWrist": "Wrist",
+  "@limitationWrist": {
+    "description": "T094 localization audit"
+  },
+  "limitationElbow": "Elbow",
+  "@limitationElbow": {
+    "description": "T094 localization audit"
+  },
+  "limitationHip": "Hip",
+  "@limitationHip": {
+    "description": "T094 localization audit"
+  },
+  "limitationAnkle": "Ankle",
+  "@limitationAnkle": {
+    "description": "T094 localization audit"
+  },
+  "limitationNeck": "Neck",
+  "@limitationNeck": {
+    "description": "T094 localization audit"
+  },
+  "liftSquat": "Squat",
+  "@liftSquat": {
+    "description": "T094 localization audit"
+  },
+  "liftBenchPress": "Bench press",
+  "@liftBenchPress": {
+    "description": "T094 localization audit"
+  },
+  "liftDeadlift": "Deadlift",
+  "@liftDeadlift": {
+    "description": "T094 localization audit"
+  },
+  "@planTitle": {
+    "description": "T094 localization audit"
+  },
+  "commonLoadError": "Something went wrong. Pull to retry or try again later.",
+  "@commonLoadError": {
+    "description": "T094 localization audit"
+  },
+  "planNone": "No active plan.",
+  "@planNone": {
+    "description": "T094 localization audit"
+  },
+  "planGenerate": "Generate a plan",
+  "@planGenerate": {
+    "description": "T094 localization audit"
+  },
+  "planRestDay": "Rest day",
+  "@planRestDay": {
+    "description": "T094 localization audit"
+  },
+  "planRestDayBody": "Recovery is part of the plan.",
+  "@planRestDayBody": {
+    "description": "T094 localization audit"
+  },
+  "@libraryTitle": {
+    "description": "T094 localization audit"
+  },
+  "libraryEmpty": "No exercises found.",
+  "@libraryEmpty": {
+    "description": "T094 localization audit"
+  },
+  "libraryFront": "Front",
+  "@libraryFront": {
+    "description": "T094 localization audit"
+  },
+  "librarySide": "Side",
+  "@librarySide": {
+    "description": "T094 localization audit"
+  },
+  "libraryCues": "Technique cues",
+  "@libraryCues": {
+    "description": "T094 localization audit"
+  },
+  "libraryMistakes": "Common mistakes",
+  "@libraryMistakes": {
+    "description": "T094 localization audit"
+  },
+  "libraryVariations": "Variations",
+  "@libraryVariations": {
+    "description": "T094 localization audit"
+  },
+  "subscriptionManageHint": "Opens App Store or Google Play",
+  "@subscriptionManageHint": {
+    "description": "T094 localization audit"
+  },
+  "subscriptionRestore": "Restore purchases",
+  "@subscriptionRestore": {
+    "description": "T094 localization audit"
+  },
+  "subscriptionTerms": "Terms of Service",
+  "@subscriptionTerms": {
+    "description": "T094 localization audit"
+  },
+  "subscriptionRestored": "Purchases restored.",
+  "@subscriptionRestored": {
+    "description": "T094 localization audit"
+  },
+  "subscriptionRestoreFailed": "Restore failed. Try again.",
+  "@subscriptionRestoreFailed": {
+    "description": "T094 localization audit"
+  },
+  "planGenSlow": "This is taking longer than expected.",
+  "@planGenSlow": {
+    "description": "T094 localization audit"
+  },
+  "planGenCheckConnection": "Please check your connection and try again.",
+  "@planGenCheckConnection": {
+    "description": "T094 localization audit"
+  },
+  "planGenAiDown": "AI is temporarily unavailable.",
+  "@planGenAiDown": {
+    "description": "T094 localization audit"
+  },
+  "planGenTryLater": "Please try again in a moment.",
+  "@planGenTryLater": {
+    "description": "T094 localization audit"
+  },
+  "commonTryAgain": "Try again",
+  "@commonTryAgain": {
+    "description": "T094 localization audit"
+  },
+  "authApple": "Continue with Apple",
+  "@authApple": {
+    "description": "T094 localization audit"
+  },
+  "authGoogle": "Continue with Google",
+  "@authGoogle": {
+    "description": "T094 localization audit"
+  },
+  "authEmail": "Sign in with email",
+  "@authEmail": {
+    "description": "T094 localization audit"
+  },
+  "commonNotFound": "Page not found.",
+  "@commonNotFound": {
+    "description": "T094 localization audit"
+  },
+  "libraryEasier": "Easier",
+  "@libraryEasier": {
+    "description": "T094 localization audit"
+  },
+  "libraryHarder": "Harder",
+  "@libraryHarder": {
+    "description": "T094 localization audit"
+  },
+  "coachSend": "Send",
+  "@coachSend": {
+    "description": "Screen-reader label (T093, FR-035)"
+  },
+  "libraryClearSearch": "Clear search",
+  "@libraryClearSearch": {
+    "description": "Screen-reader label (T093, FR-035)"
+  }
 }

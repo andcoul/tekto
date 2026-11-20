@@ -1,9 +1,9 @@
 // ---------------------------------------------------------------------------
-// T091 — PlanAdaptationService unit tests
+// T080 — PlanAdaptationService unit tests (Constitution V; FR-026)
 // ---------------------------------------------------------------------------
 // Run with: deno test supabase/functions/_shared/plan-adaptation.test.ts
 
-import { assertEquals, assertNotEquals } from 'https://deno.land/std@0.168.0/testing/asserts.ts';
+import { assert, assertEquals, assertNotEquals } from 'jsr:@std/assert@1';
 import { computeAdaptation, WeekData, PlanExerciseRow, SetLogRow } from './plan-adaptation.ts';
 
 // ---------------------------------------------------------------------------
@@ -16,9 +16,10 @@ function makePlanExercise(overrides: Partial<PlanExerciseRow> = {}): PlanExercis
     reps_min: 5,
     reps_max: 8,
     rpe_target: 7,
+    rir_target: null,
     suggested_weight_kg: 80,
-    exercise_id: 'ex-001',
-    equipment: 'barbell',
+    exercise_slug: 'barbell-squat',
+    equipment: ['barbell'],
     ...overrides,
   };
 }
@@ -38,13 +39,14 @@ function makeSetLog(overrides: Partial<SetLogRow> = {}): SetLogRow {
 function makeWeekData(
   peOverrides: Partial<PlanExerciseRow> = {},
   setLogOverrides: Partial<SetLogRow>[] = [{}, {}, {}],
-  options: { plannedSessions?: number; completedSessions?: number } = {},
+  options: { plannedSessions?: number; completedSessions?: number; sessionEffort?: number | null } = {},
 ): WeekData {
   return {
     planExercise: makePlanExercise(peOverrides),
     setLogs: setLogOverrides.map(makeSetLog),
     plannedSessionCount: options.plannedSessions ?? 3,
     completedSessionCount: options.completedSessions ?? 3,
+    sessionEffort: options.sessionEffort ?? null,
   };
 }
 
@@ -122,6 +124,7 @@ Deno.test('(e) handles edge case of zero completed sets in a session', () => {
     setLogs: [], // no sets logged
     plannedSessionCount: 3,
     completedSessionCount: 3,
+    sessionEffort: null,
   };
 
   const events = computeAdaptation([data]);
@@ -148,4 +151,70 @@ Deno.test('returns empty array when all exercises maintain', () => {
   // rpe_actual (7.5) > rpe_target (7) → allRepsHit check doesn't matter; avgRpe = 7.5, not > 8
   // → no event (maintain zone)
   assertEquals(events.length, 0);
+});
+
+Deno.test('(c) 2+ missed sessions never progress, even when every set was easy', () => {
+  const easy = [{ weight_kg: 80, reps: 8, rpe_actual: 5 }, { weight_kg: 80, reps: 8, rpe_actual: 5 }];
+  const events = computeAdaptation([makeWeekData({}, easy, { plannedSessions: 4, completedSessions: 2 })]);
+  assertEquals(events.filter((e) => e.newValue > e.oldValue), []);
+});
+
+Deno.test('(c) 2+ missed sessions still reduce a lift that was far too hard', () => {
+  const hard = [{ weight_kg: 80, reps: 5, rpe_actual: 9.5 }];
+  const events = computeAdaptation([makeWeekData({}, hard, { plannedSessions: 4, completedSessions: 2 })]);
+  assertEquals(events.map((e) => [e.field, e.newValue]), [['suggested_weight_kg', 77.5]]);
+});
+
+Deno.test('(e) zero completed sessions in the week → no change for any exercise', () => {
+  const week = [makeWeekData({ id: 'a' }, [], { completedSessions: 0 }), makeWeekData({ id: 'b' }, [], { completedSessions: 0 })];
+  assertEquals(computeAdaptation(week), []);
+});
+
+Deno.test('(f) all reps failed — every set below reps_min → weight reduced one increment, never progressed', () => {
+  const failed = [
+    { weight_kg: 80, reps: 3, rpe_actual: 7 },
+    { weight_kg: 80, reps: 2, rpe_actual: 7 },
+    { weight_kg: 80, reps: 3, rpe_actual: 6 },
+  ];
+  const events = computeAdaptation([makeWeekData({ reps_min: 5, rpe_target: 7 }, failed)]);
+  assertEquals(events.map((e) => [e.field, e.oldValue, e.newValue]), [['suggested_weight_kg', 80, 77.5]]);
+});
+
+Deno.test('a session rated too hard (effort > target + 1) reduces its exercises at the weekly review (FR-026, US5/AC3)', () => {
+  const onTarget = [{ weight_kg: 80, reps: 6, rpe_actual: null }, { weight_kg: 80, reps: 6, rpe_actual: null }];
+  const events = computeAdaptation([makeWeekData({ rpe_target: 7 }, onTarget, { sessionEffort: 9 })]);
+  assertEquals(events.map((e) => [e.field, e.newValue]), [['suggested_weight_kg', 77.5]]);
+});
+
+Deno.test('an RIR target is read as RPE = 10 − RIR', () => {
+  // rir_target 2 → RPE 8; sets at RPE 8 with all reps → progress.
+  const sets = [{ weight_kg: 80, reps: 6, rpe_actual: 8 }, { weight_kg: 80, reps: 6, rpe_actual: 8 }];
+  const events = computeAdaptation([makeWeekData({ rpe_target: null, rir_target: 2 }, sets)]);
+  assertEquals(events.map((e) => [e.field, e.newValue]), [['suggested_weight_kg', 82.5]]);
+});
+
+Deno.test('bodyweight exercises progress reps, and are held (not reduced below 0) when too hard', () => {
+  const easy = [{ weight_kg: 0, reps: 12, rpe_actual: 6 }, { weight_kg: 0, reps: 12, rpe_actual: 6 }];
+  const up = computeAdaptation([makeWeekData({ equipment: ['bodyweight'], suggested_weight_kg: 0, reps_min: 8, reps_max: 12 }, easy)]);
+  assertEquals(up.map((e) => [e.field, e.newValue]), [['reps_max', 13]]);
+
+  const hard = [{ weight_kg: 0, reps: 8, rpe_actual: 9.5 }];
+  assertEquals(computeAdaptation([makeWeekData({ equipment: ['bodyweight'], suggested_weight_kg: 0 }, hard)]), []);
+});
+
+Deno.test('dumbbell exercises move by 1 kg; the increment follows the exercise equipment', () => {
+  const sets = [{ weight_kg: 20, reps: 10, rpe_actual: 6 }, { weight_kg: 20, reps: 10, rpe_actual: 6 }];
+  const events = computeAdaptation([makeWeekData({ equipment: ['dumbbell'], suggested_weight_kg: 20, reps_min: 8, reps_max: 12 }, sets)]);
+  assertEquals(events.map((e) => [e.field, e.newValue]), [['suggested_weight_kg', 21]]);
+});
+
+Deno.test('every event carries deterministic EN and FR reasons', () => {
+  const sets = [{ weight_kg: 80, reps: 6, rpe_actual: 7 }];
+  const a = computeAdaptation([makeWeekData({}, sets)]);
+  const b = computeAdaptation([makeWeekData({}, sets)]);
+  assertEquals(a, b);
+  for (const e of a) {
+    assert(e.reasonEn.length > 0 && e.reasonFr.length > 0);
+    assertNotEquals(e.reasonEn, e.reasonFr);
+  }
 });

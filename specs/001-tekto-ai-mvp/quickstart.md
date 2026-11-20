@@ -107,10 +107,10 @@ flutter run -d iPhone-15-Pro
 **Goal**: Verify SC-001, SC-002 (< 30 s), FR-001–FR-005, FR-002/002a (free rule-based plan), FR-003b (fallback), FR-036 (disclaimer), consent.
 
 **Steps (free user)**:
-1. Fresh install (or clear app data).
+1. Fresh install (or clear app data). Signed out, the app opens on the welcome screen (video, value promise; FR-043) → Get started → sign in.
 2. Health disclaimer → confirm it cannot be skipped. Consent screen → accept. Language → French.
 3. Quiz: Goal = Muscle, Level = Intermediate, 4 days/week, 45 min, equipment **dumbbells + bodyweight only**, limitation tag `knee`.
-4. Observe plan generation; skip the Pro trial offer.
+4. Observe plan generation; check the plan rationale appears in French (FR-044); skip the Pro trial offer.
 
 **Expected outcomes (free)**:
 - Plan appears in < 30 s (no AI call: `source = 'template'`, `template_slug = 'home-dumbbell-3x'` in `plans`).
@@ -118,6 +118,9 @@ flutter run -d iPhone-15-Pro
 - No barbell exercise anywhere (US1 scenario 2) and no exercise whose `contraindications` include `knee`.
 - UI and plan name in French. Every exercise has a video thumbnail.
 - `users.consent_at` and `consent_version` populated.
+- Time from sign-in to plan recorded (SC-016, target < 3 min).
+
+**Steps (trial at onboarding, FR-004)**: repeat with a new account and start a sandbox trial on the trial offer → a new plan with `source = 'ai'` replaces the template plan (or `template_fallback` with the notice card).
 
 **Steps (free, 6 days/week)**: repeat with 6 days → plan has 4 sessions and shows the `free_plan_days_capped` card.
 
@@ -148,6 +151,11 @@ flutter run -d iPhone-15-Pro
 7. Continue logging remaining exercises offline.
 8. Re-enable connectivity.
 9. Finish workout; submit effort rating.
+10. On a barbell exercise enter 100 kg → plate calculator shows 25 + 15 per side (FR-042).
+11. On an exercise with an RIR target → the row shows "RIR 2 (≈ RPE 8)" (FR-007).
+12. As a free user, swap an exercise → works with no paywall (FR-028).
+13. Open Progress → the workout, PRs and weekly sets per muscle appear; log a body weight → shown in the user's unit (FR-039–FR-041).
+14. Reinstall the app and sign in → history reappears (T127).
 
 **Expected outcomes**:
 - Home screen shows today's session with duration and muscle targets.
@@ -213,14 +221,27 @@ flutter run -d iPhone-15-Pro
 5. Review post-set summary.
 
 **Expected outcomes**:
-- Guided placement screen appears with framing overlay.
-- During the set: rep counter increments; "knees caving" cue appears on reps 2 and 4.
+- Guided placement screen appears (placement instructions, privacy note, Beta note; free users also see the free-try note). The camera opens only after "Start form check".
+- During the set: rep counter increments; "Push your knees out" cue appears on reps 2 and 4.
 - Post-set: form score shown (0–100); rep count = 5; reps 2 and 4 flagged; top tip mentions knee tracking.
 - No prompt to upload or share video.
-- `form_check_sessions` row in Supabase: `rep_count = 5`, `flagged_reps = {2,4}`, `user_shared = false`, `cues_shown` contains `'knees_caving'`.
+- `form_check_sessions` row in Supabase: `rep_count = 5`, `flagged_reps = {2,4}`, `user_shared = false`, `cues_shown` contains `'knee_cave'`.
 
 **Free try (FR-029)**: as a free user, run one squat form check (allowed, `was_free_try = true`); a second squat attempt shows the paywall bottom sheet; a deadlift form check is still allowed once.
-- Verify frame processing time: add debug overlay in `FormCheckService`; must stay <150 ms on a mid-range device.
+- Verify frame processing time: in a debug build, read the median frame time that `FormCheckService.stopSession` logs; it must stay < 150 ms on a mid-range device (record it in `checklists/gate1.md`, T095).
+
+**Every launch lift (FR-022, T130)**: on the same setup, run 5 clean reps and 1 partial rep for each lift; expected: `rep_count = 5` and at least one lift-specific cue fires when the fault is shown deliberately.
+
+| Lift | Phone position | Deliberate fault | Expected cue |
+|---|---|---|---|
+| squat | front, ~2 m | knees cave in | `knee_cave` |
+| lunge | front, ~2 m | front knee caves in | `knee_cave` |
+| deadlift | side, ~2 m | round the back | `back_rounding` |
+| row | side, ~2 m | round the back | `back_rounding` |
+| bench_press | side/45°, ~1.5 m | flare the elbows | `elbow_flare` |
+| push_up | side, ~1.5 m | let the hips sag | `hips_sagging` |
+| overhead_press | side, ~2 m | stop short of lockout | `incomplete_lockout` (judged when the press turns back down) |
+| hip_thrust | side, ~1.5 m | stop short of full hip extension | `incomplete_hip_extension` (judged when the hips turn back down) |
 
 **Confidence gate test**:
 6. Repeat with the room light off.

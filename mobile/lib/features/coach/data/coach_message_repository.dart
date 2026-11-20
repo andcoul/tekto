@@ -1,50 +1,105 @@
+import 'dart:convert';
+
+import 'package:drift/drift.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:uuid/uuid.dart';
+
+import 'package:tekto/core/di/providers.dart';
+import 'package:tekto/shared/services/sync/sync_queue.dart';
 import 'package:tekto/shared/models/coach_model.dart';
 import 'package:tekto/shared/services/local_db/daos/coach_dao.dart';
+import 'package:tekto/shared/services/local_db/database.dart';
 
-/// Manages individual coach messages within a conversation.
+const _uuid = Uuid();
+
+/// Manages individual coach messages within a conversation (local Drift cache).
 class CoachMessageRepository {
-  const CoachMessageRepository({required CoachDao dao}) : _dao = dao;
+  const CoachMessageRepository({required CoachDao dao, SyncQueue? queue, DateTime Function() clock = DateTime.now})
+      : _dao = dao,
+        _queue = queue,
+        _clock = clock;
 
   final CoachDao _dao;
+  final SyncQueue? _queue;
+  final DateTime Function() _clock;
 
-  /// Inserts a new message and returns it.
+  /// Stores a new message and returns it.
+  /// [id] is the server's message id when known (assistant replies), so ratings and plan
+  /// changes refer to the same row on both sides.
   Future<CoachMessageModel> addMessage({
     required String conversationId,
     required String role,
     required String content,
+    String? id,
     String? screenContext,
+    String? exerciseSlug,
+    Map<String, dynamic>? planChangeProposed,
   }) async {
     final message = CoachMessageModel(
-      id: _uuid(),
+      id: id ?? _uuid.v4(),
       conversationId: conversationId,
       role: role,
       content: content,
-      screenContext: screenContext,
-      createdAt: DateTime.now(),
+      contextScreen: screenContext,
+      contextExerciseSlug: exerciseSlug,
+      planChangeProposed: planChangeProposed,
+      planChangeApplied: false,
+      createdAt: _clock(),
     );
-    await _dao.insertMessage(message);
+    await _dao.insertMessage(CoachMessagesCompanion.insert(
+      id: message.id,
+      conversationId: conversationId,
+      role: role,
+      content: content,
+      contextScreen: Value(screenContext),
+      contextExerciseSlug: Value(exerciseSlug),
+      planChangeProposed: Value(planChangeProposed == null ? null : jsonEncode(planChangeProposed)),
+      createdAt: Value(message.createdAt),
+    ));
     return message;
   }
 
-  /// Stream of messages for a conversation, oldest first.
+  /// Messages of a conversation, oldest first.
   Stream<List<CoachMessageModel>> watchMessages(String conversationId) =>
-      _dao.watchMessages(conversationId);
+      _dao.watchMessages(conversationId).map((rows) => rows.map(toModel).toList());
 
-  /// Returns the [limit] most-recent messages (for context window injection).
-  Future<List<CoachMessageModel>> getRecentMessages(
-    String conversationId, {
-    int limit = 10,
-  }) =>
-      _dao.getRecentMessages(conversationId, limit: limit);
+  /// Removes a question the server refused to answer, so it is not shown or re-sent twice.
+  Future<void> removeMessage(String messageId) => _dao.deleteMessage(messageId);
 
-  /// Marks a message's plan-change as applied.
-  Future<void> markPlanChangeApplied(String messageId) =>
-      _dao.markPlanChangeApplied(messageId);
+  /// Marks a message's proposed plan change as applied.
+  Future<void> markPlanChangeApplied(String messageId) => _dao.markChangeApplied(messageId);
 
-  /// Records a satisfaction rating (thumbs up/down).
-  Future<void> rateSatisfaction(String messageId, {required bool thumbsUp}) =>
-      _dao.rateSatisfaction(messageId, thumbsUp: thumbsUp);
+  /// Records a satisfaction rating (thumbs up/down, SC-011) on the device and queues it for
+  /// the server, where `v_coach_thumbs_up` measures it (works offline; flushed on reconnect).
+  Future<void> rateSatisfaction(String messageId, {required bool thumbsUp}) async {
+    await _dao.updateMessageRating(messageId, thumbsUp);
+    await _queue?.enqueue(
+      operation: 'update',
+      tableName: 'coach_messages',
+      payload: {'id': messageId, 'satisfaction_rating': thumbsUp},
+    );
+  }
 
-  static String _uuid() =>
-      DateTime.now().microsecondsSinceEpoch.toRadixString(16);
+  static CoachMessageModel toModel(CoachMessage row) => CoachMessageModel(
+        id: row.id,
+        conversationId: row.conversationId,
+        role: row.role,
+        content: row.content,
+        contextScreen: row.contextScreen,
+        contextExerciseSlug: row.contextExerciseSlug,
+        planChangeProposed: row.planChangeProposed == null
+            ? null
+            : Map<String, dynamic>.from(jsonDecode(row.planChangeProposed!) as Map),
+        planChangeApplied: row.planChangeApplied,
+        satisfactionRating: row.satisfactionRating,
+        createdAt: row.createdAt,
+      );
 }
+
+final coachMessageRepositoryProvider = Provider<CoachMessageRepository>(
+  (ref) => CoachMessageRepository(
+    dao: CoachDao(ref.watch(appDatabaseProvider)),
+    queue: ref.watch(syncQueueProvider),
+    clock: ref.watch(clockProvider),
+  ),
+);

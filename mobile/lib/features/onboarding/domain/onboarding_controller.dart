@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:tekto/shared/models/equipment.dart';
 
 import '../../../core/di/providers.dart';
 import 'onboarding_gate.dart';
@@ -16,18 +17,33 @@ const kStrengthLifts = ['squat', 'bench_press', 'deadlift'];
 
 /// Result of `generate-plan` that the next screens need (contracts/backend-api.md §1).
 class GeneratedPlanInfo {
-  const GeneratedPlanInfo({required this.planId, required this.source, required this.fallbackNotice, required this.notices});
+  const GeneratedPlanInfo({
+    required this.planId,
+    required this.source,
+    required this.fallbackNotice,
+    required this.notices,
+    this.rationaleEn = '',
+    this.rationaleFr = '',
+  });
   final String planId;
   final String source;
   final bool fallbackNotice;
   final List<String> notices;
+
+  /// Why the plan fits the user (FR-044); empty when the server sent none.
+  final String rationaleEn;
+  final String rationaleFr;
+
+  String rationaleFor(String languageCode) => languageCode == 'fr' ? rationaleFr : rationaleEn;
 }
 
 /// Backend calls made by onboarding; injectable for tests.
 abstract class OnboardingApi {
   /// Upserts the `users` row for the signed-in user.
   Future<void> saveProfile(Map<String, dynamic> profile);
-  Future<GeneratedPlanInfo> generatePlan();
+
+  /// `forceRegenerate` replaces the active plan (used after a trial starts — FR-004).
+  Future<GeneratedPlanInfo> generatePlan({bool forceRegenerate = false});
   Future<String> deviceTimezone();
 }
 
@@ -44,17 +60,19 @@ class SupabaseOnboardingApi implements OnboardingApi {
   }
 
   @override
-  Future<GeneratedPlanInfo> generatePlan() async {
+  Future<GeneratedPlanInfo> generatePlan({bool forceRegenerate = false}) async {
     final response = await _ref.read(dioClientProvider).post<Map<String, dynamic>>(
-          '/functions/v1/generate-plan',
-          data: const <String, dynamic>{},
-        );
+      '/functions/v1/generate-plan',
+      data: <String, dynamic>{if (forceRegenerate) 'force_regenerate': true},
+    );
     final plan = response.data!['plan'] as Map<String, dynamic>;
     return GeneratedPlanInfo(
       planId: plan['id'] as String,
       source: plan['source'] as String,
       fallbackNotice: plan['fallback_notice'] as bool? ?? false,
       notices: (plan['notices'] as List? ?? const []).cast<String>(),
+      rationaleEn: plan['rationale_en'] as String? ?? '',
+      rationaleFr: plan['rationale_fr'] as String? ?? '',
     );
   }
 
@@ -81,6 +99,7 @@ class OnboardingState {
     this.isLoading = false,
     this.error,
     this.result,
+    this.upgradeResult,
   });
 
   final bool disclaimerAccepted;
@@ -102,6 +121,9 @@ class OnboardingState {
   final String? error;
   final GeneratedPlanInfo? result;
 
+  /// The plan generated after a trial started during onboarding (FR-004); null until then.
+  final GeneratedPlanInfo? upgradeResult;
+
   bool get consentGiven => consentAt != null;
 
   /// Steps: 0 language, 1 goal, 2 level, 3 days, 4 length, 5 equipment, 6 limitations, 7 strength.
@@ -111,7 +133,6 @@ class OnboardingState {
         0 => language != null,
         1 => goal != null,
         2 => level != null,
-        5 => equipment.isNotEmpty,
         _ => step >= 0 && step < stepCount,
       };
 
@@ -130,6 +151,7 @@ class OnboardingState {
     bool? isLoading,
     String? error,
     GeneratedPlanInfo? result,
+    GeneratedPlanInfo? upgradeResult,
   }) =>
       OnboardingState(
         disclaimerAccepted: disclaimerAccepted ?? this.disclaimerAccepted,
@@ -146,6 +168,7 @@ class OnboardingState {
         isLoading: isLoading ?? this.isLoading,
         error: error,
         result: result ?? this.result,
+        upgradeResult: upgradeResult ?? this.upgradeResult,
       );
 }
 
@@ -165,6 +188,12 @@ class OnboardingController extends _$OnboardingController {
 
   void toggleEquipment(String item) => state = state.copyWith(equipment: _toggle(state.equipment, item));
 
+  /// "Gym": selects every equipment choice; when all are already selected, clears them (FR-001).
+  void toggleGym() {
+    final all = kEquipmentChoices.every(state.equipment.contains);
+    state = state.copyWith(equipment: all ? const [] : List.of(kEquipmentChoices));
+  }
+
   void toggleLimitation(String tag) {
     assert(kLimitationTags.contains(tag));
     state = state.copyWith(limitations: _toggle(state.limitations, tag));
@@ -181,13 +210,47 @@ class OnboardingController extends _$OnboardingController {
     state = state.copyWith(strength: next);
   }
 
+  /// Loads the saved answers for editing from Settings (FR-046, T131).
+  void prefill({
+    required String goal,
+    required String level,
+    required int daysPerWeek,
+    required int sessionLengthMin,
+    required List<String> equipment,
+    required List<String> limitations,
+    String? limitationsNote,
+    Map<String, ({double weightKg, int reps})> strength = const {},
+  }) {
+    state = state.copyWith(
+      goal: goal,
+      level: level,
+      daysPerWeek: daysPerWeek.clamp(1, 7),
+      sessionLengthMin: sessionLengthMin.clamp(15, 120),
+      equipment: equipment,
+      limitations: limitations.where(kLimitationTags.contains).toList(),
+      limitationsNote: limitationsNote ?? '',
+      strength: strength,
+    );
+  }
+
+  /// The answers a user can edit later (FR-046): no language (its own setting), no consent or
+  /// time zone (editing limitations needs no new consent — only a new consent version does).
+  Map<String, dynamic> editableProfileRow() {
+    final row = profileRow(timezone: '')
+      ..remove('language')
+      ..remove('timezone')
+      ..remove('consent_at')
+      ..remove('consent_version');
+    return row;
+  }
+
   /// The `users` row for this profile (snake_case columns; weights already in kg).
   Map<String, dynamic> profileRow({required String timezone}) => {
         'goal': state.goal,
         'level': state.level,
         'days_per_week': state.daysPerWeek,
         'session_length_min': state.sessionLengthMin,
-        'equipment': state.equipment,
+        'equipment': withBodyweight(state.equipment.where((e) => e != kBodyweight).toList()),
         'limitations': state.limitations,
         'limitations_note': state.limitationsNote.trim().isEmpty ? null : state.limitationsNote.trim(),
         'language': state.language ?? 'en',
@@ -196,7 +259,9 @@ class OnboardingController extends _$OnboardingController {
         'consent_version': kConsentVersion,
         'strength_estimates': state.strength.isEmpty
             ? null
-            : {for (final e in state.strength.entries) e.key: {'weight_kg': e.value.weightKg, 'reps': e.value.reps}},
+            : {
+                for (final e in state.strength.entries) e.key: {'weight_kg': e.value.weightKg, 'reps': e.value.reps}
+              },
       };
 
   /// Saves the profile, then generates the plan. The server always returns a plan (FR-003b);
@@ -213,6 +278,25 @@ class OnboardingController extends _$OnboardingController {
       await api.saveProfile(profileRow(timezone: timezone));
       final result = await api.generatePlan();
       state = state.copyWith(isLoading: false, result: result);
+    } on Exception catch (e) {
+      state = state.copyWith(isLoading: false, error: e.toString());
+    }
+  }
+
+  /// After a trial starts during onboarding, replaces the template plan with an AI plan
+  /// (FR-004). The server reads Pro status from `subscriptions`, which the RevenueCat webhook
+  /// updates a few seconds after purchase, so a plain `template` answer is retried up to
+  /// [attempts] times. A `template_fallback` answer is final (the AI was tried and failed).
+  Future<void> upgradeToAiPlan({int attempts = 3, Duration retryDelay = const Duration(seconds: 2)}) async {
+    state = state.copyWith(isLoading: true);
+    final api = ref.read(onboardingApiProvider);
+    try {
+      var result = await api.generatePlan(forceRegenerate: true);
+      for (var i = 1; i < attempts && result.source == 'template'; i++) {
+        await Future<void>.delayed(retryDelay);
+        result = await api.generatePlan(forceRegenerate: true);
+      }
+      state = state.copyWith(isLoading: false, upgradeResult: result);
     } on Exception catch (e) {
       state = state.copyWith(isLoading: false, error: e.toString());
     }

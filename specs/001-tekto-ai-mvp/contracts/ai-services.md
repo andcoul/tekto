@@ -37,7 +37,7 @@ USER PROFILE:
 
 AVAILABLE EXERCISES:
 {exercise_library_subset_json}
-(Only exercises matching the user's equipment, with a video, and not contraindicated by the user's limitations are included)
+(Only exercises whose **every** equipment item is in the user's list, with a video, and not contraindicated by the user's limitations are included. `{equipment_list}` uses the FR-001 vocabulary: barbell, dumbbell, cable, machine, bands, pull_up_bar, dip_station, bench, bodyweight — clarified 2026-11-20.)
 
 RULES (non-negotiable):
 1. Every exercise in the plan MUST be from the AVAILABLE EXERCISES list above.

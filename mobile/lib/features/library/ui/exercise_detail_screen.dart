@@ -1,3 +1,4 @@
+import 'package:tekto/features/coach/ui/coach_launcher.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -15,8 +16,7 @@ class ExerciseDetailScreen extends ConsumerStatefulWidget {
   final String exerciseSlug;
 
   @override
-  ConsumerState<ExerciseDetailScreen> createState() =>
-      _ExerciseDetailScreenState();
+  ConsumerState<ExerciseDetailScreen> createState() => _ExerciseDetailScreenState();
 }
 
 class _ExerciseDetailScreenState extends ConsumerState<ExerciseDetailScreen> {
@@ -64,17 +64,22 @@ class _ExerciseDetailScreenState extends ConsumerState<ExerciseDetailScreen> {
                   ),
                 ),
                 actions: [
+                  CoachButton(screen: 'exercise_detail', exerciseSlug: exercise.slug),
                   if (exercise.videoSideUrl != null)
                     TextButton(
                       onPressed: () => setState(() => _showSideView = !_showSideView),
-                      child: Text(_showSideView ? 'Front' : 'Side', style: const TextStyle(color: AppColors.accent)),
+                      child: Text(
+                          _showSideView
+                              ? AppLocalizations.of(context).libraryFront
+                              : AppLocalizations.of(context).librarySide,
+                          style: const TextStyle(color: AppColors.glacier)),
                     ),
                   // Offline downloads are a Pro entitlement (FR-015); hidden for free users.
                   if (isPro)
                     IconButton(
                       tooltip: l10n.libraryDownloadForOffline,
                       onPressed: download != null || _downloading || !isOnline ? null : _downloadActivePlan,
-                      icon: Icon(download != null ? Icons.download_done : Icons.download, color: AppColors.accent),
+                      icon: Icon(download != null ? Icons.download_done : Icons.download, color: AppColors.glacier),
                     ),
                 ],
               ),
@@ -86,18 +91,24 @@ class _ExerciseDetailScreenState extends ConsumerState<ExerciseDetailScreen> {
                     const SizedBox(height: 4),
                     Text(exercise.musclePrimary.join(' · '), style: Theme.of(context).textTheme.bodyMedium),
                     const SizedBox(height: AppSpacing.lg),
-                    _SectionHeader(fr ? 'Consignes techniques' : 'Technique cues'),
+                    _SectionHeader(AppLocalizations.of(context).libraryCues),
                     ...cues.asMap().entries.map((e) => _CueRow(number: e.key + 1, text: e.value)),
                     const SizedBox(height: AppSpacing.lg),
-                    _SectionHeader(fr ? 'Erreurs fréquentes' : 'Common mistakes'),
+                    _SectionHeader(AppLocalizations.of(context).libraryMistakes),
                     ...mistakes.map((m) => _MistakeRow(text: m)),
                     if (exercise.variationEasierSlug != null || exercise.variationHarderSlug != null) ...[
                       const SizedBox(height: AppSpacing.lg),
-                      _SectionHeader(fr ? 'Variantes' : 'Variations'),
+                      _SectionHeader(AppLocalizations.of(context).libraryVariations),
                       if (exercise.variationEasierSlug != null)
-                        _VariationTile(slug: exercise.variationEasierSlug!, label: fr ? 'Plus facile' : 'Easier', icon: Icons.arrow_downward),
+                        _VariationTile(
+                            slug: exercise.variationEasierSlug!,
+                            label: AppLocalizations.of(context).libraryEasier,
+                            icon: Icons.arrow_downward),
                       if (exercise.variationHarderSlug != null)
-                        _VariationTile(slug: exercise.variationHarderSlug!, label: fr ? 'Plus difficile' : 'Harder', icon: Icons.arrow_upward),
+                        _VariationTile(
+                            slug: exercise.variationHarderSlug!,
+                            label: AppLocalizations.of(context).libraryHarder,
+                            icon: Icons.arrow_upward),
                     ],
                     const SizedBox(height: 80),
                   ]),
@@ -156,14 +167,14 @@ class _CueRow extends StatelessWidget {
               height: 24,
               margin: const EdgeInsets.only(right: 12, top: 2),
               decoration: const BoxDecoration(
-                color: AppColors.accent,
+                color: AppColors.glacier,
                 shape: BoxShape.circle,
               ),
               child: Center(
                 child: Text(
                   '$number',
                   style: const TextStyle(
-                    color: AppColors.onDark,
+                    color: AppColors.ink,
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
                   ),
@@ -186,7 +197,7 @@ class _MistakeRow extends StatelessWidget {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Icon(Icons.close, color: AppColors.error, size: 18),
+            const Icon(Icons.close, color: AppColors.danger, size: 18),
             const SizedBox(width: 8),
             Expanded(child: Text(text)),
           ],
@@ -208,7 +219,7 @@ class _VariationTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) => ListTile(
         contentPadding: EdgeInsets.zero,
-        leading: Icon(icon, color: AppColors.accent),
+        leading: Icon(icon, color: AppColors.glacier),
         title: Text(label),
         subtitle: Text(slug, style: Theme.of(context).textTheme.bodyMedium),
         onTap: () => context.push('/library/$slug'),

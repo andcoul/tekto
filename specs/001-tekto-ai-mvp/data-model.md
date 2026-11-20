@@ -32,7 +32,7 @@ Extends Supabase Auth `auth.users`. Stores application-level profile data.
 | `level` | enum | NOT NULL | `beginner \| intermediate \| advanced` |
 | `days_per_week` | int | 1–7, NOT NULL | Training days per week |
 | `session_length_min` | int | 15–120, NOT NULL | Target session duration |
-| `equipment` | text[] | NOT NULL | `['barbell','dumbbell','cable','bodyweight','bands']` subset |
+| `equipment` | text[] | NOT NULL, CHECK vocabulary (014) | Subset of `barbell \| dumbbell \| cable \| machine \| bands \| pull_up_bar \| dip_station \| bench \| bodyweight`; always contains `bodyweight`; "Gym" in the quiz selects all (FR-001, 2026-11-20) |
 | `limitations` | text[] | nullable | Tags from a fixed vocabulary: `knee \| lower_back \| shoulder \| wrist \| elbow \| hip \| ankle \| neck` |
 | `limitations_note` | text | nullable | Optional free text; shown to the coach, not used for filtering |
 | `strength_estimates` | jsonb | nullable | Optional strength check: `{ "squat": {"weight_kg", "reps"}, "bench_press": {…}, "deadlift": {…} }`; null when skipped (conservative defaults apply) |
@@ -64,7 +64,7 @@ Master library of all filmed exercises. Read-only for users; managed by content 
 | `slug` | text | UNIQUE, NOT NULL | URL-safe identifier, e.g. `barbell-back-squat` |
 | `name_en` | text | NOT NULL | English name |
 | `name_fr` | text | NOT NULL | French name |
-| `equipment` | text[] | NOT NULL | Equipment required |
+| `equipment` | text[] | NOT NULL, CHECK vocabulary (014) | **Every** item the exercise needs, from `barbell \| dumbbell \| cable \| machine \| bands \| pull_up_bar \| dip_station \| bench \| bodyweight` (e.g. pull-up = `bodyweight` + `pull_up_bar`; leg press = `machine`); kettlebells count as `dumbbell` (FR-013) |
 | `muscle_primary` | text[] | NOT NULL | Primary muscles targeted |
 | `muscle_secondary` | text[] | nullable | Secondary muscles |
 | `cues_en` | text[] | NOT NULL | 3–5 technique cues (English) |
@@ -72,12 +72,12 @@ Master library of all filmed exercises. Read-only for users; managed by content 
 | `common_mistakes_en` | text[] | NOT NULL | |
 | `common_mistakes_fr` | text[] | NOT NULL | |
 | `video_front_url` | text | NOT NULL | Cloudflare Stream URL (front angle) |
-| `video_side_url` | text | nullable | Side angle video |
-| `video_duration_sec` | int | NOT NULL | 5–15 |
+| `video_side_url` | text | nullable | Second-angle video; required (validator, production) for the 8 form-check lifts and their variants (FR-014, `SECOND_ANGLE_FAMILIES` in `validate.js`) |
+| `video_duration_sec` | int | NOT NULL, CHECK 4–15 (014) | The clip's real length, written by `content/videos/ingest.js`; each clip shows at least one complete rep (FR-014) |
 | `captions_en_url` | text | NOT NULL | WebVTT caption track (English) |
 | `captions_fr_url` | text | NOT NULL | WebVTT caption track (French) |
 | `contraindications` | text[] | NOT NULL, default `{}` | Limitation tags (same vocabulary as `users.limitations`) for which this exercise is excluded from plans |
-| `variation_easier_id` | uuid | FK → exercises.id, nullable | |
+| `variation_easier_id` | uuid | FK → exercises.id, nullable | At least one of easier / harder is set for every exercise (FR-014; validator error in production) |
 | `variation_harder_id` | uuid | FK → exercises.id, nullable | |
 | `form_check_supported` | bool | NOT NULL, default false | Whether pose estimation is calibrated for this lift |
 | `form_check_lift_key` | text | nullable | Key used by PoseAnalyzer (e.g. `squat`, `deadlift`) |
@@ -110,6 +110,8 @@ A complete 4–12 week training program belonging to a user. A user may have mul
 | `last_adapted_week` | int | NOT NULL, default 0 | Highest week already adapted; makes `adapt-plan` idempotent |
 | `source` | enum | NOT NULL | `ai \| template \| template_fallback` |
 | `template_slug` | text | nullable | Set when `source` is `template` or `template_fallback` |
+| `rationale_en` | text | nullable | Why the plan fits (FR-044): from the model for `ai`, from the template for `template` / `template_fallback` |
+| `rationale_fr` | text | nullable | |
 | `generation_prompt_hash` | text | nullable | For dedup / debugging |
 | `adaptation_log` | jsonb | nullable | Array of adaptation events `[{week, sessions_scheduled, sessions_completed, changes, summary_en, summary_fr}]` |
 | `created_at` | timestamptz | NOT NULL | |
@@ -270,10 +272,11 @@ A single turn in a coach conversation.
 | `context_session_id` | uuid | FK → sessions.id, nullable | Session in view when asked |
 | `plan_change_proposed` | jsonb | nullable | Proposed change awaiting confirmation |
 | `plan_change_applied` | bool | default false | Whether the change was confirmed and applied |
+| `plan_change_rejected_at` | timestamptz | nullable | Set when the user taps "No thanks" (`confirmed: false`); migration 011 |
 | `satisfaction_rating` | bool | nullable | Thumbs up/down; null if not rated |
 | `created_at` | timestamptz | NOT NULL | |
 
-**Validation rule**: `plan_change_applied` can only be `true` if `plan_change_proposed` is non-null.
+**Validation rule**: `plan_change_applied` can only be `true` if `plan_change_proposed` is non-null; `plan_change_applied` and `plan_change_rejected_at` are never both set. A change is pending while neither is.
 
 ---
 
@@ -331,7 +334,8 @@ Tracks the user's current subscription state, synced from RevenueCat webhooks.
 | `revenuecat_customer_id` | text | nullable | RevenueCat customer ID |
 | `product_id` | text | nullable | Store product identifier |
 | `is_trial` | bool | NOT NULL, default false | Currently in 7-day trial |
-| `trial_started_at` | timestamptz | nullable | |
+| `trial_started_at` | timestamptz | nullable | First trial start; set once by the webhook and kept after the trial ends (Gate 2 trial start rate; migration 007) |
+| `trial_converted_at` | timestamptz | nullable | First trial conversion to paid; kept (trial-to-paid; migration 007) |
 | `trial_ends_at` | timestamptz | nullable | |
 | `current_period_ends_at` | timestamptz | nullable | Null for free tier |
 | `cancelled_at` | timestamptz | nullable | Set when user cancels; access continues until period end |
@@ -385,11 +389,27 @@ Starter templates for free-tier plans and the Pro fallback. Seeded from `content
 | `slug` | text | PK | e.g. `home-dumbbell-3x` |
 | `level` | enum | NOT NULL | Target level |
 | `days_per_week` | int | NOT NULL | 3 or 4 at launch |
-| `equipment_required` | text[] | NOT NULL | Minimum equipment set |
+| `equipment_required` | text[] | NOT NULL, CHECK vocabulary (014) | Every item the template's exercises use besides `bodyweight` (checked at seed time) |
 | `body` | jsonb | NOT NULL | Same schema as the `generate-plan` plan body (weeks, sessions, exercises with `exercise_slug`) |
 | `updated_at` | timestamptz | NOT NULL | |
 
 **Rules**: seeding fails if any `exercise_slug` lacks a video (Constitution IV). Read-only to clients.
+
+---
+
+### 17. BodyWeightEntry (`body_weight_entries`)
+
+One body-weight measurement (FR-041). Health data: encrypted at rest and included in GDPR export and deletion.
+
+| Field | Type | Constraints | Notes |
+|---|---|---|---|
+| `id` | uuid | PK | |
+| `user_id` | uuid | FK → users.id, NOT NULL, ON DELETE CASCADE | |
+| `weight_kg` | numeric(5,2) | NOT NULL, > 0 | Stored in kg; displayed in the user's unit |
+| `measured_on` | date | NOT NULL | UNIQUE with `user_id` (one entry per day; a new entry replaces it) |
+| `created_at` | timestamptz | NOT NULL | |
+
+**RLS**: owner-only read and write.
 
 ---
 
@@ -427,6 +447,7 @@ users ────────────────────────�
   ├── coach_quota_usage (1:many, one per week)      │
   ├── form_check_sessions (1:many)                  │
   ├── subscriptions (1:1)                           │
+  ├── body_weight_entries (1:many)                  │
   └── (device only) exercise_video_downloads        │
                                                     │
 exercises ──────────────────────────────────────────┘
@@ -440,9 +461,11 @@ coach_response_cache ── standalone system table (no user FK)
 
 ## Offline Sync Strategy
 
-**Drift (SQLite, SQLCipher-encrypted) mirrors**: `plans`, `sessions`, `plan_exercises`, `exercises` (text fields for every exercise in the active plan, for **all** users — Constitution I), `workout_logs`, `set_logs`, `personal_records`, `form_check_sessions` (summaries, for the free-try check), `subscriptions`, `coach_quota_usage`.
+**Drift (SQLite, SQLCipher-encrypted) mirrors**: `plans`, `sessions`, `plan_exercises`, `exercises` (text fields for every exercise in the active plan, for **all** users — Constitution I), `workout_logs`, `set_logs`, `personal_records`, `form_check_sessions` (summaries, for the free-try check), `subscriptions`, `coach_quota_usage`, `body_weight_entries`.
 
 **Write queue**: Any write that occurs offline is appended to a `sync_queue` local table with `{operation, table, payload, created_at}`. On connectivity restore, the queue is flushed in order to Supabase REST API.
+
+**Backfill**: on a fresh install, history (`workout_logs`, `set_logs`, `personal_records`, `body_weight_entries`) is pulled once from the server (T127).
 
 **Conflict resolution**: Last-write-wins for `workout_logs` and `set_logs` (append-only); plans are always read from server when online.
 

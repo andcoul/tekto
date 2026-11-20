@@ -31,6 +31,16 @@ export const MAJOR_MUSCLES = new Set(['chest', 'lats', 'quadriceps', 'hamstrings
 
 export const DURATION_BUFFER_MIN = 10;
 
+/**
+ * Push:pull balance for AI plans (FR-002a). Sets are summed per primary muscle, like volume.
+ * The 0.5–2.0 range is always reachable within the volume bounds: chest + shoulders minimums give
+ * ≥ 28 push sets while every pull exercise in the library targets lats (max 18), so a tighter
+ * range would reject every dumbbell-only plan.
+ */
+export const PUSH_MUSCLES = new Set(['chest', 'shoulders', 'front_deltoid', 'triceps', 'upper_chest']);
+export const PULL_MUSCLES = new Set(['lats', 'rhomboids', 'rear_deltoid', 'biceps', 'traps']);
+export const PUSH_PULL_RATIO = { min: 0.5, max: 2.0 };
+
 export function validatePlan(
   plan: DraftPlan,
   profile: PlanProfile,
@@ -91,29 +101,54 @@ export function validatePlan(
     }
   }
 
-  // Volume per muscle — AI plans only (templates are pre-validated content).
-  if (source === 'ai') {
-    const bounds = VOLUME_BOUNDS[profile.level];
-    for (const [week, sessions] of byWeek(plan)) {
-      const sets = new Map<string, number>();
-      for (const s of sessions) {
-        for (const pe of s.exercises) {
-          for (const m of library.get(pe.exercise_slug)?.muscle_primary ?? []) {
-            sets.set(m, (sets.get(m) ?? 0) + pe.sets);
-          }
-        }
+  // Volume per muscle (Constitution III): the maximum applies to every source; the minimum and
+  // push:pull balance apply to AI plans only, because templates trimmed to short sessions cannot
+  // always reach them (FR-002a).
+  const bounds = VOLUME_BOUNDS[profile.level];
+  for (const [week, sessions] of byWeek(plan)) {
+    const sets = weeklySetsPerMuscle(sessions, library);
+    for (const [muscle, count] of sets) {
+      if (count > bounds.max) {
+        errors.push({ code: 'VOLUME', message: `Week ${week}: ${muscle} has ${count} sets; maximum is ${bounds.max}.` });
+      } else if (source === 'ai' && count < bounds.min && MAJOR_MUSCLES.has(muscle) && profile.days_per_week >= 3) {
+        errors.push({ code: 'VOLUME', message: `Week ${week}: ${muscle} has ${count} sets; minimum is ${bounds.min}.` });
       }
-      for (const [muscle, count] of sets) {
-        if (count > bounds.max) {
-          errors.push({ code: 'VOLUME', message: `Week ${week}: ${muscle} has ${count} sets; maximum is ${bounds.max}.` });
-        } else if (count < bounds.min && MAJOR_MUSCLES.has(muscle) && profile.days_per_week >= 3) {
-          errors.push({ code: 'VOLUME', message: `Week ${week}: ${muscle} has ${count} sets; minimum is ${bounds.min}.` });
-        }
-      }
+    }
+    if (source === 'ai') {
+      const balance = pushPullError(week, sets);
+      if (balance) errors.push(balance);
     }
   }
 
   return { valid: errors.length === 0, errors };
+}
+
+function weeklySetsPerMuscle(sessions: DraftPlan['sessions'], library: Library): Map<string, number> {
+  const sets = new Map<string, number>();
+  for (const s of sessions) {
+    for (const pe of s.exercises) {
+      for (const m of library.get(pe.exercise_slug)?.muscle_primary ?? []) {
+        sets.set(m, (sets.get(m) ?? 0) + pe.sets);
+      }
+    }
+  }
+  return sets;
+}
+
+function pushPullError(week: number, sets: Map<string, number>): ValidationError | null {
+  let push = 0;
+  let pull = 0;
+  for (const [muscle, count] of sets) {
+    if (PUSH_MUSCLES.has(muscle)) push += count;
+    if (PULL_MUSCLES.has(muscle)) pull += count;
+  }
+  if (push === 0 && pull === 0) return null; // no upper-body work this week
+  const ratio = pull === 0 ? Infinity : push / pull;
+  if (ratio >= PUSH_PULL_RATIO.min && ratio <= PUSH_PULL_RATIO.max) return null;
+  return {
+    code: 'BALANCE',
+    message: `Week ${week}: ${push} push sets vs ${pull} pull sets; push:pull must be ${PUSH_PULL_RATIO.min}–${PUSH_PULL_RATIO.max}.`,
+  };
 }
 
 function byWeek(plan: DraftPlan): Map<number, DraftPlan['sessions']> {

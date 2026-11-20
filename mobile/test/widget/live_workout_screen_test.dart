@@ -1,0 +1,503 @@
+// T047 — live workout screen (FR-007, FR-008, FR-010, FR-011; Constitution I and VI).
+// Written before T050. Runs as a free user with no network for the whole file.
+import 'dart:convert';
+
+import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:drift/drift.dart' hide isNull, isNotNull;
+import 'package:drift/native.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
+import 'package:tekto/core/di/providers.dart';
+import 'package:tekto/core/l10n/gen/app_localizations.dart';
+import 'package:tekto/features/library/domain/exercise_provider.dart';
+import 'package:tekto/features/plan/ui/exercise_swap_sheet.dart';
+import 'package:tekto/features/subscription/domain/entitlement_provider.dart';
+import 'package:tekto/shared/models/exercise_model.dart';
+import 'package:tekto/features/workout/domain/workout_controller.dart';
+import 'package:tekto/features/workout/ui/live_workout_screen.dart';
+import 'package:tekto/shared/services/api/supabase_client.dart';
+import 'package:tekto/shared/services/local_db/database.dart';
+import 'package:tekto/shared/services/sync/sync_queue.dart';
+
+import '../helpers/workout_fixtures.dart';
+
+/// Offline transport: every request fails, so nothing leaves the queue.
+class _OfflineApi implements TektoDioClient {
+  @override
+  dynamic noSuchMethod(Invocation invocation) => throw StateError('network used while offline: ${invocation.memberName}');
+}
+
+void main() {
+  late AppDatabase db;
+  late SyncQueue queue;
+  // Drift's writes complete on the real event loop, so DB reads in assertions go
+  // through runAsync (the fake clock — and the rest timer — do not move).
+  late WidgetTester t;
+
+  Future<void> setUpDb({String unit = 'kg'}) async {
+    db = AppDatabase.forTesting(NativeDatabase.memory());
+    await seedWorkoutFixture(db, unit: unit);
+    queue = SyncQueue(db: db, dio: _OfflineApi(), connectivityChanges: const Stream<List<ConnectivityResult>>.empty());
+  }
+
+  tearDown(() async {
+    queue.dispose();
+    await db.close();
+  });
+
+  Future<void> pumpWorkout(WidgetTester tester, {bool online = false}) async {
+    t = tester;
+    tester.view.physicalSize = const Size(1080, 2340); // phone portrait, 360×780 dp
+    tester.view.devicePixelRatio = 3;
+    addTearDown(tester.view.reset);
+
+    final router = GoRouter(initialLocation: '/workout/$kSessionId', routes: [
+      GoRoute(
+        path: '/workout/:sessionId',
+        builder: (_, s) => LiveWorkoutScreen(sessionId: s.pathParameters['sessionId']!),
+        routes: [GoRoute(path: 'summary', builder: (_, __) => const Text('summary screen'))],
+      ),
+      GoRoute(path: '/form-check/:slug', builder: (_, __) => const Text('form check')),
+    ]);
+    await tester.pumpWidget(ProviderScope(
+      overrides: [
+        appDatabaseProvider.overrideWithValue(db),
+        syncQueueProvider.overrideWithValue(queue),
+        currentUserIdProvider.overrideWithValue(kUserId),
+        clockProvider.overrideWithValue(() => kWednesday),
+        isOnlineProvider.overrideWith((ref) => Stream.value(online)),
+        exercisesProvider.overrideWith((ref) async => [
+              for (final slug in ['goblet-squat', 'dumbbell-lunge'])
+                ExerciseModel(
+                  slug: slug, nameEn: slug, nameFr: slug, equipment: const ['dumbbell'],
+                  musclePrimary: const ['quadriceps'], muscleSecondary: const [], cuesEn: const [], cuesFr: const [],
+                  commonMistakesEn: const [], commonMistakesFr: const [], videoFrontUrl: 'v.m3u8', formCheckSupported: false,
+                ),
+            ]),
+        entitlementProvider.overrideWith((ref) => Stream.value(EntitlementState.free)),
+      ],
+      child: MaterialApp.router(
+        routerConfig: router,
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+      ),
+    ));
+    await tester.pumpAndSettle();
+  }
+
+  /// Ends the test with no rest timer running.
+  Future<void> unmount(WidgetTester tester) async {
+    await tester.pumpWidget(const SizedBox());
+    await tester.pump();
+  }
+
+  Finder primaryActions() => find.byType(ElevatedButton);
+
+  /// Sets recorded by the workout controller so far (the screen's own view of the log).
+  int _loggedCount(WidgetTester tester) => ProviderScope.containerOf(tester.element(find.byType(LiveWorkoutScreen)))
+      .read(workoutControllerProvider)
+      .logged
+      .values
+      .fold(0, (sum, sets) => sum + sets.length);
+
+  /// Scrolls the exercise list until [finder] is built (the list builds lazily; the logged rows
+  /// sit below the rest timer on a 360×780 dp phone).
+  Future<void> scrollTo(WidgetTester tester, Finder finder) async {
+    await tester.scrollUntilVisible(finder, 120, scrollable: find.byType(Scrollable).last);
+    await tester.pump();
+  }
+
+  Future<List<SetLog>> setLogs() async =>
+      (await t.runAsync(() => (db.select(db.setLogs)..orderBy([(s) => OrderingTerm.asc(s.loggedAt)])).get()))!;
+
+  Future<List<Map<String, dynamic>>> queued(String table) async =>
+      (await t.runAsync(() => db.select(db.syncQueueTable).get()))!
+          .where((r) => r.tableName_ == table)
+          .map((r) => jsonDecode(r.payload) as Map<String, dynamic>)
+          .toList();
+
+  Future<void> logCurrentSet(WidgetTester tester, {String? weight, int moreReps = 0, String? rpe}) async {
+    if (weight != null) {
+      await tester.enterText(find.byKey(const Key('weight-input')), weight);
+    }
+    for (var i = 0; i < moreReps; i++) {
+      await tester.tap(find.byTooltip('More reps'));
+      await tester.pump();
+    }
+    if (rpe != null) {
+      await tester.tap(find.byKey(const Key('rpe-select')));
+      await tester.pumpAndSettle();
+      await tester.dragUntilVisible(find.text(rpe), find.byType(Scrollable).last, const Offset(0, -48));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text(rpe).last);
+      await tester.pumpAndSettle();
+    }
+    final before = _loggedCount(tester);
+    await tester.tap(find.widgetWithText(ElevatedButton, 'Done'));
+    await tester.pump();
+    // The local writes finish on the real event loop. Wait until the controller has recorded
+    // the set (no fixed sleep — a busy machine can take far longer than any constant, T140),
+    // then rebuild without advancing the fake clock, so the rest timer has not ticked yet.
+    for (var i = 0; i < 500 && _loggedCount(tester) == before; i++) {
+      await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 10)));
+      await tester.pump();
+    }
+    expect(_loggedCount(tester), before + 1, reason: 'the set was not recorded within 5 s of real time');
+    for (var i = 0; i < 5; i++) {
+      await tester.pump();
+    }
+  }
+
+  testWidgets('loads today\'s first exercise from the local cache with 3 cues and the suggested weight', (tester) async {
+    await setUpDb();
+    await pumpWorkout(tester);
+
+    expect(find.text('Goblet Squat'), findsOneWidget);
+    expect(find.text('Hold the bell at your chest'), findsOneWidget);
+    expect(find.text('Knees track over toes'), findsOneWidget);
+    expect(find.text('Sit between your heels'), findsOneWidget);
+    expect(find.text('Fourth cue never shown'), findsNothing);
+    expect(find.text('Set 1 of 2'), findsOneWidget);
+    expect(tester.widget<TextField>(find.byKey(const Key('weight-input'))).controller!.text, '16');
+    await unmount(tester);
+  });
+
+  /// An earlier finished workout of the same exercise (goblet squat) on another session.
+  Future<void> seedEarlierSquat({required double kg, int week = 1}) async {
+    await db.batch((b) {
+      b.insert(db.sessions, SessionsCompanion.insert(
+          id: 's-mon', planId: kPlanId, weekNumber: week, dayOfWeek: DateTime.monday,
+          nameEn: 'Mon', nameFr: 'Lun', muscleGroups: '[]'));
+      b.insert(db.planExercises, PlanExercisesCompanion.insert(
+          id: 'pe-squat-mon', sessionId: 's-mon', exerciseSlug: 'goblet-squat', sets: 2, repsMin: 8, repsMax: 10,
+          suggestedWeightKg: const Value(16)));
+      b.insert(db.workoutLogs, WorkoutLogsCompanion.insert(
+          id: 'wl-mon', userId: kUserId, sessionId: 's-mon',
+          startedAt: Value(DateTime(2026, 11, 9, 18)), finishedAt: Value(DateTime(2026, 11, 9, 19))));
+      for (final (i, w) in [(1, kg - 2), (2, kg)]) {
+        b.insert(db.setLogs, SetLogsCompanion.insert(
+            id: 'sl-mon-$i', workoutLogId: 'wl-mon', planExerciseId: 'pe-squat-mon', setNumber: i, weightKg: w,
+            reps: 10, loggedAt: Value(DateTime(2026, 11, 9, 18, 10 * i))));
+      }
+    });
+  }
+
+  testWidgets('the first set starts from the last weight lifted for that exercise, not the plan value (FR-009, T136)',
+      (tester) async {
+    await setUpDb();
+    await seedEarlierSquat(kg: 20);
+    await pumpWorkout(tester);
+    expect(tester.widget<TextField>(find.byKey(const Key('weight-input'))).controller!.text, '20',
+        reason: 'last set of the earlier workout, not the plan\'s 16 kg');
+    await unmount(tester);
+  });
+
+  testWidgets('a plan adapted after that workout wins over the old weight (Pro adaptation is newer)', (tester) async {
+    await setUpDb();
+    await seedEarlierSquat(kg: 20);
+    await (db.update(db.plans)..where((p) => p.id.equals(kPlanId))).write(PlansCompanion(
+        adaptationLog: Value(jsonEncode([
+      {'week': 1, 'adaptations': [], 'sessions_scheduled': 1, 'sessions_completed': 1, 'summary_en': '', 'summary_fr': ''},
+    ]))));
+    await pumpWorkout(tester);
+    expect(tester.widget<TextField>(find.byKey(const Key('weight-input'))).controller!.text, '16');
+    await unmount(tester);
+  });
+
+  testWidgets('free user offline: video area shows the inline Pro notice, no dialog, no overlay', (tester) async {
+    await setUpDb();
+    await pumpWorkout(tester);
+
+    expect(find.text('Offline video requires Tekto Pro'), findsOneWidget);
+    expect(find.byType(Dialog), findsNothing);
+    expect(find.byType(AlertDialog), findsNothing);
+    expect(find.byType(ModalBarrier), findsOneWidget, reason: 'only the route\'s own barrier, no modal on top');
+    await unmount(tester);
+  });
+
+  testWidgets('logs weight, reps and optional RPE locally and queues the write — no network', (tester) async {
+    await setUpDb();
+    await pumpWorkout(tester);
+
+    await logCurrentSet(tester, weight: '18', moreReps: 1, rpe: '8.5');
+
+    final sets = await setLogs();
+    expect(sets, hasLength(1));
+    expect(sets.single.planExerciseId, 'pe-squat');
+    expect(sets.single.setNumber, 1);
+    expect(sets.single.weightKg, 18);
+    expect(sets.single.reps, 9);
+    expect(sets.single.rpeActual, 8.5);
+
+    final q = await queued('set_logs');
+    expect(q.single['weight_kg'], 18);
+    expect(q.single['rpe_actual'], 8.5);
+    expect(await queued('workout_logs'), hasLength(1), reason: 'the workout itself was created offline');
+    await unmount(tester);
+  });
+
+  testWidgets('RPE is optional', (tester) async {
+    await setUpDb();
+    await pumpWorkout(tester);
+
+    await logCurrentSet(tester);
+
+    expect((await setLogs()).single.rpeActual, isNull);
+    await unmount(tester);
+  });
+
+  testWidgets('the RPE picker offers 1–10 in 0.5 steps', (tester) async {
+    await setUpDb();
+    await pumpWorkout(tester);
+
+    final picker = tester.widget<DropdownButton<double?>>(find.byKey(const Key('rpe-select')));
+    final values = picker.items!.map((i) => i.value).toList();
+
+    expect(values.first, isNull, reason: 'blank first: RPE is optional');
+    expect(values.skip(1), [for (var i = 2; i <= 20; i++) i / 2]);
+    await unmount(tester);
+  });
+
+  testWidgets('the rest timer starts automatically with plan_exercises.rest_sec and counts down', (tester) async {
+    await setUpDb();
+    await pumpWorkout(tester);
+
+    await logCurrentSet(tester);
+
+    expect(find.text('1:30'), findsOneWidget);
+    await tester.pump(const Duration(seconds: 1));
+    expect(find.text('1:29'), findsOneWidget);
+    await unmount(tester);
+  });
+
+  testWidgets('the running rest can be adjusted by ±15 s, clamped to 15–600 s', (tester) async {
+    await setUpDb();
+    await pumpWorkout(tester);
+    await logCurrentSet(tester);
+
+    await tester.tap(find.byTooltip('Add 15 seconds'));
+    await tester.pump();
+    expect(find.text('1:45'), findsOneWidget);
+
+    await tester.tap(find.byTooltip('Remove 15 seconds'));
+    await tester.tap(find.byTooltip('Remove 15 seconds'));
+    await tester.pump();
+    expect(find.text('1:15'), findsOneWidget);
+
+    for (var i = 0; i < 10; i++) {
+      await tester.tap(find.byTooltip('Remove 15 seconds'));
+    }
+    await tester.pump();
+    expect(find.text('0:15'), findsOneWidget, reason: 'never below 15 s');
+
+    for (var i = 0; i < 50; i++) {
+      await tester.tap(find.byTooltip('Add 15 seconds'));
+    }
+    await tester.pump();
+    expect(find.text('10:00'), findsOneWidget, reason: 'never above 600 s');
+    await unmount(tester);
+  });
+
+  testWidgets('an adjustment applies to the current rest only', (tester) async {
+    await setUpDb();
+    await pumpWorkout(tester);
+    await logCurrentSet(tester);
+    await tester.tap(find.byTooltip('Add 15 seconds'));
+    await tester.pump();
+    await tester.tap(find.widgetWithText(ElevatedButton, 'Skip rest'));
+    await tester.pump();
+
+    await logCurrentSet(tester); // set 2 of the squat
+
+    expect(find.text('1:30'), findsOneWidget, reason: 'back to the plan\'s rest_sec');
+    await unmount(tester);
+  });
+
+  testWidgets('a PR shows an inline "New PR" badge on its row at once, without a dialog', (tester) async {
+    await setUpDb();
+    await pumpWorkout(tester);
+
+    await logCurrentSet(tester, weight: '18'); // no record yet → PR
+    await scrollTo(tester, find.text('New PR! 🎉'));
+
+    expect(find.text('New PR! 🎉'), findsOneWidget);
+    expect(find.byType(Dialog), findsNothing);
+    expect((await setLogs()).single.isPr, isTrue);
+    await unmount(tester);
+  });
+
+  testWidgets('a lighter set after a PR is not a PR', (tester) async {
+    await setUpDb();
+    await pumpWorkout(tester);
+    await logCurrentSet(tester, weight: '18');
+    await tester.tap(find.widgetWithText(ElevatedButton, 'Skip rest'));
+    await tester.pump();
+
+    await logCurrentSet(tester, weight: '14');
+    await scrollTo(tester, find.text('New PR! 🎉'));
+
+    expect(find.text('New PR! 🎉'), findsOneWidget, reason: 'only set 1 keeps its badge');
+    expect((await setLogs()).map((s) => s.isPr), [true, false]);
+    await unmount(tester);
+  });
+
+  testWidgets('exactly one primary action is visible in every phase of the workout', (tester) async {
+    await setUpDb();
+    await pumpWorkout(tester);
+
+    // Logging: only the current set's Done.
+    expect(primaryActions(), findsOneWidget);
+    expect(find.widgetWithText(ElevatedButton, 'Done'), findsOneWidget);
+
+    // Resting: only Skip rest.
+    await logCurrentSet(tester);
+    expect(primaryActions(), findsOneWidget);
+    expect(find.widgetWithText(ElevatedButton, 'Skip rest'), findsOneWidget);
+
+    // Exercise complete: only Next exercise.
+    await tester.tap(find.widgetWithText(ElevatedButton, 'Skip rest'));
+    await tester.pump();
+    await logCurrentSet(tester);
+    await tester.tap(find.widgetWithText(ElevatedButton, 'Skip rest'));
+    await tester.pump();
+    expect(primaryActions(), findsOneWidget);
+    expect(find.widgetWithText(ElevatedButton, 'Next exercise'), findsOneWidget);
+
+    // Last set of the workout: no rest, only Finish workout.
+    await tester.tap(find.widgetWithText(ElevatedButton, 'Next exercise'));
+    await tester.pumpAndSettle();
+    expect(find.text('Push-up'), findsOneWidget);
+    await logCurrentSet(tester);
+    expect(find.text('1:00'), findsNothing, reason: 'no rest after the final set');
+    expect(primaryActions(), findsOneWidget);
+    expect(find.widgetWithText(ElevatedButton, 'Finish workout'), findsOneWidget);
+    await unmount(tester);
+  });
+
+  testWidgets('barbell exercises offer the plate calculator; others do not (FR-042)', (tester) async {
+    await setUpDb();
+    await pumpWorkout(tester);
+    expect(find.byTooltip('Plate calculator'), findsNothing, reason: 'goblet squat is a dumbbell exercise');
+    await unmount(tester);
+
+    await (db.update(db.exercises)..where((e) => e.slug.equals('goblet-squat')))
+        .write(ExercisesCompanion(equipment: Value(jsonEncode(['barbell']))));
+    await pumpWorkout(tester);
+    await tester.tap(find.byTooltip('Plate calculator'));
+    await tester.pumpAndSettle();
+    expect(find.text('Per side'), findsOneWidget);
+    expect(find.byType(Dialog), findsNothing, reason: 'a bottom sheet, never a dialog over the set');
+    await unmount(tester);
+  });
+
+  testWidgets('an RPE target is shown as is (FR-007)', (tester) async {
+    await setUpDb();
+    await pumpWorkout(tester);
+    expect(find.text('Target RPE 7'), findsOneWidget);
+    await unmount(tester);
+  });
+
+  testWidgets('an RIR target also shows its RPE equivalent; effort is still logged as RPE (FR-007)', (tester) async {
+    await setUpDb();
+    await (db.update(db.planExercises)..where((p) => p.exerciseSlug.equals('goblet-squat')))
+        .write(const PlanExercisesCompanion(rpeTarget: Value(null), rirTarget: Value(2)));
+    await pumpWorkout(tester);
+    expect(find.text('RIR 2 (≈ RPE 8)'), findsOneWidget);
+    expect(find.byKey(const Key('rpe-select')), findsOneWidget);
+    await unmount(tester);
+  });
+
+  testWidgets('a free user can swap the current exercise before logging it (FR-028)', (tester) async {
+    await setUpDb();
+    await pumpWorkout(tester, online: true);
+    await tester.tap(find.byTooltip('Swap exercise'));
+    await tester.pumpAndSettle();
+    expect(find.byType(ExerciseSwapSheet), findsOneWidget);
+    expect(find.text('dumbbell-lunge'), findsOneWidget, reason: 'alternative with the same muscle and equipment');
+    expect(primaryActions(), findsOneWidget, reason: 'the sheet adds no second primary action');
+    await unmount(tester);
+  });
+
+  testWidgets('swap is disabled offline and hidden once a set of the exercise is logged', (tester) async {
+    await setUpDb();
+    await pumpWorkout(tester);
+    final offline = tester.widget<IconButton>(find.widgetWithIcon(IconButton, Icons.swap_horiz));
+    expect(offline.onPressed, isNull, reason: 'the swap needs the server');
+    await logCurrentSet(tester);
+    expect(find.byTooltip('Swap exercise'), findsNothing);
+    await unmount(tester);
+  });
+
+  testWidgets('bodyweight sets at 0 kg can be logged and are never PRs', (tester) async {
+    await setUpDb();
+    await pumpWorkout(tester);
+    await tester.tap(find.byTooltip('Next exercise'));
+    await tester.pumpAndSettle();
+    expect(find.text('Push-up'), findsOneWidget);
+    expect(tester.widget<TextField>(find.byKey(const Key('weight-input'))).controller!.text, '0');
+
+    await logCurrentSet(tester);
+
+    final sets = await setLogs();
+    expect(sets.single.weightKg, 0);
+    expect(sets.single.isPr, isFalse);
+    expect(find.text('New PR! 🎉'), findsNothing);
+    await unmount(tester);
+  });
+
+  testWidgets('can move between exercises offline in both directions', (tester) async {
+    await setUpDb();
+    await pumpWorkout(tester);
+
+    await tester.tap(find.byTooltip('Next exercise'));
+    await tester.pumpAndSettle();
+    expect(find.text('Push-up'), findsOneWidget);
+    expect(find.text('Hands under shoulders'), findsOneWidget);
+
+    await tester.tap(find.byTooltip('Previous exercise'));
+    await tester.pumpAndSettle();
+    expect(find.text('Goblet Squat'), findsOneWidget);
+    await unmount(tester);
+  });
+
+  testWidgets('Finish workout opens the summary', (tester) async {
+    await setUpDb();
+    await pumpWorkout(tester);
+
+    await tester.tap(find.widgetWithText(TextButton, 'Finish'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('summary screen'), findsOneWidget);
+    await unmount(tester);
+  });
+
+  testWidgets('lb users see and enter weights in lb; storage stays in kg', (tester) async {
+    await setUpDb(unit: 'lb');
+    await pumpWorkout(tester);
+
+    expect(tester.widget<TextField>(find.byKey(const Key('weight-input'))).controller!.text, '35.3');
+    expect(find.text('lb'), findsWidgets);
+
+    await logCurrentSet(tester, weight: '40');
+
+    expect((await setLogs()).single.weightKg, closeTo(18.14, 0.01));
+    await unmount(tester);
+  });
+
+  testWidgets('reopening an unfinished workout resumes it instead of starting a new one', (tester) async {
+    await setUpDb();
+    await db.into(db.workoutLogs).insert(WorkoutLogsCompanion.insert(id: 'wl-open', userId: kUserId, sessionId: kSessionId));
+    await db.into(db.setLogs).insert(SetLogsCompanion.insert(
+        id: 'set-1', workoutLogId: 'wl-open', planExerciseId: 'pe-squat', setNumber: 1, weightKg: 16, reps: 8));
+
+    await pumpWorkout(tester);
+
+    expect(find.text('Set 2 of 2'), findsOneWidget);
+    expect(await db.select(db.workoutLogs).get(), hasLength(1));
+    await logCurrentSet(tester);
+    expect((await setLogs()).map((s) => s.workoutLogId).toSet(), {'wl-open'});
+    await unmount(tester);
+  });
+}

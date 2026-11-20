@@ -2,17 +2,15 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:tekto/core/theme/app_theme.dart';
-import 'package:tekto/shared/services/form_check/form_score_calculator.dart';
 
-/// Post-set form check summary screen.
-///
-/// Shows:
-///   - Form score arc gauge (0–100)
-///   - Rep count
-///   - Cues displayed during the set
-///   - Top actionable tip in user's language
-///   - "Done" and "Try again" buttons
+import '../../../core/l10n/gen/app_localizations.dart';
+import '../../../core/theme/app_theme.dart';
+import '../../../shared/services/form_check/cue_engine.dart';
+import '../../../shared/services/form_check/form_score_calculator.dart';
+import 'beta_badge.dart';
+
+/// Post-set form check summary (FR-024): score, reps counted, flagged reps, the cues seen
+/// during the set and one prioritized tip, in the user's language.
 class FormSummaryScreen extends StatelessWidget {
   const FormSummaryScreen({
     super.key,
@@ -25,94 +23,99 @@ class FormSummaryScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    final fr = Localizations.localeOf(context).languageCode == 'fr';
+    const engine = CueEngine();
+    final topTip = fr ? summary.topTipFr : summary.topTipEn;
     return Scaffold(
-      appBar: AppBar(title: const Text('Form Summary')),
+      appBar: AppBar(
+        title: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [Text(l.formCheckSummaryTitle), const SizedBox(width: 8), const BetaBadge()]),
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(AppSpacing.lg),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // ---- Score gauge ----
             Center(
-              child: _FormScoreGauge(score: summary.score),
+              child: Semantics(
+                label: '${l.formCheckScoreLabel}: ${summary.score} / 100',
+                excludeSemantics: true,
+                child: _FormScoreGauge(score: summary.score),
+              ),
             ),
             const SizedBox(height: AppSpacing.xl),
-
-            // ---- Rep count ----
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(Icons.repeat, color: AppColors.accent),
+                const Icon(Icons.repeat, color: AppColors.glacier),
                 const SizedBox(width: 8),
-                Text(
-                  '${summary.repCount} reps counted',
-                  style: Theme.of(context).textTheme.titleMedium,
+                Flexible(
+                    child:
+                        Text(l.formCheckRepsCounted(summary.repCount), style: Theme.of(context).textTheme.titleMedium)),
+              ],
+            ),
+            const SizedBox(height: AppSpacing.sm),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(summary.flaggedReps.isEmpty ? Icons.check_circle_outline : Icons.flag_outlined,
+                    color: summary.flaggedReps.isEmpty ? AppColors.mint : AppColors.glacier),
+                const SizedBox(width: 8),
+                Flexible(
+                  child: Text(
+                    summary.flaggedReps.isEmpty
+                        ? l.formCheckNoFlaggedReps
+                        : l.formCheckFlaggedReps(summary.flaggedReps.join(', ')),
+                    style: Theme.of(context).textTheme.titleSmall,
+                  ),
                 ),
               ],
             ),
             const SizedBox(height: AppSpacing.lg),
-
-            // ---- Cues ----
             if (summary.cuesShown.isNotEmpty) ...[
-              Text(
-                'Technique notes',
-                style: Theme.of(context).textTheme.titleSmall,
-              ),
+              Text(l.formCheckTechniqueNotes, style: Theme.of(context).textTheme.titleSmall),
               const SizedBox(height: AppSpacing.sm),
-              ...summary.cuesShown.map(
-                (cueKey) => Padding(
-                  padding: const EdgeInsets.only(bottom: AppSpacing.sm),
-                  child: Row(
-                    children: [
-                      const Icon(Icons.info_outline,
-                          size: 16, color: AppColors.onDarkSecondary),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          cueKey.replaceAll('_', ' ').capitalizeFirst(),
-                          style: Theme.of(context).textTheme.bodySmall,
-                        ),
-                      ),
-                    ],
+              for (final key in summary.cuesShown)
+                if (engine.cueFor(key) case final cue?)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Icon(Icons.info_outline, size: 16, color: AppColors.mist),
+                        const SizedBox(width: 8),
+                        Expanded(
+                            child: Text(fr ? cue.textFr : cue.textEn, style: Theme.of(context).textTheme.bodySmall)),
+                      ],
+                    ),
                   ),
-                ),
-              ),
               const SizedBox(height: AppSpacing.lg),
             ],
-
-            // ---- Top tip ----
-            if (summary.topTipEn.isNotEmpty)
-              Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(AppSpacing.base),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Top tip',
-                        style:
-                            Theme.of(context).textTheme.labelMedium?.copyWith(
-                                  color: AppColors.accent,
-                                ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(summary.topTipEn),
-                    ],
-                  ),
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(AppSpacing.base),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(l.formCheckTopTipLabel,
+                        style: Theme.of(context).textTheme.labelMedium?.copyWith(color: AppColors.glacier)),
+                    const SizedBox(height: 8),
+                    Text(topTip.isEmpty ? l.formCheckGreatForm : topTip),
+                  ],
                 ),
               ),
-
-            const SizedBox(height: AppSpacing.xl),
-
-            // ---- Actions ----
-            ElevatedButton(
-              onPressed: () => context.pop(),
-              child: const Text('Done'),
             ),
             const SizedBox(height: AppSpacing.sm),
+            Text(l.formCheckBetaNote, style: Theme.of(context).textTheme.bodySmall?.copyWith(color: AppColors.mist)),
+            const SizedBox(height: AppSpacing.xl),
+            ElevatedButton(onPressed: () => context.pop(), child: Text(l.formCheckDone)),
+            const SizedBox(height: AppSpacing.sm),
+            // Re-enters through the gate, so a used free try leads to the paywall.
             OutlinedButton(
-              onPressed: () => context.go('/form-check/$exerciseSlug'),
-              child: const Text('Try again'),
+              onPressed: () => context.pushReplacement('/form-check/$exerciseSlug'),
+              child: Text(l.formCheckTryAgain),
             ),
           ],
         ),
@@ -141,17 +144,11 @@ class _FormScoreGauge extends StatelessWidget {
               children: [
                 Text(
                   '$score',
-                  style: Theme.of(context)
-                      .textTheme
-                      .displayLarge
-                      ?.copyWith(fontSize: 56, color: _scoreColor(score)),
+                  style: Theme.of(context).textTheme.displayLarge?.copyWith(fontSize: 56, color: _scoreColor(score)),
                 ),
                 Text(
                   '/ 100',
-                  style: Theme.of(context)
-                      .textTheme
-                      .bodySmall
-                      ?.copyWith(color: AppColors.onDarkSecondary),
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(color: AppColors.mist),
                 ),
               ],
             ),
@@ -160,9 +157,9 @@ class _FormScoreGauge extends StatelessWidget {
       );
 
   Color _scoreColor(int score) {
-    if (score >= 80) return Colors.green;
-    if (score >= 60) return AppColors.accent;
-    return Colors.red;
+    if (score >= 80) return AppColors.mint;
+    if (score >= 60) return AppColors.glacier;
+    return AppColors.mist;
   }
 }
 
@@ -179,7 +176,7 @@ class _GaugePainter extends CustomPainter {
 
     // Background arc
     final bgPaint = Paint()
-      ..color = AppColors.charcoalElevated
+      ..color = AppColors.deep
       ..style = PaintingStyle.stroke
       ..strokeWidth = 12
       ..strokeCap = StrokeCap.round;
@@ -209,16 +206,11 @@ class _GaugePainter extends CustomPainter {
   }
 
   Color _scoreColor(int score) {
-    if (score >= 80) return Colors.green;
-    if (score >= 60) return AppColors.accent;
-    return Colors.red;
+    if (score >= 80) return AppColors.mint;
+    if (score >= 60) return AppColors.glacier;
+    return AppColors.mist;
   }
 
   @override
   bool shouldRepaint(covariant _GaugePainter old) => old.score != score;
-}
-
-extension _StringExt on String {
-  String capitalizeFirst() =>
-      isEmpty ? this : '${this[0].toUpperCase()}${substring(1)}';
 }

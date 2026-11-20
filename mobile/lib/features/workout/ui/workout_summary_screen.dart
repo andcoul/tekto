@@ -1,98 +1,150 @@
+import 'package:tekto/features/subscription/domain/entitlement_provider.dart';
+import 'package:tekto/features/plan/domain/adaptation_provider.dart';
+import 'package:tekto/core/di/providers.dart';
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 
+import '../../../core/l10n/gen/app_localizations.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../shared/utils/weight_units.dart';
+import '../domain/workout_controller.dart';
+import '../domain/workout_providers.dart';
 
+/// Workout summary (US2 acceptance scenario 4): total volume in the user's unit,
+/// exercises completed, PRs hit, and the session effort rating (1–10).
 class WorkoutSummaryScreen extends ConsumerStatefulWidget {
-  const WorkoutSummaryScreen({super.key, required this.sessionId});
+  const WorkoutSummaryScreen({super.key, required this.sessionId, required this.workoutLogId});
   final String sessionId;
 
+  /// From the route's `?log=` parameter; null sends the user home.
+  final String? workoutLogId;
+
   @override
-  ConsumerState<WorkoutSummaryScreen> createState() =>
-      _WorkoutSummaryScreenState();
+  ConsumerState<WorkoutSummaryScreen> createState() => _WorkoutSummaryScreenState();
 }
 
-class _WorkoutSummaryScreenState
-    extends ConsumerState<WorkoutSummaryScreen> {
+class _WorkoutSummaryScreenState extends ConsumerState<WorkoutSummaryScreen> {
   int _effortRating = 7;
+  bool _saving = false;
+
+  Future<void> _finish() async {
+    final logId = widget.workoutLogId;
+    final logs = ref.read(workoutLogRepositoryProvider);
+    if (logId == null || logs == null) {
+      context.go('/home');
+      return;
+    }
+    setState(() => _saving = true);
+    final summary = await ref.read(workoutSummaryProvider(logId).future);
+    final finishedAt =
+        await logs.finishWorkout(logId, effortRating: _effortRating, totalVolumeKg: summary.totalVolumeKg);
+    final prefs = await ref.read(userPrefsProvider.future);
+
+    // Fire and forget: the workout is saved; Health must never hold the user here (FR-012).
+    unawaited(ref.read(healthSyncServiceProvider).syncFinishedWorkout(
+          workoutLogId: logId,
+          healthSyncEnabled: prefs.healthSyncEnabled,
+          start: summary.startedAt,
+          end: finishedAt,
+        ));
+
+    // Fire and forget: if this workout completed the training week, a Pro plan is adapted now
+    // (FR-026 early trigger); its summary shows as a card once the plan refreshes.
+    try {
+      final userId = ref.read(currentUserIdProvider);
+      if (userId != null) {
+        unawaited(ref.read(adaptationServiceProvider).afterWorkoutFinished(
+              sessionId: widget.sessionId,
+              userId: userId,
+              isPro: ref.read(entitlementProvider).value?.isPro ?? false,
+            ));
+      }
+    } on Object {
+      // Never keep the user here: the hourly batch adapts the week anyway.
+    }
+
+    ref.read(workoutControllerProvider.notifier).reset();
+    if (mounted) context.go('/home');
+  }
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    final logId = widget.workoutLogId;
+    final summary = logId == null ? null : ref.watch(workoutSummaryProvider(logId)).value;
+    final unit = ref.watch(userPrefsProvider).value?.unit ?? 'kg';
+    final locale = Localizations.localeOf(context).toLanguageTag();
+
     return Scaffold(
-      appBar: AppBar(title: const Text('Workout complete')),
-      body: Padding(
-        padding: const EdgeInsets.all(AppSpacing.base),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            const _SummaryCard(
-              totalVolumeKg: 2450,
-              exerciseCount: 5,
-              prCount: 1,
-            ),
-            const SizedBox(height: AppSpacing.lg),
-            Text('How hard was that session?',
-                style: Theme.of(context).textTheme.titleMedium),
-            const SizedBox(height: AppSpacing.sm),
-            Row(
-              children: [
-                Text('$_effortRating RPE',
-                    style: Theme.of(context).textTheme.headlineMedium),
+      appBar: AppBar(title: Text(l.workoutSummaryTitle), automaticallyImplyLeading: false),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.base),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              if (summary != null)
+                Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(AppSpacing.lg),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        _Stat(
+                          label: l.workoutTotalVolume,
+                          value: l.workoutVolumeValue(
+                            NumberFormat.decimalPattern(locale).format(kgToUnit(summary.totalVolumeKg, unit).round()),
+                            unit == 'lb' ? l.unitLb : l.unitKg,
+                          ),
+                        ),
+                        _Stat(label: l.workoutSummaryExercises, value: '${summary.exercisesCompleted}'),
+                        _Stat(label: l.workoutSummaryPrs, value: '${summary.prCount}', highlight: summary.prCount > 0),
+                      ],
+                    ),
+                  ),
+                )
+              else if (logId != null)
+                const Center(child: CircularProgressIndicator()),
+              const SizedBox(height: AppSpacing.lg),
+              Text(l.workoutEffortPrompt, style: theme.textTheme.titleMedium),
+              const SizedBox(height: AppSpacing.sm),
+              Row(children: [
+                SizedBox(
+                  width: 96,
+                  child: Text('$_effortRating ${l.workoutRpe}', style: theme.textTheme.headlineMedium),
+                ),
                 Expanded(
                   child: Slider(
+                    key: const Key('effort-slider'),
                     value: _effortRating.toDouble(),
                     min: 1,
                     max: 10,
                     divisions: 9,
-                    activeColor: AppColors.accent,
-                    onChanged: (v) =>
-                        setState(() => _effortRating = v.round()),
+                    label: '$_effortRating',
+                    activeColor: AppColors.glacier,
+                    onChanged: (v) => setState(() => _effortRating = v.round()),
                   ),
                 ),
-              ],
-            ),
-            const Spacer(),
-            ElevatedButton(
-              onPressed: () => context.go('/home'),
-              child: const Text('Finish'),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _SummaryCard extends StatelessWidget {
-  const _SummaryCard({
-    required this.totalVolumeKg,
-    required this.exerciseCount,
-    required this.prCount,
-  });
-
-  final int totalVolumeKg;
-  final int exerciseCount;
-  final int prCount;
-
-  @override
-  Widget build(BuildContext context) => Card(
-        child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.lg),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              _Stat(label: 'Volume', value: '${totalVolumeKg}kg'),
-              _Stat(label: 'Exercises', value: '$exerciseCount'),
-              _Stat(
-                label: 'PRs',
-                value: '$prCount',
-                highlight: prCount > 0,
+              ]),
+              const Spacer(),
+              SizedBox(
+                height: AppSizes.minTapTarget,
+                child: ElevatedButton(
+                  onPressed: _saving ? null : _finish,
+                  child: Text(l.workoutFinishShort),
+                ),
               ),
             ],
           ),
         ),
-      );
+      ),
+    );
+  }
 }
 
 class _Stat extends StatelessWidget {
@@ -102,15 +154,11 @@ class _Stat extends StatelessWidget {
   final bool highlight;
 
   @override
-  Widget build(BuildContext context) => Column(
-        children: [
-          Text(
-            value,
-            style: Theme.of(context).textTheme.displayMedium?.copyWith(
-                  color: highlight ? AppColors.pr : null,
-                ),
-          ),
-          Text(label, style: Theme.of(context).textTheme.bodyMedium),
-        ],
-      );
+  Widget build(BuildContext context) => Column(children: [
+        Text(
+          value,
+          style: Theme.of(context).textTheme.headlineSmall?.copyWith(color: highlight ? AppColors.mint : null),
+        ),
+        Text(label, style: Theme.of(context).textTheme.bodyMedium),
+      ]);
 }
