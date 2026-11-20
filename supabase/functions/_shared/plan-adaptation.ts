@@ -61,15 +61,10 @@ export interface WeekData {
 /** Load step per equipment (kg); bodyweight and bands progress by reps. */
 const INCREMENT: Record<string, number> = {
   barbell: 2.5,
-  ez_bar: 2.5,
   cable: 2.5,
   machine: 2.5,
-  smith_machine: 2.5,
-  dumbbell: 1.0,
-  kettlebell: 2.0,
-  band: 0,
-  resistance_band: 0,
-  bodyweight: 0,
+  dumbbell: 1.0, // kettlebells are tagged dumbbell (FR-001)
+  bands: 0,
 };
 const DEFAULT_INCREMENT = 2.5;
 const DEFAULT_RPE_TARGET = 8;
@@ -82,6 +77,8 @@ export function targetRpe(pe: Pick<PlanExerciseRow, 'rpe_target' | 'rir_target'>
 }
 
 export function loadIncrement(equipment: string[]): number {
+  // A bodyweight move on a bar, bench or machine still progresses by reps (T157).
+  if (equipment.includes('bodyweight')) return 0;
   for (const tag of equipment) if (tag in INCREMENT) return INCREMENT[tag];
   return DEFAULT_INCREMENT;
 }

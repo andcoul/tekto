@@ -53,7 +53,8 @@ class LiveExercise {
 
   /// Equipment the exercise needs; barbell exercises offer the plate calculator (FR-042).
   final List<String> equipment;
-  bool get usesBarbell => equipment.contains('barbell');
+  // A bodyweight move on a bar (inverted row) is not loaded, so it gets no plate calculator (T156).
+  bool get usesBarbell => equipment.contains('barbell') && !equipment.contains('bodyweight');
 
   String name(String lang) => lang == 'fr' ? nameFr : nameEn;
 

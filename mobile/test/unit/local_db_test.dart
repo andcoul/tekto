@@ -1,5 +1,6 @@
 // Verifies the foundational local DB work (T016, T017): SQLCipher is the bundled SQLite,
 // the free-try query is per lift, and isPro follows the data-model rule.
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:drift/drift.dart' hide isNull, isNotNull;
@@ -22,7 +23,8 @@ void main() {
 
     // Build a current file, then roll it back to the v1 shape (v3's column removed too).
     final v2 = AppDatabase.forTesting(NativeDatabase(file));
-    await v2.customStatement("INSERT INTO plan_exercises (id, session_id, exercise_slug, sets, reps_min, reps_max) VALUES ('pe1', 's1', 'goblet-squat', 3, 8, 12)");
+    await v2.customStatement(
+        "INSERT INTO plan_exercises (id, session_id, exercise_slug, sets, reps_min, reps_max) VALUES ('pe1', 's1', 'goblet-squat', 3, 8, 12)");
     await v2.customStatement('DROP TABLE body_weight_entries');
     await v2.customStatement('ALTER TABLE plan_exercises DROP COLUMN rir_target');
     await v2.customStatement('ALTER TABLE plans DROP COLUMN adaptation_seen_week');
@@ -35,8 +37,8 @@ void main() {
     expect(columns.map((c) => c.read<String>('name')), contains('rir_target'));
     final kept = await upgraded.select(upgraded.planExercises).getSingle();
     expect([kept.id, kept.rirTarget], ['pe1', null]);
-    await upgraded.into(upgraded.bodyWeightEntries).insert(BodyWeightEntriesCompanion.insert(
-          id: 'bw1', userId: 'u1', weightKg: 80, measuredOn: DateTime(2026, 11, 15)));
+    await upgraded.into(upgraded.bodyWeightEntries).insert(
+        BodyWeightEntriesCompanion.insert(id: 'bw1', userId: 'u1', weightKg: 80, measuredOn: DateTime(2026, 11, 15)));
     expect(await upgraded.select(upgraded.bodyWeightEntries).get(), hasLength(1));
   });
 
@@ -67,7 +69,12 @@ void main() {
     final file = File('${dir.path}/enc.sqlite');
     final enc = AppDatabase.forTesting(NativeDatabase(file, setup: (raw) => raw.execute("PRAGMA key = 'abc123';")));
     await enc.into(enc.users).insert(UsersCompanion.insert(
-          id: 'u1', goal: 'muscle', level: 'beginner', daysPerWeek: 3, sessionLengthMin: 45, equipment: '[]',
+          id: 'u1',
+          goal: 'muscle',
+          level: 'beginner',
+          daysPerWeek: 3,
+          sessionLengthMin: 45,
+          equipment: '[]',
         ));
     await enc.close();
     final header = String.fromCharCodes((await file.readAsBytes()).take(15));
@@ -82,9 +89,18 @@ void main() {
       dao = FormCheckDao(db);
       for (final (slug, lift) in [('barbell-squat', 'squat'), ('goblet-squat', 'squat'), ('deadlift', 'deadlift')]) {
         await db.into(db.exercises).insert(ExercisesCompanion.insert(
-              slug: slug, nameEn: slug, nameFr: slug, equipment: '[]', musclePrimary: '[]',
-              muscleSecondary: '[]', cuesEn: '[]', cuesFr: '[]', commonMistakesEn: '[]', commonMistakesFr: '[]',
-              formCheckSupported: const Value(true), formCheckLiftKey: Value(lift),
+              slug: slug,
+              nameEn: slug,
+              nameFr: slug,
+              equipment: '[]',
+              musclePrimary: '[]',
+              muscleSecondary: '[]',
+              cuesEn: '[]',
+              cuesFr: '[]',
+              commonMistakesEn: '[]',
+              commonMistakesFr: '[]',
+              formCheckSupported: const Value(true),
+              formCheckLiftKey: Value(lift),
             ));
       }
     });
@@ -95,7 +111,10 @@ void main() {
 
     test('a free try on one squat variation uses up the squat lift, not deadlift', () async {
       await dao.insertSession(FormCheckSessionsCompanion.insert(
-        id: 's1', userId: 'u1', exerciseSlug: 'goblet-squat', wasFreeTry: const Value(true),
+        id: 's1',
+        userId: 'u1',
+        exerciseSlug: 'goblet-squat',
+        wasFreeTry: const Value(true),
       ));
       expect(await dao.hasFreeTry('u1', 'squat'), isTrue);
       expect(await dao.hasFreeTry('u1', 'deadlift'), isFalse);
@@ -112,8 +131,14 @@ void main() {
     final now = DateTime.utc(2026, 11, 10);
     Subscription sub({String tier = 'pro', bool trial = false, DateTime? trialEnds, DateTime? periodEnds}) =>
         Subscription(
-          id: 'x', userId: 'u', tier: tier, isTrial: trial, trialEndsAt: trialEnds,
-          currentPeriodEndsAt: periodEnds, createdAt: now, updatedAt: now,
+          id: 'x',
+          userId: 'u',
+          tier: tier,
+          isTrial: trial,
+          trialEndsAt: trialEnds,
+          currentPeriodEndsAt: periodEnds,
+          createdAt: now,
+          updatedAt: now,
         );
 
     test('follows tier == pro AND (period active OR trial active)', () {
@@ -129,5 +154,32 @@ void main() {
       // A trial flag with an expired trial but an active period is still Pro.
       expect(dao.isPro(sub(trial: true, trialEnds: earlier, periodEnds: later), now: now), isTrue);
     });
+  });
+
+  // T159 — v3 → v4 remaps saved equipment to the 2026-11-20 vocabulary (T150, migration 014).
+  test('schema v3 → v4 remaps users.equipment and keeps the other columns', () async {
+    final dir = await Directory.systemTemp.createTemp('tekto_migration_v4');
+    addTearDown(() => dir.delete(recursive: true));
+    final file = File('${dir.path}/db.sqlite');
+
+    final v3 = AppDatabase.forTesting(NativeDatabase(file));
+    await v3.customStatement(
+      "INSERT INTO users (id, goal, level, days_per_week, session_length_min, equipment, language) "
+      "VALUES ('u1', 'muscle', 'beginner', 3, 45, '[\"dumbbell\"]', 'fr'), "
+      "('u2', 'strength', 'advanced', 4, 60, '[\"barbell\",\"cable\"]', 'en')",
+    );
+    await v3.customStatement('PRAGMA user_version = 3');
+    await v3.close();
+
+    final v4 = AppDatabase.forTesting(NativeDatabase(file));
+    addTearDown(v4.close);
+    final users = {for (final u in await v4.select(v4.users).get()) u.id: u};
+    expect((jsonDecode(users['u1']!.equipment) as List).toSet(), {'dumbbell', 'bench', 'bodyweight'});
+    expect(
+      (jsonDecode(users['u2']!.equipment) as List).toSet(),
+      {'barbell', 'cable', 'machine', 'bench', 'pull_up_bar', 'dip_station', 'bodyweight'},
+    );
+    expect([users['u1']!.goal, users['u1']!.language, users['u1']!.sessionLengthMin], ['muscle', 'fr', 45]);
+    expect(await v4.customSelect('PRAGMA user_version').map((r) => r.read<int>('user_version')).getSingle(), 4);
   });
 }

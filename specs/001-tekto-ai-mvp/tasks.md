@@ -19,7 +19,7 @@ description: "Task list for Tekto AI MVP (regenerated after spec clarifications 
 
 ## Progress (2026-11-20, after `/speckit-implement` of Phase 13)
 
-**140 done / 15 open** of 155. Every code task is done except T155 (second-angle clips in the content pipeline); the other open tasks need accounts, devices, content or people:
+**144 done / 15 open** of 159. Every code task is done except T155 (second-angle clips in the content pipeline); the other open tasks need accounts, devices, content or people:
 
 - **Accounts / infrastructure**: T114 staging project + secrets (blocks T075 guardrail run, T095 staging timings), T092 uptime monitor on the deployed `/health`, T133 `supabase db reset` with Docker (001–014; 014 checked on a throwaway Postgres 2026-11-20)
 - **Devices**: T135 iOS/Android build, T130 form-check threshold tuning, T095 performance run, T096 privacy audit, T097 Scenarios 1–9; T093 VoiceOver/TalkBack + tablet walkthrough (code part done)
@@ -437,7 +437,7 @@ T079 · T080 · T081 (tests)
 
 ## Notes
 
-- **Total tasks**: 155 (T001–T098, plus T099–T127 added by remediation and placed inside their phases, T128–T133 and T135 in Phase 11 Convergence, T134 in Phase 8, T136–T140 in Phase 12, T141 in Phase 3, and T142–T155 in Phase 13 from the 2026-11-20 clarifications).
+- **Total tasks**: 159 (T001–T098, plus T099–T127 added by remediation and placed inside their phases, T128–T133 and T135 in Phase 11 Convergence, T134 in Phase 8, T136–T140 in Phase 12, T141 in Phase 3, T142–T155 in Phase 13 from the 2026-11-20 clarifications, and T156–T159 in Phase 14 Convergence).
 - Additional test-first pairs from remediation: starting weights (T112 → T113), RevenueCat webhook (T108 → T109), auth screen (T101 → T102), home screen (T103 → T104), health sync (T106 → T107), progress screen (T117 → T119), swap for all tiers (T120 → T087), plate calculator (T121 → T122), welcome screen (T124 → T125).
 - Every Principle V unit has its test task before its implementation: `PlanAdaptationService` (T080 → T083), `FormScoreCalculator` (T059 → T063), `RepCounter` (T058 → T062), `CoachQuotaService` (T069 → T076), subscription gates (T053/T054 → T056/T057), plus `ExerciseSubstitution` (T012 → T014), `PlanValidator` (T013 → T015), `TemplatePlanBuilder` (T030 → T036), generate-plan flow (T031 → T037), week boundary (T079 → T082), free try (T061 → T064).
 - Paywall widget tests: `PaywallScreen` (T052), `TrialOfferScreen` (T033), in-workout bottom sheet (T053), coach quota paywall (T116).
@@ -504,3 +504,12 @@ T079 · T080 · T081 (tests)
 **Checkpoint**: `node --test` in `content/exercises/` and `content/templates/`, `deno task test`, and `flutter test` pass; `validate.js` shows no errors in dev (only the FR-013 count and missing second-angle clips as warnings); a dumbbell-only test user's plan contains no bar, dip, bench-only or machine exercise.
 
 **Dependencies**: T142–T144 first. T145 → T146, T147, T148, T149 (data, any order). T150 after T146. T151 after T146. T152 after T144. T153 after T148. T154 last.
+
+## Phase 14: Convergence
+
+**Purpose**: Gaps found by `/speckit-converge` (2026-11-20) after Phase 13. Work already tracked by open tasks (T022, T075, T092–T098, T114, T130, T133, T135, T141, T155) is not repeated.
+
+- [X] T156 [US2] Treat bodyweight exercises as unloaded even when they list an apparatus: `inverted-row` is now `['bodyweight','barbell']`, so `kindOf()` in `supabase/functions/_shared/starting-weights.ts` gives it the 20 kg empty-bar start and `LiveExercise.usesBarbell` in `mobile/lib/features/workout/domain/live_session.dart` offers the plate calculator; an exercise whose `equipment` contains `bodyweight` gets 0 kg and no plate calculator; failing cases first in `starting-weights.test.ts` and `live_workout_screen_test.dart` per FR-009, FR-042, FR-013 (contradicts)
+- [X] T157 [US5] Make band exercises progress by reps, not kilograms: `INCREMENT` in `supabase/functions/_shared/plan-adaptation.ts` lists `band` / `resistance_band` but the library tag is `bands`, so `loadIncrement(['bands'])` falls back to 2.5 kg; and `kindOf()` in `starting-weights.ts` classes `bands` as `cable` (15–45 kg start). Use the FR-001 vocabulary in both (`bands` → 0 kg, progress by reps; `machine` as today); decide whether `back-extension` (now `['machine']`) starts at 0 kg like other bodyweight-style moves (done 2026-11-20: re-tagged `['bodyweight','machine']`, and any exercise listing `bodyweight` is unloaded); failing cases first in `plan-adaptation.test.ts` and `starting-weights.test.ts` per FR-026, US5/AC1, FR-009 (contradicts)
+- [X] T158 [US6] Update the library equipment filter in `mobile/lib/features/library/ui/exercise_list_screen.dart` to the FR-001 vocabulary from `mobile/lib/shared/models/equipment.dart` (`kEquipmentChoices` plus bodyweight; today it offers only barbell, dumbbell, cable, bodyweight, bands, so machine, pull-up bar, dip station and bench moves cannot be filtered) and label the chips with the localized `quizEquipment*` strings instead of `_capitalize(key)` (French users see "Bands", "Cable"); widget test first per FR-013, FR-033 (partial)
+- [X] T159 Add a migration test for local schema v4 in `mobile/test/unit/local_db_test.dart`: a v3 database with a user whose `equipment` is `["dumbbell"]` upgrades to `["dumbbell","bench","bodyweight"]` (any order) and other columns are untouched, using Drift's schema snapshot / `SchemaVerifier` or an on-disk v3 file per plan: migrations, T150 (partial)

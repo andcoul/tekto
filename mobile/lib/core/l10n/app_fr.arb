@@ -65,6 +65,7 @@
   "workoutTotalVolume": "Volume total",
   "workoutKgMoved": "{kg} kg soulevés",
   "libraryTitle": "Bibliothèque d'exercices",
+  "librarySearchHint": "Rechercher un exercice…",
   "librarySearchHint": "Rechercher des exercices…",
   "libraryFilterMuscle": "Muscle",
   "libraryFilterEquipment": "Équipement",

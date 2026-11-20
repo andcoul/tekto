@@ -121,6 +121,10 @@
       }
     }
   },
+  "librarySearchHint": "Search exercises…",
+  "@librarySearchHint": {
+    "description": "T158 library search field"
+  },
   "libraryOfflineProRequired": "Offline video requires Tekto Pro",
   "coachTitle": "Coach",
   "coachInputHint": "Ask your coach…",

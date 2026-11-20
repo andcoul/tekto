@@ -40,9 +40,12 @@ const INCREMENT: Record<Kind, number> = { barbell: 2.5, dumbbell: 1, cable: 2.5,
 const EMPTY_BAR_KG = 20;
 
 function kindOf(ex: LibraryExercise): Kind {
+  // A bodyweight move stays unloaded even when it needs a bar, bench or machine (inverted row,
+  // pull-up, back extension), and band resistance is not in kilograms (T156, T157).
+  if (ex.equipment.includes('bodyweight') || ex.equipment.includes('bands')) return 'bodyweight';
   if (ex.equipment.includes('barbell')) return 'barbell';
   if (ex.equipment.includes('dumbbell')) return 'dumbbell';
-  if (ex.equipment.some((e) => e === 'cable' || e === 'machine' || e === 'bands')) return 'cable';
+  if (ex.equipment.some((e) => e === 'cable' || e === 'machine')) return 'cable';
   return 'bodyweight';
 }
 

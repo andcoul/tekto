@@ -3643,6 +3643,7 @@
     "name_en": "Back Extension",
     "name_fr": "Extension lombaire",
     "equipment": [
+      "bodyweight",
       "machine"
     ],
     "muscle_primary": [
