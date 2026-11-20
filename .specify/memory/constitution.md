@@ -74,10 +74,14 @@ existential risk. These rules exist to protect users and the product.
 
 ### IV. Video Gate (NON-NEGOTIABLE)
 
-A training plan MUST NEVER reference an exercise for which no filmed video
-exists in the library. This is enforced at generation time, not at display
-time.
+A training plan MUST NEVER reference an exercise for which no reviewed
+demonstration video exists in the library. This is enforced at generation
+time, not at display time.
 
+- A demonstration video MAY be filmed or AI-generated. Either way, it MUST be
+  approved in a human form review before it enters the library; a clip that
+  shows the movement incorrectly MUST NOT be published. Real filming is used
+  where generation cannot show the movement correctly.
 - The plan generator's rule-checker MUST validate that every `exercise_slug`
   in a generated plan resolves to an `exercises` row with a non-null
   `video_front_url`. Any exercise that fails this check MUST be replaced with
@@ -90,7 +94,7 @@ time.
   video before the swap is applied. The backend MUST reject swaps to
   video-less exercises with `EXERCISE_NO_VIDEO`.
 
-**Rationale**: "Real filmed video for every move" is a core product
+**Rationale**: "A correct, reviewed video for every move" is a core product
 differentiator and a trust signal. A plan that sends a user to an exercise
 with no demonstration undermines the product's entire value proposition.
 
@@ -194,7 +198,8 @@ All of the following MUST be true before the app enters public beta:
 - [ ] GDPR data export and account deletion are functional.
 - [ ] Safety guardrails tested against a minimum of 20 adversarial prompts.
 - [ ] Health disclaimer present and unskippable at onboarding.
-- [ ] All 150+ exercises have filmed videos with `video_front_url` populated.
+- [ ] All 150+ exercises have reviewed demonstration videos with
+  `video_front_url` populated.
 - [ ] Privacy audit: no camera frames logged or transmitted in test runs.
 
 ### Gate 2 — Before Public Launch
@@ -246,4 +251,4 @@ Violations require either a spec amendment with justification (documenting
 why the violation is necessary and time-bound) or a code change to restore
 compliance. Silent violations are not acceptable.
 
-**Version**: 2.0.1 | **Ratified**: 2026-11-09 | **Last Amended**: 2026-11-11
+**Version**: 3.0.0 | **Ratified**: 2026-11-09 | **Last Amended**: 2026-11-20
