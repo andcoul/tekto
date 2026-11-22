@@ -22,6 +22,10 @@ export const EXPORTED_TABLES = [
   'form_check_sessions',
   'subscriptions',
   'body_weight_entries',
+  'friendships',
+  'workout_reactions',
+  'support_threads',
+  'support_messages',
 ] as const;
 
 /** Shared content and caches: nothing in them belongs to one user. */
@@ -38,6 +42,8 @@ const DIRECT_BY_USER_ID = [
   'form_check_sessions',
   'subscriptions',
   'body_weight_entries',
+  'workout_reactions', // reactions the user gave
+  'support_threads',
 ] as const;
 
 export async function buildExport(userId: string, deps: ExportDeps): Promise<UserExport> {
@@ -55,6 +61,12 @@ export async function buildExport(userId: string, deps: ExportDeps): Promise<Use
   const planExercises = await children('plan_exercises', 'session_id', sessions);
   const setLogs = await children('set_logs', 'workout_log_id', direct.workout_logs);
   const coachMessages = await children('coach_messages', 'conversation_id', direct.coach_conversations);
+  const supportMessages = await children('support_messages', 'thread_id', direct.support_threads);
+  // Friendships where the user is either side (FR-049).
+  const friendships = [
+    ...(await deps.select('friendships', 'requester_id', [userId])),
+    ...(await deps.select('friendships', 'addressee_id', [userId])),
+  ];
 
   return {
     users,
@@ -63,5 +75,7 @@ export async function buildExport(userId: string, deps: ExportDeps): Promise<Use
     plan_exercises: planExercises,
     set_logs: setLogs,
     coach_messages: coachMessages,
+    support_messages: supportMessages,
+    friendships,
   };
 }

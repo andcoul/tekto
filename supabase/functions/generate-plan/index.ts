@@ -61,7 +61,7 @@ Deno.serve(async (req: Request) => {
   } catch (e) {
     return errorResponse((e as Error).message, 401, 'UNAUTHORIZED');
   }
-  const body = await req.json().catch(() => ({})) as { force_regenerate?: boolean };
+  const body = await req.json().catch(() => ({})) as { force_regenerate?: boolean; program_slug?: unknown };
   const db = getDb();
 
   const { data: user } = await db.from('users').select('*').eq('id', userId).maybeSingle();
@@ -82,6 +82,7 @@ Deno.serve(async (req: Request) => {
     session_length_min: user.session_length_min,
     days_per_week: user.days_per_week,
     strength_estimates: user.strength_estimates,
+    focus_muscles: user.focus_muscles ?? [],
   };
 
   const result = await runGeneratePlan(
@@ -91,6 +92,7 @@ Deno.serve(async (req: Request) => {
       consentAt: user.consent_at,
       hasActivePlan: active !== null,
       forceRegenerate: body.force_regenerate === true,
+      programSlug: typeof body.program_slug === 'string' ? body.program_slug : null,
     },
     {
       templates: (templateRows ?? []).map((r: { body: PlanTemplateDef }) => r.body),
@@ -99,7 +101,10 @@ Deno.serve(async (req: Request) => {
       generateAiPlan: (previousErrors) => generateAiPlan(profile, user.language, library, previousErrors),
     },
   );
-  if (!result.ok) return errorResponse(result.message, result.status, result.code);
+  if (!result.ok) {
+    if (result.errors) return jsonResponse({ error: result.message, code: result.code, details: result.errors }, result.status);
+    return errorResponse(result.message, result.status, result.code);
+  }
 
   const startDate = planStartDate(new Date(), user.timezone ?? 'UTC');
   let saved: { planId: string; sessions: Awaited<ReturnType<typeof saveSessions>> };
@@ -184,6 +189,7 @@ async function generateAiPlan(
     `- Session length: ${profile.session_length_min} minutes`,
     `- Equipment: ${profile.equipment.join(', ')}`,
     `- Limitations: ${profile.limitations.length ? profile.limitations.join(', ') : 'none'}`,
+    `- Focus muscles (give each about 2 extra weekly sets, within rule 2): ${profile.focus_muscles?.length ? profile.focus_muscles.join(', ') : 'none'}`,
     `- Language preference: ${language}`,
     '',
     'AVAILABLE EXERCISES (only these, already filtered for equipment, video and limitations):',

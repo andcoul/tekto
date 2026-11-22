@@ -50,6 +50,21 @@ Tekto is a premium, AI-first strength training app for iOS and Android. It build
 - Q: What minimum length should an exercise clip have? → A: 4–15 s, showing at least one complete rep (or one full hold for static moves); the library records the real length (FR-014).
 - Q: Must every exercise link to both an easier and a harder variation? → A: At least one variation per exercise (easier or harder), both where a sensible one exists; links always point to exercises in the library (FR-014).
 
+### Session 2026-11-21 (product owner requests)
+
+- Q: Should Pro users be able to choose a standard program (bro split, push/pull/legs, upper/lower…) instead of the AI plan? → A: Yes. A Pro plan library offers ready-made programs; the chosen one is fitted to the user like a template plan and replaces the active plan (FR-047).
+- Q: Which modern gym equipment must the library cover? → A: Add the Smith machine, trap bar and suspension straps as their own equipment choices; plate-loaded and selectorized machines stay "machines", landmine moves need only a barbell, kettlebells stay "dumbbells". The library adds exercises for each, including an adductor group (FR-001, FR-013).
+- Q: Are near-identical exercises kept as separate entries? → A: No. Two entries that are the same movement with only a different handle or attachment are one exercise (the straight-bar triceps pushdown was merged into the rope pushdown) (FR-013).
+- Q: How is the app organized? → A: Four tabs — Home · Feed · Library · Profile; the AI coach is a floating button on every tab; Progress moves inside Feed as its "You" view; the plan is reached from Home (FR-048).
+- Q: What do friends see and do in the Feed? → A: Once the user turns sharing on (off by default, Constitution II — decided 2026-11-22), each finished workout is posted to friends automatically (the user can turn sharing off or hide a single workout) with muscle map, time, volume, sets and records; friends react with a fixed set of emoji; no comments at launch (FR-049).
+- Q: What ranks friends on the leaderboard? → A: A weekly training score (sessions, completed sets and records, reset every Monday, with the change from last week) (FR-050).
+- Q: Muscle recovery? → A: Recovery per muscle from logged sets, effort and time since, shown as a body map, the next workout's muscles and every other muscle with % and time to ready; Pro (FR-051).
+- Q: Focus muscles? → A: Up to 2 focus muscles, chosen in onboarding (after equipment) and in training preferences, with premium muscle tiles; plans give them a little extra weekly volume within the level maximum; Pro for the effect on plans (FR-052).
+- Q: Profile? → A: A Profile tab with friends, help & support, streak, measurements, a workout heatmap by volume, badges (about 24) and the user's details (FR-053).
+- Q: Help & support? → A: An in-app chat with the Tekto support team, who reply as soon as possible; an AI assistant answers instantly and hands over to a person whenever the user asks or it cannot help (FR-054).
+- Q: Free or Pro? → A: Feed, friends, leaderboard, profile, badges and support are free; muscle recovery and focus muscles are Pro.
+- Q: Does the profile's sex field keep a "Prefer not to say" option? → A: No; the profile offers Female or Male only (design decision for the profile screen; the app does not collect sex today).
+
 ---
 
 ## User Scenarios & Testing *(mandatory)*
@@ -171,6 +186,27 @@ Any user (free or Pro) can browse and view the full exercise video library. Each
 
 ---
 
+### User Story 8 — Train with Friends and Know What Is Ready (Priority: P2)
+
+**Launch scope**: Required at launch (product owner, 2026-11-21).
+
+A user adds friends, chooses to share their workouts, sees friends' sessions in the Feed with reactions and a weekly leaderboard, checks which muscles have recovered before training, and gets help in the support chat.
+
+**Why this priority**: Social accountability and visible progress drive retention and word of mouth; recovery and support build trust.
+
+**Independent Test**: Two test accounts can befriend each other, opt in, log a workout and see it ranked — without the coach or form check.
+
+**Acceptance Scenarios**:
+
+1. **Given** two users who are not friends, **When** one finishes a workout, **Then** the other sees nothing of it (FR-049).
+2. **Given** accepted friends who have not turned sharing on, **When** one finishes a workout, **Then** it is not posted; **When** they tap "Share with friends", **Then** later workouts appear in the friend's Feed with session, time, volume, sets, records and a muscle map (FR-049).
+3. **Given** a friend's post, **When** the user taps 🔥, **Then** the count rises by one and the friend's weekly score is unaffected; tapping again removes it (FR-049).
+4. **Given** friends who trained this week, **When** the user opens Friends, **Then** the leaderboard ranks them by weekly training score with the change from last week (FR-050).
+5. **Given** a Pro user who trained shoulders hard 44 hours ago, **When** they open Recovery, **Then** shoulders show under 100 % with the time they are ready, and the next workout's muscles are listed first (FR-051).
+6. **Given** any user in the support chat, **When** they tap "Talk to a person", **Then** the assistant confirms a person will reply, stops answering, and a team reply appears in the same chat (FR-054).
+
+---
+
 ### User Story 7 — Subscription and Paywall (Priority: P1)
 
 **Launch scope**: Required at launch (PRD P0).
@@ -187,6 +223,7 @@ A free user encounters a Pro feature, sees a contextual paywall that communicate
 2. **Given** a user on the paywall, **When** they tap "Start 7-day free trial", **Then** the native App Store / Google Play subscription sheet is presented.
 3. **Given** a user who has previously purchased, **When** they tap "Restore purchases", **Then** their subscription status is restored.
 4. **Given** any paywall, **When** displayed, **Then** cancel-anytime instructions and a restore purchases link are always visible.
+5. **Given** a Pro user in the plan library, **When** they open "Bro split" and confirm "Start this plan", **Then** their active plan is replaced by a five-day bro split fitted to their equipment and limitations, and the plan screen shows it; a free user who taps the same button sees the paywall (FR-047).
 
 ---
 
@@ -210,7 +247,7 @@ A free user encounters a Pro feature, sees a contextual paywall that communicate
 
 **Onboarding & Plan Generation**
 
-- **FR-001**: The system MUST present an onboarding quiz collecting: goal (muscle, strength, fat loss, general fitness), training level, days per week, session length, available equipment, and physical limitations or injuries. Equipment choices are: barbell, dumbbells (kettlebells count as dumbbells), cable, machines, resistance bands, pull-up bar, dip station and bench; bodyweight is always available. Choosing "Gym" selects all of them; home users tick what they own.
+- **FR-001**: The system MUST present an onboarding quiz collecting: goal (muscle, strength, fat loss, general fitness), training level, days per week, session length, available equipment, and physical limitations or injuries. Equipment choices are: barbell, dumbbells (kettlebells count as dumbbells), cable, machines (selectorized and plate-loaded), resistance bands, pull-up bar, dip station, bench, Smith machine, trap bar and suspension straps; bodyweight is always available. Choosing "Gym" selects all of them; home users tick what they own.
 - **FR-002**: The system MUST generate a 4–12 week periodized training plan with named exercises, sets, reps, rest periods and RPE/RIR targets within 30 seconds (p95) of onboarding completion; if no plan arrives within the 35-second client timeout, the app offers a retry (network failures only; FR-003b covers AI failures). Pro users receive an AI-generated plan. Free users receive a rule-based plan built from one of the starter templates (FR-029), selected by equipment first, then level, then goal; the system adapts it to the user's chosen days per week (1 day → 1 session; otherwise adding or merging sessions, up to a maximum of 4 sessions per week; a user who chooses 5–7 days receives 4 sessions and a non-blocking card explaining that Pro builds programs for 5 or more days) and session length (trimming exercises from the end of each session, keeping at least 3, then reducing sets and rest if needed). No AI call is made for free plans.
 - **FR-002a**: Every plan, AI-generated or template-based, MUST pass the same plan validator (every exercise has a video, uses only the user's available equipment, rest days present, estimated session duration at most 10 minutes over the chosen session length (template plans are trimmed to fit within it), weekly sets per muscle group within the level's bounds, and for AI plans weekly push sets ÷ pull sets between 0.5 and 2.0, summed per primary muscle — push = chest, shoulders, front delts, triceps; pull = lats, rhomboids, rear delts, biceps, traps) before it is shown to the user. The volume bounds are beginner 10–14, intermediate 14–18, advanced 16–22 sets per muscle per week. The maximum applies to every plan. The minimum applies to AI plans only, for major muscles when the user trains 3 or more days per week, because template plans trimmed to short sessions cannot always reach it.
 - **FR-003**: Every exercise in a generated plan MUST have a corresponding video in the exercise library; no plan may reference a movement without a video.
@@ -241,7 +278,7 @@ A free user encounters a Pro feature, sees a contextual paywall that communicate
 
 **Exercise Video Library**
 
-- **FR-013**: The library MUST contain at least 150 exercises at launch, covering gym barbell, dumbbell, cable, machine, bodyweight and resistance-band movements. Every exercise lists all the equipment it needs from the FR-001 choices (for example, pull-up = pull-up bar; bench dip = bench; leg press = machines), so a plan or swap never offers a move that needs equipment the user did not select.
+- **FR-013**: The library MUST contain at least 150 exercises at launch, covering gym barbell, dumbbell, cable, machine (including plate-loaded machines such as the pendulum and belt squat), Smith machine, trap bar, landmine, suspension, bodyweight and resistance-band movements, with a dedicated group for every major muscle including the adductors. No two exercises may be the same movement differing only by handle or attachment. Every exercise lists all the equipment it needs from the FR-001 choices (for example, pull-up = pull-up bar; bench dip = bench; leg press = machines), so a plan or swap never offers a move that needs equipment the user did not select.
 - **FR-014**: Each exercise MUST include: a demonstration video (one main angle chosen to show the form best, looped, 4–15 s, showing at least one complete rep — or one full hold for static moves such as the plank — with the library recording the clip's real length; filmed or AI-generated, and approved in a human form review before it enters the library — real filming is used only where generation cannot show the movement correctly), target muscles, step-by-step technique cues, common mistakes, and at least one variation — an easier or a harder exercise, both where a sensible one exists; every variation links to an exercise in the library. Exercises that are one of the 8 form-check lifts (FR-022) or a variant of one (for example, front squat, Romanian deadlift, incline bench press) MUST also include a second-angle video.
 - **FR-015**: Pro users MUST be able to download the videos for all exercises in their active plan for offline use.
 
@@ -277,6 +314,14 @@ A free user encounters a Pro feature, sees a contextual paywall that communicate
 
 - **FR-033**: The full UI, coach responses and all copy MUST be available in English and French; the user's language preference is set during onboarding and can be changed in settings.
 - **FR-034**: The app MUST support kg and lb unit selection, persisted per user.
+- **FR-047**: Pro users MUST be able to browse a plan library of ready-made programs (at launch: bro split, push/pull/legs, upper/lower, full body, strength 5 × 5, power & size upper/lower, chest-back · shoulders-arms · legs, glutes & legs focus, dumbbell home) showing each program's days per week, level, weekly schedule and the equipment it uses, and start one. Starting a program replaces the active plan (logged sessions and records are kept); the program keeps its own training days and is fitted like a template plan — exercises needing equipment the user lacks or contraindicated by their limitations are substituted, sessions trimmed to the session length, weekly sets capped at the user's level maximum, starting weights computed — and MUST pass the plan validator (FR-002a). If it cannot be fitted, the current plan stays active and the user is told why. Weekly adaptation (FR-026) applies as for any plan. Free users see the library and a paywall when they try to start a program.
+- **FR-048**: The app MUST have four tabs — Home, Feed, Library, Profile — with the AI coach as a floating button beside them on every tab. Feed holds two views: Friends and You (the user's own progress, FR-024/FR-040). The plan is reached from Home.
+- **FR-049**: Users MUST be able to add friends by username or by a personal invite link; a friendship needs both sides to accept and either side can remove it or block the other. Workout sharing MUST be off until the user turns it on with an explicit action (the opt-in card in Feed or Friends, or Settings); once on, each finished workout MUST be posted to the user's friends unless the user hid that workout or turns sharing off again; a post shows the session name, time, duration, volume, set count, new records and a front/back muscle map. Friends MUST be able to react with one of a fixed set of emoji (💪 🔥 👏), one reaction per friend per post, and see counts. No user-written text appears in the Feed at launch. Friends never see body weight, measurements, limitations or notes.
+- **FR-050**: The Friends screen MUST show a weekly leaderboard of the user and their friends ranked by weekly training score — 20 points per finished session (at most 7 a week), 1 point per completed working set, 10 points per new personal record (one per exercise per workout) — computed for the current week (Monday–Sunday in each user's time zone) with the change from the previous week, plus a chart comparing the weekly scores of the user and up to 3 friends over the last 8 weeks.
+- **FR-051**: Pro users MUST see muscle recovery: for each muscle trained in the last 7 days, recovery % = min(100, hours since the session ÷ hours needed × 100), where hours needed = base (72 h for chest, back, quads, hamstrings, glutes; 48 h for others) × load factor (sets in that session for the muscle ÷ 10, between 0.5 and 1.5) × effort factor (session RPE ≥ 9 → 1.2; ≤ 6 → 0.8; else 1.0); a muscle trained in several sessions takes the lowest value. The screen shows a front/back map shaded by recovery, the next workout's muscles first, then every other muscle with % and the time it is ready. It is a guide; it never blocks a workout. Free users see the card with a paywall.
+- **FR-052**: Users MUST be able to choose up to 2 focus muscles (chest, shoulders, triceps, back, biceps, traps, forearms, quads, hamstrings, glutes, abductors, adductors, calves, abs, lower back) in onboarding after the equipment step and in training preferences. For Pro users, plan generation adds weekly sets for the focus muscles (AI: stated in the prompt; template and library plans: +2 sets a week per focus muscle on a matching exercise) without exceeding the level's weekly maximum (FR-002a).
+- **FR-053**: The Profile tab MUST show the user's photo, name and workout count; cards for friends, help & support, current streak (consecutive weeks meeting the planned sessions) and latest body weight; a calendar heatmap of workouts for the selected year shaded by volume; earned badges (about 24: streaks, workout counts, first record on each main lift, friends); then body and training details, each editable.
+- **FR-054**: Users MUST be able to chat with Tekto support from the Profile tab. An AI assistant answers each message instantly in the user's language, using only help content (never medical advice beyond FR-016); the user can ask for a person at any time, and the assistant hands over when it cannot help. Support staff see the thread and reply; replies appear in the chat and send a notification. Messages are kept with the account and deleted with it (FR-037).
 - **FR-046**: Users MUST be able to edit their onboarding answers (goal, level, days per week, session length, equipment, limitations and note, strength check) from settings. Saving updates the profile and offers "Regenerate my plan" (FR-002, `force_regenerate`); the current plan stays active until the user confirms. Editing limitations does not require new consent; only a new consent version does (FR-045).
 - **FR-035**: The app MUST meet WCAG 2.1 AA targets including dynamic type, screen-reader labels (VoiceOver / TalkBack), and captions on all exercise videos.
 
@@ -336,5 +381,5 @@ A free user encounters a Pro feature, sees a contextual paywall that communicate
 - English and French are the only supported languages at launch; the architecture supports adding more languages in future releases.
 - The trademark clearance for "Tekto" in Classes 9 and 41 is assumed to be completed before launch (open question from PRD).
 - Team size, budget, and target launch date are open questions to be resolved outside this spec.
-- Nutritional tracking, social features, wearable integrations beyond Apple Health / Google Health Connect, progress photos, form-check footage sharing, pull-up form check, full program editing (beyond swap and regeneration), in-app speech recognition, and a web app are explicitly out of scope for the MVP.
+- Nutritional tracking, public social features (public profiles, followers, comments — friends, feed and reactions are in scope since 2026-11-21, FR-049), wearable integrations beyond Apple Health / Google Health Connect, progress photos, form-check footage sharing, pull-up form check, full program editing (beyond swap and regeneration), in-app speech recognition, and a web app are explicitly out of scope for the MVP.
 - A human-reviewed content safety pass on the AI coach's guardrails will be conducted before launch to satisfy app store compliance.

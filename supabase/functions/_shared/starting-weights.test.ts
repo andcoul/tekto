@@ -49,3 +49,19 @@ Deno.test('malformed estimates (zero or negative) are ignored', () => {
   assertEquals(startingWeightKg(squat, { reps_min: 8, reps_max: 12 }, 'beginner', { squat: { weight_kg: -10, reps: 5 } }), 20);
   assertEquals(startingWeightKg(squat, { reps_min: 8, reps_max: 12 }, 'beginner', { squat: { weight_kg: 100, reps: 0 } }), 20);
 });
+
+// T156 / T157 — unloaded moves start at 0 kg (FR-009; FR-001 vocabulary, clarified 2026-11-20).
+Deno.test('bodyweight moves start at 0 kg even when they need a bar, bench or machine', () => {
+  const reps = { reps_min: 8, reps_max: 12 };
+  for (const equipment of [['bodyweight', 'barbell'], ['bodyweight', 'pull_up_bar'], ['bodyweight', 'bench'], ['bodyweight', 'machine']]) {
+    assertEquals(startingWeightKg(ex('move', equipment), reps, 'advanced', null), 0, equipment.join('+'));
+  }
+});
+
+Deno.test('band exercises start at 0 kg (resistance is not in kilograms)', () => {
+  assertEquals(startingWeightKg(ex('band-row', ['bands']), { reps_min: 10, reps_max: 15 }, 'intermediate', null), 0);
+});
+
+Deno.test('machines start like cables', () => {
+  assertEquals(startingWeightKg(ex('leg-press', ['machine']), { reps_min: 8, reps_max: 12 }, 'beginner', null), 15);
+});

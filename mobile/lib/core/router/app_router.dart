@@ -1,3 +1,10 @@
+import 'package:tekto/features/profile/ui/profile_screen.dart';
+import 'package:tekto/features/recovery/ui/recovery_screen.dart';
+import 'package:tekto/features/social/ui/feed_screen.dart';
+import 'package:tekto/features/social/ui/friends_screen.dart';
+import 'package:tekto/features/social/ui/invite_screen.dart';
+import 'package:tekto/features/support/ui/support_chat_screen.dart';
+import 'package:tekto/features/plan/ui/program_library_screen.dart';
 import 'package:tekto/core/l10n/gen/app_localizations.dart';
 import '../../shared/widgets/tekto_tab_bar.dart';
 import 'package:flutter/material.dart';
@@ -130,6 +137,8 @@ GoRouter appRouter(Ref ref) {
             path: '/plan',
             builder: (context, state) => const PlanOverviewScreen(),
           ),
+          GoRoute(path: '/feed', builder: (context, state) => const FeedScreen()),
+          GoRoute(path: '/profile', builder: (context, state) => const ProfileScreen()),
 
           // ── Library ─────────────────────────────────────────────────────────
           GoRoute(
@@ -221,6 +230,25 @@ GoRouter appRouter(Ref ref) {
         // Feature-specific clip and copy: /paywall?feature=form_check|coach|adaptive_plan|general.
         builder: (context, state) =>
             PaywallScreen(feature: PaywallFeature.fromKey(state.uri.queryParameters['feature'])),
+      ),
+
+      // ── Friends, recovery, support (FR-049–FR-054) ──────────────────────
+      GoRoute(path: '/friends', builder: (context, state) => const FriendsScreen()),
+      GoRoute(path: '/recovery', builder: (context, state) => const RecoveryScreen()),
+      GoRoute(path: '/support', builder: (context, state) => const SupportChatScreen()),
+      // Invite links: https://tekto.app/invite/<code> (FR-049).
+      GoRoute(path: '/invite/:code', builder: (context, state) => InviteScreen(code: state.pathParameters['code']!)),
+
+      // ── Plan library (Pro, FR-047) ──────────────────────────────────────
+      GoRoute(
+        path: '/plan/programs',
+        builder: (context, state) => const ProgramLibraryScreen(),
+        routes: [
+          GoRoute(
+            path: ':slug',
+            builder: (context, state) => ProgramDetailScreen(slug: state.pathParameters['slug']!),
+          ),
+        ],
       ),
 
       // ── Plan adaptation ─────────────────────────────────────────────────

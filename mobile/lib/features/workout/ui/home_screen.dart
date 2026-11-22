@@ -1,3 +1,4 @@
+import 'package:tekto/features/recovery/ui/recovery_screen.dart';
 import 'package:tekto/features/plan/ui/adaptation_card.dart';
 import 'package:tekto/features/coach/ui/coach_launcher.dart';
 import 'package:flutter/material.dart';
@@ -58,6 +59,8 @@ class HomeScreen extends ConsumerWidget {
             const AdaptationCard(),
             const SizedBox(height: AppSpacing.base),
             const _QuickAccessRow(),
+            const SizedBox(height: 12),
+            const RecoveryCard(),
           ],
         ),
       ),
@@ -191,8 +194,8 @@ class _QuickAccessRow extends StatelessWidget {
     final l = AppLocalizations.of(context);
     return Row(children: [
       Expanded(
-        child: _QuickButton(
-            icon: Icons.library_books_outlined, label: l.homeExercises, onTap: () => context.push('/library')),
+        child:
+            _QuickButton(icon: Icons.calendar_view_week_outlined, label: l.navPlan, onTap: () => context.push('/plan')),
       ),
       const SizedBox(width: 8),
       Expanded(
@@ -200,8 +203,7 @@ class _QuickAccessRow extends StatelessWidget {
               icon: Icons.chat_bubble_outline, label: l.homeCoach, onTap: () => openCoach(context, screen: 'home'))),
       const SizedBox(width: 8),
       Expanded(
-        child:
-            _QuickButton(icon: Icons.bar_chart_outlined, label: l.homeProgress, onTap: () => context.push('/progress')),
+        child: _QuickButton(icon: Icons.bar_chart_outlined, label: l.homeProgress, onTap: () => context.go('/feed')),
       ),
     ]);
   }

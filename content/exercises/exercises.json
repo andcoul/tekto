@@ -3463,48 +3463,6 @@
     "form_check_lift_key": null
   },
   {
-    "slug": "triceps-pushdown",
-    "name_en": "Triceps Pushdown",
-    "name_fr": "Extension triceps à la poulie",
-    "equipment": [
-      "cable"
-    ],
-    "muscle_primary": [
-      "triceps"
-    ],
-    "muscle_secondary": [],
-    "cues_en": [
-      "Face the cable, short bar at chest height, elbows tucked.",
-      "Push the bar down until your arms are straight.",
-      "Let it rise slowly, upper arms staying still."
-    ],
-    "cues_fr": [
-      "Face à la poulie, barre courte à hauteur de poitrine, coudes collés.",
-      "Poussez la barre vers le bas jusqu'aux bras tendus.",
-      "Laissez-la remonter lentement, haut des bras immobile."
-    ],
-    "common_mistakes_en": [
-      "Letting the elbows drift forward",
-      "Leaning over the bar"
-    ],
-    "common_mistakes_fr": [
-      "Laisser les coudes avancer",
-      "Se pencher sur la barre"
-    ],
-    "video_front_url": "https://customer-tekto.cloudflarestream.com/triceps-pushdown-front/manifest/video.m3u8",
-    "video_side_url": null,
-    "video_duration_sec": 7,
-    "captions_en_url": "captions/triceps-pushdown_en.vtt",
-    "captions_fr_url": "captions/triceps-pushdown_fr.vtt",
-    "contraindications": [
-      "elbow"
-    ],
-    "variation_easier_slug": "band-triceps-pushdown",
-    "variation_harder_slug": "skull-crusher",
-    "form_check_supported": false,
-    "form_check_lift_key": null
-  },
-  {
     "slug": "bench-dip",
     "name_en": "Bench Dip",
     "name_fr": "Dips sur banc",
@@ -3643,6 +3601,7 @@
     "name_en": "Back Extension",
     "name_fr": "Extension lombaire",
     "equipment": [
+      "bodyweight",
       "machine"
     ],
     "muscle_primary": [

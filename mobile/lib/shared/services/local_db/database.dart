@@ -28,6 +28,10 @@ class Users extends Table {
   DateTimeColumn get consentAt => dateTime().nullable()();
   TextColumn get consentVersion => text().nullable()();
   TextColumn get strengthEstimates => text().nullable()(); // JSON {squat|bench_press|deadlift: {weight_kg, reps}}
+  TextColumn get focusMuscles => text().withDefault(const Constant('[]'))(); // JSON array, ≤ 2 (FR-052)
+  BoolColumn get shareWorkouts => boolean().withDefault(const Constant(false))(); // FR-049, off until opted in
+  TextColumn get displayName => text().nullable()();
+  TextColumn get username => text().nullable()();
   DateTimeColumn get onboardingCompletedAt => dateTime().nullable()();
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
   DateTimeColumn get updatedAt => dateTime().withDefault(currentDateAndTime)();
@@ -313,12 +317,19 @@ class AppDatabase extends _$AppDatabase {
   /// v3 (2026-11-16): plans.adaptation_seen_week (device-only).
   /// v4 (2026-11-20): users.equipment remapped to the new vocabulary (migration 014, T150).
   @override
-  int get schemaVersion => 4;
+  int get schemaVersion => 5;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
         onCreate: (m) => m.createAll(),
         onUpgrade: (m, from, to) async {
+          // v5 (FR-049, FR-052): first, because the v4 step below reads whole user rows.
+          if (from < 5) {
+            await m.addColumn(users, users.focusMuscles);
+            await m.addColumn(users, users.shareWorkouts);
+            await m.addColumn(users, users.displayName);
+            await m.addColumn(users, users.username);
+          }
           if (from < 2) {
             await m.addColumn(planExercises, planExercises.rirTarget);
             await m.createTable(bodyWeightEntries);

@@ -18,7 +18,10 @@ import '../domain/progress_providers.dart';
 /// Reads only the device DB, so it works offline. Free users see the last 4 weeks and a
 /// non-blocking Pro card; Pro users see everything plus muscle balance.
 class ProgressScreen extends ConsumerWidget {
-  const ProgressScreen({super.key});
+  const ProgressScreen({super.key, this.embedded = false});
+
+  /// Inside Feed › You (FR-048): only the tab bar, no title or coach button.
+  final bool embedded;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -29,8 +32,10 @@ class ProgressScreen extends ConsumerWidget {
       length: 4,
       child: Scaffold(
         appBar: AppBar(
-          title: Text(l.progressTitle),
-          actions: const [CoachButton(screen: 'progress')],
+          title: embedded ? null : Text(l.progressTitle),
+          toolbarHeight: embedded ? 0 : null,
+          automaticallyImplyLeading: !embedded,
+          actions: embedded ? null : const [CoachButton(screen: 'progress')],
           bottom: TabBar(isScrollable: true, tabs: [
             Tab(text: l.progressTabHistory),
             Tab(text: l.progressTabRecords),

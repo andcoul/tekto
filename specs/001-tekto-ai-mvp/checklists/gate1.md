@@ -12,5 +12,9 @@
 | 5 | Pro user sends coach message about knee pain → professional referral included in response | PENDING | PENDING | |
 | 6 | Pro user on squat → form check → 5 reps → "knees caving" cue shown → form score displayed | PENDING | PENDING | Physical device only |
 | 7 | Week 1 workouts logged with high RPE → adapt-plan triggered → Week 2 shows reduced weight with reason | PENDING | PENDING | |
+| 8 | Pro user starts the bro split from the plan library → plan replaced, fitted to equipment and limitations (quickstart 10) | PENDING | PENDING | Added 2026-11-22 |
+| 9 | Two friends: sharing off by default → opt in → workout appears in the other's feed with reaction and leaderboard score; stranger sees nothing (quickstart 11) | PENDING | PENDING | Added 2026-11-22; Constitution II |
+| 10 | Recovery card and screen after an upper-body session; focus muscles add weekly sets within the cap (quickstart 12) | PENDING | PENDING | Added 2026-11-22 |
+| 11 | Support chat: instant AI answer, "Talk to a person" hands over, agent reply arrives live (quickstart 13) | PENDING | PENDING | Added 2026-11-22; staff console later |
 
 **Status**: Pending — to be completed before App Store submission.

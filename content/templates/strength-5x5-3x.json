@@ -1,0 +1,119 @@
+{
+  "slug": "strength-5x5-3x",
+  "level": "intermediate",
+  "days_per_week": 3,
+  "equipment_required": [
+    "barbell",
+    "bench"
+  ],
+  "name_en": "Strength 5 × 5",
+  "name_fr": "Force 5 × 5",
+  "weeks_total": 12,
+  "rationale_en": "Few lifts, five heavy sets of five, small weight jumps every session. Two workouts that alternate, three days a week.",
+  "rationale_fr": "Peu d'exercices, cinq séries lourdes de cinq, de petites augmentations à chaque séance. Deux séances en alternance, trois jours par semaine.",
+  "catalog": {
+    "order": 4,
+    "goal": "strength",
+    "image": "barbell-squat",
+    "summary_en": "Few lifts, heavy sets of five, small jumps each session.",
+    "summary_fr": "Peu d'exercices, séries lourdes de cinq."
+  },
+  "sessions": [
+    {
+      "ref": "a1",
+      "day_of_week": 1,
+      "name_en": "Workout A",
+      "name_fr": "Séance A",
+      "exercises": [
+        {
+          "exercise_slug": "barbell-squat",
+          "sets": 5,
+          "reps_min": 5,
+          "reps_max": 5,
+          "rest_sec": 180,
+          "rpe_target": 8
+        },
+        {
+          "exercise_slug": "bench-press",
+          "sets": 5,
+          "reps_min": 5,
+          "reps_max": 5,
+          "rest_sec": 180,
+          "rpe_target": 8
+        },
+        {
+          "exercise_slug": "barbell-row",
+          "sets": 5,
+          "reps_min": 5,
+          "reps_max": 5,
+          "rest_sec": 150,
+          "rpe_target": 8
+        }
+      ]
+    },
+    {
+      "ref": "b",
+      "day_of_week": 3,
+      "name_en": "Workout B",
+      "name_fr": "Séance B",
+      "exercises": [
+        {
+          "exercise_slug": "barbell-squat",
+          "sets": 5,
+          "reps_min": 5,
+          "reps_max": 5,
+          "rest_sec": 180,
+          "rpe_target": 8
+        },
+        {
+          "exercise_slug": "overhead-press",
+          "sets": 5,
+          "reps_min": 5,
+          "reps_max": 5,
+          "rest_sec": 180,
+          "rpe_target": 8
+        },
+        {
+          "exercise_slug": "deadlift",
+          "sets": 1,
+          "reps_min": 5,
+          "reps_max": 5,
+          "rest_sec": 240,
+          "rpe_target": 8
+        }
+      ]
+    },
+    {
+      "ref": "a2",
+      "day_of_week": 5,
+      "name_en": "Workout A",
+      "name_fr": "Séance A",
+      "exercises": [
+        {
+          "exercise_slug": "barbell-squat",
+          "sets": 5,
+          "reps_min": 5,
+          "reps_max": 5,
+          "rest_sec": 180,
+          "rpe_target": 8
+        },
+        {
+          "exercise_slug": "bench-press",
+          "sets": 5,
+          "reps_min": 5,
+          "reps_max": 5,
+          "rest_sec": 180,
+          "rpe_target": 8
+        },
+        {
+          "exercise_slug": "barbell-row",
+          "sets": 5,
+          "reps_min": 5,
+          "reps_max": 5,
+          "rest_sec": 150,
+          "rpe_target": 8
+        }
+      ]
+    }
+  ]
+}

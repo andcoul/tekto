@@ -4,8 +4,12 @@
 export const MIN_EXERCISES = 150;
 export const LIMITATION_TAGS = ['knee', 'lower_back', 'shoulder', 'wrist', 'elbow', 'hip', 'ankle', 'neck'];
 export const LANGUAGES = ['en', 'fr'];
-/** Equipment vocabulary (FR-001, FR-013 — clarified 2026-11-20). Kettlebells count as `dumbbell`. */
-export const EQUIPMENT = ['barbell', 'dumbbell', 'cable', 'machine', 'bands', 'pull_up_bar', 'dip_station', 'bench', 'bodyweight'];
+/**
+ * Equipment vocabulary (FR-001, FR-013 — clarified 2026-11-20; Smith machine, trap bar and suspension
+ * straps added 2026-11-21). Kettlebells count as `dumbbell`; plate-loaded machines count as `machine`;
+ * landmine moves need only a `barbell` (a corner works as the anchor).
+ */
+export const EQUIPMENT = ['barbell', 'dumbbell', 'cable', 'machine', 'bands', 'pull_up_bar', 'dip_station', 'bench', 'smith_machine', 'smith_machine', 'trap_bar', 'suspension', 'bodyweight'];
 /** The 8 form-check lifts at launch (FR-022). */
 export const FORM_CHECK_LIFTS = ['squat', 'deadlift', 'bench_press', 'overhead_press', 'row', 'lunge', 'hip_thrust', 'push_up'];
 /** The form-check lifts and their variants: each needs a second-angle video (FR-014). */

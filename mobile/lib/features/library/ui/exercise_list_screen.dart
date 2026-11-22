@@ -5,6 +5,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/app_theme.dart';
+import '../../../shared/models/equipment.dart';
+import '../../../shared/utils/equipment_labels.dart';
+import '../../../shared/utils/muscle_labels.dart';
 import '../../../shared/models/exercise_model.dart';
 import '../domain/exercise_provider.dart';
 
@@ -34,13 +37,8 @@ class _ExerciseListScreenState extends ConsumerState<ExerciseListScreen> {
     'erectors',
   ];
 
-  static const _equipment = [
-    'barbell',
-    'dumbbell',
-    'cable',
-    'bodyweight',
-    'bands',
-  ];
+  /// The quiz vocabulary plus bodyweight (FR-001, FR-013).
+  static const _equipment = [...kEquipmentChoices, kBodyweight];
 
   @override
   Widget build(BuildContext context) {
@@ -63,7 +61,7 @@ class _ExerciseListScreenState extends ConsumerState<ExerciseListScreen> {
             child: TextField(
               onChanged: (v) => setState(() => _query = v),
               decoration: InputDecoration(
-                hintText: 'Search exercises…',
+                hintText: AppLocalizations.of(context).librarySearchHint,
                 prefixIcon: const Icon(Icons.search),
                 suffixIcon: _query.isNotEmpty
                     ? IconButton(
@@ -134,7 +132,7 @@ class _FilterChips extends StatelessWidget {
             (m) => Padding(
               padding: const EdgeInsets.only(right: 8),
               child: FilterChip(
-                label: Text(_capitalize(m)),
+                label: Text(muscleLabel(m, Localizations.localeOf(context).languageCode)),
                 selected: selectedMuscle == m,
                 onSelected: (_) => onMuscleSelected(m),
               ),
@@ -145,7 +143,7 @@ class _FilterChips extends StatelessWidget {
             (e) => Padding(
               padding: const EdgeInsets.only(right: 8),
               child: FilterChip(
-                label: Text(_capitalize(e)),
+                label: Text(equipmentLabel(AppLocalizations.of(context), e)),
                 selected: selectedEquipment == e,
                 onSelected: (_) => onEquipmentSelected(e),
               ),
@@ -155,8 +153,6 @@ class _FilterChips extends StatelessWidget {
       ),
     );
   }
-
-  static String _capitalize(String s) => s.isEmpty ? s : s[0].toUpperCase() + s.substring(1);
 }
 
 class _ExerciseRow extends StatelessWidget {

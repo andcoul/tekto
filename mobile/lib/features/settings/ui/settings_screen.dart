@@ -35,7 +35,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
     final service = ref.watch(settingsServiceProvider);
-    final settings = service == null ? null : ref.watch(_settingsProvider(service)).value;
+    final settings = service == null ? null : ref.watch(userSettingsProvider(service)).value;
 
     return Scaffold(
       appBar: AppBar(title: Text(l.settingsTitle), actions: const [CoachButton(screen: 'settings')]),
@@ -71,6 +71,23 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             title: Text(l.settingsHealthSync),
             value: settings?.healthSyncEnabled ?? false,
             onChanged: service == null ? null : service.setHealthSync,
+            activeThumbColor: AppColors.glacier,
+          ),
+          // Friends (FR-049): the name friends see, and whether workouts are posted to them.
+          ListTile(
+            key: const ValueKey('settings-display-name'),
+            leading: const Icon(Icons.badge_outlined),
+            title: Text(l.settingsDisplayName),
+            subtitle: Text(settings?.displayName ?? l.settingsDisplayNameUnset),
+            onTap: service == null ? null : () => _editName(settings?.displayName),
+          ),
+          SwitchListTile(
+            key: const ValueKey('settings-share-workouts'),
+            secondary: const Icon(Icons.dynamic_feed_outlined),
+            title: Text(l.settingsShareWorkouts),
+            subtitle: Text(l.settingsShareWorkoutsBody),
+            value: settings?.shareWorkouts ?? false,
+            onChanged: service == null ? null : service.setShareWorkouts,
             activeThumbColor: AppColors.glacier,
           ),
           ListTile(
@@ -142,6 +159,23 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     } finally {
       if (mounted) setState(() => _busy = false);
     }
+  }
+
+  Future<void> _editName(String? current) async {
+    final l = AppLocalizations.of(context);
+    final ctrl = TextEditingController(text: current ?? '');
+    final name = await showDialog<String>(
+      context: context,
+      builder: (c) => AlertDialog(
+        title: Text(l.settingsDisplayName),
+        content: TextField(controller: ctrl, autofocus: true, maxLength: 40),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(c), child: Text(l.cancelButton)),
+          TextButton(onPressed: () => Navigator.pop(c, ctrl.text), child: Text(l.profileEditSave)),
+        ],
+      ),
+    );
+    if (name != null) await _service?.setDisplayName(name);
   }
 
   Future<void> _regenerate() async {
@@ -226,7 +260,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   }
 }
 
-final _settingsProvider = StreamProvider.autoDispose.family<UserSettings?, SettingsService>((ref, s) => s.watch());
+final userSettingsProvider = StreamProvider.autoDispose.family<UserSettings?, SettingsService>((ref, s) => s.watch());
 
 class _SectionHeader extends StatelessWidget {
   const _SectionHeader(this.text);

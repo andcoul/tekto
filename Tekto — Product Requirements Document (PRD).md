@@ -1,6 +1,6 @@
 # Tekto — Product Requirements Document (PRD)
 
-Nov 9, 2026 · @Andy Coul · Draft v0.2 (Nov 15, 2026: aligned with spec `001-tekto-ai-mvp`)
+Nov 9, 2026 · @Andy Coul · Draft v0.3 (Nov 22, 2026: plan library, modern-equipment library, friends and feed, muscle recovery, focus muscles, profile and support chat; aligned with spec `001-tekto-ai-mvp` FR-047–FR-054)
 
 ## Overview
 
@@ -52,17 +52,19 @@ The MVP ships four AI pillars plus the tracking that feeds them. P0 = must ship 
 
 ### 1. AI plan generator (P0)
 
-- Onboarding quiz: goal (muscle, strength, fat loss, general fitness), level, days per week, session length, equipment, injuries or limits.
+- Onboarding quiz: goal (muscle, strength, fat loss, general fitness), level, days per week, session length, equipment (barbell, dumbbells/kettlebells, cable, machines, bands, pull-up bar, dip station, bench, Smith machine, trap bar, suspension straps; bodyweight always), up to 2 focus muscles, injuries or limits.
 - Pro users get an AI-generated plan; free users get a rule-based plan built from a starter template (no AI call).
 - Generates a 4 to 12 week program with splits, exercises, sets, reps, rest and target effort (RPE/RIR).
 - Adapts weekly from logged results: progresses load when targets are hit, adjusts when sessions are missed or too hard.
 - Exercise swap with equivalent alternatives (same muscle, available equipment), for free and Pro users.
+- Focus muscles (Pro): plans give each up to 2 extra weekly sets, within the level's safe maximum.
+- Plan library (Pro): ready-made programs — bro split, push/pull/legs, upper/lower, full body, strength 5×5, power & size upper/lower, chest-back · shoulders-arms · legs, glutes & legs focus, dumbbell home — fitted to the user's equipment, limitations and session length, then adapted weekly like any plan.
 - Must: every generated exercise exists in the video library; no plan references a movement without a video.
 
 ### 2. Real exercise video library (P0)
 
-- Filmed demonstrations, not 3D animations: front and side angles, looped, 5 to 15 seconds.
-- 150+ exercises at launch covering gym barbell, dumbbell, cable, band and bodyweight.
+- Reviewed demonstration videos (filmed or AI-generated, each passing a human form review), not 3D animations: one main angle, a second angle for the form-check lifts, looped, 4 to 15 seconds.
+- 150+ exercises at launch covering modern gym equipment: barbell, dumbbell and kettlebell, cable, selectorized and plate-loaded machines, Smith machine, trap bar, landmine, suspension, bands and bodyweight, with every major muscle including the adductors. No duplicates (same movement with a different handle counts once).
 - Per exercise: target muscles, step-by-step cues, common mistakes, easier and harder variations.
 - Offline download of the videos in the current plan (Pro).
 
@@ -86,9 +88,24 @@ The MVP ships four AI pillars plus the tracking that feeds them. P0 = must ship 
 - History, personal records, estimated 1RM, volume per muscle group, body weight (progress photos after the MVP).
 - Apple Health and Google Health Connect sync.
 
+### 6. Friends, feed and profile (P0, free)
+
+- Four tabs: Home · Feed · Library · Profile, with the AI coach one tap away on every tab.
+- Friends by username or invite link (both sides accept). Once the user turns sharing on, finished workouts appear in friends' feed with a muscle map, time, volume, sets and records; friends react with fixed emoji (no comments at launch). Friends never see body weight, measurements, limitations or notes.
+- Weekly leaderboard by training score (sessions, sets, records) and an 8-week comparison chart.
+- Profile: friends, help & support, streak, latest weight, workout heatmap, badges (about 24).
+
+### 7. Muscle recovery (P0, Pro)
+
+- Recovery per muscle from logged sets, effort and time since (about 72 h for big muscles, 48 h for small): body map, next workout's muscles, every other muscle with % and time to ready. A guide; never blocks training.
+
+### 8. Help & support chat (P0)
+
+- In-app chat: an AI assistant answers at once from help content; the user can ask for a person at any time and the Tekto team replies in the same chat. (The staff console is built later.)
+
 ### Out of MVP
 
-- Nutrition tracking, social feed, wearables beyond Health sync, live human coaching, web app, progress photos, form-check footage sharing, full program editing, in-app speech recognition.
+- Nutrition tracking, comments in the feed, wearables beyond Health sync, live human coaching, web app, progress photos, form-check footage sharing, full program editing, in-app speech recognition.
 
 ## User journeys
 
@@ -155,6 +172,10 @@ Tekto is freemium: the free tier makes the app genuinely useful for training, an
 | AI chat coach | 3 questions per week | Unlimited |
 | Camera form check | 1 try per lift | Unlimited |
 | Advanced analytics (volume, e1RM, muscle balance) | Basic | Full |
+| Plan library (ready-made programs) | — | Yes |
+| Muscle recovery | Preview | Full |
+| Focus muscles shaping the plan | Saved only | Yes |
+| Friends, feed, leaderboard, profile, badges, support chat | Yes | Yes |
 
 **Proposed pricing (USD, store prices):** Pro monthly 12.99, Pro yearly 79.99 (about 49% saving, the default choice on the paywall), 7-day free trial on both. Use App Store and Google Play regional pricing so lower-income markets (including West Africa) pay local-level prices.
 
@@ -221,6 +242,8 @@ Form check is required at launch with 8 lifts (labelled Beta) and gains more lif
 | AI gives unsafe advice | User injury, store rejection | Rule-checked plans, safety guardrails, health disclaimer |
 | Low conversion in price-sensitive markets | Slower revenue | Regional pricing; study local payment methods |
 | Name or trademark conflict | Rebrand cost | Trademark attorney check in Classes 9 and 41 before launch |
+| Social features expose health data | Privacy complaints, store review | Sharing off until the user turns it on; friends only (no public profiles); no free text in the feed; block and remove friends; GDPR export and deletion include friends, reactions and support chats |
+| Support replies are slow | Bad reviews | AI assistant answers at once; clear "a person will reply" message; staff console and reply-time target before launch |
 
 ### Open questions
 
@@ -230,3 +253,5 @@ Form check is required at launch with 8 lifts (labelled Beta) and gains more lif
 - [ ] Which LLM and pose-estimation stack, and what runs on-device vs in the cloud? (TRD)
 - [ ] Local payments such as Wave or Orange Money for African markets, beyond store billing?
 - [ ] Final prices after beta testing?
+- [ ] Support team hours and reply-time target; which tool the team uses to answer (console built later)?
+- [ ] Badge set and names after beta testing?

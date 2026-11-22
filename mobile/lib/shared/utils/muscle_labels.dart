@@ -19,6 +19,9 @@ const _labels = <String, (String, String)>{
   'triceps': ('Triceps', 'Triceps'),
   'core': ('Core', 'Sangle abdominale'),
   'calves': ('Calves', 'Mollets'),
+  'adductors': ('Inner thighs', 'Adducteurs'),
+  'forearms': ('Forearms', 'Avant-bras'),
+  'hip_flexors': ('Hip flexors', 'Fléchisseurs de hanche'),
 };
 
 /// Localized label; unknown keys fall back to the key with spaces.

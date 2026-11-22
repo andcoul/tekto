@@ -218,3 +218,19 @@ Deno.test('every event carries deterministic EN and FR reasons', () => {
     assertNotEquals(e.reasonEn, e.reasonFr);
   }
 });
+
+// T157 — bands progress by reps; a bodyweight move stays unloaded even when it needs an apparatus
+// (FR-001 vocabulary, clarified 2026-11-20).
+Deno.test('band exercises progress reps, never kilograms', () => {
+  const easy = [{ weight_kg: 0, reps: 12, rpe_actual: 6 }, { weight_kg: 0, reps: 12, rpe_actual: 6 }];
+  const up = computeAdaptation([makeWeekData({ equipment: ['bands'], suggested_weight_kg: 0, reps_min: 8, reps_max: 12 }, easy)]);
+  assertEquals(up.map((e) => [e.field, e.newValue]), [['reps_max', 13]]);
+});
+
+Deno.test('bodyweight moves on a bar, bench or machine progress reps, never kilograms', () => {
+  const easy = [{ weight_kg: 0, reps: 12, rpe_actual: 6 }, { weight_kg: 0, reps: 12, rpe_actual: 6 }];
+  for (const equipment of [['bodyweight', 'barbell'], ['bodyweight', 'pull_up_bar'], ['bodyweight', 'machine']]) {
+    const up = computeAdaptation([makeWeekData({ equipment, suggested_weight_kg: 0, reps_min: 8, reps_max: 12 }, easy)]);
+    assertEquals(up.map((e) => [e.field, e.newValue]), [['reps_max', 13]], equipment.join('+'));
+  }
+});

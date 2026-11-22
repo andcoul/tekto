@@ -1,4 +1,6 @@
 // T103 — home screen (FR-006, US2 acceptance scenario 1). Written before T104.
+import 'package:tekto/features/recovery/data/local_training_history.dart';
+import 'package:tekto/features/subscription/domain/entitlement_provider.dart';
 import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -43,6 +45,9 @@ void main() {
         clockProvider.overrideWithValue(() => now),
         activePlanProvider.overrideWith((ref) => Stream.value(noPlan ? null : (plan ?? fixturePlan()))),
         unseenAdaptationProvider.overrideWith((ref) => Stream.value(null)), // adaptation_card_test covers it
+        // The recovery card (FR-051) has its own tests.
+        entitlementProvider.overrideWith((ref) => Stream.value(EntitlementState.free)),
+        recoveryProvider.overrideWith((ref) async => const {}),
       ],
       child: MaterialApp.router(
         routerConfig: router,

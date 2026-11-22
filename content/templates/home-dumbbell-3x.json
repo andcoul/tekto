@@ -12,6 +12,13 @@
   "rationale_en": "A 3-day full-body programme requiring only dumbbells and bodyweight. Perfect for home gym training with minimal equipment, focusing on compound movements and progressive overload.",
   "rationale_fr": "Un programme full-body de 3 jours ne nécessitant que des haltères et le poids du corps. Parfait pour l'entraînement à domicile avec un équipement minimal, axé sur les mouvements composés et la surcharge progressive.",
   "_comment": "Week-1 pattern; the template builder repeats it for weeks_total weeks. Exercises are ordered compound-first so trimming removes accessories. Starting weights are computed (starting-weights.ts).",
+  "catalog": {
+    "order": 9,
+    "goal": "general",
+    "image": "dumbbell-rdl",
+    "summary_en": "Only dumbbells and a bench.",
+    "summary_fr": "Seulement des haltères et un banc."
+  },
   "sessions": [
     {
       "ref": "A",

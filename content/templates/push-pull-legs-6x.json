@@ -1,0 +1,283 @@
+{
+  "slug": "push-pull-legs-6x",
+  "level": "intermediate",
+  "days_per_week": 6,
+  "equipment_required": [
+    "barbell",
+    "dumbbell",
+    "cable",
+    "machine",
+    "pull_up_bar",
+    "bench"
+  ],
+  "name_en": "Push · Pull · Legs",
+  "name_fr": "Push · Pull · Legs",
+  "weeks_total": 8,
+  "rationale_en": "Six focused sessions that train each muscle twice a week: pushing, pulling, then legs, twice through.",
+  "rationale_fr": "Six séances ciblées qui travaillent chaque muscle deux fois par semaine : poussée, tirage, jambes, deux fois.",
+  "catalog": {
+    "order": 2,
+    "goal": "muscle",
+    "image": "overhead-press",
+    "summary_en": "Each muscle twice a week in six focused sessions.",
+    "summary_fr": "Chaque muscle deux fois par semaine, en six séances."
+  },
+  "sessions": [
+    {
+      "ref": "push-a",
+      "day_of_week": 1,
+      "name_en": "Push A",
+      "name_fr": "Poussée A",
+      "exercises": [
+        {
+          "exercise_slug": "bench-press",
+          "sets": 4,
+          "reps_min": 6,
+          "reps_max": 8,
+          "rest_sec": 150,
+          "rpe_target": 8
+        },
+        {
+          "exercise_slug": "overhead-press",
+          "sets": 3,
+          "reps_min": 8,
+          "reps_max": 10,
+          "rest_sec": 120,
+          "rpe_target": 8
+        },
+        {
+          "exercise_slug": "incline-dumbbell-press",
+          "sets": 3,
+          "reps_min": 10,
+          "reps_max": 12,
+          "rest_sec": 90,
+          "rpe_target": 8
+        },
+        {
+          "exercise_slug": "lateral-raise",
+          "sets": 3,
+          "reps_min": 12,
+          "reps_max": 15,
+          "rest_sec": 60,
+          "rpe_target": 8
+        },
+        {
+          "exercise_slug": "rope-pushdown",
+          "sets": 3,
+          "reps_min": 10,
+          "reps_max": 12,
+          "rest_sec": 60,
+          "rpe_target": 8
+        }
+      ]
+    },
+    {
+      "ref": "pull-a",
+      "day_of_week": 2,
+      "name_en": "Pull A",
+      "name_fr": "Tirage A",
+      "exercises": [
+        {
+          "exercise_slug": "barbell-row",
+          "sets": 4,
+          "reps_min": 6,
+          "reps_max": 8,
+          "rest_sec": 150,
+          "rpe_target": 8
+        },
+        {
+          "exercise_slug": "lat-pulldown",
+          "sets": 3,
+          "reps_min": 10,
+          "reps_max": 12,
+          "rest_sec": 90,
+          "rpe_target": 8
+        },
+        {
+          "exercise_slug": "face-pull",
+          "sets": 3,
+          "reps_min": 12,
+          "reps_max": 15,
+          "rest_sec": 60,
+          "rpe_target": 8
+        },
+        {
+          "exercise_slug": "barbell-curl",
+          "sets": 3,
+          "reps_min": 8,
+          "reps_max": 10,
+          "rest_sec": 60,
+          "rpe_target": 8
+        }
+      ]
+    },
+    {
+      "ref": "legs-a",
+      "day_of_week": 3,
+      "name_en": "Legs A",
+      "name_fr": "Jambes A",
+      "exercises": [
+        {
+          "exercise_slug": "barbell-squat",
+          "sets": 4,
+          "reps_min": 6,
+          "reps_max": 8,
+          "rest_sec": 180,
+          "rpe_target": 8
+        },
+        {
+          "exercise_slug": "romanian-deadlift",
+          "sets": 3,
+          "reps_min": 8,
+          "reps_max": 10,
+          "rest_sec": 150,
+          "rpe_target": 8
+        },
+        {
+          "exercise_slug": "leg-extension",
+          "sets": 3,
+          "reps_min": 12,
+          "reps_max": 15,
+          "rest_sec": 60,
+          "rpe_target": 8
+        },
+        {
+          "exercise_slug": "calf-raise",
+          "sets": 3,
+          "reps_min": 12,
+          "reps_max": 15,
+          "rest_sec": 60,
+          "rpe_target": 8
+        }
+      ]
+    },
+    {
+      "ref": "push-b",
+      "day_of_week": 4,
+      "name_en": "Push B",
+      "name_fr": "Poussée B",
+      "exercises": [
+        {
+          "exercise_slug": "dumbbell-shoulder-press",
+          "sets": 3,
+          "reps_min": 8,
+          "reps_max": 10,
+          "rest_sec": 120,
+          "rpe_target": 8
+        },
+        {
+          "exercise_slug": "dumbbell-bench-press",
+          "sets": 3,
+          "reps_min": 8,
+          "reps_max": 10,
+          "rest_sec": 120,
+          "rpe_target": 8
+        },
+        {
+          "exercise_slug": "cable-fly",
+          "sets": 3,
+          "reps_min": 12,
+          "reps_max": 15,
+          "rest_sec": 60,
+          "rpe_target": 8
+        },
+        {
+          "exercise_slug": "cable-lateral-raise",
+          "sets": 3,
+          "reps_min": 12,
+          "reps_max": 15,
+          "rest_sec": 60,
+          "rpe_target": 8
+        },
+        {
+          "exercise_slug": "skull-crusher",
+          "sets": 3,
+          "reps_min": 10,
+          "reps_max": 12,
+          "rest_sec": 60,
+          "rpe_target": 8
+        }
+      ]
+    },
+    {
+      "ref": "pull-b",
+      "day_of_week": 5,
+      "name_en": "Pull B",
+      "name_fr": "Tirage B",
+      "exercises": [
+        {
+          "exercise_slug": "pull-up",
+          "sets": 4,
+          "reps_min": 6,
+          "reps_max": 10,
+          "rest_sec": 150,
+          "rpe_target": 8
+        },
+        {
+          "exercise_slug": "seated-cable-row",
+          "sets": 3,
+          "reps_min": 10,
+          "reps_max": 12,
+          "rest_sec": 90,
+          "rpe_target": 8
+        },
+        {
+          "exercise_slug": "rear-delt-fly",
+          "sets": 3,
+          "reps_min": 12,
+          "reps_max": 15,
+          "rest_sec": 60,
+          "rpe_target": 8
+        },
+        {
+          "exercise_slug": "hammer-curl",
+          "sets": 3,
+          "reps_min": 10,
+          "reps_max": 12,
+          "rest_sec": 60,
+          "rpe_target": 8
+        }
+      ]
+    },
+    {
+      "ref": "legs-b",
+      "day_of_week": 6,
+      "name_en": "Legs B",
+      "name_fr": "Jambes B",
+      "exercises": [
+        {
+          "exercise_slug": "front-squat",
+          "sets": 3,
+          "reps_min": 6,
+          "reps_max": 8,
+          "rest_sec": 180,
+          "rpe_target": 8
+        },
+        {
+          "exercise_slug": "hip-thrust",
+          "sets": 3,
+          "reps_min": 8,
+          "reps_max": 10,
+          "rest_sec": 120,
+          "rpe_target": 8
+        },
+        {
+          "exercise_slug": "bulgarian-split-squat",
+          "sets": 3,
+          "reps_min": 8,
+          "reps_max": 10,
+          "rest_sec": 90,
+          "rpe_target": 8
+        },
+        {
+          "exercise_slug": "seated-leg-curl",
+          "sets": 3,
+          "reps_min": 10,
+          "reps_max": 12,
+          "rest_sec": 60,
+          "rpe_target": 8
+        }
+      ]
+    }
+  ]
+}

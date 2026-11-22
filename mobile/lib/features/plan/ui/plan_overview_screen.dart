@@ -72,6 +72,13 @@ class PlanOverviewScreen extends ConsumerWidget {
                         style: Theme.of(context).textTheme.bodyMedium,
                       ),
                       _PlanNotices(planId: plan.id),
+                      const SizedBox(height: AppSpacing.sm),
+                      OutlinedButton.icon(
+                        key: const ValueKey('browse-programs'),
+                        onPressed: () => context.push('/plan/programs'),
+                        icon: const Icon(Icons.view_list_outlined),
+                        label: Text(AppLocalizations.of(context).planBrowsePrograms),
+                      ),
                     ],
                   ),
                 ),

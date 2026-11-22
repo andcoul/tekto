@@ -121,6 +121,9 @@
       }
     }
   },
+  "@librarySearchHint": {
+    "description": "T158 library search field"
+  },
   "libraryOfflineProRequired": "Offline video requires Tekto Pro",
   "coachTitle": "Coach",
   "coachInputHint": "Ask your coach…",
@@ -749,6 +752,18 @@
   "@quizEquipmentMachine": {
     "description": "T152 equipment choices (FR-001)"
   },
+  "quizEquipmentSmithMachine": "Smith machine",
+  "@quizEquipmentSmithMachine": {
+    "description": "Quiz/library equipment option: Smith machine (barbell on guide rails)."
+  },
+  "quizEquipmentTrapBar": "Trap bar",
+  "@quizEquipmentTrapBar": {
+    "description": "Quiz/library equipment option: hexagonal trap bar."
+  },
+  "quizEquipmentSuspension": "Suspension straps",
+  "@quizEquipmentSuspension": {
+    "description": "Quiz/library equipment option: suspension trainer straps."
+  },
   "quizEquipmentGym": "Gym",
   "@quizEquipmentGym": {
     "description": "T152 equipment choices (FR-001)"
@@ -950,5 +965,765 @@
   "libraryClearSearch": "Clear search",
   "@libraryClearSearch": {
     "description": "Screen-reader label (T093, FR-035)"
+  },
+  "programLibraryTitle": "Plans",
+  "@programLibraryTitle": {
+    "description": "Plan library (FR-047)"
+  },
+  "programLibraryHeadline": "Pick a classic",
+  "@programLibraryHeadline": {
+    "description": "Plan library (FR-047)"
+  },
+  "programLibraryBody": "Proven programs. Your coach sets the weights from your logs and adjusts them every week.",
+  "@programLibraryBody": {
+    "description": "Plan library (FR-047)"
+  },
+  "programFilterAll": "All",
+  "@programFilterAll": {
+    "description": "Plan library (FR-047)"
+  },
+  "programFilterThree": "3 days",
+  "@programFilterThree": {
+    "description": "Plan library (FR-047)"
+  },
+  "programFilterFour": "4 days",
+  "@programFilterFour": {
+    "description": "Plan library (FR-047)"
+  },
+  "programFilterFivePlus": "5–6 days",
+  "@programFilterFivePlus": {
+    "description": "Plan library (FR-047)"
+  },
+  "programFilterStrength": "Strength",
+  "@programFilterStrength": {
+    "description": "Plan library (FR-047)"
+  },
+  "programFilterHome": "Home",
+  "@programFilterHome": {
+    "description": "Plan library (FR-047)"
+  },
+  "programCurrentLabel": "Current plan",
+  "@programCurrentLabel": {
+    "description": "Plan library (FR-047)"
+  },
+  "programProOnly": "Ready-made plans are part of Pro",
+  "@programProOnly": {
+    "description": "Plan library (FR-047)"
+  },
+  "programSafetyNote": "Every plan passes the same safety check as your AI plan.",
+  "@programSafetyNote": {
+    "description": "Plan library (FR-047)"
+  },
+  "programLoadError": "Plans could not load. Check your connection and try again.",
+  "@programLoadError": {
+    "description": "Plan library (FR-047)"
+  },
+  "programLevelBeginner": "Beginner",
+  "@programLevelBeginner": {
+    "description": "Plan library (FR-047)"
+  },
+  "programLevelIntermediate": "Intermediate",
+  "@programLevelIntermediate": {
+    "description": "Plan library (FR-047)"
+  },
+  "programLevelAdvanced": "Advanced",
+  "@programLevelAdvanced": {
+    "description": "Plan library (FR-047)"
+  },
+  "programStatDays": "days a week",
+  "@programStatDays": {
+    "description": "Plan library (FR-047)"
+  },
+  "programStatLevel": "level",
+  "@programStatLevel": {
+    "description": "Plan library (FR-047)"
+  },
+  "programStatLength": "then refresh",
+  "@programStatLength": {
+    "description": "Plan library (FR-047)"
+  },
+  "programYourWeek": "YOUR WEEK",
+  "@programYourWeek": {
+    "description": "Plan library (FR-047)"
+  },
+  "programFitNote": "Your coach fits it to your limitations and session length. Your current plan and history are kept.",
+  "@programFitNote": {
+    "description": "Plan library (FR-047)"
+  },
+  "programStart": "Start this plan",
+  "@programStart": {
+    "description": "Plan library (FR-047)"
+  },
+  "programUnlock": "Unlock with Pro",
+  "@programUnlock": {
+    "description": "Plan library (FR-047)"
+  },
+  "programConfirmBody": "It replaces your current plan from today. Logged sessions and records stay.",
+  "@programConfirmBody": {
+    "description": "Plan library (FR-047)"
+  },
+  "programNotSuitable": "This plan can't be fitted to your equipment and limitations. Try another one.",
+  "@programNotSuitable": {
+    "description": "Plan library (FR-047)"
+  },
+  "programStartFailed": "The plan could not start. Check your connection and try again.",
+  "@programStartFailed": {
+    "description": "Plan library (FR-047)"
+  },
+  "programStarted": "New plan ready.",
+  "@programStarted": {
+    "description": "Plan library (FR-047)"
+  },
+  "planBrowsePrograms": "Browse plans",
+  "@planBrowsePrograms": {
+    "description": "Plan library (FR-047)"
+  },
+  "dayMon": "Mon",
+  "@dayMon": {
+    "description": "Plan library (FR-047)"
+  },
+  "dayTue": "Tue",
+  "@dayTue": {
+    "description": "Plan library (FR-047)"
+  },
+  "dayWed": "Wed",
+  "@dayWed": {
+    "description": "Plan library (FR-047)"
+  },
+  "dayThu": "Thu",
+  "@dayThu": {
+    "description": "Plan library (FR-047)"
+  },
+  "dayFri": "Fri",
+  "@dayFri": {
+    "description": "Plan library (FR-047)"
+  },
+  "daySat": "Sat",
+  "@daySat": {
+    "description": "Plan library (FR-047)"
+  },
+  "daySun": "Sun",
+  "@daySun": {
+    "description": "Plan library (FR-047)"
+  },
+  "programDaysPerWeek": "{count, plural, =1{1 day} other{{count} days}}",
+  "@programDaysPerWeek": {
+    "description": "Plan library (FR-047)",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "programExerciseCount": "{count, plural, =1{1 exercise} other{{count} exercises}}",
+  "@programExerciseCount": {
+    "description": "Plan library (FR-047)",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "programWeeks": "{count} wk",
+  "@programWeeks": {
+    "description": "Plan library (FR-047)",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "programConfirmTitle": "Start {name}?",
+  "@programConfirmTitle": {
+    "description": "Plan library (FR-047)",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "programAdaptNote": "You don't have: {items}. Your coach swaps those exercises for ones you can do, and fits the plan to your limitations.",
+  "@programAdaptNote": {
+    "description": "Plan library (FR-047)",
+    "placeholders": {
+      "items": {
+        "type": "String"
+      }
+    }
+  },
+  "navFeed": "Feed",
+  "@navFeed": {
+    "description": "Feed, friends, recovery, profile, support (FR-048–FR-054)"
+  },
+  "navProfile": "Profile",
+  "@navProfile": {
+    "description": "Feed, friends, recovery, profile, support (FR-048–FR-054)"
+  },
+  "feedTitle": "Feed",
+  "@feedTitle": {
+    "description": "Feed, friends, recovery, profile, support (FR-048–FR-054)"
+  },
+  "feedFriends": "Friends",
+  "@feedFriends": {
+    "description": "Feed, friends, recovery, profile, support (FR-048–FR-054)"
+  },
+  "feedYou": "You",
+  "@feedYou": {
+    "description": "Feed, friends, recovery, profile, support (FR-048–FR-054)"
+  },
+  "feedEmpty": "Train with your friends",
+  "@feedEmpty": {
+    "description": "Feed, friends, recovery, profile, support (FR-048–FR-054)"
+  },
+  "feedEmptyBody": "Add friends to see their workouts here and cheer them on.",
+  "@feedEmptyBody": {
+    "description": "Feed, friends, recovery, profile, support (FR-048–FR-054)"
+  },
+  "feedLoadError": "Couldn't load. Check your connection and try again.",
+  "@feedLoadError": {
+    "description": "Feed, friends, recovery, profile, support (FR-048–FR-054)"
+  },
+  "feedThisWeek": "This week",
+  "@feedThisWeek": {
+    "description": "Feed, friends, recovery, profile, support (FR-048–FR-054)"
+  },
+  "feedTime": "Time",
+  "@feedTime": {
+    "description": "Feed, friends, recovery, profile, support (FR-048–FR-054)"
+  },
+  "feedVolume": "Volume",
+  "@feedVolume": {
+    "description": "Feed, friends, recovery, profile, support (FR-048–FR-054)"
+  },
+  "feedSets": "Sets",
+  "@feedSets": {
+    "description": "Feed, friends, recovery, profile, support (FR-048–FR-054)"
+  },
+  "friendsTitle": "Friends",
+  "@friendsTitle": {
+    "description": "Feed, friends, recovery, profile, support (FR-048–FR-054)"
+  },
+  "friendsAdd": "Add",
+  "@friendsAdd": {
+    "description": "Feed, friends, recovery, profile, support (FR-048–FR-054)"
+  },
+  "friendsYou": "You",
+  "@friendsYou": {
+    "description": "Feed, friends, recovery, profile, support (FR-048–FR-054)"
+  },
+  "friendsRequests": "Friend requests",
+  "@friendsRequests": {
+    "description": "Feed, friends, recovery, profile, support (FR-048–FR-054)"
+  },
+  "friendsAccept": "Accept",
+  "@friendsAccept": {
+    "description": "Feed, friends, recovery, profile, support (FR-048–FR-054)"
+  },
+  "friendsDecline": "Decline",
+  "@friendsDecline": {
+    "description": "Feed, friends, recovery, profile, support (FR-048–FR-054)"
+  },
+  "friendsLeaderboard": "LEADERBOARD · THIS WEEK",
+  "@friendsLeaderboard": {
+    "description": "Feed, friends, recovery, profile, support (FR-048–FR-054)"
+  },
+  "friendsCompare": "Compare progress",
+  "@friendsCompare": {
+    "description": "Feed, friends, recovery, profile, support (FR-048–FR-054)"
+  },
+  "friendsCompareBody": "Weekly training score, last 8 weeks",
+  "@friendsCompareBody": {
+    "description": "Feed, friends, recovery, profile, support (FR-048–FR-054)"
+  },
+  "friendsNeverTrained": "No workout yet",
+  "@friendsNeverTrained": {
+    "description": "Feed, friends, recovery, profile, support (FR-048–FR-054)"
+  },
+  "friendsInvite": "Train with friends",
+  "@friendsInvite": {
+    "description": "Feed, friends, recovery, profile, support (FR-048–FR-054)"
+  },
+  "friendsInviteBody": "Share your link, or find them by username.",
+  "@friendsInviteBody": {
+    "description": "Feed, friends, recovery, profile, support (FR-048–FR-054)"
+  },
+  "friendsShareLink": "Share link",
+  "@friendsShareLink": {
+    "description": "Feed, friends, recovery, profile, support (FR-048–FR-054)"
+  },
+  "friendsLinkCopied": "Invite link copied",
+  "@friendsLinkCopied": {
+    "description": "Feed, friends, recovery, profile, support (FR-048–FR-054)"
+  },
+  "friendsSearch": "Search",
+  "@friendsSearch": {
+    "description": "Feed, friends, recovery, profile, support (FR-048–FR-054)"
+  },
+  "friendsAddTitle": "Add a friend",
+  "@friendsAddTitle": {
+    "description": "Feed, friends, recovery, profile, support (FR-048–FR-054)"
+  },
+  "friendsUsernameHint": "username",
+  "@friendsUsernameHint": {
+    "description": "Feed, friends, recovery, profile, support (FR-048–FR-054)"
+  },
+  "friendsSendRequest": "Send request",
+  "@friendsSendRequest": {
+    "description": "Feed, friends, recovery, profile, support (FR-048–FR-054)"
+  },
+  "friendsRequestSent": "Request sent",
+  "@friendsRequestSent": {
+    "description": "Feed, friends, recovery, profile, support (FR-048–FR-054)"
+  },
+  "friendsNotFound": "No one with that username",
+  "@friendsNotFound": {
+    "description": "Feed, friends, recovery, profile, support (FR-048–FR-054)"
+  },
+  "friendsPrivacy": "Friends see your workouts, records and score. Never your body weight, measurements, limitations or notes.",
+  "@friendsPrivacy": {
+    "description": "Feed, friends, recovery, profile, support (FR-048–FR-054)"
+  },
+  "friendsSetUsername": "Choose a username",
+  "@friendsSetUsername": {
+    "description": "Feed, friends, recovery, profile, support (FR-048–FR-054)"
+  },
+  "friendsUsernameRules": "3–20 characters: letters, numbers, _ and .",
+  "@friendsUsernameRules": {
+    "description": "Feed, friends, recovery, profile, support (FR-048–FR-054)"
+  },
+  "friendsUsernameTaken": "That username is taken",
+  "@friendsUsernameTaken": {
+    "description": "Feed, friends, recovery, profile, support (FR-048–FR-054)"
+  },
+  "friendsInviteTitle": "Train together",
+  "@friendsInviteTitle": {
+    "description": "Feed, friends, recovery, profile, support (FR-048–FR-054)"
+  },
+  "friendsInviteAcceptBody": "Accept to become friends: you will see each other's workouts and weekly score.",
+  "@friendsInviteAcceptBody": {
+    "description": "Feed, friends, recovery, profile, support (FR-048–FR-054)"
+  },
+  "friendsInviteInvalid": "This invite link doesn't work any more.",
+  "@friendsInviteInvalid": {
+    "description": "Feed, friends, recovery, profile, support (FR-048–FR-054)"
+  },
+  "recoveryTitle": "Muscle recovery",
+  "@recoveryTitle": {
+    "description": "Feed, friends, recovery, profile, support (FR-048–FR-054)"
+  },
+  "recoveryNext": "NEXT WORKOUT",
+  "@recoveryNext": {
+    "description": "Feed, friends, recovery, profile, support (FR-048–FR-054)"
+  },
+  "recoveryOther": "OTHER MUSCLES",
+  "@recoveryOther": {
+    "description": "Feed, friends, recovery, profile, support (FR-048–FR-054)"
+  },
+  "recoveryReady": "Ready",
+  "@recoveryReady": {
+    "description": "Feed, friends, recovery, profile, support (FR-048–FR-054)"
+  },
+  "recoveryFresh": "Fresh",
+  "@recoveryFresh": {
+    "description": "Feed, friends, recovery, profile, support (FR-048–FR-054)"
+  },
+  "recoveryExplain": "Worked out from your logged sets, how hard they were and the time since. Big muscles need about 72 hours, small ones about 48. A guide, not a rule: how you feel comes first.",
+  "@recoveryExplain": {
+    "description": "Feed, friends, recovery, profile, support (FR-048–FR-054)"
+  },
+  "recoveryLegendRest": "Needs rest",
+  "@recoveryLegendRest": {
+    "description": "Feed, friends, recovery, profile, support (FR-048–FR-054)"
+  },
+  "recoveryLegendRecovering": "Recovering",
+  "@recoveryLegendRecovering": {
+    "description": "Feed, friends, recovery, profile, support (FR-048–FR-054)"
+  },
+  "recoveryLegendFresh": "Fresh",
+  "@recoveryLegendFresh": {
+    "description": "Feed, friends, recovery, profile, support (FR-048–FR-054)"
+  },
+  "recoveryCardTitle": "Recovery",
+  "@recoveryCardTitle": {
+    "description": "Feed, friends, recovery, profile, support (FR-048–FR-054)"
+  },
+  "recoveryCardAllFresh": "Every muscle is fresh",
+  "@recoveryCardAllFresh": {
+    "description": "Feed, friends, recovery, profile, support (FR-048–FR-054)"
+  },
+  "recoveryPro": "See what is ready to train — Pro",
+  "@recoveryPro": {
+    "description": "Feed, friends, recovery, profile, support (FR-048–FR-054)"
+  },
+  "profileNoName": "Add your name in Settings",
+  "@profileNoName": {
+    "description": "Feed, friends, recovery, profile, support (FR-048–FR-054)"
+  },
+  "profileFriendsSub": "Leaderboard and invites",
+  "@profileFriendsSub": {
+    "description": "Feed, friends, recovery, profile, support (FR-048–FR-054)"
+  },
+  "profileSupportSub": "Chat with us",
+  "@profileSupportSub": {
+    "description": "Feed, friends, recovery, profile, support (FR-048–FR-054)"
+  },
+  "profileMeasurements": "Measurements",
+  "@profileMeasurements": {
+    "description": "Feed, friends, recovery, profile, support (FR-048–FR-054)"
+  },
+  "profileVolume": "Volume",
+  "@profileVolume": {
+    "description": "Feed, friends, recovery, profile, support (FR-048–FR-054)"
+  },
+  "profileLess": "Less",
+  "@profileLess": {
+    "description": "Feed, friends, recovery, profile, support (FR-048–FR-054)"
+  },
+  "profileMore": "More",
+  "@profileMore": {
+    "description": "Feed, friends, recovery, profile, support (FR-048–FR-054)"
+  },
+  "profileBadges": "Badges",
+  "@profileBadges": {
+    "description": "Feed, friends, recovery, profile, support (FR-048–FR-054)"
+  },
+  "profileBadgesNone": "Finish your first workout to earn a badge.",
+  "@profileBadgesNone": {
+    "description": "Feed, friends, recovery, profile, support (FR-048–FR-054)"
+  },
+  "profileFocus": "Focus muscles",
+  "@profileFocus": {
+    "description": "Feed, friends, recovery, profile, support (FR-048–FR-054)"
+  },
+  "profileFocusNone": "None",
+  "@profileFocusNone": {
+    "description": "Feed, friends, recovery, profile, support (FR-048–FR-054)"
+  },
+  "profileTraining": "Training preferences",
+  "@profileTraining": {
+    "description": "Feed, friends, recovery, profile, support (FR-048–FR-054)"
+  },
+  "badgeFirstFriend": "First friend",
+  "@badgeFirstFriend": {
+    "description": "Feed, friends, recovery, profile, support (FR-048–FR-054)"
+  },
+  "liftOverheadPress": "Overhead press",
+  "@liftOverheadPress": {
+    "description": "Feed, friends, recovery, profile, support (FR-048–FR-054)"
+  },
+  "liftRow": "Row",
+  "@liftRow": {
+    "description": "Feed, friends, recovery, profile, support (FR-048–FR-054)"
+  },
+  "liftHipThrust": "Hip thrust",
+  "@liftHipThrust": {
+    "description": "Feed, friends, recovery, profile, support (FR-048–FR-054)"
+  },
+  "supportTitle": "Help & support",
+  "@supportTitle": {
+    "description": "Feed, friends, recovery, profile, support (FR-048–FR-054)"
+  },
+  "supportIntro": "Hi! Ask me anything about Tekto. I answer right away, and a member of our team is one tap away.",
+  "@supportIntro": {
+    "description": "Feed, friends, recovery, profile, support (FR-048–FR-054)"
+  },
+  "supportHint": "Write your message",
+  "@supportHint": {
+    "description": "Feed, friends, recovery, profile, support (FR-048–FR-054)"
+  },
+  "supportSend": "Send",
+  "@supportSend": {
+    "description": "Feed, friends, recovery, profile, support (FR-048–FR-054)"
+  },
+  "supportHuman": "Talk to a person",
+  "@supportHuman": {
+    "description": "Feed, friends, recovery, profile, support (FR-048–FR-054)"
+  },
+  "supportHumanMessage": "I'd like to talk to a person.",
+  "@supportHumanMessage": {
+    "description": "Feed, friends, recovery, profile, support (FR-048–FR-054)"
+  },
+  "supportWaiting": "A member of the Tekto team will reply here as soon as possible. You'll get a notification.",
+  "@supportWaiting": {
+    "description": "Feed, friends, recovery, profile, support (FR-048–FR-054)"
+  },
+  "supportAgent": "Tekto team",
+  "@supportAgent": {
+    "description": "Feed, friends, recovery, profile, support (FR-048–FR-054)"
+  },
+  "supportAi": "Assistant",
+  "@supportAi": {
+    "description": "Feed, friends, recovery, profile, support (FR-048–FR-054)"
+  },
+  "supportError": "Message not sent. Check your connection and try again.",
+  "@supportError": {
+    "description": "Feed, friends, recovery, profile, support (FR-048–FR-054)"
+  },
+  "quizFocusTitle": "Focus muscles",
+  "@quizFocusTitle": {
+    "description": "Feed, friends, recovery, profile, support (FR-048–FR-054)"
+  },
+  "quizFocusBody": "Pick up to 2. Your coach gives them a little extra work each week, within safe limits for your level.",
+  "@quizFocusBody": {
+    "description": "Feed, friends, recovery, profile, support (FR-048–FR-054)"
+  },
+  "settingsDisplayName": "Name shown to friends",
+  "@settingsDisplayName": {
+    "description": "Feed, friends, recovery, profile, support (FR-048–FR-054)"
+  },
+  "settingsDisplayNameUnset": "Not set",
+  "@settingsDisplayNameUnset": {
+    "description": "Feed, friends, recovery, profile, support (FR-048–FR-054)"
+  },
+  "settingsShareWorkouts": "Share workouts with friends",
+  "@settingsShareWorkouts": {
+    "description": "Feed, friends, recovery, profile, support (FR-048–FR-054)"
+  },
+  "settingsShareWorkoutsBody": "Finished workouts appear in your friends' feed.",
+  "@settingsShareWorkoutsBody": {
+    "description": "Feed, friends, recovery, profile, support (FR-048–FR-054)"
+  },
+  "feedRank": "You are #{rank} of {total}",
+  "@feedRank": {
+    "description": "Feed, friends, recovery, profile, support (FR-048–FR-054)",
+    "placeholders": {
+      "rank": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "feedBehind": "{points} points behind {name}",
+  "@feedBehind": {
+    "description": "Feed, friends, recovery, profile, support (FR-048–FR-054)",
+    "placeholders": {
+      "points": {
+        "type": "int"
+      },
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "feedMinutes": "{n} min",
+  "@feedMinutes": {
+    "description": "Feed, friends, recovery, profile, support (FR-048–FR-054)",
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "feedRecords": "{n, plural, =1{New record} other{{n} new records}}",
+  "@feedRecords": {
+    "description": "Feed, friends, recovery, profile, support (FR-048–FR-054)",
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "friendsLastTrained": "Last trained {when}",
+  "@friendsLastTrained": {
+    "description": "Feed, friends, recovery, profile, support (FR-048–FR-054)",
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "friendsUpThisWeek": "+{n} this week",
+  "@friendsUpThisWeek": {
+    "description": "Feed, friends, recovery, profile, support (FR-048–FR-054)",
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "friendsDownThisWeek": "−{n} this week",
+  "@friendsDownThisWeek": {
+    "description": "Feed, friends, recovery, profile, support (FR-048–FR-054)",
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "friendsYourUsername": "Your username: @{u}",
+  "@friendsYourUsername": {
+    "description": "Feed, friends, recovery, profile, support (FR-048–FR-054)",
+    "placeholders": {
+      "u": {
+        "type": "String"
+      }
+    }
+  },
+  "timeAgoMinutes": "{n} min ago",
+  "@timeAgoMinutes": {
+    "description": "Feed, friends, recovery, profile, support (FR-048–FR-054)",
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "timeAgoHours": "{n} h ago",
+  "@timeAgoHours": {
+    "description": "Feed, friends, recovery, profile, support (FR-048–FR-054)",
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "timeAgoDays": "{n, plural, =1{1 day ago} other{{n} days ago}}",
+  "@timeAgoDays": {
+    "description": "Feed, friends, recovery, profile, support (FR-048–FR-054)",
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "recoveryReadyAt": "Ready {when}",
+  "@recoveryReadyAt": {
+    "description": "Feed, friends, recovery, profile, support (FR-048–FR-054)",
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "recoveryCardLowest": "{muscle} {pct}% · others fresh soon",
+  "@recoveryCardLowest": {
+    "description": "Feed, friends, recovery, profile, support (FR-048–FR-054)",
+    "placeholders": {
+      "muscle": {
+        "type": "String"
+      },
+      "pct": {
+        "type": "int"
+      }
+    }
+  },
+  "profileWorkouts": "{n, plural, =1{1 workout} other{{n} workouts}}",
+  "@profileWorkouts": {
+    "description": "Feed, friends, recovery, profile, support (FR-048–FR-054)",
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "profileFriends": "{n, plural, =0{Friends} =1{1 friend} other{{n} friends}}",
+  "@profileFriends": {
+    "description": "Feed, friends, recovery, profile, support (FR-048–FR-054)",
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "profileStreak": "{n, plural, =0{No streak yet} =1{1-week streak} other{{n}-week streak}}",
+  "@profileStreak": {
+    "description": "Feed, friends, recovery, profile, support (FR-048–FR-054)",
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "profileStreakSub": "{done} / {target} sessions this week",
+  "@profileStreakSub": {
+    "description": "Feed, friends, recovery, profile, support (FR-048–FR-054)",
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "target": {
+        "type": "int"
+      }
+    }
+  },
+  "profileBadgesCount": "{a} of {b}",
+  "@profileBadgesCount": {
+    "description": "Feed, friends, recovery, profile, support (FR-048–FR-054)",
+    "placeholders": {
+      "a": {
+        "type": "int"
+      },
+      "b": {
+        "type": "int"
+      }
+    }
+  },
+  "badgeStreak": "{n}-week streak",
+  "@badgeStreak": {
+    "description": "Feed, friends, recovery, profile, support (FR-048–FR-054)",
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "badgeWorkouts": "{n, plural, =1{First workout} other{{n} workouts}}",
+  "@badgeWorkouts": {
+    "description": "Feed, friends, recovery, profile, support (FR-048–FR-054)",
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "badgeRecord": "First {lift} record",
+  "@badgeRecord": {
+    "description": "Feed, friends, recovery, profile, support (FR-048–FR-054)",
+    "placeholders": {
+      "lift": {
+        "type": "String"
+      }
+    }
+  },
+  "badgeFriends": "{n} friends",
+  "@badgeFriends": {
+    "description": "Feed, friends, recovery, profile, support (FR-048–FR-054)",
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "badgeVolume": "{t} t lifted",
+  "@badgeVolume": {
+    "description": "Feed, friends, recovery, profile, support (FR-048–FR-054)",
+    "placeholders": {
+      "t": {
+        "type": "int"
+      }
+    }
+  },
+  "quizFocusCount": "{n} / 2 selected",
+  "@quizFocusCount": {
+    "description": "Feed, friends, recovery, profile, support (FR-048–FR-054)",
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "shareOptInTitle": "Your workouts are private",
+  "@shareOptInTitle": {
+    "description": "Feed sharing opt-in (FR-049, Constitution II)"
+  },
+  "shareOptInBody": "Share your finished workouts with your friends? They see the session, time, volume, sets and records — never your weight, measurements or notes. You can stop any time in Settings.",
+  "@shareOptInBody": {
+    "description": "Feed sharing opt-in (FR-049, Constitution II)"
+  },
+  "shareOptInButton": "Share with friends",
+  "@shareOptInButton": {
+    "description": "Feed sharing opt-in (FR-049, Constitution II)"
   }
 }
