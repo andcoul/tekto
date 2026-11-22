@@ -381,5 +381,5 @@ A free user encounters a Pro feature, sees a contextual paywall that communicate
 - English and French are the only supported languages at launch; the architecture supports adding more languages in future releases.
 - The trademark clearance for "Tekto" in Classes 9 and 41 is assumed to be completed before launch (open question from PRD).
 - Team size, budget, and target launch date are open questions to be resolved outside this spec.
-- Nutritional tracking, social features, wearable integrations beyond Apple Health / Google Health Connect, progress photos, form-check footage sharing, pull-up form check, full program editing (beyond swap and regeneration), in-app speech recognition, and a web app are explicitly out of scope for the MVP.
+- Nutritional tracking, public social features (public profiles, followers, comments — friends, feed and reactions are in scope since 2026-11-21, FR-049), wearable integrations beyond Apple Health / Google Health Connect, progress photos, form-check footage sharing, pull-up form check, full program editing (beyond swap and regeneration), in-app speech recognition, and a web app are explicitly out of scope for the MVP.
 - A human-reviewed content safety pass on the AI coach's guardrails will be conducted before launch to satisfy app store compliance.
