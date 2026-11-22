@@ -6,7 +6,8 @@ ALTER TABLE public.users
   ADD COLUMN display_name   text CHECK (char_length(display_name) BETWEEN 1 AND 40),
   ADD COLUMN username       text UNIQUE CHECK (username ~ '^[a-z0-9_.]{3,20}$'),
   ADD COLUMN invite_code    text UNIQUE NOT NULL DEFAULT encode(gen_random_bytes(6), 'hex'),
-  ADD COLUMN share_workouts bool NOT NULL DEFAULT true,
+  -- Off until the user turns it on (Constitution II: workout logs are health data).
+  ADD COLUMN share_workouts bool NOT NULL DEFAULT false,
   ADD COLUMN focus_muscles  text[] NOT NULL DEFAULT '{}' CHECK (
     cardinality(focus_muscles) <= 2 AND focus_muscles <@ ARRAY['chest', 'shoulders', 'triceps', 'back', 'biceps',
       'traps', 'forearms', 'quads', 'hamstrings', 'glutes', 'abductors', 'adductors', 'calves', 'abs', 'lower_back']

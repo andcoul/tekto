@@ -331,6 +331,49 @@ deno task eval:guardrails --env staging
 2. **Camera privacy**: run Xcode Instruments → Network during a form check session → zero bytes sent while `FormCheckService.isSessionActive`.
 3. **Export**: Settings → Export my data → link opens a JSON file containing profile, plans, logs, coach messages and consent record.
 4. **Delete**: Settings → Delete account (two-step confirm) → `auth.users` row gone, all user rows cascaded, RevenueCat customer deleted, local DB and key wiped, app returns to welcome screen.
+5. **Social data**: the export also contains friendships, reactions the user gave and support chats; after deletion, the user disappears from friends' leaderboards and feeds.
+
+---
+
+### Scenario 10: Plan Library (Pro, FR-047)
+
+**Steps**:
+1. Pro user with a full gym → Plan → "Browse plans" → nine programs; the "5–6 days" filter shows bro split, push/pull/legs and the pairs split.
+2. Open **Bro split** → week Mon–Fri (chest, back, shoulders, arms, legs), training days, coach note → "Start this plan" → confirm.
+
+**Expected**: the active plan is replaced (`source = template`, `template_slug = bro-split-5x`), logged sessions and records are kept, the plan screen shows five days. With a knee limitation no knee-contraindicated exercise appears. A dumbbell-only user sees "You don't have: …" and gets dumbbell substitutes, or a clear "can't be fitted" message with the old plan kept. A free user sees "Unlock with Pro" and the paywall.
+
+---
+
+### Scenario 11: Friends, Feed and Leaderboard (FR-048–FR-050)
+
+**Steps**:
+1. Users A and B: Settings → name shown to friends; A opens Friends → "Choose a username"; B adds A by username (or opens A's invite link) → A accepts.
+2. In Feed › Friends, A sees the card "Your workouts are private" → "Share with friends". B does the same.
+3. B finishes a workout with one new record.
+
+**Expected**: before step 2 neither sees the other's workouts. After it, A's Feed shows B's post (session, time, volume, sets, "New record", muscle map); A reacts 🔥 (count 1, changing or removing it works; offline the tap is undone). Friends shows both on the leaderboard with weekly score = 20 × sessions + sets + 10 × records and the change from last week, plus the 8-week chart. Hiding the workout or turning sharing off removes it from A's feed. A stranger (no friendship) sees nothing and cannot react.
+
+---
+
+### Scenario 12: Recovery and Focus Muscles (FR-051, FR-052)
+
+**Steps**:
+1. Pro user logs an upper-body session (16 sets of shoulders, session RPE 8) → Home → Recovery card → Recovery screen.
+2. Settings → Edit profile → Focus muscles → pick Glutes and Shoulders (a third tap does nothing) → Save → Regenerate plan.
+
+**Expected**: shoulders show about 61 % 44 h later with "Ready" time; next workout's muscles listed first; muscles trained more than 7 days ago show 100 %. A free user sees the card locked and the paywall. After regeneration, each focus muscle has about 2 more weekly sets than before, never above the level maximum; a free user's plan is unchanged.
+
+---
+
+### Scenario 13: Profile and Support Chat (FR-053, FR-054)
+
+**Steps**:
+1. Profile tab → check cards (friends, help & support, streak, weight), heatmap (year switch), badges (sheet with all 24).
+2. Help & support → ask "How do I restore my purchase?" → then tap "Talk to a person".
+3. On staging, insert an `agent` message for the thread (service role).
+
+**Expected**: the assistant answers within a few seconds in the user's language; after "Talk to a person" the thread is `waiting_agent`, the assistant says a person will reply and no further AI answers arrive; the agent message appears live, labelled "Tekto team". More than 20 messages in an hour returns `RATE_LIMITED`.
 
 ---
 

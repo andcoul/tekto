@@ -36,7 +36,7 @@ class UserSettings {
     required this.language,
     required this.unit,
     required this.healthSyncEnabled,
-    this.shareWorkouts = true,
+    this.shareWorkouts = false,
     this.displayName,
   });
   final String language;
@@ -134,7 +134,7 @@ class SettingsService {
     await _save(local, fields);
   }
 
-  /// FR-049: post finished workouts to friends (default on).
+  /// FR-049: post finished workouts to friends; off until the user turns it on (Constitution II).
   Future<void> setShareWorkouts(bool on) => _save(UsersCompanion(shareWorkouts: Value(on)), {'share_workouts': on});
 
   /// Name shown to friends (FR-049).

@@ -488,6 +488,46 @@ No change to data-model.md or contracts/. This is a content and design rule. T02
 
 ---
 
+## 17. Plan Library and Equipment Breadth (FR-047, FR-001, FR-013; 2026-11-21)
+
+**Decision**: Library programs are ordinary rows in `plan_templates` with a `catalog` block (order, goal, image, summaries). `generate-plan` with `program_slug` builds them through the same template builder (substitution for missing equipment or limitations, session trimming, level volume cap, starting weights) and the same validator; no AI call. A program keeps its own training days. If it cannot be fitted, the request fails with `PROGRAM_NOT_SUITABLE` and the current plan stays.
+
+The equipment vocabulary adds `smith_machine`, `trap_bar` and `suspension` (migration 015). Plate-loaded and selectorized machines stay `machine`, landmine moves need only a `barbell`, kettlebells stay `dumbbell`. Smith moves start like machines (counterbalanced bars vary), trap-bar moves like barbells.
+
+New exercises are written in full (EN/FR cues, mistakes, muscles, equipment, variations) in `content/exercises/pending-batch-6.js` and enter `exercises.json` only through `promote.js`, after their clip passed the ingest checks and the human form review (Constitution IV). Two entries that are the same movement with only a different handle are one exercise.
+
+**Alternatives considered**: AI-generated "classic" programs (rejected: cost and variance for a fixed, well-known structure); a separate `programs` table (rejected: same shape and seed path as templates, Constitution VII).
+
+---
+
+## 18. Friends, Feed and Weekly Score (FR-048–FR-050; Constitution II)
+
+**Decision**: Friendships are mutual (`pending` → `accepted`; either side removes or blocks). Workout sharing is **off until the user turns it on** with one explicit tap (Friends or Feed card, or Settings). Friends read each other's workouts only through SECURITY DEFINER RPCs (`friend_feed`, `friend_leaderboard`, `weekly_scores`, `friend_requests`) that return summaries (session name, time, duration, volume, sets, record exercises, sets per muscle) and never body weight, measurements, limitations or notes. Reactions are three fixed emoji (no user-written text, so no moderation queue at launch). Invite links carry a random `invite_code`; opening one accepts at once.
+
+Weekly training score = 20 × finished sessions (≤ 7) + 1 × logged sets + 10 × records (one per exercise per workout), Monday–Sunday in each user's time zone; the same formula in SQL and Dart.
+
+**Alternatives considered**: public profiles and follower graphs (rejected: privacy and abuse risk); comments (deferred: needs report/block/moderation for App Store guideline 1.2); total volume as the score (rejected: favours heavy lifters).
+
+---
+
+## 19. Muscle Recovery and Focus Muscles (FR-051, FR-052)
+
+**Decision**: Recovery is computed on the device from the local workout history (works offline): hours needed = base (72 h chest, back, quads, hamstrings, glutes; 48 h others) × load factor (sets ÷ 10, clamped 0.5–1.5) × effort factor (session RPE ≥ 9 → 1.2, ≤ 6 → 0.8); recovery % = elapsed ÷ needed, capped at 100; the least recovered session in the last 7 days wins. It is a guide shown to Pro users and never blocks a workout.
+
+Focus muscles (≤ 2 of 15 groups) are stored in `users.focus_muscles`. For Pro users the template builder adds 2 weekly sets per focus muscle on matching exercises before the level cap; the AI prompt asks for about 2 extra weekly sets within the volume rule.
+
+**Alternatives considered**: a fixed 48 h for every muscle (rejected: ignores volume and effort); server-side recovery (rejected: needless round trip, breaks offline).
+
+---
+
+## 20. Help & Support Chat (FR-054)
+
+**Decision**: One open `support_threads` row per user with `support_messages` (`user`, `ai`, `agent`). `support-message` stores the user's message and asks `claude-haiku-5-5` (help content only, no medical advice, ≤ 120 words, structured `{reply, needs_human}`) for an instant answer. The thread moves to `waiting_agent` when the user asks for a person, the assistant cannot help, or the model is down; then no AI replies are sent until staff act. Staff reply as `agent` with the service role; the app receives replies through Realtime. A staff console and push notification for replies are built later.
+
+**Alternatives considered**: a third-party help-desk SDK (deferred: another vendor and data processor; may be adopted for the console later); AI-only support (rejected by the product owner: real people must reply).
+
+---
+
 ## Summary of All Decisions
 
 | Area | Decision |
@@ -509,3 +549,8 @@ No change to data-model.md or contracts/. This is a content and design rule. T02
 | Offline sync | Drift + custom sync queue via Supabase REST |
 | Guardrail validation | Adversarial eval suite, 100 % pass bar |
 | Imagery and casting | Mixed cast with Black men and women in lead roles (at least half of each set); dark-UI lighting brief (§16) |
+| Plan library | Catalog templates fitted by the template builder; `program_slug`; Pro (§17) |
+| Equipment | + Smith machine, trap bar, suspension straps; written exercises wait for reviewed clips (§17) |
+| Social | Mutual friends; sharing off until turned on; summaries via RPCs; fixed reactions; weekly score (§18) |
+| Recovery / focus | On-device recovery formula (Pro); ≤ 2 focus muscles add weekly sets within the cap (§19) |
+| Support | AI assistant answers instantly, hands over to staff in the same thread (§20) |

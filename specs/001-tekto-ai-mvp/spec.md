@@ -56,7 +56,7 @@ Tekto is a premium, AI-first strength training app for iOS and Android. It build
 - Q: Which modern gym equipment must the library cover? → A: Add the Smith machine, trap bar and suspension straps as their own equipment choices; plate-loaded and selectorized machines stay "machines", landmine moves need only a barbell, kettlebells stay "dumbbells". The library adds exercises for each, including an adductor group (FR-001, FR-013).
 - Q: Are near-identical exercises kept as separate entries? → A: No. Two entries that are the same movement with only a different handle or attachment are one exercise (the straight-bar triceps pushdown was merged into the rope pushdown) (FR-013).
 - Q: How is the app organized? → A: Four tabs — Home · Feed · Library · Profile; the AI coach is a floating button on every tab; Progress moves inside Feed as its "You" view; the plan is reached from Home (FR-048).
-- Q: What do friends see and do in the Feed? → A: Each finished workout is posted to friends automatically (the user can turn sharing off or hide a single workout) with muscle map, time, volume, sets and records; friends react with a fixed set of emoji; no comments at launch (FR-049).
+- Q: What do friends see and do in the Feed? → A: Once the user turns sharing on (off by default, Constitution II — decided 2026-11-22), each finished workout is posted to friends automatically (the user can turn sharing off or hide a single workout) with muscle map, time, volume, sets and records; friends react with a fixed set of emoji; no comments at launch (FR-049).
 - Q: What ranks friends on the leaderboard? → A: A weekly training score (sessions, completed sets and records, reset every Monday, with the change from last week) (FR-050).
 - Q: Muscle recovery? → A: Recovery per muscle from logged sets, effort and time since, shown as a body map, the next workout's muscles and every other muscle with % and time to ready; Pro (FR-051).
 - Q: Focus muscles? → A: Up to 2 focus muscles, chosen in onboarding (after equipment) and in training preferences, with premium muscle tiles; plans give them a little extra weekly volume within the level maximum; Pro for the effect on plans (FR-052).
@@ -186,6 +186,27 @@ Any user (free or Pro) can browse and view the full exercise video library. Each
 
 ---
 
+### User Story 8 — Train with Friends and Know What Is Ready (Priority: P2)
+
+**Launch scope**: Required at launch (product owner, 2026-11-21).
+
+A user adds friends, chooses to share their workouts, sees friends' sessions in the Feed with reactions and a weekly leaderboard, checks which muscles have recovered before training, and gets help in the support chat.
+
+**Why this priority**: Social accountability and visible progress drive retention and word of mouth; recovery and support build trust.
+
+**Independent Test**: Two test accounts can befriend each other, opt in, log a workout and see it ranked — without the coach or form check.
+
+**Acceptance Scenarios**:
+
+1. **Given** two users who are not friends, **When** one finishes a workout, **Then** the other sees nothing of it (FR-049).
+2. **Given** accepted friends who have not turned sharing on, **When** one finishes a workout, **Then** it is not posted; **When** they tap "Share with friends", **Then** later workouts appear in the friend's Feed with session, time, volume, sets, records and a muscle map (FR-049).
+3. **Given** a friend's post, **When** the user taps 🔥, **Then** the count rises by one and the friend's weekly score is unaffected; tapping again removes it (FR-049).
+4. **Given** friends who trained this week, **When** the user opens Friends, **Then** the leaderboard ranks them by weekly training score with the change from last week (FR-050).
+5. **Given** a Pro user who trained shoulders hard 44 hours ago, **When** they open Recovery, **Then** shoulders show under 100 % with the time they are ready, and the next workout's muscles are listed first (FR-051).
+6. **Given** any user in the support chat, **When** they tap "Talk to a person", **Then** the assistant confirms a person will reply, stops answering, and a team reply appears in the same chat (FR-054).
+
+---
+
 ### User Story 7 — Subscription and Paywall (Priority: P1)
 
 **Launch scope**: Required at launch (PRD P0).
@@ -295,7 +316,7 @@ A free user encounters a Pro feature, sees a contextual paywall that communicate
 - **FR-034**: The app MUST support kg and lb unit selection, persisted per user.
 - **FR-047**: Pro users MUST be able to browse a plan library of ready-made programs (at launch: bro split, push/pull/legs, upper/lower, full body, strength 5 × 5, power & size upper/lower, chest-back · shoulders-arms · legs, glutes & legs focus, dumbbell home) showing each program's days per week, level, weekly schedule and the equipment it uses, and start one. Starting a program replaces the active plan (logged sessions and records are kept); the program keeps its own training days and is fitted like a template plan — exercises needing equipment the user lacks or contraindicated by their limitations are substituted, sessions trimmed to the session length, weekly sets capped at the user's level maximum, starting weights computed — and MUST pass the plan validator (FR-002a). If it cannot be fitted, the current plan stays active and the user is told why. Weekly adaptation (FR-026) applies as for any plan. Free users see the library and a paywall when they try to start a program.
 - **FR-048**: The app MUST have four tabs — Home, Feed, Library, Profile — with the AI coach as a floating button beside them on every tab. Feed holds two views: Friends and You (the user's own progress, FR-024/FR-040). The plan is reached from Home.
-- **FR-049**: Users MUST be able to add friends by username or by a personal invite link; a friendship needs both sides to accept and either side can remove it or block the other. Each finished workout MUST be posted to the user's friends unless the user turned sharing off (Settings › Privacy) or hid that workout; a post shows the session name, time, duration, volume, set count, new records and a front/back muscle map. Friends MUST be able to react with one of a fixed set of emoji (💪 🔥 👏), one reaction per friend per post, and see counts. No user-written text appears in the Feed at launch. Friends never see body weight, measurements, limitations or notes.
+- **FR-049**: Users MUST be able to add friends by username or by a personal invite link; a friendship needs both sides to accept and either side can remove it or block the other. Workout sharing MUST be off until the user turns it on with an explicit action (the opt-in card in Feed or Friends, or Settings); once on, each finished workout MUST be posted to the user's friends unless the user hid that workout or turns sharing off again; a post shows the session name, time, duration, volume, set count, new records and a front/back muscle map. Friends MUST be able to react with one of a fixed set of emoji (💪 🔥 👏), one reaction per friend per post, and see counts. No user-written text appears in the Feed at launch. Friends never see body weight, measurements, limitations or notes.
 - **FR-050**: The Friends screen MUST show a weekly leaderboard of the user and their friends ranked by weekly training score — 20 points per finished session (at most 7 a week), 1 point per completed working set, 10 points per new personal record (one per exercise per workout) — computed for the current week (Monday–Sunday in each user's time zone) with the change from the previous week, plus a chart comparing the weekly scores of the user and up to 3 friends over the last 8 weeks.
 - **FR-051**: Pro users MUST see muscle recovery: for each muscle trained in the last 7 days, recovery % = min(100, hours since the session ÷ hours needed × 100), where hours needed = base (72 h for chest, back, quads, hamstrings, glutes; 48 h for others) × load factor (sets in that session for the muscle ÷ 10, between 0.5 and 1.5) × effort factor (session RPE ≥ 9 → 1.2; ≤ 6 → 0.8; else 1.0); a muscle trained in several sessions takes the lowest value. The screen shows a front/back map shaded by recovery, the next workout's muscles first, then every other muscle with % and the time it is ready. It is a guide; it never blocks a workout. Free users see the card with a paywall.
 - **FR-052**: Users MUST be able to choose up to 2 focus muscles (chest, shoulders, triceps, back, biceps, traps, forearms, quads, hamstrings, glutes, abductors, adductors, calves, abs, lower back) in onboarding after the equipment step and in training preferences. For Pro users, plan generation adds weekly sets for the focus muscles (AI: stated in the prompt; template and library plans: +2 sets a week per focus muscle on a matching exercise) without exceeding the level's weekly maximum (FR-002a).

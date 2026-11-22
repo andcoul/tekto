@@ -35,7 +35,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
     final service = ref.watch(settingsServiceProvider);
-    final settings = service == null ? null : ref.watch(_settingsProvider(service)).value;
+    final settings = service == null ? null : ref.watch(userSettingsProvider(service)).value;
 
     return Scaffold(
       appBar: AppBar(title: Text(l.settingsTitle), actions: const [CoachButton(screen: 'settings')]),
@@ -86,7 +86,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             secondary: const Icon(Icons.dynamic_feed_outlined),
             title: Text(l.settingsShareWorkouts),
             subtitle: Text(l.settingsShareWorkoutsBody),
-            value: settings?.shareWorkouts ?? true,
+            value: settings?.shareWorkouts ?? false,
             onChanged: service == null ? null : service.setShareWorkouts,
             activeThumbColor: AppColors.glacier,
           ),
@@ -260,7 +260,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   }
 }
 
-final _settingsProvider = StreamProvider.autoDispose.family<UserSettings?, SettingsService>((ref, s) => s.watch());
+final userSettingsProvider = StreamProvider.autoDispose.family<UserSettings?, SettingsService>((ref, s) => s.watch());
 
 class _SectionHeader extends StatelessWidget {
   const _SectionHeader(this.text);

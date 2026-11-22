@@ -93,6 +93,7 @@ class _FriendsView extends ConsumerWidget {
         padding: EdgeInsets.fromLTRB(
             AppSpacing.base, AppSpacing.sm, AppSpacing.base, MediaQuery.paddingOf(context).bottom + AppSpacing.base),
         children: [
+          const ShareOptInCard(),
           if (board.length > 1) _RankCard(board: board, me: me),
           ...switch (posts) {
             AsyncData(:final value) when value.isEmpty => [_EmptyFeed(l: l)],

@@ -7,6 +7,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tekto/core/di/providers.dart';
 import 'package:tekto/core/l10n/gen/app_localizations.dart';
 import 'package:tekto/features/onboarding/ui/focus_muscles_picker.dart';
+import 'package:tekto/features/settings/domain/settings_service.dart';
 import 'package:tekto/features/social/data/social_api.dart';
 import 'package:tekto/features/social/ui/feed_screen.dart';
 import 'package:tekto/features/social/ui/friends_screen.dart';
@@ -86,7 +87,7 @@ class _FakeSupport implements SupportApi {
 }
 
 Widget _app(Widget home, List overrides) => ProviderScope(
-      overrides: [...overrides.cast()],
+      overrides: [settingsServiceProvider.overrideWithValue(null), ...overrides.cast()],
       child: MaterialApp(
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,

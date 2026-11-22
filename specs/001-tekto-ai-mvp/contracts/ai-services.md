@@ -33,6 +33,7 @@ USER PROFILE:
 - Session length: {session_length_min} minutes
 - Equipment: {equipment_list}
 - Limitations: {limitations_list or "none"}
+- Focus muscles (give each about 2 extra weekly sets, within rule 2): {focus_muscles or "none"}   ← Pro only (FR-052)
 - Language preference: {language}
 
 AVAILABLE EXERCISES:
@@ -199,6 +200,24 @@ OUTPUT FORMAT (JSON, enforced by structured outputs):
 **Function**: `adapt-plan` → Anthropic Claude. **Model**: `claude-haiku-5-5`, effort `low`, structured output `{ "reasons": [{ "plan_exercise_id", "reason_en", "reason_fr" }], "summary_en", "summary_fr" }`.
 
 Input: the `AdaptationEvent[]` computed by `PlanAdaptationService` (the model only words them; it never decides changes). On any failure, the deterministic `reasonEn` / `reasonFr` from the service are used.
+
+---
+
+## 2c. Support Assistant — Claude API Contract (FR-054, 2026-11-21)
+
+### Function: `support-message` Edge Function → Anthropic Claude
+
+| Setting | Value |
+|---|---|
+| Model | `claude-haiku-5-5` (`COACH_MODEL`) |
+| Effort | `low` |
+| Output | Structured `{ "reply": string, "needs_human": boolean }` |
+| Max tokens / timeout | 1024 / 15 s |
+| Context | Last 12 messages of the user's open thread (user, assistant, Tekto team) and the user's language |
+
+**System prompt (stable, cached)**: answers questions about the app only (accounts, subscriptions and trial — refunds go through the App Store or Google Play —, restore, plans and the plan library, workouts, library, form check, friends and feed, privacy, export and deletion); at most 120 words with exact menu paths; never medical advice (pain or injury → stop and see a health professional; the AI coach handles training changes); never invents features, prices or policies; sets `needs_human` when the user asks for a person, reports a bug or a billing problem, is upset, or when unsure.
+
+**Hand-off**: `needs_human`, a request for a person, or any model failure → the thread becomes `waiting_agent`, the assistant adds the hand-off message in the user's language, and no further AI replies are sent while waiting. Guardrail eval (Constitution III) covers this prompt before launch together with the coach prompt.
 
 ---
 

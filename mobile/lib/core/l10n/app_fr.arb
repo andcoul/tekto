@@ -487,5 +487,8 @@
   "badgeRecord": "Premier record : {lift}",
   "badgeFriends": "{n} amis",
   "badgeVolume": "{t} t soulevées",
-  "quizFocusCount": "{n} / 2 choisis"
+  "quizFocusCount": "{n} / 2 choisis",
+  "shareOptInTitle": "Vos séances sont privées",
+  "shareOptInBody": "Partager vos séances terminées avec vos amis ? Ils voient la séance, la durée, le volume, les séries et les records — jamais votre poids, vos mensurations ni vos notes. Vous pouvez arrêter à tout moment dans Réglages.",
+  "shareOptInButton": "Partager avec mes amis"
 }

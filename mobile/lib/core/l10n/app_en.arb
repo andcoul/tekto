@@ -1713,5 +1713,17 @@
         "type": "int"
       }
     }
+  },
+  "shareOptInTitle": "Your workouts are private",
+  "@shareOptInTitle": {
+    "description": "Feed sharing opt-in (FR-049, Constitution II)"
+  },
+  "shareOptInBody": "Share your finished workouts with your friends? They see the session, time, volume, sets and records — never your weight, measurements or notes. You can stop any time in Settings.",
+  "@shareOptInBody": {
+    "description": "Feed sharing opt-in (FR-049, Constitution II)"
+  },
+  "shareOptInButton": "Share with friends",
+  "@shareOptInButton": {
+    "description": "Feed sharing opt-in (FR-049, Constitution II)"
   }
 }

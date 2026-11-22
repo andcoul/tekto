@@ -2,6 +2,11 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../../core/l10n/gen/app_localizations.dart';
+import '../../settings/domain/settings_service.dart';
+import '../../settings/ui/settings_screen.dart';
 
 import '../../../core/theme/app_theme.dart';
 
@@ -82,4 +87,35 @@ class _RingPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(_RingPainter old) => old.fraction != fraction || old.color != color;
+}
+
+/// Sharing is off until the user turns it on (FR-049, Constitution II): one explicit tap.
+class ShareOptInCard extends ConsumerWidget {
+  const ShareOptInCard({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final service = ref.watch(settingsServiceProvider);
+    if (service == null) return const SizedBox.shrink();
+    final s = ref.watch(userSettingsProvider(service)).value;
+    if (s == null || s.shareWorkouts) return const SizedBox.shrink();
+    final l = AppLocalizations.of(context);
+    return Card(
+      key: const ValueKey('share-opt-in'),
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacing.base),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Row(children: [
+            const Icon(Icons.lock_outline, color: AppColors.glacier),
+            const SizedBox(width: AppSpacing.sm),
+            Expanded(child: Text(l.shareOptInTitle, style: const TextStyle(fontWeight: FontWeight.w600))),
+          ]),
+          const SizedBox(height: AppSpacing.xs),
+          Text(l.shareOptInBody, style: Theme.of(context).textTheme.bodySmall),
+          const SizedBox(height: AppSpacing.md),
+          ElevatedButton(onPressed: () => service.setShareWorkouts(true), child: Text(l.shareOptInButton)),
+        ]),
+      ),
+    );
+  }
 }

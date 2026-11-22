@@ -6,7 +6,7 @@ All design work for the Tekto app: brand, screens, photos and the prompts used t
 
 | What | Where |
 |---|---|
-| App tour and clickable prototype | https://claude.ai/artifact/2TPDSPzsfgC9Y99e8qf7mn. Add `#try` to open the prototype, or `#try-201` to start on a given screen (here 2.01). (private; share it from its Share menu). A local copy is in `app-tour/`. |
+| App tour and clickable prototype (v15, 2026-11-22) | https://claude.ai/artifact/2TPDSPzsfgC9Y99e8qf7mn. Tabs Home · Feed · Library · Profile; stages include the plan library (5.05–5.06), Feed and Friends (7.01, 3.05, 7.02), Recovery and Focus muscles (7.03–7.04) and Help & support (7.05). Add `#try` to open the prototype, or `#try-201` to start on a given screen (here 2.01). (private; share it from its Share menu). A local copy is in `app-tour/`. |
 | Figma file: mood board, research, onboarding screens, components, photos | https://www.figma.com/design/HVh5cpvoaxvWq1287kA6vC |
 
 ## Folders
@@ -22,7 +22,9 @@ All design work for the Tekto app: brand, screens, photos and the prompts used t
 | `video-prompts.md` | Batch 1, done and frozen: the prompts that made the 23 clips in use, plus the photo-recast prompts. |
 | `video-prompts-batch-2.md` | Batch 2, done 2026-11-18: 22 new exercise clips, the bench press redo, and redos of its own (Part C). Frozen; the dropped dead bug is replaced in batch 3. Its rules say what may be changed and what must stay; its tracker shows each clip's status. |
 | `video-prompts-batch-3.md` | Batch 3, delivered 2026-11-19 (31 of 32 in the library; the diamond push-up needs a redo): 32 clips covering bands, barbell, dumbbell, kettlebell, cable and machines, and bodyweight, including the dead bug's replacement. It has the same rules and tracker, plus lessons from batches 1 and 2. |
-| `video-prompts-batch-4.md` | Batch 4, 1 of 23 delivered (the reverse pec deck); the rest to generate: 23 of the exercises gym members use most that Tekto lacks (decline bench, T-bar row, barbell and preacher curls, hack squat, crunch and others). It has the same rules and tracker. |
+| `video-prompts-batch-5.md` | Batch 5: the 31 second-angle clips (102–132) for the form-check lifts and their variants. |
+| `video-prompts-batch-6.md` | Batch 6 (2026-11-21): 75 clips (133–207) for modern gym equipment — 13 Smith machine, plate-loaded and selectorized machines, trap bar, landmine, suspension, cable and 6 adductor moves. Generated from `content/exercises/pending-batch-6.js` by `make-batch6-brief.js`; each exercise enters the library with `promote.js` after its clip passes review. |
+| `video-prompts-batch-4.md` | Batch 4, 14 of 23 delivered; the triceps pushdown (89) was merged into the rope pushdown as a duplicate on 2026-11-21. Originally: 23 of the exercises gym members use most that Tekto lacks (decline bench, T-bar row, barbell and preacher curls, hack squat, crunch and others). It has the same rules and tracker. |
 | `videos/` | The 77 generated clips (71 exercises, 6 screens). `cd content/videos && node ingest.js` checks and converts them and bundles the welcome and paywall clips with the app. The review and the clip-to-screen mapping are in `videos/README.md`. |
 | `tools/` | `render-icon.swift` draws the app icon at any size. `crop-screens.swift` cuts a Figma stage export into single screens. |
 
@@ -46,6 +48,8 @@ All design work for the Tekto app: brand, screens, photos and the prompts used t
 - **Never use** yellow, red LED or dot-matrix displays.
 - **Type:** Bricolage Grotesque for titles (ExtraBold uppercase over photos), Geist for interface text and numbers, Geist Mono for small labels.
 - **Layout:** follow Ladder's structure and behaviour, with Tekto's own identity. Never copy Ladder, Fitbod or Any Distance logos, colours or footage.
+- **Body figure:** muscle maps and muscle tiles use one anatomical figure (left half mirrored), lit in Glacier with a soft glow by level and a mint outline for records; the same shapes are in the tour (`fig()`) and the app (`mobile/lib/shared/widgets/muscle_figure.dart`).
+- **Social:** friends are shown with their photo or an initials avatar; scores sit in rings (not hexagons); no red for falling scores or tired muscles (mist and Glacier instead).
 - **Casting:** at least half of each photo or video set shows Black men and women in lead roles. Lighting is a warm key light plus a cool blue rim light, so deep skin tones read well on the dark background. See `specs/001-tekto-ai-mvp/research.md` §16.
 
 ## Regenerating

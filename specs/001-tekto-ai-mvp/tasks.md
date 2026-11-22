@@ -19,7 +19,7 @@ description: "Task list for Tekto AI MVP (regenerated after spec clarifications 
 
 ## Progress (2026-11-21, after Phase 15: plan library and modern-equipment exercises)
 
-**163 done / 21 open** of 184. Every code task is done except T155 (second-angle clips in the content pipeline); the other open tasks need accounts, devices, content or people:
+**165 done / 21 open** of 186 (T182 support console deferred by the product owner). Every code task is done except T155 (second-angle clips in the content pipeline); the other open tasks need accounts, devices, content or people:
 
 - **Accounts / infrastructure**: T114 staging project + secrets (blocks T075 guardrail run, T095 staging timings), T092 uptime monitor on the deployed `/health`, T133 `supabase db reset` with Docker (001–014; 014 checked on a throwaway Postgres 2026-11-20)
 - **Devices**: T135 iOS/Android build, T130 form-check threshold tuning, T095 performance run, T096 privacy audit, T097 Scenarios 1–9; T093 VoiceOver/TalkBack + tablet walkthrough (code part done)
@@ -437,7 +437,7 @@ T079 · T080 · T081 (tests)
 
 ## Notes
 
-- **Total tasks**: 184 (T001–T098, plus T099–T127 added by remediation and placed inside their phases, T128–T133 and T135 in Phase 11 Convergence, T134 in Phase 8, T136–T140 in Phase 12, T141 in Phase 3, T142–T155 in Phase 13 from the 2026-11-20 clarifications, T156–T159 in Phase 14 Convergence, T160 (second-angle clip production, analyze run 10) in Phase 13, T161–T169 in Phase 15 (plan library and modern gym equipment, 2026-11-21), and T170–T184 in Phase 16 (feed, friends, recovery, focus, profile, support, 2026-11-21).
+- **Total tasks**: 186 (T001–T098, plus T099–T127 added by remediation and placed inside their phases, T128–T133 and T135 in Phase 11 Convergence, T134 in Phase 8, T136–T140 in Phase 12, T141 in Phase 3, T142–T155 in Phase 13 from the 2026-11-20 clarifications, T156–T159 in Phase 14 Convergence, T160 (second-angle clip production, analyze run 10) in Phase 13, T161–T169 in Phase 15 (plan library and modern gym equipment, 2026-11-21), T170–T184 in Phase 16 (feed, friends, recovery, focus, profile, support, 2026-11-21), and T185–T186 in Phase 17 (alignment, 2026-11-22).
 - Additional test-first pairs from remediation: starting weights (T112 → T113), RevenueCat webhook (T108 → T109), auth screen (T101 → T102), home screen (T103 → T104), health sync (T106 → T107), progress screen (T117 → T119), swap for all tiers (T120 → T087), plate calculator (T121 → T122), welcome screen (T124 → T125).
 - Every Principle V unit has its test task before its implementation: `PlanAdaptationService` (T080 → T083), `FormScoreCalculator` (T059 → T063), `RepCounter` (T058 → T062), `CoachQuotaService` (T069 → T076), subscription gates (T053/T054 → T056/T057), plus `ExerciseSubstitution` (T012 → T014), `PlanValidator` (T013 → T015), `TemplatePlanBuilder` (T030 → T036), generate-plan flow (T031 → T037), week boundary (T079 → T082), free try (T061 → T064).
 - Paywall widget tests: `PaywallScreen` (T052), `TrialOfferScreen` (T033), in-workout bottom sheet (T053), coach quota paywall (T116).
@@ -547,9 +547,14 @@ T079 · T080 · T081 (tests)
 - [X] T179 Focus muscles in onboarding and the profile editor (FR-052): step 6 of the quiz with premium tiles, at most 2; saved to `users.focus_muscles`; local DB schema v5 (`focus_muscles`, `share_workouts`, `display_name`, `username`)
 - [X] T180 Profile tab (FR-053): `features/profile/` (streak, heatmap by volume and year, 24 badges, friends / support / streak / weight cards, details)
 - [X] T181 Support chat screen (FR-054): `features/support/` (live thread via Realtime, AI and team labels, "Talk to a person")
-- [ ] T182 Support console for the Tekto team: a staff view (or Supabase dashboard procedure) to list `waiting_agent` threads, reply as `agent`, close threads; push notification to the user on an agent reply (needs push setup); document the reply-time target
+- [ ] T182 **Deferred by the product owner (2026-11-22)** — built later with the support back office: support console for the Tekto team: a staff view (or Supabase dashboard procedure) to list `waiting_agent` threads, reply as `agent`, close threads; push notification to the user on an agent reply (needs push setup); document the reply-time target
 - [ ] T183 Invite links: configure `https://tekto.app/invite/<code>` as iOS universal link / Android app link (with T114 staging domain)
 - [ ] T184 Onboarding Figma screen for the focus-muscles step (the tour's onboarding screens are Figma exports) and device check of all new screens (T097, T093)
 
 **Checkpoint**: `deno test` (all functions), `node --test` (content), `flutter test`, and the 016 SQL checks pass.
+
+## Phase 17: Alignment after Phase 16 (2026-11-22)
+
+- [X] T185 Workout sharing opt-in (Constitution II, FR-049): `users.share_workouts` defaults to `false` (migration 016, local schema v5), opt-in card in Feed › Friends and Friends (`ShareOptInCard`), Settings switch; SQL check asserts the default
+- [X] T186 Bring every document in line with FR-047–FR-054: PRD v0.3 (features 6–8, monetization rows, risks, open questions), `plan.md` (summary, changes, Constitution re-check, structure), `research.md` §17–§20, `quickstart.md` scenarios 10–13, `contracts/ai-services.md` §2c (support assistant) and focus muscles in the plan prompt, `checklists/gate1.md` rows 8–11, User Story 8 in `spec.md`, `design/README.md`
 

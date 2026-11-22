@@ -191,7 +191,7 @@ void main() {
     );
     expect([users['u1']!.goal, users['u1']!.language, users['u1']!.sessionLengthMin], ['muscle', 'fr', 45]);
     // v5 columns arrive with their defaults.
-    expect([users['u1']!.focusMuscles, users['u1']!.shareWorkouts, users['u1']!.displayName], ['[]', true, null]);
+    expect([users['u1']!.focusMuscles, users['u1']!.shareWorkouts, users['u1']!.displayName], ['[]', false, null]);
     expect(await v4.customSelect('PRAGMA user_version').map((r) => r.read<int>('user_version')).getSingle(), 5);
   });
 }

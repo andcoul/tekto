@@ -38,6 +38,7 @@ class FriendsScreen extends ConsumerWidget {
       body: ListView(
         padding: const EdgeInsets.fromLTRB(AppSpacing.base, 0, AppSpacing.base, AppSpacing.xl),
         children: [
+          const ShareOptInCard(),
           if (requests.isNotEmpty) ...[
             Text(l.friendsRequests, style: Theme.of(context).textTheme.labelLarge),
             for (final r in requests)

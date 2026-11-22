@@ -490,7 +490,7 @@ coach_response_cache ── standalone system table (no user FK)
 
 | Table | Key fields | Rules |
 |---|---|---|
-| `users` (new columns) | `username` text UNIQUE (3–20, `[a-z0-9_.]`), `invite_code` text UNIQUE, `share_workouts` bool DEFAULT true, `focus_muscles` text[] (≤ 2, FR-052 vocabulary) | username set on first visit to Friends |
+| `users` (new columns) | `username` text UNIQUE (3–20, `[a-z0-9_.]`), `invite_code` text UNIQUE, `share_workouts` bool DEFAULT false (opt-in, Constitution II), `focus_muscles` text[] (≤ 2, FR-052 vocabulary) | username set on first visit to Friends |
 | `friendships` | `id`, `requester_id`, `addressee_id`, `status` (`pending` \| `accepted` \| `blocked`), `created_at` | one row per pair; RLS: either party reads; addressee accepts; either deletes |
 | `workout_logs` (new column) | `hidden_from_feed` bool DEFAULT false | |
 | `workout_reactions` | PK (`workout_log_id`, `user_id`), `emoji` CHECK in (💪, 🔥, 👏) | only friends of the owner may react (RLS via `are_friends()`) |

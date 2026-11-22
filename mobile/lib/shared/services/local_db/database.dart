@@ -29,7 +29,7 @@ class Users extends Table {
   TextColumn get consentVersion => text().nullable()();
   TextColumn get strengthEstimates => text().nullable()(); // JSON {squat|bench_press|deadlift: {weight_kg, reps}}
   TextColumn get focusMuscles => text().withDefault(const Constant('[]'))(); // JSON array, ≤ 2 (FR-052)
-  BoolColumn get shareWorkouts => boolean().withDefault(const Constant(true))(); // FR-049
+  BoolColumn get shareWorkouts => boolean().withDefault(const Constant(false))(); // FR-049, off until opted in
   TextColumn get displayName => text().nullable()();
   TextColumn get username => text().nullable()();
   DateTimeColumn get onboardingCompletedAt => dateTime().nullable()();
