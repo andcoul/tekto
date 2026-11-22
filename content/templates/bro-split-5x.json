@@ -1,0 +1,284 @@
+{
+  "slug": "bro-split-5x",
+  "level": "intermediate",
+  "days_per_week": 5,
+  "equipment_required": [
+    "barbell",
+    "dumbbell",
+    "cable",
+    "machine",
+    "pull_up_bar",
+    "dip_station",
+    "bench"
+  ],
+  "name_en": "Bro split",
+  "name_fr": "Bro split",
+  "weeks_total": 8,
+  "rationale_en": "One muscle group a day, five days a week, with plenty of sets for each. Simple to follow and built for size.",
+  "rationale_fr": "Un groupe musculaire par jour, cinq jours par semaine, avec beaucoup de séries pour chacun. Simple à suivre, pensé pour la masse.",
+  "catalog": {
+    "order": 1,
+    "goal": "muscle",
+    "image": "bench-press",
+    "summary_en": "One muscle group a day, lots of sets for each.",
+    "summary_fr": "Un groupe musculaire par jour, beaucoup de séries."
+  },
+  "sessions": [
+    {
+      "ref": "chest",
+      "day_of_week": 1,
+      "name_en": "Chest",
+      "name_fr": "Pectoraux",
+      "exercises": [
+        {
+          "exercise_slug": "bench-press",
+          "sets": 4,
+          "reps_min": 6,
+          "reps_max": 8,
+          "rest_sec": 150,
+          "rpe_target": 8
+        },
+        {
+          "exercise_slug": "incline-dumbbell-press",
+          "sets": 3,
+          "reps_min": 8,
+          "reps_max": 10,
+          "rest_sec": 120,
+          "rpe_target": 8
+        },
+        {
+          "exercise_slug": "cable-fly",
+          "sets": 3,
+          "reps_min": 10,
+          "reps_max": 12,
+          "rest_sec": 90,
+          "rpe_target": 8
+        },
+        {
+          "exercise_slug": "chest-dip",
+          "sets": 3,
+          "reps_min": 8,
+          "reps_max": 12,
+          "rest_sec": 90,
+          "rpe_target": 8
+        },
+        {
+          "exercise_slug": "pec-deck",
+          "sets": 2,
+          "reps_min": 12,
+          "reps_max": 15,
+          "rest_sec": 60,
+          "rpe_target": 8
+        }
+      ]
+    },
+    {
+      "ref": "back",
+      "day_of_week": 2,
+      "name_en": "Back",
+      "name_fr": "Dos",
+      "exercises": [
+        {
+          "exercise_slug": "pull-up",
+          "sets": 4,
+          "reps_min": 6,
+          "reps_max": 10,
+          "rest_sec": 150,
+          "rpe_target": 8
+        },
+        {
+          "exercise_slug": "barbell-row",
+          "sets": 4,
+          "reps_min": 6,
+          "reps_max": 8,
+          "rest_sec": 150,
+          "rpe_target": 8
+        },
+        {
+          "exercise_slug": "lat-pulldown",
+          "sets": 3,
+          "reps_min": 10,
+          "reps_max": 12,
+          "rest_sec": 90,
+          "rpe_target": 8
+        },
+        {
+          "exercise_slug": "seated-cable-row",
+          "sets": 3,
+          "reps_min": 10,
+          "reps_max": 12,
+          "rest_sec": 90,
+          "rpe_target": 8
+        },
+        {
+          "exercise_slug": "straight-arm-pulldown",
+          "sets": 2,
+          "reps_min": 12,
+          "reps_max": 15,
+          "rest_sec": 60,
+          "rpe_target": 8
+        }
+      ]
+    },
+    {
+      "ref": "shoulders",
+      "day_of_week": 3,
+      "name_en": "Shoulders",
+      "name_fr": "Épaules",
+      "exercises": [
+        {
+          "exercise_slug": "overhead-press",
+          "sets": 4,
+          "reps_min": 6,
+          "reps_max": 8,
+          "rest_sec": 150,
+          "rpe_target": 8
+        },
+        {
+          "exercise_slug": "arnold-press",
+          "sets": 3,
+          "reps_min": 8,
+          "reps_max": 10,
+          "rest_sec": 90,
+          "rpe_target": 8
+        },
+        {
+          "exercise_slug": "lateral-raise",
+          "sets": 4,
+          "reps_min": 12,
+          "reps_max": 15,
+          "rest_sec": 60,
+          "rpe_target": 8
+        },
+        {
+          "exercise_slug": "reverse-pec-deck",
+          "sets": 3,
+          "reps_min": 12,
+          "reps_max": 15,
+          "rest_sec": 60,
+          "rpe_target": 8
+        },
+        {
+          "exercise_slug": "face-pull",
+          "sets": 2,
+          "reps_min": 12,
+          "reps_max": 15,
+          "rest_sec": 60,
+          "rpe_target": 8
+        }
+      ]
+    },
+    {
+      "ref": "arms",
+      "day_of_week": 4,
+      "name_en": "Arms",
+      "name_fr": "Bras",
+      "exercises": [
+        {
+          "exercise_slug": "barbell-curl",
+          "sets": 3,
+          "reps_min": 8,
+          "reps_max": 10,
+          "rest_sec": 90,
+          "rpe_target": 8
+        },
+        {
+          "exercise_slug": "close-grip-bench-press",
+          "sets": 3,
+          "reps_min": 6,
+          "reps_max": 8,
+          "rest_sec": 120,
+          "rpe_target": 8
+        },
+        {
+          "exercise_slug": "incline-dumbbell-curl",
+          "sets": 3,
+          "reps_min": 10,
+          "reps_max": 12,
+          "rest_sec": 60,
+          "rpe_target": 8
+        },
+        {
+          "exercise_slug": "rope-pushdown",
+          "sets": 3,
+          "reps_min": 10,
+          "reps_max": 12,
+          "rest_sec": 60,
+          "rpe_target": 8
+        },
+        {
+          "exercise_slug": "hammer-curl",
+          "sets": 2,
+          "reps_min": 10,
+          "reps_max": 12,
+          "rest_sec": 60,
+          "rpe_target": 8
+        },
+        {
+          "exercise_slug": "overhead-triceps-extension",
+          "sets": 2,
+          "reps_min": 10,
+          "reps_max": 12,
+          "rest_sec": 60,
+          "rpe_target": 8
+        }
+      ]
+    },
+    {
+      "ref": "legs",
+      "day_of_week": 5,
+      "name_en": "Legs",
+      "name_fr": "Jambes",
+      "exercises": [
+        {
+          "exercise_slug": "barbell-squat",
+          "sets": 4,
+          "reps_min": 6,
+          "reps_max": 8,
+          "rest_sec": 180,
+          "rpe_target": 8
+        },
+        {
+          "exercise_slug": "romanian-deadlift",
+          "sets": 3,
+          "reps_min": 8,
+          "reps_max": 10,
+          "rest_sec": 150,
+          "rpe_target": 8
+        },
+        {
+          "exercise_slug": "leg-press",
+          "sets": 3,
+          "reps_min": 10,
+          "reps_max": 12,
+          "rest_sec": 120,
+          "rpe_target": 8
+        },
+        {
+          "exercise_slug": "lying-leg-curl",
+          "sets": 3,
+          "reps_min": 10,
+          "reps_max": 12,
+          "rest_sec": 90,
+          "rpe_target": 8
+        },
+        {
+          "exercise_slug": "leg-extension",
+          "sets": 2,
+          "reps_min": 12,
+          "reps_max": 15,
+          "rest_sec": 60,
+          "rpe_target": 8
+        },
+        {
+          "exercise_slug": "calf-raise",
+          "sets": 3,
+          "reps_min": 12,
+          "reps_max": 15,
+          "rest_sec": 60,
+          "rpe_target": 8
+        }
+      ]
+    }
+  ]
+}

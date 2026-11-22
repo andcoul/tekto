@@ -3,6 +3,7 @@ import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:tekto/shared/models/equipment.dart';
+import 'package:tekto/shared/models/muscle_groups.dart';
 
 import '../../../core/di/providers.dart';
 import 'onboarding_gate.dart';
@@ -93,6 +94,7 @@ class OnboardingState {
     this.daysPerWeek = 3,
     this.sessionLengthMin = 45,
     this.equipment = const [],
+    this.focusMuscles = const [],
     this.limitations = const [],
     this.limitationsNote = '',
     this.strength = const {},
@@ -112,6 +114,9 @@ class OnboardingState {
   final int daysPerWeek;
   final int sessionLengthMin;
   final List<String> equipment;
+
+  /// Up to 2 focus muscles (FR-052), from kMuscleGroups.
+  final List<String> focusMuscles;
   final List<String> limitations;
   final String limitationsNote;
 
@@ -126,8 +131,9 @@ class OnboardingState {
 
   bool get consentGiven => consentAt != null;
 
-  /// Steps: 0 language, 1 goal, 2 level, 3 days, 4 length, 5 equipment, 6 limitations, 7 strength.
-  static const stepCount = 8;
+  /// Steps: 0 language, 1 goal, 2 level, 3 days, 4 length, 5 equipment, 6 focus muscles,
+  /// 7 limitations, 8 strength.
+  static const stepCount = 9;
 
   bool canProceed(int step) => switch (step) {
         0 => language != null,
@@ -145,6 +151,7 @@ class OnboardingState {
     int? daysPerWeek,
     int? sessionLengthMin,
     List<String>? equipment,
+    List<String>? focusMuscles,
     List<String>? limitations,
     String? limitationsNote,
     Map<String, ({double weightKg, int reps})>? strength,
@@ -162,6 +169,7 @@ class OnboardingState {
         daysPerWeek: daysPerWeek ?? this.daysPerWeek,
         sessionLengthMin: sessionLengthMin ?? this.sessionLengthMin,
         equipment: equipment ?? this.equipment,
+        focusMuscles: focusMuscles ?? this.focusMuscles,
         limitations: limitations ?? this.limitations,
         limitationsNote: limitationsNote ?? this.limitationsNote,
         strength: strength ?? this.strength,
@@ -194,6 +202,14 @@ class OnboardingController extends _$OnboardingController {
     state = state.copyWith(equipment: all ? const [] : List.of(kEquipmentChoices));
   }
 
+  /// Focus muscles (FR-052): at most 2; tapping a third does nothing.
+  void toggleFocus(String group) {
+    assert(kMuscleGroups.contains(group));
+    final on = state.focusMuscles.contains(group);
+    if (!on && state.focusMuscles.length >= maxFocusMuscles) return;
+    state = state.copyWith(focusMuscles: _toggle(state.focusMuscles, group));
+  }
+
   void toggleLimitation(String tag) {
     assert(kLimitationTags.contains(tag));
     state = state.copyWith(limitations: _toggle(state.limitations, tag));
@@ -218,6 +234,7 @@ class OnboardingController extends _$OnboardingController {
     required int sessionLengthMin,
     required List<String> equipment,
     required List<String> limitations,
+    List<String> focusMuscles = const [],
     String? limitationsNote,
     Map<String, ({double weightKg, int reps})> strength = const {},
   }) {
@@ -228,6 +245,7 @@ class OnboardingController extends _$OnboardingController {
       sessionLengthMin: sessionLengthMin.clamp(15, 120),
       equipment: equipment,
       limitations: limitations.where(kLimitationTags.contains).toList(),
+      focusMuscles: focusMuscles.where(kMuscleGroups.contains).take(maxFocusMuscles).toList(),
       limitationsNote: limitationsNote ?? '',
       strength: strength,
     );
@@ -251,6 +269,7 @@ class OnboardingController extends _$OnboardingController {
         'days_per_week': state.daysPerWeek,
         'session_length_min': state.sessionLengthMin,
         'equipment': withBodyweight(state.equipment.where((e) => e != kBodyweight).toList()),
+        'focus_muscles': state.focusMuscles,
         'limitations': state.limitations,
         'limitations_note': state.limitationsNote.trim().isEmpty ? null : state.limitationsNote.trim(),
         'language': state.language ?? 'en',

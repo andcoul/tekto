@@ -109,13 +109,14 @@ flutter run -d iPhone-15-Pro
 **Steps (free user)**:
 1. Fresh install (or clear app data). Signed out, the app opens on the welcome screen (video, value promise; FR-043) → Get started → sign in.
 2. Health disclaimer → confirm it cannot be skipped. Consent screen → accept. Language → French.
-3. Quiz: Goal = Muscle, Level = Intermediate, 4 days/week, 45 min, equipment **dumbbells + bodyweight only**, limitation tag `knee`.
+3. Quiz: Goal = Muscle, Level = Intermediate, 4 days/week, 45 min, equipment **Dumbbells / kettlebells only** (no bench, pull-up bar, dip station or machines; bodyweight is always included), limitation tag `knee`.
 4. Observe plan generation; check the plan rationale appears in French (FR-044); skip the Pro trial offer.
 
 **Expected outcomes (free)**:
 - Plan appears in < 30 s (no AI call: `source = 'template'`, `template_slug = 'home-dumbbell-3x'` in `plans`).
 - 4 sessions per week (3-day template + repeat of session A); each session ≤ 45 min.
-- No barbell exercise anywhere (US1 scenario 2) and no exercise whose `contraindications` include `knee`.
+- No barbell exercise anywhere (US1 scenario 2), no exercise needing a bench, pull-up bar, dip station or machine (FR-013 edge case: e.g. no dumbbell bench press, Bulgarian split squat, pull-up, dip or inverted row), and no exercise whose `contraindications` include `knee`.
+- `users.equipment` is `["dumbbell", "bodyweight"]`.
 - UI and plan name in French. Every exercise has a video thumbnail.
 - `users.consent_at` and `consent_version` populated.
 - Time from sign-in to plan recorded (SC-016, target < 3 min).

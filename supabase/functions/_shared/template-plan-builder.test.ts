@@ -153,3 +153,36 @@ Deno.test('quickstart Scenario 1: dumbbell-only intermediate, knee, 4 days, 45 m
   }
   assert(validatePlan(r.plan, p, LIBRARY, 'template').valid);
 });
+
+// FR-052 (2026-11-21): focus muscles get extra weekly sets, never past the level maximum.
+import { addFocusSets, buildProgramPlan, FOCUS_EXTRA_SETS } from './template-plan-builder.ts';
+
+Deno.test('focus muscles add 2 sets a week, spread over sessions', () => {
+  const lib = libraryFrom(JSON.parse(Deno.readTextFileSync(new URL('../../../content/exercises/exercises.json', import.meta.url))));
+  const week = [
+    { ref: 'a', day_of_week: 1, name_en: 'A', name_fr: 'A', exercises: [{ exercise_slug: 'hip-thrust', sets: 3, reps_min: 8, reps_max: 10, rest_sec: 90, rpe_target: 8 }] },
+    { ref: 'b', day_of_week: 3, name_en: 'B', name_fr: 'B', exercises: [{ exercise_slug: 'bench-press', sets: 3, reps_min: 8, reps_max: 10, rest_sec: 90, rpe_target: 8 }, { exercise_slug: 'glute-bridge', sets: 3, reps_min: 10, reps_max: 12, rest_sec: 60, rpe_target: 8 }] },
+  ];
+  const out = addFocusSets(week, ['glutes'], lib);
+  const sets = (s: typeof out) => s.flatMap((x) => x.exercises).reduce((n, e) => n + e.sets, 0);
+  assertEquals(sets(out) - sets(week), FOCUS_EXTRA_SETS);
+  assertEquals(out[0].exercises[0].sets, 4);
+  assertEquals(out[1].exercises[1].sets, 4, 'second set goes to the next session');
+  assertEquals(out[1].exercises[0].sets, 3, 'bench press untouched');
+  assertEquals(sets(addFocusSets(week, [], lib)), sets(week));
+});
+
+Deno.test('a program with glute focus stays within the level maximum', () => {
+  const dir = new URL('../../../content/templates/', import.meta.url);
+  const templates = [...Deno.readDirSync(dir)].filter((f) => f.name.endsWith('.json') && !f.name.startsWith('package'))
+    .map((f) => JSON.parse(Deno.readTextFileSync(new URL(f.name, dir))));
+  const lib = libraryFrom(JSON.parse(Deno.readTextFileSync(new URL('../../../content/exercises/exercises.json', import.meta.url))));
+  const profile = {
+    goal: 'muscle' as const, level: 'intermediate' as const, equipment: ['barbell', 'dumbbell', 'cable', 'machine', 'bench', 'bands', 'pull_up_bar', 'bodyweight'],
+    limitations: [], session_length_min: 75, days_per_week: 4, focus_muscles: ['glutes'],
+  };
+  const r = buildProgramPlan(templates, 'glutes-legs-focus-4x', profile, lib);
+  const glutes = r.plan.sessions.filter((s) => s.week_number === 1).flatMap((s) => s.exercises)
+    .filter((e) => lib.get(e.exercise_slug)!.muscle_primary.includes('glutes')).reduce((n, e) => n + e.sets, 0);
+  assert(glutes <= 18, `glutes ${glutes}`);
+});

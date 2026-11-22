@@ -7,12 +7,12 @@ import '../../core/l10n/gen/app_localizations.dart';
 import '../../core/theme/app_theme.dart';
 import '../../features/coach/ui/coach_launcher.dart';
 
-/// The four top-level tabs, in display order.
+/// The four top-level tabs, in display order (FR-048); the coach is the round button beside them.
 enum TektoTab {
   home('/home', 'home', Icons.home_outlined, Icons.home_rounded),
-  plan('/plan', 'plan_overview', Icons.fitness_center_outlined, Icons.fitness_center),
+  feed('/feed', 'feed', Icons.dynamic_feed_outlined, Icons.dynamic_feed_rounded),
   library('/library', 'library', Icons.grid_view_outlined, Icons.grid_view_rounded),
-  progress('/progress', 'progress', Icons.bar_chart_outlined, Icons.bar_chart_rounded);
+  profile('/profile', 'profile', Icons.person_outline_rounded, Icons.person_rounded);
 
   const TektoTab(this.path, this.coachScreen, this.icon, this.activeIcon);
   final String path;
@@ -24,9 +24,9 @@ enum TektoTab {
 
   String label(AppLocalizations l) => switch (this) {
         TektoTab.home => l.navHome,
-        TektoTab.plan => l.navPlan,
+        TektoTab.feed => l.navFeed,
         TektoTab.library => l.navLibrary,
-        TektoTab.progress => l.navProgress,
+        TektoTab.profile => l.navProfile,
       };
 
   /// The tab whose root screen is [location], or null on any deeper screen

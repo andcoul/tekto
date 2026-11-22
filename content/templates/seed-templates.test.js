@@ -24,3 +24,33 @@ test('the home template uses no barbell exercise', () => {
   const slugs = read('home-dumbbell-3x').sessions.flatMap((s) => s.exercises.map((e) => e.exercise_slug));
   for (const s of slugs) assert.ok(!(equipmentOf.get(s) ?? []).includes('barbell'), s);
 });
+
+// Plan library (FR-047, 2026-11-21): the programs a Pro user can choose.
+import { readdirSync } from 'node:fs';
+import { volumeErrors } from './seed-templates.js';
+
+const musclesOf = new Map(library.map((e) => [e.slug, e.muscle_primary]));
+const programs = readdirSync(new URL('.', import.meta.url))
+  .filter((f) => f.endsWith('.json') && !f.startsWith('package'))
+  .map((f) => read(f.replace(/\.json$/, '')))
+  .filter((t) => t.catalog);
+
+test('the plan library has nine programs with complete catalog entries in both languages', () => {
+  assert.equal(programs.length, 9);
+  assert.deepEqual(programs.map((p) => p.catalog.order).sort((a, b) => a - b), [1, 2, 3, 4, 5, 6, 7, 8, 9]);
+  for (const p of programs) {
+    for (const k of ['goal', 'image', 'summary_en', 'summary_fr']) assert.ok(p.catalog[k], `${p.slug}.catalog.${k}`);
+    assert.ok(library.some((e) => e.slug === p.catalog.image), `${p.slug}: image ${p.catalog.image}`);
+    assert.equal(p.days_per_week, p.sessions.length, p.slug);
+    assert.equal(new Set(p.sessions.map((s) => s.day_of_week)).size, p.sessions.length, `${p.slug}: one session a day`);
+  }
+});
+
+test('every program uses library exercises only, within its equipment and its level volume maximum', () => {
+  const slugs = new Set(library.map((e) => e.slug));
+  for (const p of programs) {
+    for (const s of p.sessions) for (const e of s.exercises) assert.ok(slugs.has(e.exercise_slug), `${p.slug}: ${e.exercise_slug}`);
+    assert.deepEqual(equipmentErrors(`${p.slug}.json`, p, equipmentOf), [], p.slug);
+    assert.deepEqual(volumeErrors(`${p.slug}.json`, p, musclesOf), [], p.slug);
+  }
+});

@@ -32,12 +32,38 @@ export interface PlanTemplateDef {
   rationale_en: string;
   rationale_fr: string;
   sessions: TemplateSessionDef[];
+  /** Present when the template is offered in the Pro plan library (FR-047). */
+  catalog?: { order: number; goal: string; image: string; summary_en: string; summary_fr: string };
 }
 
 export interface BuilderProfile extends PlanProfile {
   goal: TrainingGoal;
   strength_estimates?: StrengthEstimates | null;
+  /** Up to 2 focus muscles (FR-052); flow.ts passes them for Pro users only. */
+  focus_muscles?: string[];
 }
+
+/** Focus-muscle choices (FR-052) → library `muscle_primary` values. */
+export const FOCUS_MUSCLES: Record<string, string[]> = {
+  chest: ['chest', 'upper_chest'],
+  shoulders: ['shoulders', 'front_deltoid', 'rear_deltoid'],
+  triceps: ['triceps'],
+  back: ['lats', 'rhomboids'],
+  biceps: ['biceps'],
+  traps: ['traps'],
+  forearms: ['forearms'],
+  quads: ['quadriceps'],
+  hamstrings: ['hamstrings'],
+  glutes: ['glutes'],
+  abductors: ['abductors'],
+  adductors: ['adductors'],
+  calves: ['calves'],
+  abs: ['core'],
+  lower_back: ['erectors'],
+};
+/** Extra weekly sets per focus muscle (FR-052). */
+export const FOCUS_EXTRA_SETS = 2;
+const MAX_SETS_PER_EXERCISE = 6;
 
 export interface TemplatePlanResult {
   plan: DraftPlan;
@@ -76,9 +102,36 @@ export function buildTemplatePlan(
   const notices: string[] = [];
   if (profile.days_per_week > MAX_FREE_SESSIONS) notices.push('free_plan_days_capped');
 
-  const fitted = scheduleWeek(template, Math.min(profile.days_per_week, MAX_FREE_SESSIONS))
+  return buildFrom(template, scheduleWeek(template, Math.min(profile.days_per_week, MAX_FREE_SESSIONS)), profile, library, notices);
+}
+
+/**
+ * A program the Pro user picked from the plan library (FR-047): its own days and sessions, adapted
+ * to the user's equipment, limitations, session length and level volume maximum, with starting
+ * weights. Throws when the slug is not a library program.
+ */
+export function buildProgramPlan(
+  templates: PlanTemplateDef[],
+  programSlug: string,
+  profile: BuilderProfile,
+  library: Library,
+): TemplatePlanResult {
+  const template = templates.find((t) => t.slug === programSlug && t.catalog);
+  if (!template) throw new Error(`Program '${programSlug}' is not in the plan library`);
+  return buildFrom(template, template.sessions, profile, library, []);
+}
+
+function buildFrom(
+  template: PlanTemplateDef,
+  week: TemplateSessionDef[],
+  profile: BuilderProfile,
+  library: Library,
+  notices: string[],
+): TemplatePlanResult {
+  const fitted = week
     .map((s) => ({ ...s, exercises: fitSession(adaptExercises(s.exercises, profile, library), profile.session_length_min) }));
-  const pattern = capWeeklyVolume(fitted, VOLUME_BOUNDS[profile.level].max, library)
+  const focused = addFocusSets(fitted, profile.focus_muscles ?? [], library);
+  const pattern = capWeeklyVolume(focused, VOLUME_BOUNDS[profile.level].max, library)
     .map((s) => ({
       ...s,
       exercises: s.exercises.map((e) => ({
@@ -183,4 +236,28 @@ function fitSession(exercises: DraftExercise[], minutes: number): DraftExercise[
     longest.rest_sec = Math.max(MIN_REST_SEC, longest.rest_sec - 15);
   }
   return list;
+}
+
+/**
+ * FR-052: up to FOCUS_EXTRA_SETS more sets a week for each focus muscle, one set at a time on the
+ * first exercise of each session that trains it, spread across the week. The level maximum is
+ * applied afterwards by capWeeklyVolume, so focus never pushes a plan past it.
+ */
+export function addFocusSets(sessions: TemplateSessionDef[], focus: string[], library: Library): TemplateSessionDef[] {
+  const out = sessions.map((s) => ({ ...s, exercises: s.exercises.map((e) => ({ ...e })) }));
+  for (const f of focus.slice(0, 2)) {
+    const muscles = FOCUS_MUSCLES[f] ?? [];
+    let added = 0;
+    for (let pass = 0; pass < FOCUS_EXTRA_SETS && added < FOCUS_EXTRA_SETS; pass++) {
+      for (const s of out) {
+        if (added >= FOCUS_EXTRA_SETS) break;
+        const target = s.exercises.find((e) =>
+          (library.get(e.exercise_slug)?.muscle_primary ?? []).some((m) => muscles.includes(m)) &&
+          e.sets < MAX_SETS_PER_EXERCISE
+        );
+        if (target) [target.sets, added] = [target.sets + 1, added + 1];
+      }
+    }
+  }
+  return out;
 }

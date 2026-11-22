@@ -1,0 +1,186 @@
+{
+  "slug": "glutes-legs-focus-4x",
+  "level": "intermediate",
+  "days_per_week": 4,
+  "equipment_required": [
+    "barbell",
+    "dumbbell",
+    "cable",
+    "machine",
+    "bench"
+  ],
+  "name_en": "Glutes & legs focus",
+  "name_fr": "Focus fessiers & jambes",
+  "weeks_total": 8,
+  "rationale_en": "Two lower-body days built around the hip thrust and squat, and two lighter upper-body days to keep everything balanced.",
+  "rationale_fr": "Deux jours bas du corps autour du hip thrust et du squat, et deux jours haut du corps plus légers pour rester équilibré.",
+  "catalog": {
+    "order": 7,
+    "goal": "lower_body",
+    "image": "hip-thrust",
+    "summary_en": "Two lower-body days around the hip thrust, two upper.",
+    "summary_fr": "Deux jours bas du corps, deux jours haut."
+  },
+  "sessions": [
+    {
+      "ref": "glutes-hams",
+      "day_of_week": 1,
+      "name_en": "Glutes & hamstrings",
+      "name_fr": "Fessiers & ischios",
+      "exercises": [
+        {
+          "exercise_slug": "hip-thrust",
+          "sets": 4,
+          "reps_min": 8,
+          "reps_max": 10,
+          "rest_sec": 120,
+          "rpe_target": 8
+        },
+        {
+          "exercise_slug": "romanian-deadlift",
+          "sets": 3,
+          "reps_min": 8,
+          "reps_max": 10,
+          "rest_sec": 120,
+          "rpe_target": 8
+        },
+        {
+          "exercise_slug": "cable-kickback",
+          "sets": 2,
+          "reps_min": 12,
+          "reps_max": 15,
+          "rest_sec": 60,
+          "rpe_target": 8
+        },
+        {
+          "exercise_slug": "lying-leg-curl",
+          "sets": 3,
+          "reps_min": 10,
+          "reps_max": 12,
+          "rest_sec": 60,
+          "rpe_target": 8
+        }
+      ]
+    },
+    {
+      "ref": "upper-a",
+      "day_of_week": 2,
+      "name_en": "Upper body",
+      "name_fr": "Haut du corps",
+      "exercises": [
+        {
+          "exercise_slug": "dumbbell-row",
+          "sets": 3,
+          "reps_min": 8,
+          "reps_max": 12,
+          "rest_sec": 90,
+          "rpe_target": 8
+        },
+        {
+          "exercise_slug": "dumbbell-shoulder-press",
+          "sets": 3,
+          "reps_min": 8,
+          "reps_max": 10,
+          "rest_sec": 90,
+          "rpe_target": 8
+        },
+        {
+          "exercise_slug": "lat-pulldown",
+          "sets": 3,
+          "reps_min": 10,
+          "reps_max": 12,
+          "rest_sec": 90,
+          "rpe_target": 8
+        },
+        {
+          "exercise_slug": "push-up",
+          "sets": 3,
+          "reps_min": 8,
+          "reps_max": 12,
+          "rest_sec": 60,
+          "rpe_target": null
+        }
+      ]
+    },
+    {
+      "ref": "quads-glutes",
+      "day_of_week": 4,
+      "name_en": "Quads & glutes",
+      "name_fr": "Quadriceps & fessiers",
+      "exercises": [
+        {
+          "exercise_slug": "barbell-squat",
+          "sets": 4,
+          "reps_min": 6,
+          "reps_max": 8,
+          "rest_sec": 180,
+          "rpe_target": 8
+        },
+        {
+          "exercise_slug": "bulgarian-split-squat",
+          "sets": 3,
+          "reps_min": 8,
+          "reps_max": 10,
+          "rest_sec": 90,
+          "rpe_target": 8
+        },
+        {
+          "exercise_slug": "leg-extension",
+          "sets": 3,
+          "reps_min": 12,
+          "reps_max": 15,
+          "rest_sec": 60,
+          "rpe_target": 8
+        },
+        {
+          "exercise_slug": "cable-pull-through",
+          "sets": 2,
+          "reps_min": 12,
+          "reps_max": 15,
+          "rest_sec": 60,
+          "rpe_target": 8
+        }
+      ]
+    },
+    {
+      "ref": "upper-b",
+      "day_of_week": 5,
+      "name_en": "Upper body",
+      "name_fr": "Haut du corps",
+      "exercises": [
+        {
+          "exercise_slug": "dumbbell-bench-press",
+          "sets": 3,
+          "reps_min": 8,
+          "reps_max": 10,
+          "rest_sec": 90,
+          "rpe_target": 8
+        },
+        {
+          "exercise_slug": "seated-cable-row",
+          "sets": 3,
+          "reps_min": 10,
+          "reps_max": 12,
+          "rest_sec": 90,
+          "rpe_target": 8
+        },
+        {
+          "exercise_slug": "lateral-raise",
+          "sets": 3,
+          "reps_min": 12,
+          "reps_max": 15,
+          "rest_sec": 60,
+          "rpe_target": 8
+        },
+        {
+          "exercise_slug": "face-pull",
+          "sets": 2,
+          "reps_min": 12,
+          "reps_max": 15,
+          "rest_sec": 60,
+          "rpe_target": 8
+        }
+      ]
+    }
+  ]
+}

@@ -1,11 +1,24 @@
-// Equipment vocabulary (spec FR-001, FR-013 — clarified 2026-11-20). Same list as
-// content/exercises/validate.js EQUIPMENT and supabase/migrations/014.
+// Equipment vocabulary (spec FR-001, FR-013 — clarified 2026-11-20; Smith machine, trap bar and
+// suspension straps added 2026-11-21). Same list as content/exercises/validate.js EQUIPMENT and
+// supabase/migrations/015.
 
 /// Always available; never asked in the quiz.
 const kBodyweight = 'bodyweight';
 
 /// The quiz choices, in display order. Kettlebells count as `dumbbell`. "Gym" selects them all.
-const kEquipmentChoices = ['barbell', 'dumbbell', 'cable', 'machine', 'bands', 'pull_up_bar', 'dip_station', 'bench'];
+const kEquipmentChoices = [
+  'barbell',
+  'dumbbell',
+  'cable',
+  'machine',
+  'bands',
+  'pull_up_bar',
+  'dip_station',
+  'bench',
+  'smith_machine',
+  'trap_bar',
+  'suspension',
+];
 
 /// The equipment list saved for a profile: the chosen items plus bodyweight.
 List<String> withBodyweight(List<String> equipment) =>

@@ -61,7 +61,7 @@ Batch 4 has 23 clips, numbered 78–100. They are the exercises gym members use 
 | 86 | `arms-preacher-curl.mp4` | barbell (EZ bar) | East Asian man | yes | Delivered (2026-11-19) with Veo 3.1 Fast from a start frame at the hardest point; sped to 6.8 s |
 | 87 | `arms-concentration-curl.mp4` | dumbbell | Black woman | yes | Delivered (2026-11-19): start frame made by EDITING an existing batch-3 photo of a woman (new women-led prompts were refused that day); Veo 3.1 Fast; sped to 6.8 s |
 | 88 | `arms-incline-db-curl.mp4` | dumbbell | Middle Eastern man | yes | Delivered (2026-11-19) with Veo 3.1 Fast from a start frame at the hardest point; sped to 6.8 s |
-| 89 | `arms-triceps-pushdown.mp4` | cable | Black man | yes | Delivered (2026-11-19) on redo: take 1 moved only from thighs to belly; redo with explicit full range; sped to 6.8 s |
+| 89 | `arms-triceps-pushdown.mp4` | cable | Black man | **no — merged** | Removed from the library on 2026-11-21: same movement as the rope pushdown (only the handle differs), so it was a duplicate. Delivered (2026-11-19) on redo: take 1 moved only from thighs to belly; redo with explicit full range; sped to 6.8 s |
 | 90 | `arms-bench-dip.mp4` | bodyweight | white man | yes | Delivered (2026-11-19) with Veo 3.1 Fast from a start frame at the hardest point; sped to 6.8 s |
 | 91 | `arms-assisted-dip.mp4` | machine | Black woman | no | Redo — start frame made by editing a batch-3 woman photo (2026-11-19), but the Veo take failed: almost no movement |
 | 92 | `legs-seated-leg-curl.mp4` | machine | Latino man | yes | Delivered on redo (2026-11-20): new legs-straight start frame with the ankles on top of the roller; heels curl down and back under the seat; Veo 3.1 Fast; sped to 6.8 s |

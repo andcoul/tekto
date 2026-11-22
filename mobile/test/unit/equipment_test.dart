@@ -3,9 +3,11 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tekto/shared/models/equipment.dart';
 
 void main() {
-  test('the quiz offers eight choices; bodyweight is not one of them', () {
-    expect(
-        kEquipmentChoices, ['barbell', 'dumbbell', 'cable', 'machine', 'bands', 'pull_up_bar', 'dip_station', 'bench']);
+  test('the quiz offers eleven choices; bodyweight is not one of them', () {
+    expect(kEquipmentChoices, [
+      'barbell', 'dumbbell', 'cable', 'machine', 'bands', 'pull_up_bar', 'dip_station', 'bench', //
+      'smith_machine', 'trap_bar', 'suspension',
+    ]);
     expect(kEquipmentChoices.contains(kBodyweight), isFalse);
   });
 

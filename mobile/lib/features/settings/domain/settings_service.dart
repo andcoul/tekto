@@ -32,10 +32,18 @@ abstract class SettingsApi {
 }
 
 class UserSettings {
-  const UserSettings({required this.language, required this.unit, required this.healthSyncEnabled});
+  const UserSettings({
+    required this.language,
+    required this.unit,
+    required this.healthSyncEnabled,
+    this.shareWorkouts = true,
+    this.displayName,
+  });
   final String language;
   final String unit;
   final bool healthSyncEnabled;
+  final bool shareWorkouts;
+  final String? displayName;
 }
 
 /// Settings logic (T091). Preferences are written to the device first and queued for the
@@ -66,8 +74,14 @@ class SettingsService {
   static const units = {'kg', 'lb'};
 
   Stream<UserSettings?> watch() =>
-      (_db.select(_db.users)..where((u) => u.id.equals(_userId))).watchSingleOrNull().map((u) =>
-          u == null ? null : UserSettings(language: u.language, unit: u.unit, healthSyncEnabled: u.healthSyncEnabled));
+      (_db.select(_db.users)..where((u) => u.id.equals(_userId))).watchSingleOrNull().map((u) => u == null
+          ? null
+          : UserSettings(
+              language: u.language,
+              unit: u.unit,
+              healthSyncEnabled: u.healthSyncEnabled,
+              shareWorkouts: u.shareWorkouts,
+              displayName: u.displayName));
 
   /// FR-033: the app switches language immediately.
   Future<void> setLanguage(String languageCode) async {
@@ -115,8 +129,18 @@ class SettingsService {
       limitations: Value(json(fields['limitations'])),
       limitationsNote: Value(fields['limitations_note'] as String?),
       strengthEstimates: Value(json(fields['strength_estimates'])),
+      focusMuscles: Value(jsonEncode(fields['focus_muscles'] ?? const <String>[])),
     );
     await _save(local, fields);
+  }
+
+  /// FR-049: post finished workouts to friends (default on).
+  Future<void> setShareWorkouts(bool on) => _save(UsersCompanion(shareWorkouts: Value(on)), {'share_workouts': on});
+
+  /// Name shown to friends (FR-049).
+  Future<void> setDisplayName(String name) {
+    final n = name.trim();
+    return _save(UsersCompanion(displayName: Value(n.isEmpty ? null : n)), {'display_name': n.isEmpty ? null : n});
   }
 
   Future<void> regeneratePlan() => _api.regeneratePlan();

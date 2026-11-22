@@ -110,6 +110,7 @@ void main() {
           'dumbbell',
           'bodyweight'
         ], // bodyweight is always added (FR-001)
+        'focus_muscles': <String>[],
         'limitations': ['knee'], 'limitations_note': 'old ACL surgery',
         'language': 'fr', 'timezone': 'Europe/Paris', 'consent_at': '2026-11-10T09:00:00.000Z',
         'consent_version': kConsentVersion,

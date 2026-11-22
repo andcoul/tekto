@@ -43,9 +43,10 @@ function kindOf(ex: LibraryExercise): Kind {
   // A bodyweight move stays unloaded even when it needs a bar, bench or machine (inverted row,
   // pull-up, back extension), and band resistance is not in kilograms (T156, T157).
   if (ex.equipment.includes('bodyweight') || ex.equipment.includes('bands')) return 'bodyweight';
-  if (ex.equipment.includes('barbell')) return 'barbell';
+  if (ex.equipment.includes('barbell') || ex.equipment.includes('trap_bar')) return 'barbell';
   if (ex.equipment.includes('dumbbell')) return 'dumbbell';
-  if (ex.equipment.some((e) => e === 'cable' || e === 'machine')) return 'cable';
+  // Smith bars are counterbalanced and vary by model, so they start like a machine, not a 20 kg bar.
+  if (ex.equipment.some((e) => e === 'cable' || e === 'machine' || e === 'smith_machine')) return 'cable';
   return 'bodyweight';
 }
 

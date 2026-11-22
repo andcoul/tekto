@@ -63,8 +63,11 @@ const INCREMENT: Record<string, number> = {
   barbell: 2.5,
   cable: 2.5,
   machine: 2.5,
+  smith_machine: 2.5,
+  trap_bar: 2.5,
   dumbbell: 1.0, // kettlebells are tagged dumbbell (FR-001)
   bands: 0,
+  suspension: 0,
 };
 const DEFAULT_INCREMENT = 2.5;
 const DEFAULT_RPE_TARGET = 8;

@@ -460,7 +460,7 @@ WebVTT caption files per exercise and language, stored in `content/exercises/cap
 All people shown in Tekto (design photos, exercise thumbnails, welcome and paywall clips from T132, and the filmed exercise videos from T022) come from a mixed cast in which **Black men and Black women play lead roles**, not background ones. The rule applies to the Figma file now and to the filmed content later.
 
 - **Share:** at least half of the photos of people in each set show Black athletes, split about evenly between men and women. The other half is also mixed.
-- **Lighting:** the app is dark only (#0F1014), so deep skin tones need a warm key light plus a cool Glacier rim light (#9DB8FF). Faces must stay readable under the bottom scrims. Exposure is checked on the dark background, not on white.
+- **Lighting:** the app is dark-first (#0F1014; a light theme follows the system setting, Constitution VI), and the exercise videos and photos are designed for dark screens, so deep skin tones need a warm key light plus a cool Glacier rim light (#9DB8FF). Faces must stay readable under the bottom scrims. Exposure is checked on the dark background, not on white.
 - **Styling:** real gym clothing in neutral or dark colours. No yellow and no red.
 - **One person per exercise photo,** with the movement clearly visible, so the photo still reads as an icon at 56 px in the library chips.
 

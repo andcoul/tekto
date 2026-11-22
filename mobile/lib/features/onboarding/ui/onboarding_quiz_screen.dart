@@ -1,3 +1,4 @@
+import 'package:tekto/features/onboarding/ui/focus_muscles_picker.dart';
 import 'dart:convert';
 import 'package:tekto/shared/models/equipment.dart';
 
@@ -70,6 +71,7 @@ class _OnboardingQuizScreenState extends ConsumerState<OnboardingQuizScreen> {
           sessionLengthMin: user.sessionLengthMin,
           equipment: list(user.equipment),
           limitations: list(user.limitations),
+          focusMuscles: list(user.focusMuscles),
           limitationsNote: user.limitationsNote,
           strength: strength,
         );
@@ -182,11 +184,15 @@ class _OnboardingQuizScreenState extends ConsumerState<OnboardingQuizScreen> {
             'pull_up_bar': AppLocalizations.of(context).quizEquipmentPullUpBar,
             'dip_station': AppLocalizations.of(context).quizEquipmentDipStation,
             'bench': AppLocalizations.of(context).quizEquipmentBench,
+            'smith_machine': AppLocalizations.of(context).quizEquipmentSmithMachine,
+            'trap_bar': AppLocalizations.of(context).quizEquipmentTrapBar,
+            'suspension': AppLocalizations.of(context).quizEquipmentSuspension,
           },
           selected: state.equipment,
           onToggle: ctrl.toggleEquipment,
         ),
-      6 => _LimitationsStep(
+      6 => FocusMusclesPicker(selected: state.focusMuscles, onToggle: ctrl.toggleFocus),
+      7 => _LimitationsStep(
           selected: state.limitations,
           note: state.limitationsNote,
           onToggle: ctrl.toggleLimitation,

@@ -11,6 +11,9 @@ String equipmentLabel(AppLocalizations l10n, String key) => switch (key) {
       'pull_up_bar' => l10n.quizEquipmentPullUpBar,
       'dip_station' => l10n.quizEquipmentDipStation,
       'bench' => l10n.quizEquipmentBench,
+      'smith_machine' => l10n.quizEquipmentSmithMachine,
+      'trap_bar' => l10n.quizEquipmentTrapBar,
+      'suspension' => l10n.quizEquipmentSuspension,
       'bodyweight' => l10n.quizEquipmentBodyweight,
       _ => key.replaceAll('_', ' '),
     };

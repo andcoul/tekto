@@ -14,6 +14,13 @@
   "rationale_en": "A 3-day full-body programme targeting all major muscle groups each session. Designed for beginners to build foundational strength and motor patterns with manageable volume and adequate recovery.",
   "rationale_fr": "Un programme full-body de 3 jours ciblant tous les groupes musculaires à chaque séance. Conçu pour les débutants afin de développer des bases de force et des schémas moteurs avec un volume gérable et une récupération adéquate.",
   "_comment": "Week-1 pattern; the template builder repeats it for weeks_total weeks. Exercises are ordered compound-first so trimming removes accessories. Starting weights are computed (starting-weights.ts).",
+  "catalog": {
+    "order": 8,
+    "goal": "general",
+    "image": "goblet-squat",
+    "summary_en": "Three sessions that train everything. The best start.",
+    "summary_fr": "Trois séances qui travaillent tout le corps. Le meilleur départ."
+  },
   "sessions": [
     {
       "ref": "A",

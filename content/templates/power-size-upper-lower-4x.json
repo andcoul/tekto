@@ -1,0 +1,227 @@
+{
+  "slug": "power-size-upper-lower-4x",
+  "level": "advanced",
+  "days_per_week": 4,
+  "equipment_required": [
+    "barbell",
+    "dumbbell",
+    "cable",
+    "machine",
+    "pull_up_bar",
+    "bench"
+  ],
+  "name_en": "Power & size upper/lower",
+  "name_fr": "Force & volume haut/bas",
+  "weeks_total": 8,
+  "rationale_en": "Two heavy days for strength, two volume days for size, split upper and lower body. For lifters with a few years of training.",
+  "rationale_fr": "Deux jours lourds pour la force, deux jours volume pour la masse, en haut et bas du corps. Pour les pratiquants confirmés.",
+  "catalog": {
+    "order": 5,
+    "goal": "muscle_strength",
+    "image": "deadlift",
+    "summary_en": "Two heavy days, two volume days.",
+    "summary_fr": "Deux jours lourds, deux jours volume."
+  },
+  "sessions": [
+    {
+      "ref": "upper-power",
+      "day_of_week": 1,
+      "name_en": "Upper power",
+      "name_fr": "Haut force",
+      "exercises": [
+        {
+          "exercise_slug": "bench-press",
+          "sets": 4,
+          "reps_min": 3,
+          "reps_max": 5,
+          "rest_sec": 180,
+          "rpe_target": 8.5
+        },
+        {
+          "exercise_slug": "pendlay-row",
+          "sets": 4,
+          "reps_min": 3,
+          "reps_max": 5,
+          "rest_sec": 180,
+          "rpe_target": 8.5
+        },
+        {
+          "exercise_slug": "overhead-press",
+          "sets": 3,
+          "reps_min": 5,
+          "reps_max": 6,
+          "rest_sec": 150,
+          "rpe_target": 8
+        },
+        {
+          "exercise_slug": "pull-up",
+          "sets": 3,
+          "reps_min": 5,
+          "reps_max": 8,
+          "rest_sec": 150,
+          "rpe_target": 8
+        },
+        {
+          "exercise_slug": "barbell-curl",
+          "sets": 2,
+          "reps_min": 6,
+          "reps_max": 8,
+          "rest_sec": 90,
+          "rpe_target": 8
+        }
+      ]
+    },
+    {
+      "ref": "lower-power",
+      "day_of_week": 2,
+      "name_en": "Lower power",
+      "name_fr": "Bas force",
+      "exercises": [
+        {
+          "exercise_slug": "barbell-squat",
+          "sets": 4,
+          "reps_min": 3,
+          "reps_max": 5,
+          "rest_sec": 240,
+          "rpe_target": 8.5
+        },
+        {
+          "exercise_slug": "deadlift",
+          "sets": 3,
+          "reps_min": 3,
+          "reps_max": 5,
+          "rest_sec": 240,
+          "rpe_target": 8.5
+        },
+        {
+          "exercise_slug": "leg-press",
+          "sets": 3,
+          "reps_min": 8,
+          "reps_max": 10,
+          "rest_sec": 120,
+          "rpe_target": 8
+        },
+        {
+          "exercise_slug": "lying-leg-curl",
+          "sets": 3,
+          "reps_min": 6,
+          "reps_max": 8,
+          "rest_sec": 90,
+          "rpe_target": 8
+        },
+        {
+          "exercise_slug": "calf-raise",
+          "sets": 3,
+          "reps_min": 8,
+          "reps_max": 10,
+          "rest_sec": 60,
+          "rpe_target": 8
+        }
+      ]
+    },
+    {
+      "ref": "upper-size",
+      "day_of_week": 4,
+      "name_en": "Upper size",
+      "name_fr": "Haut volume",
+      "exercises": [
+        {
+          "exercise_slug": "incline-dumbbell-press",
+          "sets": 4,
+          "reps_min": 8,
+          "reps_max": 12,
+          "rest_sec": 90,
+          "rpe_target": 8
+        },
+        {
+          "exercise_slug": "seated-cable-row",
+          "sets": 4,
+          "reps_min": 8,
+          "reps_max": 12,
+          "rest_sec": 90,
+          "rpe_target": 8
+        },
+        {
+          "exercise_slug": "cable-fly",
+          "sets": 3,
+          "reps_min": 12,
+          "reps_max": 15,
+          "rest_sec": 60,
+          "rpe_target": 8
+        },
+        {
+          "exercise_slug": "lateral-raise",
+          "sets": 4,
+          "reps_min": 12,
+          "reps_max": 15,
+          "rest_sec": 60,
+          "rpe_target": 8
+        },
+        {
+          "exercise_slug": "incline-dumbbell-curl",
+          "sets": 3,
+          "reps_min": 10,
+          "reps_max": 12,
+          "rest_sec": 60,
+          "rpe_target": 8
+        },
+        {
+          "exercise_slug": "skull-crusher",
+          "sets": 3,
+          "reps_min": 10,
+          "reps_max": 12,
+          "rest_sec": 60,
+          "rpe_target": 8
+        }
+      ]
+    },
+    {
+      "ref": "lower-size",
+      "day_of_week": 5,
+      "name_en": "Lower size",
+      "name_fr": "Bas volume",
+      "exercises": [
+        {
+          "exercise_slug": "front-squat",
+          "sets": 4,
+          "reps_min": 8,
+          "reps_max": 10,
+          "rest_sec": 150,
+          "rpe_target": 8
+        },
+        {
+          "exercise_slug": "romanian-deadlift",
+          "sets": 3,
+          "reps_min": 8,
+          "reps_max": 12,
+          "rest_sec": 120,
+          "rpe_target": 8
+        },
+        {
+          "exercise_slug": "bulgarian-split-squat",
+          "sets": 3,
+          "reps_min": 10,
+          "reps_max": 12,
+          "rest_sec": 90,
+          "rpe_target": 8
+        },
+        {
+          "exercise_slug": "leg-extension",
+          "sets": 3,
+          "reps_min": 12,
+          "reps_max": 15,
+          "rest_sec": 60,
+          "rpe_target": 8
+        },
+        {
+          "exercise_slug": "seated-leg-curl",
+          "sets": 3,
+          "reps_min": 12,
+          "reps_max": 15,
+          "rest_sec": 60,
+          "rpe_target": 8
+        }
+      ]
+    }
+  ]
+}

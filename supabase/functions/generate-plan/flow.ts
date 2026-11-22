@@ -4,7 +4,12 @@ import { findSubstitute, isAllowed } from '../_shared/exercise-substitution.ts';
 import type { DraftPlan, Library } from '../_shared/plan-draft.ts';
 import { validatePlan } from '../_shared/plan-validator.ts';
 import { startingWeightKg } from '../_shared/starting-weights.ts';
-import { type BuilderProfile, buildTemplatePlan, type PlanTemplateDef } from '../_shared/template-plan-builder.ts';
+import {
+  type BuilderProfile,
+  buildProgramPlan,
+  buildTemplatePlan,
+  type PlanTemplateDef,
+} from '../_shared/template-plan-builder.ts';
 import type { PlanSource } from '../_shared/types.ts';
 
 export type AiPlan = DraftPlan & { rationale_en: string; rationale_fr: string };
@@ -15,6 +20,8 @@ export interface FlowInput {
   consentAt: string | null;
   hasActivePlan: boolean;
   forceRegenerate: boolean;
+  /** A program from the Pro plan library (FR-047); replaces the AI plan for this request. */
+  programSlug?: string | null;
 }
 
 export interface FlowDeps {
@@ -37,7 +44,13 @@ export type FlowResult =
     notices: string[];
     attempts: number;
   }
-  | { ok: false; status: number; code: 'CONSENT_REQUIRED' | 'ACTIVE_PLAN_EXISTS'; message: string };
+  | {
+    ok: false;
+    status: number;
+    code: 'CONSENT_REQUIRED' | 'ACTIVE_PLAN_EXISTS' | 'PRO_REQUIRED' | 'PROGRAM_NOT_FOUND' | 'PROGRAM_NOT_SUITABLE';
+    message: string;
+    errors?: string[];
+  };
 
 /** 1 attempt + 2 retries (Constitution III). */
 export const MAX_ATTEMPTS = 3;
@@ -52,6 +65,9 @@ export async function runGeneratePlan(input: FlowInput, deps: FlowDeps): Promise
     return { ok: false, status: 409, code: 'ACTIVE_PLAN_EXISTS', message: 'An active plan exists; pass force_regenerate to replace it.' };
   }
 
+  // Focus muscles shape Pro plans only (FR-052).
+  if (!input.isPro && input.profile.focus_muscles?.length) input = { ...input, profile: { ...input.profile, focus_muscles: [] } };
+  if (input.programSlug) return programResult(input, input.programSlug, deps);
   if (!input.isPro) return templateResult(input, deps, 'template', 0);
 
   const started = deps.nowMs();
@@ -82,6 +98,31 @@ export async function runGeneratePlan(input: FlowInput, deps: FlowDeps): Promise
   }
 
   return templateResult(input, deps, 'template_fallback', attempts);
+}
+
+/** FR-047: a Pro user's chosen program, adapted and validated like any template plan. */
+function programResult(input: FlowInput, slug: string, deps: FlowDeps): FlowResult {
+  if (!input.isPro) {
+    return { ok: false, status: 402, code: 'PRO_REQUIRED', message: 'The plan library is a Pro feature.' };
+  }
+  if (!deps.templates.some((t) => t.slug === slug && t.catalog)) {
+    return { ok: false, status: 404, code: 'PROGRAM_NOT_FOUND', message: `No program '${slug}' in the plan library.` };
+  }
+  const t = buildProgramPlan(deps.templates, slug, input.profile, deps.library);
+  const check = validatePlan(t.plan, input.profile, deps.library, 'template');
+  if (!check.valid) {
+    // The current plan stays active; the app says this program does not fit and why.
+    return {
+      ok: false, status: 422, code: 'PROGRAM_NOT_SUITABLE',
+      message: 'This program cannot be fitted to your equipment and limitations.',
+      errors: check.errors.map((e) => e.message),
+    };
+  }
+  return {
+    ok: true, plan: t.plan, source: 'template', template_slug: t.template_slug,
+    rationale_en: t.rationale_en, rationale_fr: t.rationale_fr,
+    fallback_notice: false, notices: [], attempts: 0,
+  };
 }
 
 function templateResult(input: FlowInput, deps: FlowDeps, source: PlanSource, attempts: number): FlowResult {

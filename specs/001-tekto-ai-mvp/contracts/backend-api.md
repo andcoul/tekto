@@ -19,6 +19,7 @@ Errors follow the shape `{ "error": { "code": string, "message": string } }`.
 Generates a personalized training plan from the authenticated user's profile.
 - **Free tier**: rule-based plan from `plan_templates` (research §11). No AI call.
 - **Pro**: AI plan via `claude-sonnet-5-5`; on repeated validation failure or AI outage, a validated template plan with `fallback_notice: true` (research §12).
+- **Pro, plan library** (FR-047, 2026-11-21): with `program_slug`, the chosen program from `plan_templates` (rows with a `catalog` block) is fitted to the user (substitution, session trimming, volume cap, starting weights) and validated; no AI call. Response `source: "template"`, `template_slug` = the program.
 
 **Auth**: Required (user JWT). Called at onboarding and from Settings → "Regenerate my plan" (`force_regenerate: true`, e.g. after an equipment change).
 
@@ -32,6 +33,7 @@ Generates a personalized training plan from the authenticated user's profile.
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | `force_regenerate` | bool | No | If `true`, archives the current active plan and creates a new one |
+| `program_slug` | string | No | Plan library program to start (Pro). Send with `force_regenerate: true` when a plan is active. Errors: `402 PRO_REQUIRED` (free user), `404 PROGRAM_NOT_FOUND` (not a library program), `422 PROGRAM_NOT_SUITABLE` with `details: [string]` (cannot be fitted; the active plan is unchanged) |
 
 **Response `201 Created`**:
 ```json
@@ -453,3 +455,22 @@ Used by the external uptime monitor (SC-013). No auth; returns no user data.
 ```
 
 Returns `503` with the failing component (`"db": "down"` or `"ai": "degraded"`) otherwise. The AI check is a cached reachability probe (at most one real call per 5 minutes), not a model call per request.
+
+
+## 10. Support chat (FR-054, 2026-11-21)
+
+### `POST /support-message`
+
+Stores the user's message in their open support thread (created if none) and returns the AI assistant's instant reply, unless the thread is waiting for a person.
+
+**Request**: `{ "body": "string (1–2000)", "want_human": false }`
+
+**Response `201`**: `{ "thread_id": "uuid", "status": "open | waiting_agent", "messages": [{ "id", "sender": "user|ai", "body", "created_at" }] }`
+
+- `want_human: true`, or an assistant reply that cannot help, sets `status = waiting_agent`; the assistant then says a person will answer, and no further AI replies are sent until staff close or reopen the thread.
+- Staff reply by inserting `sender = 'agent'` rows with the service role (support console); the app receives them through Realtime on `support_messages`.
+- Errors: `400 INVALID_BODY`, `401`, `429 RATE_LIMITED` (more than 20 messages an hour).
+
+## 11. Friends (FR-049, FR-050)
+
+Plain PostgREST calls with RLS, plus RPCs: `friend_feed`, `friend_leaderboard`, `weekly_scores`, `add_friend_by_username(username)`, `accept_invite(invite_code)` (see data-model.md, migration 016).

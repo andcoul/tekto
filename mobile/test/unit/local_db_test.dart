@@ -28,6 +28,9 @@ void main() {
     await v2.customStatement('DROP TABLE body_weight_entries');
     await v2.customStatement('ALTER TABLE plan_exercises DROP COLUMN rir_target');
     await v2.customStatement('ALTER TABLE plans DROP COLUMN adaptation_seen_week');
+    for (final c in ['focus_muscles', 'share_workouts', 'display_name', 'username']) {
+      await v2.customStatement('ALTER TABLE users DROP COLUMN $c');
+    }
     await v2.customStatement('PRAGMA user_version = 1');
     await v2.close();
 
@@ -50,6 +53,9 @@ void main() {
     final v2 = AppDatabase.forTesting(NativeDatabase(file));
     await v2.customStatement("INSERT INTO plans (id, user_id, name, weeks_total) VALUES ('p1', 'u1', 'Plan', 4)");
     await v2.customStatement('ALTER TABLE plans DROP COLUMN adaptation_seen_week');
+    for (final c in ['focus_muscles', 'share_workouts', 'display_name', 'username']) {
+      await v2.customStatement('ALTER TABLE users DROP COLUMN $c');
+    }
     await v2.customStatement('PRAGMA user_version = 2');
     await v2.close();
 
@@ -157,7 +163,7 @@ void main() {
   });
 
   // T159 — v3 → v4 remaps saved equipment to the 2026-11-20 vocabulary (T150, migration 014).
-  test('schema v3 → v4 remaps users.equipment and keeps the other columns', () async {
+  test('schema v3 → v5 remaps users.equipment, adds the social columns and keeps the rest', () async {
     final dir = await Directory.systemTemp.createTemp('tekto_migration_v4');
     addTearDown(() => dir.delete(recursive: true));
     final file = File('${dir.path}/db.sqlite');
@@ -168,6 +174,10 @@ void main() {
       "VALUES ('u1', 'muscle', 'beginner', 3, 45, '[\"dumbbell\"]', 'fr'), "
       "('u2', 'strength', 'advanced', 4, 60, '[\"barbell\",\"cable\"]', 'en')",
     );
+    // A real v3 file has none of the v5 columns (FR-049, FR-052).
+    for (final c in ['focus_muscles', 'share_workouts', 'display_name', 'username']) {
+      await v3.customStatement('ALTER TABLE users DROP COLUMN $c');
+    }
     await v3.customStatement('PRAGMA user_version = 3');
     await v3.close();
 
@@ -180,6 +190,8 @@ void main() {
       {'barbell', 'cable', 'machine', 'bench', 'pull_up_bar', 'dip_station', 'bodyweight'},
     );
     expect([users['u1']!.goal, users['u1']!.language, users['u1']!.sessionLengthMin], ['muscle', 'fr', 45]);
-    expect(await v4.customSelect('PRAGMA user_version').map((r) => r.read<int>('user_version')).getSingle(), 4);
+    // v5 columns arrive with their defaults.
+    expect([users['u1']!.focusMuscles, users['u1']!.shareWorkouts, users['u1']!.displayName], ['[]', true, null]);
+    expect(await v4.customSelect('PRAGMA user_version').map((r) => r.read<int>('user_version')).getSingle(), 5);
   });
 }

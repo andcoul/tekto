@@ -168,10 +168,10 @@ void main() {
 
   const choices = [
     'Barbell', 'Dumbbells / kettlebells', 'Cable', 'Machines', 'Resistance bands', 'Pull-up bar', 'Dip station',
-    'Bench', //
+    'Bench', 'Smith machine', 'Trap bar', 'Suspension straps', //
   ];
 
-  testWidgets('the equipment step lists the eight choices and a Gym shortcut, with no Bodyweight option',
+  testWidgets('the equipment step lists the eleven choices and a Gym shortcut, with no Bodyweight option',
       (tester) async {
     await tester.runAsync(seed);
     await pump(tester);
@@ -188,7 +188,10 @@ void main() {
     final user = (await tester.runAsync(() => db.select(db.users).getSingle()))!;
     expect(
       (jsonDecode(user.equipment) as List).toSet(),
-      {'barbell', 'dumbbell', 'cable', 'machine', 'bands', 'pull_up_bar', 'dip_station', 'bench', 'bodyweight'},
+      {
+        'barbell', 'dumbbell', 'cable', 'machine', 'bands', 'pull_up_bar', 'dip_station', 'bench', //
+        'smith_machine', 'trap_bar', 'suspension', 'bodyweight',
+      },
     );
   });
 

@@ -1,0 +1,227 @@
+{
+  "slug": "upper-lower-4x",
+  "level": "intermediate",
+  "days_per_week": 4,
+  "equipment_required": [
+    "barbell",
+    "dumbbell",
+    "cable",
+    "machine",
+    "pull_up_bar",
+    "bench"
+  ],
+  "name_en": "Upper / Lower",
+  "name_fr": "Haut / Bas",
+  "weeks_total": 8,
+  "rationale_en": "Four sessions, each muscle twice a week: two upper-body days and two lower-body days. Easy to fit around work.",
+  "rationale_fr": "Quatre séances, chaque muscle deux fois par semaine : deux jours haut du corps, deux jours bas du corps.",
+  "catalog": {
+    "order": 3,
+    "goal": "muscle_strength",
+    "image": "barbell-row",
+    "summary_en": "Four sessions, each muscle twice a week.",
+    "summary_fr": "Quatre séances, chaque muscle deux fois par semaine."
+  },
+  "sessions": [
+    {
+      "ref": "upper-a",
+      "day_of_week": 1,
+      "name_en": "Upper A",
+      "name_fr": "Haut A",
+      "exercises": [
+        {
+          "exercise_slug": "bench-press",
+          "sets": 4,
+          "reps_min": 6,
+          "reps_max": 8,
+          "rest_sec": 150,
+          "rpe_target": 8
+        },
+        {
+          "exercise_slug": "barbell-row",
+          "sets": 4,
+          "reps_min": 6,
+          "reps_max": 8,
+          "rest_sec": 150,
+          "rpe_target": 8
+        },
+        {
+          "exercise_slug": "dumbbell-shoulder-press",
+          "sets": 3,
+          "reps_min": 8,
+          "reps_max": 10,
+          "rest_sec": 90,
+          "rpe_target": 8
+        },
+        {
+          "exercise_slug": "lat-pulldown",
+          "sets": 3,
+          "reps_min": 10,
+          "reps_max": 12,
+          "rest_sec": 90,
+          "rpe_target": 8
+        },
+        {
+          "exercise_slug": "dumbbell-curl",
+          "sets": 2,
+          "reps_min": 10,
+          "reps_max": 12,
+          "rest_sec": 60,
+          "rpe_target": 8
+        },
+        {
+          "exercise_slug": "rope-pushdown",
+          "sets": 2,
+          "reps_min": 10,
+          "reps_max": 12,
+          "rest_sec": 60,
+          "rpe_target": 8
+        }
+      ]
+    },
+    {
+      "ref": "lower-a",
+      "day_of_week": 2,
+      "name_en": "Lower A",
+      "name_fr": "Bas A",
+      "exercises": [
+        {
+          "exercise_slug": "barbell-squat",
+          "sets": 4,
+          "reps_min": 6,
+          "reps_max": 8,
+          "rest_sec": 180,
+          "rpe_target": 8
+        },
+        {
+          "exercise_slug": "romanian-deadlift",
+          "sets": 3,
+          "reps_min": 8,
+          "reps_max": 10,
+          "rest_sec": 150,
+          "rpe_target": 8
+        },
+        {
+          "exercise_slug": "leg-press",
+          "sets": 3,
+          "reps_min": 10,
+          "reps_max": 12,
+          "rest_sec": 120,
+          "rpe_target": 8
+        },
+        {
+          "exercise_slug": "calf-raise",
+          "sets": 3,
+          "reps_min": 12,
+          "reps_max": 15,
+          "rest_sec": 60,
+          "rpe_target": 8
+        },
+        {
+          "exercise_slug": "plank",
+          "sets": 2,
+          "reps_min": 30,
+          "reps_max": 45,
+          "rest_sec": 60,
+          "rpe_target": null
+        }
+      ]
+    },
+    {
+      "ref": "upper-b",
+      "day_of_week": 4,
+      "name_en": "Upper B",
+      "name_fr": "Haut B",
+      "exercises": [
+        {
+          "exercise_slug": "overhead-press",
+          "sets": 4,
+          "reps_min": 6,
+          "reps_max": 8,
+          "rest_sec": 150,
+          "rpe_target": 8
+        },
+        {
+          "exercise_slug": "pull-up",
+          "sets": 4,
+          "reps_min": 6,
+          "reps_max": 10,
+          "rest_sec": 150,
+          "rpe_target": 8
+        },
+        {
+          "exercise_slug": "incline-dumbbell-press",
+          "sets": 3,
+          "reps_min": 8,
+          "reps_max": 10,
+          "rest_sec": 90,
+          "rpe_target": 8
+        },
+        {
+          "exercise_slug": "seated-cable-row",
+          "sets": 3,
+          "reps_min": 10,
+          "reps_max": 12,
+          "rest_sec": 90,
+          "rpe_target": 8
+        },
+        {
+          "exercise_slug": "lateral-raise",
+          "sets": 3,
+          "reps_min": 12,
+          "reps_max": 15,
+          "rest_sec": 60,
+          "rpe_target": 8
+        }
+      ]
+    },
+    {
+      "ref": "lower-b",
+      "day_of_week": 5,
+      "name_en": "Lower B",
+      "name_fr": "Bas B",
+      "exercises": [
+        {
+          "exercise_slug": "deadlift",
+          "sets": 3,
+          "reps_min": 4,
+          "reps_max": 6,
+          "rest_sec": 180,
+          "rpe_target": 8
+        },
+        {
+          "exercise_slug": "bulgarian-split-squat",
+          "sets": 3,
+          "reps_min": 8,
+          "reps_max": 10,
+          "rest_sec": 90,
+          "rpe_target": 8
+        },
+        {
+          "exercise_slug": "hip-thrust",
+          "sets": 2,
+          "reps_min": 8,
+          "reps_max": 10,
+          "rest_sec": 120,
+          "rpe_target": 8
+        },
+        {
+          "exercise_slug": "lying-leg-curl",
+          "sets": 3,
+          "reps_min": 10,
+          "reps_max": 12,
+          "rest_sec": 60,
+          "rpe_target": 8
+        },
+        {
+          "exercise_slug": "hanging-leg-raise",
+          "sets": 2,
+          "reps_min": 10,
+          "reps_max": 12,
+          "rest_sec": 60,
+          "rpe_target": 8
+        }
+      ]
+    }
+  ]
+}

@@ -32,7 +32,7 @@ Extends Supabase Auth `auth.users`. Stores application-level profile data.
 | `level` | enum | NOT NULL | `beginner \| intermediate \| advanced` |
 | `days_per_week` | int | 1–7, NOT NULL | Training days per week |
 | `session_length_min` | int | 15–120, NOT NULL | Target session duration |
-| `equipment` | text[] | NOT NULL, CHECK vocabulary (014) | Subset of `barbell \| dumbbell \| cable \| machine \| bands \| pull_up_bar \| dip_station \| bench \| bodyweight`; always contains `bodyweight`; "Gym" in the quiz selects all (FR-001, 2026-11-20) |
+| `equipment` | text[] | NOT NULL, CHECK vocabulary (014, 015) | Subset of `barbell \| dumbbell \| cable \| machine \| bands \| pull_up_bar \| dip_station \| bench \| smith_machine \| trap_bar \| suspension \| bodyweight`; always contains `bodyweight`; "Gym" in the quiz selects all (FR-001, 2026-11-20) |
 | `limitations` | text[] | nullable | Tags from a fixed vocabulary: `knee \| lower_back \| shoulder \| wrist \| elbow \| hip \| ankle \| neck` |
 | `limitations_note` | text | nullable | Optional free text; shown to the coach, not used for filtering |
 | `strength_estimates` | jsonb | nullable | Optional strength check: `{ "squat": {"weight_kg", "reps"}, "bench_press": {…}, "deadlift": {…} }`; null when skipped (conservative defaults apply) |
@@ -64,7 +64,7 @@ Master library of all filmed exercises. Read-only for users; managed by content 
 | `slug` | text | UNIQUE, NOT NULL | URL-safe identifier, e.g. `barbell-back-squat` |
 | `name_en` | text | NOT NULL | English name |
 | `name_fr` | text | NOT NULL | French name |
-| `equipment` | text[] | NOT NULL, CHECK vocabulary (014) | **Every** item the exercise needs, from `barbell \| dumbbell \| cable \| machine \| bands \| pull_up_bar \| dip_station \| bench \| bodyweight` (e.g. pull-up = `bodyweight` + `pull_up_bar`; leg press = `machine`); kettlebells count as `dumbbell` (FR-013) |
+| `equipment` | text[] | NOT NULL, CHECK vocabulary (014, 015) | **Every** item the exercise needs, from `barbell \| dumbbell \| cable \| machine \| bands \| pull_up_bar \| dip_station \| bench \| smith_machine \| trap_bar \| suspension \| bodyweight` (e.g. pull-up = `bodyweight` + `pull_up_bar`; leg press = `machine`); kettlebells count as `dumbbell` (FR-013) |
 | `muscle_primary` | text[] | NOT NULL | Primary muscles targeted |
 | `muscle_secondary` | text[] | nullable | Secondary muscles |
 | `cues_en` | text[] | NOT NULL | 3–5 technique cues (English) |
@@ -382,14 +382,14 @@ Semantic cache of generic coach answers. Not user data; no `user_id`.
 
 ### 16. PlanTemplate (`plan_templates`) — content table
 
-Starter templates for free-tier plans and the Pro fallback. Seeded from `content/templates/` by `seed-templates.js`.
+Starter templates for free-tier plans and the Pro fallback, and the programs of the Pro plan library (FR-047): a template whose `body.catalog` is set (`order`, `goal`, `image` exercise slug, `summary_en`, `summary_fr`) is listed in the library. Seeded from `content/templates/` by `seed-templates.js`.
 
 | Field | Type | Constraints | Notes |
 |---|---|---|---|
 | `slug` | text | PK | e.g. `home-dumbbell-3x` |
 | `level` | enum | NOT NULL | Target level |
-| `days_per_week` | int | NOT NULL | 3 or 4 at launch |
-| `equipment_required` | text[] | NOT NULL, CHECK vocabulary (014) | Every item the template's exercises use besides `bodyweight` (checked at seed time) |
+| `days_per_week` | int | NOT NULL | 3–6 (library programs keep their own days) |
+| `equipment_required` | text[] | NOT NULL, CHECK vocabulary (014, 015) | Every item the template's exercises use besides `bodyweight` (checked at seed time) |
 | `body` | jsonb | NOT NULL | Same schema as the `generate-plan` plan body (weeks, sessions, exercises with `exercise_slug`) |
 | `updated_at` | timestamptz | NOT NULL | |
 
@@ -482,3 +482,19 @@ coach_response_cache ── standalone system table (no user FK)
 - Account deletion: Edge Function deletes the `auth.users` row (cascades to all user data via FK ON DELETE CASCADE).
 - Form check: no video bytes stored remotely; `user_shared = false` is auditable.
 - `coach_messages.content` is PII; included in export; purged on deletion.
+
+
+---
+
+## Social, recovery, focus and support (2026-11-21; FR-049–FR-054; migration 016)
+
+| Table | Key fields | Rules |
+|---|---|---|
+| `users` (new columns) | `username` text UNIQUE (3–20, `[a-z0-9_.]`), `invite_code` text UNIQUE, `share_workouts` bool DEFAULT true, `focus_muscles` text[] (≤ 2, FR-052 vocabulary) | username set on first visit to Friends |
+| `friendships` | `id`, `requester_id`, `addressee_id`, `status` (`pending` \| `accepted` \| `blocked`), `created_at` | one row per pair; RLS: either party reads; addressee accepts; either deletes |
+| `workout_logs` (new column) | `hidden_from_feed` bool DEFAULT false | |
+| `workout_reactions` | PK (`workout_log_id`, `user_id`), `emoji` CHECK in (💪, 🔥, 👏) | only friends of the owner may react (RLS via `are_friends()`) |
+| `support_threads` | `id`, `user_id`, `status` (`open` \| `waiting_agent` \| `closed`), `created_at`, `updated_at` | one open thread per user |
+| `support_messages` | `id`, `thread_id`, `sender` (`user` \| `ai` \| `agent`), `body`, `created_at` | user inserts only `user` rows; `ai` rows come from `support-message`; `agent` rows from staff (service role) |
+
+RPCs (SECURITY DEFINER, friends only): `friend_feed(before timestamptz)` returns friends' visible workouts with summary fields and reaction counts; `friend_leaderboard()` returns this week's score, last week's score and last trained time for the user and accepted friends; `weekly_scores(user_ids uuid[], weeks int)` for the comparison chart. Recovery, streak, heatmap and badges are computed on the device from local workout data.
